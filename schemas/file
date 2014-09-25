@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://rabix.org/schemas/file",
+  "description": "File description for common workflow language",
+
+  "type": "object",
+  "required": ["path"],
+  "properties": {
+    "path": { "type": "string" },
+    "size": { "type": "number" },
+    "checksum": { "type": "string" },
+    "secondaryFiles": {
+      "type": "array",
+      "items": { "$ref": "#" }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "file_type": {"type": "string"}
+      },
+      "additionalProperties": true,
+      "required": ["file_type"]
+    }
+  }
+}
+
