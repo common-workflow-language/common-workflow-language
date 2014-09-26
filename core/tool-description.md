@@ -25,8 +25,17 @@ Describes files that are generated in the process of execution.
 
 ### Document Author
 
-[FOAF](http://www.foaf-project.org)
-person entry for author of description document.
+Name and contact detail of an author of description document.
+
+Example:
+
+```jsonld
+{
+  "@context": "http://xmlns.com/foaf/context",
+  "name": "John Smith",
+  "email": "j.smith@example.com"
+}
+```
 
 ### Software Description
 
@@ -34,5 +43,23 @@ Software description field contains
 [DOAP](https://github.com/edumbill/doap/wiki)
 record that describes the application.
 
+Example:
+
+```jsonld
+{
+  "@context": {"@vocab": "http://usefulinc.com/ns/doap#"},
+  "name": "My aWesome Aligner",
+  "homepage": "http://example.com/mwa",
+  "version": "0.1",
+  "maintainer": {
+    "@context": "http://xmlns.com/foaf/context",
+    "name": "John Smith",
+    "email": "j.smith@example.com"
+  }
+}
+```
+
+
 ### EDAM Classification
 
+TBD.
