@@ -6,8 +6,10 @@ to make it easier for bioinformaticians
 to share tools and pipelines,
 and reproduce computational analysis.
 
-## Core Components
+Core protocol relies on simple things like JSON files and URIs,
+but is also designed to be extensible.
 
+## Core Components
 
 [Tool Description](core/tool-description.md)
 
@@ -18,15 +20,11 @@ and reproduce computational analysis.
 
 ## Extensions
 
-Adapter
+There are several
+[extensions](extensions/extensions.md)
+that are already drafted that make this protocol more useful,
+and working with it more easy.
 
-Docker
-
-File metadata
-
-Script Language
-
-YAML
 
 ## How to contribute
 
