@@ -9,21 +9,27 @@ document that enables its inclusion in workflows, scheduling, execution and UI g
 
 ## Basic file format
 
-Tool description contains these parts:
+Tool description can conceptually be splitted into these parts:
 
 
-### Context
+### Context and ID
 
-A JSON-LD context for this document.
-Its value should be:
+In order for tool description to be a valid JSON-LD document,
+context and ID should be specified.
 
-    https://raw.githubusercontent.com/rabix/common-workflow-language/master/contextx/draft01/tool
+Example:
 
+```jsonld
+{
+  "@context": "http://example.com/contexts/draft01/tool",
+  "@id": "http://example.com/tools/mwa"
+}
+```
 
 ### Inputs Description
 
 Inputs are described using [JSON Schema](http://json-schema.org).
-JSON Schema type for `inputs` field MUST be `object`.
+JSON Schema type for `inputs` field must be `object`.
 Basic schema is extended with `adapter` key that describes how
 the input is translated to command line argument.
 
