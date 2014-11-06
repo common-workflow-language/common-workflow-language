@@ -40,7 +40,7 @@ For simplicity, lists are given special treatment:
 
 ## Parallel for-each
 
-If a process receives a List<T> on a port which accepts T, it is automatically executed for each item in the list.
+If a process receives a ```List<T>``` on a port which accepts ```T```, it is automatically executed for each item in the list.
 Likewise for nested lists of any depth (the structure is preserved on the output).
 
 Port nesting level is determined by checking the innermost lists first (against the JSON-Schema definition of the port).
