@@ -1,35 +1,38 @@
-Common Workflow
-===============
+Common Workflow Language
+========================
 
-Main goals of the Common Workflow project are
-to make it easier for bioinformaticians
-to share tools and pipelines,
-and reproduce computational analysis.
+This repo holds an approximate description of the specification being developed on the
+[Common Workflow Language mailing list](https://groups.google.com/forum/#!forum/common-workflow-language).
 
-Core protocol relies on simple things like JSON files and URIs,
-but is also designed to be extensible.
-
-## Core Components
-
-[Tool Description](core/tool-description.md)
-
-[Workflow Description](core/workflow-description.md)
-
-[Runtime Environment](core/runtime-environment.md)
+CWL is an informal task force consisting of people from various organizations that have an interest in portability
+ of bioinformatics workflows.
+The goal is to specify a way to describe bioinformatics tools and workflows that is powerful,
+ easy to use and allows for portability of tools/workflows and reproducibility of runs.
 
 
-## Extensions
+## Basic design
 
-There are several
-[extensions](extensions/extensions.md)
-that are already drafted that make this protocol more useful,
-and working with it more easy.
+Current draft is based on a typical data-flow workflow model.
+No cycles are allowed in the graph as loop constructs are replaced with automatic "parallel-for-each"
+runs of individual workflow components.
+
+Data passed between input/output ports of these components can be any JSON-compatible structure.
+Files are encoded as a structure with URL/path pointer to the data,
+ and additional metadata which includes accompanying index files.
+
+For packaging tools and dependencies, we currently only support [Docker](http://docker.com) images.
 
 
-## How to contribute
+## More details
 
-Design of this specification is open for all interested parties.
-If you want to participate, join our
-[mailing list](https://groups.google.com/forum/#!forum/common-workflow-language).
-When you feel you are ready to make a proposal, submit a pull request to this repo.
-Bare in mind though, that any proposal has better chance to be accepted if accompanied with working code.
+[Tools](core/tool-description.md)
+
+[Workflows](core/workflow-description.md)
+
+[Runtime environment for tools](core/runtime-environment.md)
+
+
+## Contributing
+
+If you are interested in contributing ideas or code,
+ join the [mailing list](https://groups.google.com/forum/#!forum/common-workflow-language).

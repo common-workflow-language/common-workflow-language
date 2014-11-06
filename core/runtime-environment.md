@@ -1,12 +1,11 @@
 # Runtime Environment
 
-Every execution of every tool will have set its own separate working directory. Executor will  contain a file named `job.json`.
-
-Tool should create its output files inside its working directory. Exception to this rule is when tool is creating accompanying file to its input file, such as index file. In that case a tool can choose to create its output in the same folder as input file.
+Every execution of every tool will have set its own separate working directory pre-populated with the "JobOrder" in a "job.json" file.
+Tools should create its output files inside its working directory.
 
 ### Job order file format
 
-Job order is a JSON file that contains an application ID, tool inputs, resources allocated for the job, and list of supported platform features.
+Job order is a JSON structure that contains an application ID, tool inputs, resources allocated for the job, and list of supported platform features.
 
 Example:
 

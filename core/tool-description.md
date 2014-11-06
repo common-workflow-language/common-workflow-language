@@ -9,7 +9,7 @@ document that enables its inclusion in workflows, scheduling, execution and UI g
 
 ## Basic file format
 
-Tool description can conceptually be splitted into these parts:
+Tool description can conceptually be split into these parts:
 
 
 ### Context and ID
@@ -31,7 +31,8 @@ Example:
 Inputs are described using [JSON Schema](http://json-schema.org).
 JSON Schema type for `inputs` field must be `object`.
 Basic schema is extended with `adapter` key that describes how
-the input is translated to command line argument.
+the input is translated to command line argument;
+basic types are extended with a literal "file".
 
 
 Example:
@@ -41,7 +42,7 @@ Example:
   "required": ["input1", "param1"],
   "properties": {
     "input1": {
-      "type": {"$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/file"},
+      "type": "file",
       "adapter": {"order": 2}
     },
     "param1": {
@@ -69,10 +70,13 @@ Example:
 
 ### Output description
 
-Describes files that are generated in the process of execution.
+Describes files that are generated in the process of execution. Also uses JSON-Schema.
+
+Adapter section of individual outputs consists of a glob expression (to capture generated files),
+ as well as "meta" and "indices" fields used to describe metadata of generated files.
 
 
-### Command line specification
+### Command line adapter
 
 Procedural or declarative description of how to run a tool via command line.
 
@@ -126,13 +130,9 @@ Example:
 TBD.
 
 
-## JSON Evaluation
+## Expressions
 
-There are several things to note while processing tool description JSON.
-Tool description relies on
-[JSON references](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
-and any such reference must be resolved prior to further processing.
-The description may also contain
+The description may contain
 [ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
 expressions as values.
 Those expressions should be evaluated in accordance with rules outlined in
