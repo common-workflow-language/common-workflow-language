@@ -5,7 +5,7 @@ Tool is an atomic executable element of a workflow.
 It represents a software application and accompanying description.
 Tool description is a
 [JSON-LD](http://www.w3.org/TR/2014/REC-json-ld-20140116/)
-document that enables its inclusion in workflows, scheduling, execution and UI generation.
+document that enables its inclusion in workflows, execution and UI generation.
 
 ## Basic file format
 
@@ -78,12 +78,16 @@ Adapter section of individual outputs consists of a glob expression (to capture 
 
 ### Command line adapter
 
-Procedural or declarative description of how to run a tool via command line.
+An array of either string literals or expressions that generates the executable path and process arguments.
+Annotated inputs will map onto process arguments which are appended to this list.
+Value for the ```stdout``` field is a string or expression that specifies a file name where stdout is piped.
 
 
-### Runtime Requirements
+### Requirements
 
-Computation resources, platform features...
+* Container specification (currently just location of docker image).
+* Computation resources (CPU, RAM, Network).
+* Platform features (enumeration of non-standard platform features).
 
 
 ### Document Author
@@ -102,7 +106,7 @@ Example:
 
 ### Software Description
 
-Software description field contains
+Software description field contains a
 [DOAP](https://github.com/edumbill/doap/wiki)
 record that describes the application.
 Mandatory fields are `name`, `version` and `licence`.
@@ -112,8 +116,8 @@ Example:
 ```jsonld
 {
   "@context": {"@vocab": "http://usefulinc.com/ns/doap#"},
-  "name": "My aWesome Aligner",
-  "homepage": "http://example.com/mwa",
+  "name": "My Aligner",
+  "homepage": "http://example.com/ma",
   "version": "0.1",
   "licence": "http://spdx.org/licenses/GPL-2.0+",
   "maintainer": {
@@ -132,9 +136,10 @@ TBD.
 
 ## Expressions
 
-The description may contain
+Some fields may contain
 [ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
 expressions as values.
-Those expressions should be evaluated in accordance with rules outlined in
-[runtime environment](runtime-environment.md)
-specification.
+They are used for basic string manipulation when generating the command line,
+ creating output structures (metadata and indices) and dynamic resource requirements.
+
+The order of evaluation is undefined.
