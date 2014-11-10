@@ -104,7 +104,8 @@
                         { "$ref": "#definitions/expression" }
                     ]
                 },
-                "stdout": { "$ref": "#definitions/strOrExpr" }
+                "stdout": { "$ref": "metaschema.json#definitions/file" },
+                "stdin": { "$ref": "metaschema.json#definitions/file" }
             }
         }
     }

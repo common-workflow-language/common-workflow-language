@@ -2,7 +2,6 @@ import os
 import pprint
 import json
 import execjs
-import pprint
 import copy
 
 from jsonschema.validators import Draft4Validator
@@ -11,12 +10,21 @@ from ref_resolver import from_url, resolve_pointer
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
 with open(os.path.join(module_dir, 'schemas/tool.json')) as f:
-    tool_schema = json.load(f)
+    tool_schema_doc = json.load(f)
 with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
     metaschema = json.load(f)
-tool_schema["properties"]["inputs"]["$ref"] = "file:%s/schemas/metaschema.json" % module_dir
-tool_schema["properties"]["outputs"]["$ref"] = "file:%s/schemas/metaschema.json" % module_dir
-tool_schema = Draft4Validator(tool_schema)
+
+def fix_metaschema(m):
+    if '$ref' in m and m['$ref'].startswith("metaschema.json"):
+        m['$ref'] = "file:%s/schemas/%s" % (module_dir, m['$ref'])
+    else:
+        for k in m:
+            if isinstance(m[k], dict):
+                fix_metaschema(m[k])
+
+fix_metaschema(tool_schema_doc)
+
+tool_schema = Draft4Validator(tool_schema_doc)
 
 class Job(object):
     def run(self):
@@ -55,6 +63,7 @@ def fix_file_type(t):
     if 'type' in t and t['type'] == "file":
         for a in metaschema["definitions"]["file"]:
             t[a] = metaschema["definitions"]["file"][a]
+        t["_type"] = "file"
     for k in t:
         if isinstance(t[k], dict):
             fix_file_type(t[k])
@@ -73,24 +82,71 @@ def jseval(expression=None, job=None):
     exp = exp_tpl % (json.dumps(job['job']), expression)
     return execjs.eval(exp)
 
-def to_cli(value):
-    if isinstance(value, dict) and 'path' in value:
-        return value["path"]
+def adapt_inputs(schema, inp):
+    adapters = []
+
+    if not 'adapter' in schema:
+        if isinstance(inp, dict):
+            for i in inp:
+                adapters.extend(adapt_inputs(schema["properties"][i], inp[i]))
+            return adapters
+        elif isinstance(inp, list):
+            for i in inp:
+                adapters.extend(adapt_inputs(schema["items"], i))
+            return adapters
+
+    if 'adapter' in schema:
+        a = copy.copy(schema['adapter'])
     else:
-        return str(value)
+        a = {}
+
+    if not 'value' in a:
+        a['value'] = inp
+    if not "order" in a:
+        a["order"] = 1000000
+    a["schema"] = schema
+
+    adapters.append(a)
+    return adapters
+
+def to_str(schema, value):
+    if "$ref" in schema:
+        schema = from_url(schema["$ref"])
+
+    if 'oneOf' in schema:
+        for a in schema['oneOf']:
+            v = to_str(a, value)
+            if v is not None:
+                return v
+        return None
+    elif 'type' in schema:
+        if schema["type"] == "array" and isinstance(value, list):
+            return [to_str(schema["items"], v) for v in value]
+        elif schema["type"] == "object" and isinstance(value, dict):
+            if "path" in value:
+                return value["path"]
+            else:
+                raise Exception("Not expecting a dict")
+        elif schema["type"] in ("string", "number", "integer"):
+            return str(value)
+        elif schema["boolean"]:
+            # need special handling for flags
+            return str(value)
+
+    return None
 
 def adapt(adapter, job):
     if "value" in adapter:
-        if "$expr" in adapter["value"]:
+        if isinstance(adapter["value"], dict) and "$expr" in adapter["value"]:
             value = jseval(adapter["value"]["$expr"]["value"], job)
         else:
             value = adapter["value"]
     elif "valueFrom" in adapter:
         value = resolve_pointer(job, adapter["valueFrom"])
 
-    sep = adapter["separator"] if "separator" in adapter else ''
+    value = to_str(adapter["schema"], value)
 
-    value = [to_cli(v) for v in each(value)]
+    sep = adapter["separator"] if "separator" in adapter else ''
 
     if 'itemSeparator' in adapter:
         if adapter["prefix"]:
@@ -110,47 +166,45 @@ def adapt(adapter, job):
 
     return l
 
+
 class Tool(object):
     def __init__(self, toolpath_object):
         self.tool = toolpath_object["tool"]
         fix_file_type(self.tool)
         tool_schema.validate(self.tool)
 
+
     def job(self, joborder):
         inputs = joborder["job"]['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
         adapter = self.tool["adapter"]
-        adapters = [{"order": -1000000, "value": adapter['baseCmd']}]
+        adapters = [{"order": -1000000,
+                     "schema": tool_schema_doc["properties"]["adapter"]["properties"]["baseCmd"],
+                     "value": adapter['baseCmd']}]
 
         for a in adapter["args"]:
+            a = copy.copy(a)
+            a["schema"] = tool_schema_doc["definitions"]["strOrExpr"]
             adapters.append(a)
 
-        for k, v in self.tool['inputs']['properties'].items():
-            if 'adapter' in v:
-                a = copy.copy(v['adapter'])
-            else:
-                a = {}
-
-            if not 'value' in a:
-                a['valueFrom'] = "#/job/inputs/"+ k
-            if not "order" in a:
-                a["order"] = 1000000
-            adapters.append(a)
+        adapters.extend(adapt_inputs(self.tool['inputs'], inputs))
 
         adapters.sort(key=lambda a: a["order"])
-        pprint.pprint(adapters)
 
         j = Job()
         j.command_line = flatten(map(lambda adapter: adapt(adapter, joborder), adapters))
 
         if 'stdin' in adapter:
-            j.stdin = flatten(adapt({"value": adapter['stdin']}, joborder))[0]
+            j.stdin = flatten(adapt({"value": adapter['stdin'],
+                                     "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdin"]
+                                 }, joborder))[0]
         else:
             j.stdin = None
 
         if 'stdout' in adapter:
-            j.stdout = flatten(adapt({"value": adapter['stdout']}, joborder))[0]
+            j.stdout = flatten(adapt({"value": adapter['stdout'],
+                                      "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdout"]}, joborder))[0]
         else:
             j.stdout = None
 

@@ -23,6 +23,23 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "secondaryFile": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+                "path": { "type": "string" },
+                "size": { "type": "number" },
+                "checksum": { "type": "string" },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "file_type": {"type": "string"}
+                    },
+                    "additionalProperties": true,
+                    "required": ["file_type"]
+                }
+            }
+        },
         "file": {
             "type": "object",
             "required": ["path"],
@@ -32,7 +49,7 @@
                 "checksum": { "type": "string" },
                 "secondaryFiles": {
                     "type": "array",
-                    "items": { "$ref": "#/definitions/file" }
+                    "items": { "$ref": "#/definitions/secondaryFile" }
                 },
                 "meta": {
                     "type": "object",
