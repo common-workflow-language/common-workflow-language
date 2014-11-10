@@ -1,8 +1,6 @@
 Install
 
-libv8-dev
-libboost-python-dev
-python setup.py
+python setup.py tests
 
 Run
 
