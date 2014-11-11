@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument("tool", type=str)
@@ -27,5 +28,7 @@ for i, t in enumerate(tests):
 
 if failures == 0:
     print "All tests passed"
+    sys.exit(0)
 else:
     print "%i failures" % failures
+    sys.exit(1)
