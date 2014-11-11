@@ -34,10 +34,14 @@ Specify the path for each tool to test on the command line.
 
 ```
 $ ./run_test.sh CWLTOOL=../reference RABIX=$HOME/work/rabix/rabix
+
 --- Running cwltool tests ---
 Test [1/1]
 All tests passed
+
 --- Running rabix/cliche tests ---
 Test [1/1]
 All tests passed
+
+All tool tests succeeded
 ```

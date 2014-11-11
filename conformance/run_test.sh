@@ -51,9 +51,15 @@ fi
 # Add your tool test here.
 
 
-#
+
+# Final reporting
 
 echo
-echo "$failures tool tests failed"
+
+if [[ $failures != 0 ]]; then
+    echo "$failures tool tests failed"
+else
+    echo "All tool tests succeeded"
+fi
 
 exit $failures
