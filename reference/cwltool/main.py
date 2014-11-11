@@ -25,7 +25,12 @@ def main():
     try:
         job = t.job(from_url(args.job_order))
         if args.conformance_test:
-            print json.dumps(job.command_line)
+            a = {"args": job.command_line}
+            if job.stdin:
+                a["stdin"] = job.stdin
+            if job.stdout:
+                a["stdout"] = job.stdout
+            print json.dumps(a)
         else:
             print '%s%s%s' % (' '.join(job.command_line),
                                 ' < %s' % (job.stdin) if job.stdin else '',
