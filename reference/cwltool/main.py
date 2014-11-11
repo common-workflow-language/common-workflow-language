@@ -1,12 +1,16 @@
+#!/usr/bin/env python
+
 import tool
 import argparse
 from ref_resolver import from_url
 import jsonschema
+import json
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("tool", type=str)
     parser.add_argument("job_order", type=str)
+    parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("-x", action="store_true", help="Execute")
 
     args = parser.parse_args()
@@ -20,10 +24,16 @@ def main():
 
     try:
         job = t.job(from_url(args.job_order))
-        print '%s%s%s' % (' '.join(job.command_line),
-                            ' < %s' % (job.stdin) if job.stdin else '',
-                            ' > %s' % (job.stdout) if job.stdout else '')
+        if args.conformance_test:
+            print json.dumps(job.command_line)
+        else:
+            print '%s%s%s' % (' '.join(job.command_line),
+                                ' < %s' % (job.stdin) if job.stdin else '',
+                                ' > %s' % (job.stdout) if job.stdout else '')
     except jsonschema.exceptions.ValidationError as e:
         print "Job order failed validation"
         print e
         return
+
+if __name__ == "__main__":
+    main()
