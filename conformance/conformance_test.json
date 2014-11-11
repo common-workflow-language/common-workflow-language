@@ -1,0 +1,10 @@
+[
+    {
+        "tool": "../examples/bwa-mem-tool.json",
+        "job": "../examples/bwa-mem-job.json",
+        "command": ["bwa", "mem", "-t4", "-m", "3", "-I1,2,3,4",
+                    "./rabix/tests/test-files/chr20.fa",
+                    "./rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
+                    "./rabix/tests/test-files/example_human_Illumina.pe_2.fastq"]
+    }
+]

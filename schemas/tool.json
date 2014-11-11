@@ -1,0 +1,112 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Common tool description schema",
+    "type": "object",
+    "definitions": {
+        "expression": {
+            "type": "object",
+            "required": ["$expr"],
+            "properties": {
+                "$expr": {
+                    "type": "object",
+                    "required": ["lang", "value"],
+                    "properties": {
+                        "lang": {"type": "string"},
+                        "value": {"type": "string"}
+                    }
+                }
+            }
+        },
+        "strOrExpr": {
+            "oneOf": [
+                { "type": "string" },
+                { "$ref": "#definitions/expression" }
+            ]
+        },
+        "numOrExpr": {
+            "oneOf": [
+                { "type": "number" },
+                { "$ref": "#definitions/expression" }
+            ]
+        },
+        "intOrExpr": {
+            "oneOf": [
+                { "type": "integer" },
+                { "$ref": "#definitions/expression" }
+            ]
+        },
+        "boolOrExpr": {
+            "anyOf": [
+                { "type": "boolean" },
+                { "$ref": "#definitions/expression" }
+            ]
+        }
+    },
+    "properties": {
+        "documentAuthor": {
+                    "oneOf": [
+                        { "$ref": "http://json-schema.org/draft-04/schema#definitions/stringArray" },
+                        { "type": "string" }
+                    ]
+        },
+        "softwareDescription": { "type": "object" },
+        "softwareRelease": { "type": "object" },
+        "inputs": { "$ref": "metaschema.json" },
+        "outputs": { "$ref": "metaschema.json" },
+        "requirements": {
+            "type": "object",
+            "properties": {
+                "platformFeatures": { "$ref": "http://json-schema.org/draft-04/schema#definitions/stringArray" },
+                "environment": {
+                    "type": "object",
+                    "properties": {
+                        "container": {
+                            "type": "object",
+                            "properties": {
+                                "imageId": { "type": "string" },
+                                "type": { "type": "string" },
+                                "uri": { "type": "string" }
+                            }
+                        }
+                    }
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "cpu": { "$ref": "#definitions/intOrExpr" },
+                        "diskSpace": { "$ref": "#definitions/intOrExpr" },
+                        "mem": { "$ref": "#definitions/intOrExpr" },
+                        "network": { "$ref": "#definitions/boolOrExpr" }
+                    }
+                }
+            }
+        },
+        "adapter": {
+            "type": "object",
+            "properties": {
+                "args": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "prefix": { "type": "string" },
+                            "order": { "type": "integer" },
+                            "separator": { "type": "string" },
+                            "itemSeparator": { "type": "string" },
+                            "value": { "$ref": "#definitions/strOrExpr" }
+                        }
+                    }
+                },
+                "baseCmd": {
+                    "oneOf": [
+                        { "$ref": "http://json-schema.org/draft-04/schema#definitions/stringArray" },
+                        { "type": "string" },
+                        { "$ref": "#definitions/expression" }
+                    ]
+                },
+                "stdout": { "$ref": "metaschema.json#definitions/file" },
+                "stdin": { "$ref": "metaschema.json#definitions/file" }
+            }
+        }
+    }
+}
