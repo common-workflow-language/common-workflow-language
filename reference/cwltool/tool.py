@@ -79,7 +79,7 @@ def jseval(expression=None, job=None):
         $job = %s;
         return %s;}()
         '''
-    exp = exp_tpl % (json.dumps(job['job']), expression)
+    exp = exp_tpl % (json.dumps(job), expression)
     return execjs.eval(exp)
 
 def adapt_inputs(schema, inp):
@@ -169,13 +169,13 @@ def adapt(adapter, job):
 
 class Tool(object):
     def __init__(self, toolpath_object):
-        self.tool = toolpath_object["tool"]
+        self.tool = toolpath_object
         fix_file_type(self.tool)
         tool_schema.validate(self.tool)
 
 
     def job(self, joborder):
-        inputs = joborder["job"]['inputs']
+        inputs = joborder['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
         adapter = self.tool["adapter"]

@@ -18,5 +18,6 @@ for t in tests:
     if t["command"] == out:
         print "Passed"
     else:
-        print "Failed %s %s" % (t["tool"], t["job"])
-        print "expected %s but got %s" % (json.dumps(t["command"]), json.dumps(out))
+        print "Failed tool %s   job %s" % (t["tool"], t["job"])
+        print "  expected %s" % (json.dumps(t["command"]))
+        print "   but got %s" % (json.dumps(out))

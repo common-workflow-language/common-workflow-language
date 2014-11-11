@@ -4,4 +4,4 @@ python setup.py tests
 
 Run
 
-python -mcwltool --tool [uri] --job-order [uri]
+python cwltool [tool] [job]
