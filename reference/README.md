@@ -1,7 +1,22 @@
-Install
+# Common workflow language tool description reference implementation
 
-python setup.py tests
+This is intended to be a lightweight reference implementation of the common
+workflow language tool description.
 
-Run
+## Install
 
-python cwltool [tool] [job]
+```
+$ easy_install .
+```
+
+## Run on the command line
+
+```
+$ cwltool [tool] [job]
+```
+
+## Use as a library
+
+```
+import cwltool
+```
