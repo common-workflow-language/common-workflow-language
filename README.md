@@ -12,16 +12,26 @@ reproducibility of runs.
 
 ## Repository contents
 
-[Draft specifications](core/README.md)
+[Draft specifications](core/)
 
-[Schemas](schemas/README.md)
+[Schemas](schemas/)
 
-[Conformance test suite](conformance/README.md)
+[Conformance test suite](conformance/)
 
-[Reference implementation](reference/README.md)
+[Reference implementation](reference/)
 
-[Examples](examples/README.md)
+[Examples](examples/)
+
+## Implementations
+
+Current implementations of the common workflow language tool description:
+
+* [Reference implementation (Python)](reference/)
+* [Rabix (Python)](https://github.com/rabix/rabix)
+* [Cliche (Javascript)](https://github.com/rabix/cliche)
 
 ## Contributing
 
-If you are interested in contributing ideas or code, please join the [mailing list](https://groups.google.com/forum/#!forum/common-workflow-language) or fork the repository and send a pull request!
+If you are interested in contributing ideas or code, please join the
+[mailing list](https://groups.google.com/forum/#!forum/common-workflow-language) or fork
+the repository and send a pull request!
