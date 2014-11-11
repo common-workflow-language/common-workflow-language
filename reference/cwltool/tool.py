@@ -3,6 +3,8 @@ import pprint
 import json
 import execjs
 import copy
+import sys
+import jsonschema.exceptions
 
 from jsonschema.validators import Draft4Validator
 from ref_resolver import from_url, resolve_pointer
@@ -15,12 +17,15 @@ with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
     metaschema = json.load(f)
 
 def fix_metaschema(m):
-    if '$ref' in m and m['$ref'].startswith("metaschema.json"):
-        m['$ref'] = "file:%s/schemas/%s" % (module_dir, m['$ref'])
-    else:
-        for k in m:
-            if isinstance(m[k], dict):
+    if isinstance(m, dict):
+        if '$ref' in m and m['$ref'].startswith("metaschema.json"):
+            m['$ref'] = "file:%s/schemas/%s" % (module_dir, m['$ref'])
+        else:
+            for k in m:
                 fix_metaschema(m[k])
+    if isinstance(m, list):
+        for k in m:
+            fix_metaschema(k)
 
 fix_metaschema(tool_schema_doc)
 
@@ -68,7 +73,7 @@ def fix_file_type(t):
         if isinstance(t[k], dict):
             fix_file_type(t[k])
 
-def jseval(expression=None, job=None):
+def jseval(job=None, expression=None):
     if expression.startswith('{'):
         exp_tpl = '''function () {
         $job = %s;
@@ -82,31 +87,49 @@ def jseval(expression=None, job=None):
     exp = exp_tpl % (json.dumps(job), expression)
     return execjs.eval(exp)
 
-def adapt_inputs(schema, inp):
+def adapt_inputs(schema, inp, key):
     adapters = []
 
-    if not 'adapter' in schema:
-        if isinstance(inp, dict):
+    if 'oneOf' in schema:
+        for one in schema["oneOf"]:
+            try:
+                Draft4Validator(one).validate(inp)
+                schema = one
+                break
+            except jsonschema.exceptions.ValidationError:
+                pass
+
+    if isinstance(inp, dict):
+        if "properties" in schema:
             for i in inp:
-                adapters.extend(adapt_inputs(schema["properties"][i], inp[i]))
-            return adapters
-        elif isinstance(inp, list):
-            for i in inp:
-                adapters.extend(adapt_inputs(schema["items"], i))
-            return adapters
+                a = adapt_inputs(schema["properties"][i], inp[i], i)
+                adapters.extend(a)
+    elif isinstance(inp, list):
+        for n, i in enumerate(inp):
+            a = adapt_inputs(schema["items"], i, format(n, '06'))
+            for x in a:
+                x["order"].insert(0, n)
+            adapters.extend(a)
 
     if 'adapter' in schema:
         a = copy.copy(schema['adapter'])
-    else:
-        a = {}
 
-    if not 'value' in a:
-        a['value'] = inp
-    if not "order" in a:
-        a["order"] = 1000000
-    a["schema"] = schema
+        if "order" in a:
+            a["order"] = [a["order"], key]
+        else:
+            a["order"] = [1000000, key]
 
-    adapters.append(a)
+        a["schema"] = schema
+
+        for x in adapters:
+            x["order"] = a["order"] + x["order"]
+
+        if not 'value' in a and len(adapters) == 0:
+            a['value'] = inp
+
+        if len(adapters) == 0 or "value" in a:
+            adapters.insert(0, a)
+
     return adapters
 
 def to_str(schema, value):
@@ -126,10 +149,10 @@ def to_str(schema, value):
             if "path" in value:
                 return value["path"]
             else:
-                raise Exception("Not expecting a dict")
+                raise Exception("Not expecting a dict %s" % (value))
         elif schema["type"] in ("string", "number", "integer"):
             return str(value)
-        elif schema["boolean"]:
+        elif schema["type"] == "boolean":
             # need special handling for flags
             return str(value)
 
@@ -137,12 +160,12 @@ def to_str(schema, value):
 
 def adapt(adapter, job):
     if "value" in adapter:
-        if isinstance(adapter["value"], dict) and "$expr" in adapter["value"]:
-            value = jseval(adapter["value"]["$expr"]["value"], job)
-        else:
-            value = adapter["value"]
-    elif "valueFrom" in adapter:
-        value = resolve_pointer(job, adapter["valueFrom"])
+        value = adapter["value"]
+        if isinstance(value, dict):
+            if "$expr" in value:
+                value = jseval(job, value["$expr"]["value"])
+            elif "$job" in value:
+                value = resolve_pointer(job, value["$job"])
 
     value = to_str(adapter["schema"], value)
 
@@ -179,16 +202,24 @@ class Tool(object):
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
         adapter = self.tool["adapter"]
-        adapters = [{"order": -1000000,
+        adapters = [{"order": [-1000000],
                      "schema": tool_schema_doc["properties"]["adapter"]["properties"]["baseCmd"],
-                     "value": adapter['baseCmd']}]
+                     "value": adapter['baseCmd'],
+                     #"_key": "0"
+                 }]
 
-        for a in adapter["args"]:
-            a = copy.copy(a)
-            a["schema"] = tool_schema_doc["definitions"]["strOrExpr"]
-            adapters.append(a)
+        if "args" in adapter:
+            for i, a in enumerate(adapter["args"]):
+                a = copy.copy(a)
+                if "order" in a:
+                    a["order"] = [a["order"]]
+                else:
+                    a["order"] = [0]
+                a["schema"] = tool_schema_doc["definitions"]["strOrExpr"]
+                #a["_key"] = "!" + format(i, '06')
+                adapters.append(a)
 
-        adapters.extend(adapt_inputs(self.tool['inputs'], inputs))
+        adapters.extend(adapt_inputs(self.tool['inputs'], inputs, ""))
 
         adapters.sort(key=lambda a: a["order"])
 

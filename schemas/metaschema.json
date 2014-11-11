@@ -60,6 +60,13 @@
                     "required": ["file_type"]
                 }
             }
+        },
+        "$job": {
+            "type": "object",
+            "required": ["$job"],
+            "properties": {
+                "$job": { "type": "string" }
+            }
         }
     },
     "type": "object",

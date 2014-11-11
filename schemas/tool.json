@@ -104,8 +104,20 @@
                         { "$ref": "#definitions/expression" }
                     ]
                 },
-                "stdout": { "$ref": "metaschema.json#definitions/file" },
-                "stdin": { "$ref": "metaschema.json#definitions/file" }
+                "stdout": {
+                    "oneOf": [
+                        { "$ref": "metaschema.json#definitions/file" },
+                        { "$ref": "metaschema.json#definitions/$job" },
+                        { "$ref": "#definitions/expression" }
+                    ]
+                },
+                "stdin": {
+                    "oneOf": [
+                        { "$ref": "metaschema.json#definitions/file" },
+                        { "$ref": "metaschema.json#definitions/$job" },
+                        { "$ref": "#definitions/expression" }
+                    ]
+                }
             }
         }
     }
