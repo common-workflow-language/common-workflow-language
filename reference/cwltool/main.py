@@ -25,7 +25,7 @@ def main():
         return 1
 
     try:
-        job = t.job(from_url(args.job_order))
+        job = t.job(from_url(args.job_order), os.path.abspath(os.path.dirname(args.job_order)))
         if args.conformance_test:
             a = {"args": job.command_line}
             if job.stdin:

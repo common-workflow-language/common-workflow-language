@@ -28,6 +28,11 @@ for i, t in enumerate(tests):
     except subprocess.CalledProcessError:
         pass
 
+    pwd = os.path.abspath(os.path.dirname(t["job"]))
+    t["args"] = map(lambda x: x.replace("$PWD", pwd), t["args"])
+    if "stdin" in t:
+        t["stdin"] = t["stdin"].replace("$PWD", pwd)
+
     if t.get("args") == out.get("args") and t.get("stdin") == out.get("stdin") and t.get("stdout") == out.get("stdout"):
         pass
     else:

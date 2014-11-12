@@ -3,9 +3,9 @@
         "tool": "../examples/bwa-mem-tool.json",
         "job": "../examples/bwa-mem-job.json",
         "args": ["bwa", "mem", "-t4", "-I1,2,3,4", "-m", "3",
-                    "./rabix/tests/test-files/chr20.fa",
-                    "./rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
-                    "./rabix/tests/test-files/example_human_Illumina.pe_2.fastq"],
+                    "$PWD/./rabix/tests/test-files/chr20.fa",
+                    "$PWD/./rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
+                    "$PWD/./rabix/tests/test-files/example_human_Illumina.pe_2.fastq"],
         "stdout": "output.sam"
     },
     {
@@ -18,7 +18,7 @@
                  "stage2",
                  "map1", "--max-seq-length", "20", "--min-seq-length", "10", "--seed-length", "16",
                  "map2", "--max-seed-hits", "-1", "--max-seq-length", "20", "--min-seq-length", "10"],
-        "stdin": "reads.fastq",
+        "stdin": "$PWD/reads.fastq",
         "stdout": "output.sam"
     },
     {
@@ -35,6 +35,6 @@
     {
         "tool": "../examples/cat-tool.json",
         "job": "../examples/cat-job.json",
-        "args": ["cat", "cat-tool.json"]
+        "args": ["cat", "$PWD/cat-tool.json"]
     }
 ]

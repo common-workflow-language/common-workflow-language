@@ -183,7 +183,8 @@ def find_files(adapter, job):
         return None
     elif 'type' in schema:
         if schema["type"] == "array" and isinstance(value, list):
-            return [find_files(schema["items"], v) for v in value]
+            return [find_files({"value": v,
+                                "schema": schema["items"]}, job) for v in value]
         elif schema["type"] == "object" and isinstance(value, dict):
             if "path" in value:
                 return value["path"]
@@ -222,14 +223,15 @@ def adapt(adapter, job, path_mapper):
     return l
 
 class PathMapper(object):
-    def __init__(self, basedir):
-        self.basedir = basedir
+    def __init__(self, referenced_files, basedir):
         self._pathmap = {}
+        for src in referenced_files:
+            dest = src
+            if not os.path.isabs(dest):
+                dest = os.path.join(basedir, src)
+            self._pathmap[src] = dest
 
     def mapper(self, src):
-        if not os.path.isabs(src):
-            src = os.path.join(self.basedir, src)
-        self._pathmap[src] = src
         return self._pathmap[src]
 
     def pathmap(self):
@@ -244,7 +246,7 @@ class Tool(object):
         fix_file_type(self.tool)
         tool_schema.validate(self.tool)
 
-    def job(self, joborder, basedir=""):
+    def job(self, joborder, basedir):
         inputs = joborder['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
@@ -270,7 +272,6 @@ class Tool(object):
         adapters.sort(key=lambda a: a["order"])
 
         referenced_files = filter(lambda a: a is not None, flatten(map(lambda a: find_files(a, joborder), adapters)))
-        print >>sys.stderr, referenced_files
 
         j = Job()
         j.tool = self
@@ -305,11 +306,14 @@ class Tool(object):
                 c = b.get("container")
                 if c:
                     if c.get("type") == "docker":
-                        d = DockerPathMapper(basedir)
+                        d = DockerPathMapper(referenced_files, basedir)
                         j.container = c
 
         if d is None:
-            d = PathMapper(basedir)
+            d = PathMapper(referenced_files, basedir)
+
+        if j.stdin:
+            j.stdin = d.mapper(j.stdin)
 
         j.command_line = flatten(map(lambda a: adapt(a, joborder, d.mapper), adapters))
 
