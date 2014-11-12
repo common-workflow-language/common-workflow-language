@@ -94,7 +94,7 @@
             "bwa",
             "mem"
         ],
-        "stdout": {"path": "output.sam"},
+        "stdout": "output.sam",
         "args": [
             {
                 "order": 1,

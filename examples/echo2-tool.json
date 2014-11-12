@@ -1,0 +1,27 @@
+{
+    "documentAuthor": ["peter.amstutz@curoverse.com"],
+    "requirements": {
+        "environment": {
+            "container": {
+                "type": "docker",
+                "imageId": "arvados/jobs"
+            }
+        }
+    },
+    "inputs": {
+        "type": "object",
+        "required": [ "text" ],
+        "properties": {
+            "text": {
+                "type": "string",
+                "adapter": {
+                    "order": 1
+                }
+            }
+        }
+    },
+    "adapter": {
+        "baseCmd": "echo",
+        "stdout": "output.txt"
+    }
+}

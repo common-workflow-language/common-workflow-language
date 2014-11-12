@@ -68,8 +68,8 @@
             "tmap",
             "mapall"
         ],
-        "stdin": { "$job": "#inputs/reads" },
-        "stdout": {"path": "output.sam"},
+        "stdin": { "$job": "#inputs/reads/path" },
+        "stdout": "output.sam",
     },
     "outputs": {
         "required": [

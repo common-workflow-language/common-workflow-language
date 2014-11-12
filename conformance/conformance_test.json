@@ -20,5 +20,21 @@
                  "map2", "--max-seed-hits", "-1", "--max-seq-length", "20", "--min-seq-length", "10"],
         "stdin": "reads.fastq",
         "stdout": "output.sam"
+    },
+    {
+        "tool": "../examples/echo-tool.json",
+        "job": "../examples/echo-job.json",
+        "args": ["echo", "hello world!"]
+    },
+    {
+        "tool": "../examples/echo2-tool.json",
+        "job": "../examples/echo-job.json",
+        "args": ["echo", "hello world!"],
+        "stdout": "output.txt"
+    },
+    {
+        "tool": "../examples/cat-tool.json",
+        "job": "../examples/cat-job.json",
+        "args": ["cat", "cat-tool.json"]
     }
 ]

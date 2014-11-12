@@ -5,6 +5,8 @@ import argparse
 from ref_resolver import from_url
 import jsonschema
 import json
+import os
+import sys
 
 def main():
     parser = argparse.ArgumentParser()
@@ -20,7 +22,7 @@ def main():
     except jsonschema.exceptions.ValidationError as e:
         print "Tool definition failed validation"
         print e
-        return
+        return 1
 
     try:
         job = t.job(from_url(args.job_order))
@@ -38,7 +40,12 @@ def main():
     except jsonschema.exceptions.ValidationError as e:
         print "Job order failed validation"
         print e
-        return
+        return 1
+
+    if args.x:
+        job.run()
+
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -20,25 +20,29 @@
         "strOrExpr": {
             "oneOf": [
                 { "type": "string" },
-                { "$ref": "#definitions/expression" }
+                { "$ref": "#definitions/expression" },
+                { "$ref": "metaschema.json#definitions/$job" }
             ]
         },
         "numOrExpr": {
             "oneOf": [
                 { "type": "number" },
-                { "$ref": "#definitions/expression" }
+                { "$ref": "#definitions/expression" },
+                { "$ref": "metaschema.json#definitions/$job" }
             ]
         },
         "intOrExpr": {
             "oneOf": [
                 { "type": "integer" },
-                { "$ref": "#definitions/expression" }
+                { "$ref": "#definitions/expression" },
+                { "$ref": "metaschema.json#definitions/$job" }
             ]
         },
         "boolOrExpr": {
-            "anyOf": [
+            "oneOf": [
                 { "type": "boolean" },
-                { "$ref": "#definitions/expression" }
+                { "$ref": "#definitions/expression" },
+                { "$ref": "metaschema.json#definitions/$job" }
             ]
         }
     },
@@ -104,20 +108,8 @@
                         { "$ref": "#definitions/expression" }
                     ]
                 },
-                "stdout": {
-                    "oneOf": [
-                        { "$ref": "metaschema.json#definitions/file" },
-                        { "$ref": "metaschema.json#definitions/$job" },
-                        { "$ref": "#definitions/expression" }
-                    ]
-                },
-                "stdin": {
-                    "oneOf": [
-                        { "$ref": "metaschema.json#definitions/file" },
-                        { "$ref": "metaschema.json#definitions/$job" },
-                        { "$ref": "#definitions/expression" }
-                    ]
-                }
+                "stdout": { "$ref": "#definitions/strOrExpr" },
+                "stdin": { "$ref": "#definitions/strOrExpr" }
             }
         }
     }

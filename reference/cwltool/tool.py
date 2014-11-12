@@ -5,13 +5,15 @@ import execjs
 import copy
 import sys
 import jsonschema.exceptions
+from job import Job
 
 from jsonschema.validators import Draft4Validator
 from ref_resolver import from_url, resolve_pointer
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(module_dir, 'schemas/tool.json')) as f:
+toolpath = os.path.join(module_dir, 'schemas/tool.json')
+with open(toolpath) as f:
     tool_schema_doc = json.load(f)
 with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
     metaschema = json.load(f)
@@ -30,10 +32,6 @@ def fix_metaschema(m):
 fix_metaschema(tool_schema_doc)
 
 tool_schema = Draft4Validator(tool_schema_doc)
-
-class Job(object):
-    def run(self):
-        pass
 
 def each(l):
     if l is None:
@@ -87,7 +85,15 @@ def jseval(job=None, expression=None):
     exp = exp_tpl % (json.dumps(job), expression)
     return execjs.eval(exp)
 
-def adapt_inputs(schema, inp, key):
+def resolve_eval(job, v):
+    if isinstance(v, dict):
+        if "$expr" in v:
+            return jseval(job, v["$expr"]["value"])
+        elif "$job" in v:
+            return resolve_pointer(job, v["$job"])
+    return v
+
+def adapt_inputs(schema, job, inp, key):
     adapters = []
 
     if 'oneOf' in schema:
@@ -102,11 +108,11 @@ def adapt_inputs(schema, inp, key):
     if isinstance(inp, dict):
         if "properties" in schema:
             for i in inp:
-                a = adapt_inputs(schema["properties"][i], inp[i], i)
+                a = adapt_inputs(schema["properties"][i], job, inp[i], i)
                 adapters.extend(a)
     elif isinstance(inp, list):
         for n, i in enumerate(inp):
-            a = adapt_inputs(schema["items"], i, format(n, '06'))
+            a = adapt_inputs(schema["items"], job, i, format(n, '06'))
             for x in a:
                 x["order"].insert(0, n)
             adapters.extend(a)
@@ -132,22 +138,22 @@ def adapt_inputs(schema, inp, key):
 
     return adapters
 
-def to_str(schema, value):
+def to_str(schema, value, base_url, path_mapper):
     if "$ref" in schema:
-        schema = from_url(schema["$ref"])
+        schema = from_url(schema["$ref"], base_url)
 
     if 'oneOf' in schema:
         for a in schema['oneOf']:
-            v = to_str(a, value)
+            v = to_str(a, value, base_url, path_mapper)
             if v is not None:
                 return v
         return None
     elif 'type' in schema:
         if schema["type"] == "array" and isinstance(value, list):
-            return [to_str(schema["items"], v) for v in value]
+            return [to_str(schema["items"], v, base_url, path_mapper) for v in value]
         elif schema["type"] == "object" and isinstance(value, dict):
             if "path" in value:
-                return value["path"]
+                return path_mapper(value["path"])
             else:
                 raise Exception("Not expecting a dict %s" % (value))
         elif schema["type"] in ("string", "number", "integer"):
@@ -158,16 +164,42 @@ def to_str(schema, value):
 
     return None
 
-def adapt(adapter, job):
+def find_files(adapter, job):
     if "value" in adapter:
-        value = adapter["value"]
-        if isinstance(value, dict):
-            if "$expr" in value:
-                value = jseval(job, value["$expr"]["value"])
-            elif "$job" in value:
-                value = resolve_pointer(job, value["$job"])
+        value = resolve_eval(job, adapter["value"])
+    else:
+        return None
 
-    value = to_str(adapter["schema"], value)
+    schema = adapter["schema"]
+
+    if "$ref" in schema:
+        schema = from_url(schema["$ref"], adapter.get("$ref_base_url"))
+
+    if 'oneOf' in schema:
+        for a in schema['oneOf']:
+            v = find_files(a, value)
+            if v is not None:
+                return v
+        return None
+    elif 'type' in schema:
+        if schema["type"] == "array" and isinstance(value, list):
+            return [find_files(schema["items"], v) for v in value]
+        elif schema["type"] == "object" and isinstance(value, dict):
+            if "path" in value:
+                return value["path"]
+            else:
+                raise Exception("Not expecting a dict %s" % (value))
+
+    return None
+
+
+def adapt(adapter, job, path_mapper):
+    if "value" in adapter:
+        value = resolve_eval(job, adapter["value"])
+    else:
+        raise Exception("No value in adapter")
+
+    value = to_str(adapter["schema"], value, adapter.get("$ref_base_url"), path_mapper)
 
     sep = adapter["separator"] if "separator" in adapter else ''
 
@@ -189,6 +221,22 @@ def adapt(adapter, job):
 
     return l
 
+class PathMapper(object):
+    def __init__(self, basedir):
+        self.basedir = basedir
+        self._pathmap = {}
+
+    def mapper(self, src):
+        if not os.path.isabs(src):
+            src = os.path.join(self.basedir, src)
+        self._pathmap[src] = src
+        return self._pathmap[src]
+
+    def pathmap(self):
+        return self._pathmap
+
+class DockerPathMapper(PathMapper):
+    pass
 
 class Tool(object):
     def __init__(self, toolpath_object):
@@ -196,8 +244,7 @@ class Tool(object):
         fix_file_type(self.tool)
         tool_schema.validate(self.tool)
 
-
-    def job(self, joborder):
+    def job(self, joborder, basedir=""):
         inputs = joborder['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
@@ -205,7 +252,7 @@ class Tool(object):
         adapters = [{"order": [-1000000],
                      "schema": tool_schema_doc["properties"]["adapter"]["properties"]["baseCmd"],
                      "value": adapter['baseCmd'],
-                     #"_key": "0"
+                     "$ref_base_url": "file:"+toolpath
                  }]
 
         if "args" in adapter:
@@ -216,27 +263,56 @@ class Tool(object):
                 else:
                     a["order"] = [0]
                 a["schema"] = tool_schema_doc["definitions"]["strOrExpr"]
-                #a["_key"] = "!" + format(i, '06')
                 adapters.append(a)
 
-        adapters.extend(adapt_inputs(self.tool['inputs'], inputs, ""))
+        adapters.extend(adapt_inputs(self.tool['inputs'], inputs, inputs, ""))
 
         adapters.sort(key=lambda a: a["order"])
 
+        referenced_files = filter(lambda a: a is not None, flatten(map(lambda a: find_files(a, joborder), adapters)))
+        print >>sys.stderr, referenced_files
+
         j = Job()
-        j.command_line = flatten(map(lambda adapter: adapt(adapter, joborder), adapters))
+        j.tool = self
+
+        j.container = None
 
         if 'stdin' in adapter:
             j.stdin = flatten(adapt({"value": adapter['stdin'],
-                                     "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdin"]
-                                 }, joborder))[0]
+                                              "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdin"],
+                                              "$ref_base_url": "file:"+toolpath
+                                          }, joborder, None))[0]
+            referenced_files.append(j.stdin)
         else:
             j.stdin = None
 
         if 'stdout' in adapter:
             j.stdout = flatten(adapt({"value": adapter['stdout'],
-                                      "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdout"]}, joborder))[0]
+                                               "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdout"],
+                                               "$ref_base_url": "file:"+toolpath
+                                           }, joborder, None))[0]
+
+            if os.path.isabs(j.stdout):
+                raise Exception("stdout must be a relative path")
         else:
             j.stdout = None
+
+        d = None
+        a = self.tool.get("requirements")
+        if a:
+            b = a.get("environment")
+            if b:
+                c = b.get("container")
+                if c:
+                    if c.get("type") == "docker":
+                        d = DockerPathMapper(basedir)
+                        j.container = c
+
+        if d is None:
+            d = PathMapper(basedir)
+
+        j.command_line = flatten(map(lambda a: adapt(a, joborder, d.mapper), adapters))
+
+        j.pathmap = d.pathmap()
 
         return j
