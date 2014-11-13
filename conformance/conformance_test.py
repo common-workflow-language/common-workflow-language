@@ -20,7 +20,7 @@ for i, t in enumerate(tests):
     sys.stdout.flush()
     out = {}
     try:
-        outstr = subprocess.check_output([args.tool, "--conformance-test", t["tool"], t["job"]])
+        outstr = subprocess.check_output([args.tool, "--conformance-test", "--basedir=/conformance/test", "--no-container", t["tool"], t["job"]])
         out = json.loads(outstr)
     except ValueError as v:
         print v
@@ -29,9 +29,9 @@ for i, t in enumerate(tests):
         pass
 
     pwd = os.path.abspath(os.path.dirname(t["job"]))
-    t["args"] = map(lambda x: x.replace("$PWD", pwd), t["args"])
-    if "stdin" in t:
-        t["stdin"] = t["stdin"].replace("$PWD", pwd)
+    # t["args"] = map(lambda x: x.replace("$PWD", pwd), t["args"])
+    # if "stdin" in t:
+    #     t["stdin"] = t["stdin"].replace("$PWD", pwd)
 
     if t.get("args") == out.get("args") and t.get("stdin") == out.get("stdin") and t.get("stdout") == out.get("stdout"):
         pass

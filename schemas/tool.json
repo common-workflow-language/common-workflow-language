@@ -53,6 +53,7 @@
                         { "type": "string" }
                     ]
         },
+        "documentDescription": { "type": "string" },
         "softwareDescription": { "type": "object" },
         "softwareRelease": { "type": "object" },
         "inputs": { "$ref": "metaschema.json" },

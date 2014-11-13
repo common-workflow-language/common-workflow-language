@@ -13,6 +13,8 @@ def main():
     parser.add_argument("tool", type=str)
     parser.add_argument("job_order", type=str)
     parser.add_argument("--conformance-test", action="store_true")
+    parser.add_argument("--basedir", type=str)
+    parser.add_argument("--no-container", action="store_true")
     parser.add_argument("-x", action="store_true", help="Execute")
 
     args = parser.parse_args()
@@ -24,8 +26,10 @@ def main():
         print e
         return 1
 
+    basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
+
     try:
-        job = t.job(from_url(args.job_order), os.path.abspath(os.path.dirname(args.job_order)))
+        job = t.job(from_url(args.job_order), basedir, use_container=(not args.no_container))
         if args.conformance_test:
             a = {"args": job.command_line}
             if job.stdin:

@@ -1,16 +1,16 @@
 {
     "inputs": {
         "reference": {
-            "path": "./rabix/tests/test-files/chr20.fa",
+            "path": "rabix/tests/test-files/chr20.fa",
             "size": 123,
             "checksum": "sha1$hash"
         },
         "reads": [
             {
-                "path": "./rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
+                "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
             },
             {
-                "path": "./rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
+                "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
             }
         ],
         "min_std_max_min": [

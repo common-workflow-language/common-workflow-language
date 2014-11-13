@@ -1,5 +1,6 @@
 {
     "documentAuthor": ["peter.amstutz@curoverse.com"],
+    "documentDescription": "Copy the contents of a file to 'output.txt' using 'cat' running in a docker container.",
     "requirements": {
         "environment": {
             "container": {
@@ -21,6 +22,7 @@
         }
     },
     "adapter": {
-        "baseCmd": "cat"
+        "baseCmd": "cat",
+        "stdout": "output.txt"
     }
 }

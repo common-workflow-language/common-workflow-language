@@ -3,9 +3,9 @@
         "tool": "../examples/bwa-mem-tool.json",
         "job": "../examples/bwa-mem-job.json",
         "args": ["bwa", "mem", "-t4", "-I1,2,3,4", "-m", "3",
-                    "$PWD/./rabix/tests/test-files/chr20.fa",
-                    "$PWD/./rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
-                    "$PWD/./rabix/tests/test-files/example_human_Illumina.pe_2.fastq"],
+                    "/conformance/test/rabix/tests/test-files/chr20.fa",
+                    "/conformance/test/rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
+                    "/conformance/test/rabix/tests/test-files/example_human_Illumina.pe_2.fastq"],
         "stdout": "output.sam"
     },
     {
@@ -18,23 +18,31 @@
                  "stage2",
                  "map1", "--max-seq-length", "20", "--min-seq-length", "10", "--seed-length", "16",
                  "map2", "--max-seed-hits", "-1", "--max-seq-length", "20", "--min-seq-length", "10"],
-        "stdin": "$PWD/reads.fastq",
+        "stdin": "/conformance/test/reads.fastq",
         "stdout": "output.sam"
     },
     {
-        "tool": "../examples/echo-tool.json",
-        "job": "../examples/echo-job.json",
-        "args": ["echo", "hello world!"]
+        "tool": "../examples/cat1-tool.json",
+        "job": "../examples/cat-job.json",
+        "args": ["cat", "/conformance/test/cat-job.json"]
     },
     {
-        "tool": "../examples/echo2-tool.json",
-        "job": "../examples/echo-job.json",
-        "args": ["echo", "hello world!"],
+        "tool": "../examples/cat2-tool.json",
+        "job": "../examples/cat-job.json",
+        "args": ["cat"],
+        "stdin": "/conformance/test/cat-job.json"
+    },
+    {
+        "tool": "../examples/cat3-tool.json",
+        "job": "../examples/cat-job.json",
+        "args": ["cat", "/conformance/test/cat-job.json"],
         "stdout": "output.txt"
     },
     {
-        "tool": "../examples/cat-tool.json",
+        "tool": "../examples/cat4-tool.json",
         "job": "../examples/cat-job.json",
-        "args": ["cat", "$PWD/cat-tool.json"]
+        "args": ["cat"],
+        "stdin": "/conformance/test/cat-job.json",
+        "stdout": "output.txt"
     }
 ]

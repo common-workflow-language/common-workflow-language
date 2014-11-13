@@ -1,5 +1,6 @@
 {
     "documentAuthor": ["peter.amstutz@curoverse.com"],
+    "documentDescription": "Print the contents of a file by piping it into stdin of 'cat' running in a docker container.",
     "requirements": {
         "environment": {
             "container": {
@@ -10,17 +11,15 @@
     },
     "inputs": {
         "type": "object",
-        "required": [ "text" ],
+        "required": [ "file1" ],
         "properties": {
-            "text": {
-                "type": "string",
-                "adapter": {
-                    "order": 1
-                }
+            "file1": {
+                "type": "file",
             }
         }
     },
     "adapter": {
-        "baseCmd": "echo"
+        "baseCmd": "cat",
+        "stdin": {"$job": "#inputs/file1/path"}
     }
 }

@@ -228,11 +228,7 @@ class PathMapper(object):
     def __init__(self, referenced_files, basedir):
         self._pathmap = {}
         for src in referenced_files:
-            if os.path.isabs(src):
-                abs = src
-            else:
-                abs = os.path.join(basedir, src)
-
+            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
             self._pathmap[src] = abs
 
     def mapper(self, src):
@@ -287,7 +283,7 @@ class Tool(object):
         fix_file_type(self.tool)
         tool_schema.validate(self.tool)
 
-    def job(self, joborder, basedir):
+    def job(self, joborder, basedir, use_container=True):
         inputs = joborder['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
@@ -345,7 +341,7 @@ class Tool(object):
             b = a.get("environment")
             if b:
                 c = b.get("container")
-                if c:
+                if use_container and c:
                     if c.get("type") == "docker":
                         d = DockerPathMapper(referenced_files, basedir)
                         j.container = c
@@ -354,7 +350,7 @@ class Tool(object):
             d = PathMapper(referenced_files, basedir)
 
         if j.stdin:
-            j.stdin = d.mapper(j.stdin)
+            j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
 
         j.command_line = flatten(map(lambda a: adapt(a, joborder, d.mapper), adapters))
 
