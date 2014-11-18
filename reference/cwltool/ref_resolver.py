@@ -1,6 +1,5 @@
 import os
 import json
-import yaml
 import copy
 import hashlib
 import logging
@@ -87,7 +86,7 @@ class Loader(object):
         elif scheme == 'file':
             try:
                 with open(path) as fp:
-                    result = yaml.load(fp)
+                    result = json.load(fp)
             except (OSError, IOError) as e:
                 raise RuntimeError('Failed for %s: %s' % (url, e))
         else:
