@@ -10,7 +10,7 @@ Install
 
 From source::
 
-  git clone https://github.com/curoverse/common-workflow-language.git
+  git clone https://github.com/rabix/common-workflow-language.git
   cd common-workflow-language/reference
   easy_install .
 
@@ -32,4 +32,3 @@ Add::
   import cwltool
 
 to your script.
-
