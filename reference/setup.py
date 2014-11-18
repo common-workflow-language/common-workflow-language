@@ -35,8 +35,8 @@ setup(name='cwltool',
       package_data={'cwltool': ['schemas/*.json']},
       include_package_data=True,
       install_requires=[
-          'jsonschema',
-          'pyexecjs'
+          'jsonschema >= 2.4.0',
+          'pyexecjs >= 1.0.5'
         ],
       test_suite='tests',
       tests_require=[],
