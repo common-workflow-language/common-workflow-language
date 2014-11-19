@@ -9,9 +9,16 @@ import random
 from job import Job
 
 from jsonschema.validators import Draft4Validator
+import ref_resolver
 from ref_resolver import from_url, resolve_pointer
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
+
+jsonschemapath = os.path.join(module_dir, 'schemas/json-schema-draft-04.json')
+with open(jsonschemapath) as f:
+    jsonschemapath_doc = json.load(f)
+
+ref_resolver.loader.fetched["http://json-schema.org/draft-04/schema"] = jsonschemapath_doc
 
 toolpath = os.path.join(module_dir, 'schemas/tool.json')
 with open(toolpath) as f:
@@ -19,18 +26,8 @@ with open(toolpath) as f:
 with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
     metaschema = json.load(f)
 
-def fix_metaschema(m):
-    if isinstance(m, dict):
-        if '$ref' in m and m['$ref'].startswith("metaschema.json"):
-            m['$ref'] = "file:%s/schemas/%s" % (module_dir, m['$ref'])
-        else:
-            for k in m:
-                fix_metaschema(m[k])
-    if isinstance(m, list):
-        for k in m:
-            fix_metaschema(k)
-
-fix_metaschema(tool_schema_doc)
+ref_resolver.loader.fetched["https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/tool.json"] = tool_schema_doc
+ref_resolver.loader.fetched["https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json"] = metaschema
 
 tool_schema = Draft4Validator(tool_schema_doc)
 

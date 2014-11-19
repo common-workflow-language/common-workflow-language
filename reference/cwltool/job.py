@@ -6,8 +6,11 @@ class Job(object):
     def remap_files():
         pass
 
-    def run(self):
-        outdir = tempfile.mkdtemp()
+    def run(self, dry_run=False):
+        if not dry_run:
+            outdir = tempfile.mkdtemp()
+        else:
+            outdir = "/tmp"
 
         runtime = []
 
@@ -25,21 +28,22 @@ class Job(object):
         stdin = None
         stdout = None
 
-        if self.stdin:
-            stdin = open(self.stdin, "rb")
-
-        if self.stdout:
-            stdout = open(os.path.join(outdir, self.stdout), "wb")
-
         print runtime + self.command_line
 
-        sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
-        sp.wait()
+        if not dry_run:
+            if self.stdin:
+                stdin = open(self.stdin, "rb")
 
-        if stdin:
-            stdin.close()
+            if self.stdout:
+                stdout = open(os.path.join(outdir, self.stdout), "wb")
 
-        if stdout:
-            stdout.close()
+            sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
+            sp.wait()
 
-        print "Output directory is %s" % outdir
+            if stdin:
+                stdin.close()
+
+            if stdout:
+                stdout.close()
+
+            print "Output directory is %s" % outdir

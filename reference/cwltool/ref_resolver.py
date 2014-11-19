@@ -81,7 +81,7 @@ class Loader(object):
             try:
                 resp.raise_for_status()
             except Exception as e:
-                raise RuntimeError(url, cause=e)
+                raise RuntimeError(url, e)
             result = resp.json()
         elif scheme == 'file':
             try:
