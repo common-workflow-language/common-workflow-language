@@ -14,7 +14,7 @@
         "required": [ "file1" ],
         "properties": {
             "file1": {
-                "type": "file",
+                "type": "file"
             }
         }
     },

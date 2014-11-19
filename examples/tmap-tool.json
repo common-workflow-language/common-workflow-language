@@ -69,7 +69,7 @@
             "mapall"
         ],
         "stdin": { "$job": "#inputs/reads/path" },
-        "stdout": "output.sam",
+        "stdout": "output.sam"
     },
     "outputs": {
         "required": [
