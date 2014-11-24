@@ -50,8 +50,10 @@ tools:
           items:
             type: integer
     outputs:
-      sum:
-        type: integer
+      type: object
+      properties:
+        sum:
+          type: integer
     script: |
       {var result = 0;
       for (var i = 0; i < $job.inputs.arr.length; i++) {
@@ -107,12 +109,12 @@ workflows:
       - id: sum
         app:
           $ref: "#tools/sum"
-          inputs:
-            arr:
-              $from: [a, b]
-          outputs:
-            sum:
-              $to: result
+        inputs:
+          arr:
+            $from: [a, b]
+        outputs:
+          sum:
+            $to: result
 
 jobs:
   simple_sum:
