@@ -69,7 +69,8 @@
         "result": 18
       }, 
       "requiresFeatures": [
-        "map"
+        "map", 
+        "nested"
       ]
     }, 
     "batch_add_one_mul_two": {
@@ -95,7 +96,10 @@
       }, 
       "outputs": {
         "result": 2
-      }
+      }, 
+      "requiresFeatures": [
+        "multilink"
+      ]
     }, 
     "simple_add_mul": {
       "@type": "Test", 
@@ -138,7 +142,7 @@
         }, 
         "type": "object"
       }, 
-      "script": "{c: $job.inputs.a + $job.inputs.b}"
+      "script": "{return {c: $job.inputs.a + $job.inputs.b}}"
     }, 
     "mul": {
       "@type": "Script", 
@@ -161,7 +165,7 @@
         }, 
         "type": "object"
       }, 
-      "script": "{c: $job.inputs.a * $job.inputs.b}"
+      "script": "{return {c: $job.inputs.a * $job.inputs.b}}"
     }, 
     "sum": {
       "@type": "Script", 

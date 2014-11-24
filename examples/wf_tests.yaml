@@ -5,6 +5,7 @@
 # "requiresFeatures" is a list of following feature requirements (to allow testing partial conformance):
 #  map - support for parallel-for-each on single port
 #  multilink - support for multiple incoming data links to same port
+#  nested - support for nested workflows
 
 tools:
   add:
@@ -21,7 +22,7 @@ tools:
       properties:
         c:
           type: integer
-    script: "{c: $job.inputs.a + $job.inputs.b}"
+    script: "{return {c: $job.inputs.a + $job.inputs.b}}"
 
   mul:
     "@type": Script
@@ -37,7 +38,7 @@ tools:
       properties:
         c:
           type: integer
-    script: "{c: $job.inputs.a * $job.inputs.b}"
+    script: "{return {c: $job.inputs.a * $job.inputs.b}}"
 
   sum:
     "@type": Script
@@ -171,6 +172,7 @@ tests:
       $ref: "#jobs/multi_link_sum"
     outputs:
       result: 2
+    requiresFeatures: [multilink]
 
   batch_add_one_mul_two:
     "@type": Test
@@ -186,4 +188,4 @@ tests:
       $ref: "#jobs/add_mul_sum"
     outputs:
       result: 18
-    requiresFeatures: [map]
+    requiresFeatures: [map, nested]
