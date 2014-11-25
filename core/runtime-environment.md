@@ -11,7 +11,7 @@ Example:
 
 ```json
 {
-  "@context": "http://example.com/contexts/draft01/job"
+  "@context": "http://example.com/contexts/draft01/job",
   "app": "http://example.com/tools/mwa",
   "inputs": {
     "input1": {
