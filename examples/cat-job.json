@@ -1,7 +1,7 @@
 {
     "inputs": {
         "file1": {
-            "path": "cat-job.json"
+            "path": "hello.txt"
         }
     }
 }

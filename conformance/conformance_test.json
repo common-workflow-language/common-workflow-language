@@ -24,25 +24,25 @@
     {
         "tool": "../examples/cat1-tool.json",
         "job": "../examples/cat-job.json",
-        "args": ["cat", "/conformance/test/cat-job.json"]
+        "args": ["cat", "/conformance/test/hello.txt"]
     },
     {
         "tool": "../examples/cat2-tool.json",
         "job": "../examples/cat-job.json",
         "args": ["cat"],
-        "stdin": "/conformance/test/cat-job.json"
+        "stdin": "/conformance/test/hello.txt"
     },
     {
         "tool": "../examples/cat3-tool.json",
         "job": "../examples/cat-job.json",
-        "args": ["cat", "/conformance/test/cat-job.json"],
+        "args": ["cat", "/conformance/test/hello.txt"],
         "stdout": "output.txt"
     },
     {
         "tool": "../examples/cat4-tool.json",
         "job": "../examples/cat-job.json",
         "args": ["cat"],
-        "stdin": "/conformance/test/cat-job.json",
+        "stdin": "/conformance/test/hello.txt",
         "stdout": "output.txt"
     }
 ]
