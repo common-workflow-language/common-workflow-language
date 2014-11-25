@@ -1,0 +1,283 @@
+{
+  "jobs": {
+    "add_mul_sum": {
+      "@type": "Job", 
+      "app": {
+        "$ref": "#workflows/add_mul_sum"
+      }, 
+      "inputs": {
+        "a": [
+          1, 
+          2, 
+          3
+        ]
+      }
+    }, 
+    "batch_add_one_mul_two": {
+      "@type": "Job", 
+      "app": {
+        "$ref": "#workflows/add_one_mul_two"
+      }, 
+      "inputs": {
+        "a": [
+          1, 
+          2, 
+          3
+        ]
+      }
+    }, 
+    "multi_link_sum": {
+      "@type": "Job", 
+      "app": {
+        "$ref": "#workflows/multi_link_sum"
+      }, 
+      "inputs": {
+        "a": 1, 
+        "b": 1
+      }
+    }, 
+    "simple_add_mul": {
+      "@type": "Job", 
+      "app": {
+        "$ref": "#workflows/add_one_mul_two"
+      }, 
+      "inputs": {
+        "a": 1
+      }
+    }, 
+    "simple_sum": {
+      "@type": "Job", 
+      "app": {
+        "$ref": "#tools/sum"
+      }, 
+      "inputs": {
+        "arr": [
+          1, 
+          2, 
+          3
+        ]
+      }
+    }
+  }, 
+  "tests": {
+    "add_mul_sum": {
+      "@type": "Test", 
+      "job": {
+        "$ref": "#jobs/add_mul_sum"
+      }, 
+      "outputs": {
+        "result": 18
+      }, 
+      "requiresFeatures": [
+        "map", 
+        "nested"
+      ]
+    }, 
+    "batch_add_one_mul_two": {
+      "@type": "Test", 
+      "job": {
+        "$ref": "#jobs/batch_add_one_mul_two"
+      }, 
+      "outputs": {
+        "result": [
+          4, 
+          6, 
+          8
+        ]
+      }, 
+      "requiresFeatures": [
+        "map"
+      ]
+    }, 
+    "multi_link_sum": {
+      "@type": "Test", 
+      "job": {
+        "$ref": "#jobs/multi_link_sum"
+      }, 
+      "outputs": {
+        "result": 2
+      }, 
+      "requiresFeatures": [
+        "multilink"
+      ]
+    }, 
+    "simple_add_mul": {
+      "@type": "Test", 
+      "job": {
+        "$ref": "#jobs/simple_add_mul"
+      }, 
+      "outputs": {
+        "result": 4
+      }
+    }, 
+    "simple_sum": {
+      "@type": "Test", 
+      "job": {
+        "$ref": "#jobs/simple_sum"
+      }, 
+      "outputs": {
+        "sum": 6
+      }
+    }
+  }, 
+  "tools": {
+    "add": {
+      "@type": "Script", 
+      "inputs": {
+        "properties": {
+          "a": {
+            "type": "integer"
+          }, 
+          "b": {
+            "type": "integer"
+          }
+        }, 
+        "type": "object"
+      }, 
+      "outputs": {
+        "properties": {
+          "c": {
+            "type": "integer"
+          }
+        }, 
+        "type": "object"
+      }, 
+      "script": "{return {c: $job.inputs.a + $job.inputs.b}}"
+    }, 
+    "mul": {
+      "@type": "Script", 
+      "inputs": {
+        "properties": {
+          "a": {
+            "type": "integer"
+          }, 
+          "b": {
+            "type": "integer"
+          }
+        }, 
+        "type": "object"
+      }, 
+      "outputs": {
+        "properties": {
+          "c": {
+            "type": "integer"
+          }
+        }, 
+        "type": "object"
+      }, 
+      "script": "{return {c: $job.inputs.a * $job.inputs.b}}"
+    }, 
+    "sum": {
+      "@type": "Script", 
+      "inputs": {
+        "properties": {
+          "arr": {
+            "items": {
+              "type": "integer"
+            }, 
+            "type": "array"
+          }
+        }, 
+        "type": "object"
+      }, 
+      "outputs": {
+        "sum": {
+          "type": "integer"
+        }
+      }, 
+      "script": "{var result = 0;\nfor (var i = 0; i < $job.inputs.arr.length; i++) {\n  result += $job.inputs.arr[i];\n}\nreturn {sum: result};}\n"
+    }
+  }, 
+  "workflows": {
+    "add_mul_sum": {
+      "@type": "Workflow", 
+      "steps": [
+        {
+          "app": {
+            "$ref": "#workflows/add_one_mul_two"
+          }, 
+          "id": "add_mul", 
+          "inputs": {
+            "a": {
+              "$from": "a"
+            }
+          }
+        }, 
+        {
+          "app": {
+            "$ref": "#/tools/sum"
+          }, 
+          "id": "sum", 
+          "inputs": {
+            "arr": {
+              "$from": "add_mul.result"
+            }
+          }, 
+          "outputs": {
+            "sum": {
+              "$to": "result"
+            }
+          }
+        }
+      ]
+    }, 
+    "add_one_mul_two": {
+      "@type": "Workflow", 
+      "steps": [
+        {
+          "app": {
+            "$ref": "#tools/add"
+          }, 
+          "id": "add_one", 
+          "inputs": {
+            "a": {
+              "$from": "a"
+            }, 
+            "b": 1
+          }
+        }, 
+        {
+          "app": {
+            "$ref": "#tools/mul"
+          }, 
+          "id": "times_two", 
+          "inputs": {
+            "a": {
+              "$from": "add_one.c"
+            }, 
+            "b": 2
+          }, 
+          "outputs": {
+            "c": {
+              "$to": "result"
+            }
+          }
+        }
+      ]
+    }, 
+    "multi_link_sum": {
+      "@type": "Workflow", 
+      "steps": [
+        {
+          "app": {
+            "$ref": "#tools/sum", 
+            "inputs": {
+              "arr": {
+                "$from": [
+                  "a", 
+                  "b"
+                ]
+              }
+            }, 
+            "outputs": {
+              "sum": {
+                "$to": "result"
+              }
+            }
+          }, 
+          "id": "sum"
+        }
+      ]
+    }
+  }
+}
