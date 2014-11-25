@@ -10,6 +10,12 @@ to specify a way to describe bioinformatics tools and workflows that is
 powerful, easy to use and allows for portability of tools/workflows and
 reproducibility of runs.
 
+Please be aware that Common Workflow Language is still under heavy development
+and that the following draft specification documents are likely to contain
+errors or be out of date.  Current status is best reflected by the
+[reference implementation](reference/), [conformance test suite](conformance/) and
+[examples](examples/).
+
 ## Repository contents
 
 [Draft specifications](core/)
