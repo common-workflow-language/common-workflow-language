@@ -1,7 +1,7 @@
 import os
 import pprint
 import json
-import execjs
+import sandboxjs
 import copy
 import sys
 import jsonschema.exceptions
@@ -71,17 +71,17 @@ def fix_file_type(t):
 
 def jseval(job=None, expression=None):
     if expression.startswith('{'):
-        exp_tpl = '''function () {
-        $job = %s;
-        return function()%s();}()
+        exp_tpl = '''{
+        var $job = %s;
+        return function()%s();}
         '''
     else:
-        exp_tpl = '''function () {
-        $job = %s;
-        return %s;}()
+        exp_tpl = '''{
+        var $job = %s;
+        return %s;}
         '''
     exp = exp_tpl % (json.dumps(job), expression)
-    return execjs.eval(exp)
+    return sandboxjs.execjs(exp)
 
 def resolve_eval(job, v):
     if isinstance(v, dict):
