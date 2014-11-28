@@ -57,6 +57,11 @@ class Job(object):
                 adapter = schema["adapter"]
                 if "glob" in adapter:
                     r = [{"path": g} for g in glob.glob(os.path.join(outdir, adapter["glob"]))]
+                    if not ("type" in schema and schema["type"] == "array"):
+                        if r:
+                            r = r[0]
+                        else:
+                            r = None
                 if "value" in adapter:
                     r = tool.resolve_eval(self.joborder, adapter["value"])
             if not r and "properties" in schema:
