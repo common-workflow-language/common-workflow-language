@@ -1,11 +1,10 @@
 import subprocess
 import os
 import tempfile
+import tool
+import glob
 
 class Job(object):
-    def remap_files():
-        pass
-
     def run(self, dry_run=False):
         if not dry_run:
             outdir = tempfile.mkdtemp()
@@ -47,3 +46,24 @@ class Job(object):
                 stdout.close()
 
             print "Output directory is %s" % outdir
+            return self.collect_outputs(self.tool.tool["outputs"], outdir)
+        else:
+            return None
+
+    def collect_outputs(self, schema, outdir):
+        r = None
+        if isinstance(schema, dict):
+            if "adapter" in schema:
+                adapter = schema["adapter"]
+                if "glob" in adapter:
+                    r = [{"path": g} for g in glob.glob(os.path.join(outdir, adapter["glob"]))]
+                if "value" in adapter:
+                    r = tool.resolve_eval(self.joborder, adapter["value"])
+            if not r and "properties" in schema:
+                r = {}
+                for k, v in schema["properties"].items():
+                    out = self.collect_outputs(v, outdir)
+                    if out:
+                        r[k] = out
+
+        return r

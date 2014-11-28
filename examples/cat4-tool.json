@@ -18,6 +18,17 @@
             }
         }
     },
+    "outputs": {
+        "type": "object",
+        "required": [ "output" ],
+        "properties":{
+            "output": {
+                "adapter": {
+                    "glob":"output.txt"
+                }
+            }
+        }
+    },
     "adapter": {
         "baseCmd": "cat",
         "stdin": {"$job": "#inputs/file1/path"},

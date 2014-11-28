@@ -21,6 +21,17 @@
             }
         }
     },
+    "outputs": {
+        "type": "object",
+        "required": [ "output" ],
+        "properties":{
+            "output": {
+                "adapter": {
+                    "glob":"output.txt"
+                }
+            }
+        }
+    },
     "adapter": {
         "baseCmd": "cat",
         "stdout": "output.txt"

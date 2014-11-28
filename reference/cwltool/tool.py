@@ -308,6 +308,7 @@ class Tool(object):
         referenced_files = filter(lambda a: a is not None, flatten(map(lambda a: find_files(a, joborder), adapters)))
 
         j = Job()
+        j.joborder = joborder
         j.tool = self
 
         j.container = None
