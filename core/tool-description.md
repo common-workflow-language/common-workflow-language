@@ -99,10 +99,13 @@ Example:
 ```jsonld
 {
   "@context": "http://xmlns.com/foaf/context",
+  "@id" : "http://orcid.org/0000-0002-1825-0097",
   "name": "John Smith",
   "email": "j.smith@example.com"
 }
 ```
+
+The `@id` SHOULD be an [ORCID](http://orcid.org/) identifier, but MAY be any other [Web-ID](http://www.w3.org/TR/webid/).
 
 ### Software Description
 
