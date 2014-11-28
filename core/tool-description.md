@@ -57,7 +57,7 @@ Example:
     },
     "param2": {
       "type": "array",
-      "items" {"type": "string"},
+      "items" : {"type": "string"},
       "adapter": {
         "order": 1,
         "itemSeparator": ","
