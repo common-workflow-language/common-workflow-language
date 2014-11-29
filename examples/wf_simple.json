@@ -1,0 +1,24 @@
+{
+  "@context": {
+    "@vocab": "http://github.com/common-workflow-language/schema/wf#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "source": {"@type": "@id"},
+    "destination": {"@type": "@id"},
+    "tool": {"@type": "@id"}
+  },
+  "@id": "",
+  "@type": "Workflow",
+  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
+  "outputs": {"@id": "#result"},
+  "steps": [
+    {"@id": "#sum", "inputs": [{"@id": "#sum/a"}, {"@id": "#sum/b"}], "outputs": {"@id": "#sum/c"}, "expr": "{return {c: $job.inputs.a + $job.inputs.b}}"},
+    {"@id": "#square", "inputs": {"@id": "#square/a"}, "outputs": {"@id": "#square/b"}, "expr": "{return {b: $job.inputs.a * $job.inputs.a}}"}
+  ],
+  "connections": [
+    {"source": "#a", "destination": "#sum/a"},
+    {"source": "#b", "destination": "#sum/b"},
+    {"source": "#sum/c", "destination": "#square/a"},
+    {"source": "#square/b", "destination": "#aplusbsquared"}
+  ]
+}

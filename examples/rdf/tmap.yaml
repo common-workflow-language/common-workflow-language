@@ -1,0 +1,110 @@
+"@id": http://example.org/tmap
+"@type": CommandLineTool
+
+schemaDefs:
+  - name: Map1
+    type: record
+    fields:
+      - name: algo
+        type: enum
+        symbols: [map1]
+        adapter:
+          position: 0
+      - name: seedLength
+        type: int
+        adapter:
+          position: 1
+          prefix: --seed-length
+
+  - name: Map2
+    type: record
+    fields:
+      - name: algo
+        type: enum
+        symbols: [map2]
+        adapter:
+          position: 0
+      - name: maxSeedHits
+        type: int
+        adapter:
+          position: 1
+          prefix: --max-seed-hits
+
+  - name: Map3
+    type: record
+    fields:
+      - name: algo
+        type: enum
+        symbols: [map3]
+        adapter:
+          position: 0
+      - name: fwdSearch
+        type: boolean
+        adapter:
+          position: 1
+          prefix: --fwd-search
+
+  - name: Map4
+    type: record
+    fields:
+      - name: algo
+        type: enum
+        symbols: [map4]
+        adapter:
+          position: 0
+      - name: seedStep
+        type: int
+        adapter:
+          position: 1
+          prefix: --seed-step
+
+inputs:
+  - id: "#reads"
+    depth: 0
+    schema:
+      type: File
+      adapter:
+        position: 1
+
+  - id: "#stages"
+    depth: 1
+    schema:
+      type: array
+      adapter:
+        position: 2
+      items:
+        type: record
+        fields:
+          - name: stageId
+            type: int
+            adapter:
+              prefix: stage
+              separator: ""
+              position: 0
+          - name: stageOption1
+            type: boolean
+            adapter:
+              prefix: -n
+              position: 1
+          - name: algos
+            type: array
+            adapter:
+              position: 2
+            items: [Map1, Map2, Map3, Map4]
+
+outputs:
+  - id: "#sam"
+    depth: 0
+    schema:
+      type: File
+      adapter:
+        glob: output.sam
+
+baseCmd: [tmap, mapall]
+
+stdin:
+  "@type": Transform
+  language: jsonpointer
+  value: "#inputs/reads/path"
+
+stdout: output.sam

@@ -1,0 +1,62 @@
+requirements:
+  - "@type": DockerContainer
+    image:
+      "@type": DockerImage
+      dockerRepo: images.sbgenomics.com/rabix/bwa
+      imageId: 9d3b9b0359cf
+  - "@type": MemoryRequirement
+    value: 5000
+
+inputs:
+  - id: reference
+    depth: 0
+    schema:
+      type: File
+      adapter:
+        position: 2
+
+  - id: reads
+    depth: 1
+    streamable: true
+    schema:
+      type: array
+      items: File
+      adaper:
+        position: 3
+
+  - id: minimum_seed_length
+    depth: 0
+    schema:
+      type: int
+      adapter:
+        position: 1
+        prefix: -m
+
+  - id: min_std_max_min
+    depth: 1
+    schema:
+      type: array
+      items: int
+      adapter:
+        position: 1
+        prefix: -I
+        itemSeparator: ","
+
+outputs:
+  - id: sam
+    depth: 0
+    streamable: true
+    schema:
+      type: File
+      adapter:
+        glob: output.sam
+
+baseCmd: [bwa, mem]
+stdout: output.sam
+adapters:
+  - position: 1
+    prefix: -t
+    valueFrom:
+      "@type": Transform
+      language: javascript
+      value: "$job.allocatedResources.cpu"

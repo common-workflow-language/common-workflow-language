@@ -1,0 +1,70 @@
+{
+  "id": "@id",
+  "cwl": "http://github.com/common-workflow-language#",
+  "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+  "cnt": "http://www.w3.org/2011/content#",
+  "sch": "http://schema.org/",
+  "dct": "http://purl.org/dc/terms/",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "fields": {
+    "@id": "cwl:avroFields",
+    "@container": "@list"
+  },
+  "adapters": {
+    "@id": "cwl:hasArgumentAdapters",
+    "@container": "@list"
+  },
+  "symbols": {
+    "@id": "cwl:avroSymbols",
+    "@container": "@list"
+  },
+  "items": {
+    "@id": "cwl:avroItems",
+    "@container": "@list"
+  },
+  "baseCmd": {
+    "@id": "cwl:hasBaseCmd",
+    "@container": "@list"
+  },
+  "requirements": {
+    "@id": "cwl:hasRequirements",
+    "@container": "@list"
+  },
+  "Transform": "cwl:Transformation",
+  "CommandLineTool": "cwl:CommandLineTool",
+  "CPURequirement": "cwl:CPURequirement",
+  "MemoryRequirement": "cwl:MemoryRequirement",
+  "DockerContainer": "cwl:DockerContainer",
+  "DockerImage": "cwl:DockerImage",
+  "Dockerfile": "cwl:Dockerfile",
+  "dockerRepo": "cwl:hasDockerRepository",
+  "dockerTag": "cwl:hasDockerImageTag",
+  "imageId": "cwl:hasDockerImageId",
+  "schemaDefs": "cwl:usesSchema",
+  "schema": "cwl:hasSchema",
+  "name": "cwl:avroName",
+  "type": "cwl:avroType",
+  "doc": "cwl:avroDoc",
+  "adapter": "cwl:hasAdapter",
+  "position": "cwl:hasCommandLinePosition",
+  "prefix": "cwl:hasPrefix",
+  "separator": "cwl:hasSeparator",
+  "itemPrefix": "cwl:hasItemPrefix",
+  "transform": "cwl:transformsValueWith",
+  "valueFrom": "cwl:getsValueFrom",
+  "inputs": "wfdesc:hasInput",
+  "outputs": "wfdesc:hasOutput",
+  "depth": "cwl:hasDepth",
+  "streamable": "cwl:isStreamable",
+  "language": "cwl:hasLanguage",
+  "stdin": "cwl:hasStdin",
+  "stdout": "cwl:hasStdout",
+  "image": "cwl:hasDockerImageSpec",
+  "meta": "cwl:hasMetadata",
+  "metaFrom": "cwl:inheritsMetadataFrom",
+  "indicesFrom": "cwl:inheritsIndicesFrom",
+  "metaTpl": "cwl:hasMetadataTemplate",
+  "producedIndices": "cwl:producesIndexFile",
+  "modifiesDir": "cwl:modifiesMountedDirectory",
+  "value": "rdf:value"
+}

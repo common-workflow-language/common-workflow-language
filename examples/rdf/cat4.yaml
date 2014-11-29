@@ -1,0 +1,20 @@
+inputs:
+  id: file1
+  depth: 0
+  schema:
+    type: File
+
+requirements:
+  - "@type": DockerContainer
+    image:
+      "@type": DockerImage
+      dockerRepo: arvados/jobs
+
+baseCmd: [cat]
+
+stdin:
+  "@type": Transform
+  language: jsonpointer
+  value: "#inputs/file1/path"
+
+stdout: output.txt

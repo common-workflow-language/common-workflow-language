@@ -1,0 +1,380 @@
+# baseURI: http://github.com/common-workflow-language
+# imports: http://purl.org/wf4ever/wfdesc
+
+@prefix cnt: <http://www.w3.org/2011/content#> .
+@prefix cwl: <http://github.com/common-workflow-language#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sch: <http://schema.org/> .
+@prefix wfdesc: <http://purl.org/wf4ever/wfdesc#> .
+@prefix wfprov: <http://purl.org/wf4ever/wfprov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://github.com/common-workflow-language>
+  owl:imports <http://purl.org/wf4ever/wfdesc> ;
+.
+cwl:Adapter
+  rdf:type owl:Class ;
+  rdfs:comment "Base class for ArgumentAdapter and OutputAdapter."^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+cwl:ArgumentAdapter
+  rdf:type owl:Class ;
+  rdfs:comment "Describes how to map values known at runtime (or literals) to command line."^^xsd:string ;
+  rdfs:subClassOf cwl:Adapter ;
+.
+cwl:AvroTypeDef
+  rdf:type owl:Class ;
+  rdfs:comment "Type definition compatible with Apache Avro"^^xsd:string ;
+  rdfs:subClassOf cwl:ParameterSchema ;
+.
+cwl:BaseResource
+  rdf:type owl:Class ;
+  rdfs:comment "Base class for computation resources. Use rdf:value property to specify value. For dynamic requirements, target can be cwl:Transformation"^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+cwl:CPU
+  rdf:type owl:Class ;
+  rdfs:comment "Number of needed or allocated CPU cores (through rdf:value)"^^xsd:string ;
+  rdfs:subClassOf cwl:BaseResource ;
+.
+cwl:CommandLineTool
+  rdf:type owl:Class ;
+  rdfs:comment "Adapts a CLI tool to be runnable in CWL engines and used in workflows."^^xsd:string ;
+  rdfs:subClassOf wfdesc:Process ;
+  rdfs:subClassOf wfdesc:ProcessImplementation ;
+.
+cwl:ContainerRequirement
+  rdf:type owl:Class ;
+  rdfs:comment "Signifies that a Process (CommandLineTool) needs to run within a linux container."^^xsd:string ;
+  rdfs:subClassOf cwl:Requirement ;
+.
+cwl:DockerContainer
+  rdf:type owl:Class ;
+  rdfs:comment "Signifies the process (CommandLineTool) needs to run in a Docker container. Image is specified using cwl:hasImageSpec."^^xsd:string ;
+  rdfs:subClassOf cwl:ContainerRequirement ;
+.
+cwl:DockerImage
+  rdf:type owl:Class ;
+  rdfs:comment "Specifies a docker image through repository, tag and ID. For published tools, all three should be given."^^xsd:string ;
+  rdfs:subClassOf cwl:DockerImageSpec ;
+.
+cwl:DockerImageSpec
+  rdf:type owl:Class ;
+  rdfs:comment "Base class for ways to specify a docker image."^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+cwl:Dockerfile
+  rdf:type owl:Class ;
+  rdfs:comment "Specifies a docker image by referencing or embedding a dockerfile."^^xsd:string ;
+  rdfs:subClassOf cwl:DockerImageSpec ;
+  rdfs:subClassOf cwl:ExternalResource ;
+.
+cwl:ExternalResource
+  rdf:type owl:Class ;
+  rdfs:comment "Base class for things that can store their content on external URL (sch:contentUrl) or embedded with rdf:value or cnt:chars/bytes"^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+  owl:unionOf (
+      cnt:Content
+      [
+        rdf:type owl:Restriction ;
+        owl:minCardinality 1 ;
+        owl:onProperty sch:contentUrl ;
+      ]
+      [
+        rdf:type owl:Restriction ;
+        owl:cardinality 1;
+        owl:onProperty rdf:value ;
+      ]
+    ) ;
+.
+cwl:File
+  rdf:type owl:Class ;
+  rdfs:comment "File content specified through cnt:contentUrl in absolute paths. Additional triples that can be propagated to files produced by workflows should be kept in a node referenced through cwl:hasAnnotations. Likewise, for accompanying index files, use cwl:hasIndexFile. TODO: Add file properties and look for a possible base class."^^xsd:string ;
+  rdfs:subClassOf cwl:ExternalResource ;
+.
+cwl:IndexFile
+  rdf:type owl:Class ;
+  rdfs:comment "Index files accompany data files and follow a naming convention."^^xsd:string ;
+  rdfs:subClassOf cwl:File ;
+.
+cwl:InheritsIndicesFrom
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Signifies that file produced by Output associated with the OutputAdapter should inherit index files from Input which is the object of this property. Only useful for tools that create index files."^^xsd:string ;
+  rdfs:domain cwl:OutputAdapter ;
+  rdfs:range wfdesc:Input ;
+.
+cwl:Memory
+  rdf:type owl:Class ;
+  rdfs:comment "Number of needed or allocated memory in MB (through rdf:value)"^^xsd:string ;
+  rdfs:subClassOf cwl:BaseResource ;
+.
+cwl:OutputAdapter
+  rdf:type owl:Class ;
+  rdfs:comment "Describes how to report process outputs from generated files. This includes file metadata and accompanying index files."^^xsd:string ;
+  rdfs:subClassOf cwl:Adapter ;
+.
+cwl:ParameterSchema
+  rdf:type owl:Class ;
+  rdfs:comment "TODO: subclass with AvroTypeDefinition"^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+cwl:RequiredCPU
+  rdf:type owl:Class ;
+  rdfs:subClassOf cwl:CPU ;
+  rdfs:subClassOf cwl:ResourceRequirement ;
+.
+cwl:RequiredMemory
+  rdf:type owl:Class ;
+  rdfs:subClassOf cwl:Memory ;
+  rdfs:subClassOf cwl:ResourceRequirement ;
+.
+cwl:Requirement
+  rdf:type owl:Class ;
+  rdfs:comment "Base class for requirements a Process needs to run."^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+cwl:ResourceRequirement
+  rdf:type owl:Class ;
+  rdfs:comment "Describes what computational resources a process needs to run (#CPU, RAM). Used for CommandLineTools. Actual value supplied via rdf:value which can point to cwl:Transformation for dynamic requirements."^^xsd:string ;
+  rdfs:subClassOf cwl:BaseResource ;
+  rdfs:subClassOf cwl:Requirement ;
+.
+cwl:SimpleTransformTool
+  rdf:type owl:Class ;
+  rdfs:comment "A process which performs a simple transformation of its inputs."^^xsd:string ;
+  rdfs:subClassOf cwl:Transformation ;
+  rdfs:subClassOf wfdesc:Process ;
+  rdfs:subClassOf wfdesc:ProcessImplementation ;
+.
+cwl:Transformation
+  rdf:type owl:Class ;
+  rdfs:comment "Transformation that can be applied to values known at runtime. Specify via rdf:value and cwl:hasLanguage"^^xsd:string ;
+  rdfs:subClassOf cwl:ExternalResource ;
+.
+cwl:Workflow
+  rdf:type owl:Class ;
+  rdfs:comment "A cwl:Workflow can be its own definition."^^xsd:string ;
+  rdfs:subClassOf wfdesc:Workflow ;
+  rdfs:subClassOf wfdesc:WorkflowDefinition ;
+.
+cwl:WorkflowEngineFeature
+  rdf:type owl:Class ;
+  rdfs:comment "Class for CWL extension features."^^xsd:string ;
+  rdfs:subClassOf cwl:Requirement ;
+.
+cwl:avroDoc
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Describes Avro schema definition. Used for UI generation. TODO: subproperty of rdfs:comment?"^^xsd:string ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range xsd:string ;
+.
+cwl:avroFields
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range rdf:List ;
+.
+cwl:avroItemType
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies one or more item types for Avro array type."^^xsd:string ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range xsd:string ;
+.
+cwl:avroName
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies Avro type name. It needs to be unique within the process description and cannot be \"File\"."^^xsd:string ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range xsd:string ;
+.
+cwl:avroSymbols
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range rdf:List ;
+.
+cwl:avroType
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:label "Specifies Avro type. TODO: range enum"^^xsd:string ;
+  rdfs:range xsd:string ;
+.
+cwl:getsValueFrom
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Defines how to get the value at runtime in order to map it to command line argument. Target is usually a cwl:Transformation but any cwl:ExternalResource can be used to declare a constant."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range cwl:ExternalResource ;
+.
+cwl:hasAdapter
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "A way to embed adapters with schema."^^xsd:string ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range cwl:Adapter ;
+.
+cwl:hasAdditionalMetadata
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Associates File with a node that holds additional assertions about the file which can be automatically propagated to output files."^^xsd:string ;
+  rdfs:domain cwl:File ;
+  rdfs:subPropertyOf owl:sameAs ;
+.
+cwl:hasArgumentAdapters
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Specifies additional adapters for CommandLineTool. Elements are cwl:ArgumentAdapter"^^xsd:string ;
+  rdfs:domain cwl:CommandLineTool ;
+  rdfs:range rdf:List ;
+.
+cwl:hasBaseArguments
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "A list of used as base for building command line arguments. If any element is cwl:Transformation, it will be applied at runtime."^^xsd:string ;
+  rdfs:domain cwl:CommandLineTool ;
+  rdfs:range rdf:List ;
+.
+cwl:hasCommandLinePosition
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Used to order values when building command line arguments. Lower takes priority."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range xsd:integer ;
+.
+cwl:hasDepth
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies nesting depth of inputs and outputs. Zero for no nesting. If unspecified, depth is considered to be \"any\"."^^xsd:string ;
+  rdfs:domain wfdesc:Parameter ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+cwl:hasDockerImageId
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies ID of docker image. ID is also the checksum."^^xsd:string ;
+  rdfs:domain cwl:DockerImage ;
+  rdfs:range xsd:string ;
+.
+cwl:hasDockerRepository
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies docker repository. For repos on main docker index, this is the name optionally prefixed with namespace. For other repositories, this is the URL."^^xsd:string ;
+  rdfs:domain cwl:DockerImage ;
+  rdfs:range xsd:string ;
+.
+cwl:hasDockerRepositoryTag
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Specifies docker repository tag without leading \"#\"."^^xsd:string ;
+  rdfs:domain cwl:DockerImage ;
+  rdfs:range xsd:string ;
+.
+cwl:hasGlob
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Output adapters select produced files using a glob expression."^^xsd:string ;
+  rdfs:domain cwl:OutputAdapter ;
+.
+cwl:hasImageSpec
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Used to specify how to get or build a docker image."^^xsd:string ;
+  rdfs:domain cwl:DockerContainer ;
+  rdfs:range cwl:DockerImageSpec ;
+.
+cwl:hasIndexFile
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Files have accompanying index files based on a naming convention."^^xsd:string ;
+  rdfs:domain cwl:File ;
+  rdfs:range cwl:IndexFile ;
+.
+cwl:hasItemAdapter
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Used to embed adapters with schema. Specifies default adapter for list items."^^xsd:string ;
+  rdfs:domain cwl:AvroTypeDef ;
+  rdfs:range cwl:ArgumentAdapter ;
+.
+cwl:hasItemSeparator
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Used for mapping lists to command line."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range xsd:string ;
+.
+cwl:hasLanguage
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Programing language of subject Transformation. TODO: Consider making it object property and using dbpedia for vocab."^^xsd:string ;
+  rdfs:domain cwl:Transformation ;
+  rdfs:range xsd:string ;
+.
+cwl:hasMetadata
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Associates a File with additional metadata that can be propagated to process outputs. TODO: subproperty of owl:sameAs?"^^xsd:string ;
+  rdfs:domain cwl:File ;
+.
+cwl:hasMetadataTemplate
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Associates a metadata template with OutputAdapter. The template is a node with properties whose objects can be cwl:Transformation to get value at runtime."^^xsd:string ;
+  rdfs:domain cwl:OutputAdapter ;
+.
+cwl:hasPrefix
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Used for building command line arguments."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range xsd:string ;
+.
+cwl:hasRequirements
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Associates a Process with its requirements to run. Multiple cwl:hasRequirements are to be interpreted as oneOf, not allOf."^^xsd:string ;
+  rdfs:domain wfdesc:Process ;
+  rdfs:range rdf:List ;
+.
+cwl:hasSchema
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Associates a Parameter with its schema. It should only have one."^^xsd:string ;
+  rdfs:domain wfdesc:Parameter ;
+  rdfs:range cwl:AvroTypeDef ;
+.
+cwl:hasSeparator
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Used for building command line arguments."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range xsd:string ;
+.
+cwl:hasStdin
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Value produced by object of this property is a file path for stdin. TODO: range should be string or transformation"^^xsd:string ;
+  rdfs:domain cwl:CommandLineTool ;
+.
+cwl:hasStdout
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Value produced by object of this property is a file path for stdout. TODO: range should be string or transformation"^^xsd:string ;
+  rdfs:domain cwl:CommandLineTool ;
+.
+cwl:inheritsMetadataFrom
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Signifies that files produced by Output associated with the OutputAdapter should inherit additional metadata from Input which is the object of this property."^^xsd:string ;
+  rdfs:domain cwl:OutputAdapter ;
+  rdfs:range wfdesc:Input ;
+.
+cwl:isStreamable
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Signifies that files on associated input or output can be streamed (the tool does not perform seeks)."^^xsd:string ;
+  rdfs:domain wfdesc:Parameter ;
+  rdfs:range xsd:boolean ;
+.
+cwl:modifiesMountedDirectory
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Signifies that the tool will modify the directories where files from this input are located."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range xsd:boolean ;
+.
+cwl:producesIndexFile
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "Used by adapters to report produced index files which should accompany main files. Value is the extension, optionally prefixed with a dot to signify that original extension should be replaced."^^xsd:string ;
+  rdfs:domain cwl:OutputAdapter ;
+  rdfs:range xsd:string ;
+.
+cwl:transformsValueWith
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "A transformation to apply to result of cwl:getsValueFrom."^^xsd:string ;
+  rdfs:domain cwl:ArgumentAdapter ;
+  rdfs:range cwl:Transformation ;
+.
+cwl:usesSchema
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Used for parameters with complex structures. Process can define schema classes using this property and they will be available for reference in parameter schema definitions."^^xsd:string ;
+  rdfs:domain wfdesc:Process ;
+  rdfs:range cwl:AvroTypeDef ;
+.
+<http://github.com/common-workflow-language>
+  rdf:type owl:Ontology ;
+  owl:imports <http://purl.org/wf4ever/wfdesc> ;
+  owl:imports <http://purl.org/wf4ever/wfprov> ;
+.
