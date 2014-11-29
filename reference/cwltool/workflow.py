@@ -12,6 +12,7 @@ log = logging.getLogger(__file__)
 
 CWL = Namespace('http://github.com/common-workflow-language/schema/wf#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
+DCTERMS = Namespace('http://purl.org/dc/terms/')
 
 
 class JsonLiteral(Literal):
@@ -30,22 +31,22 @@ def lazy(func):
     return property(wrapped)
 
 
-class Activity(object):
+class Process(object):
     def __init__(self, graph, iri):
         self.g = graph
-        self.iri = iri
+        self.iri = URIRef(iri)
 
     @lazy
-    def process(self):
-        return self.g.value(self.iri, CWL.activityFor)
+    def activity(self):
+        return self.g.value(None, CWL.activityFor, self.iri)
 
     @lazy
     def inputs(self):
-        return list(self.g.objects(self.process, CWL.inputs))
+        return list(self.g.objects(self.iri, CWL.inputs))
 
     @lazy
     def outputs(self):
-        return list(self.g.objects(self.process, CWL.outputs))
+        return list(self.g.objects(self.iri, CWL.outputs))
 
     @lazy
     def has_prereqs(self):
@@ -53,11 +54,11 @@ class Activity(object):
 
     @lazy
     def started(self):
-        return self.g.value(self.iri, PROV.startedAtTime)
+        return self.g.value(self.activity, PROV.startedAtTime) if self.activity else None
 
     @lazy
     def ended(self):
-        return self.g.value(self.iri, PROV.endedAtTime)
+        return self.g.value(self.activity, PROV.endedAtTime) if self.activity else None
 
     @lazy
     def sources(self):
@@ -65,10 +66,22 @@ class Activity(object):
         select ?src
         where {
             <%s> cwl:inputs ?port .
-            ?x cwl:destination ?port .
-            ?x cwl:source ?src .
+            ?link   cwl:destination ?port ;
+                    cwl:source ?src .
         }
-        ''' % self.process)]
+        ''' % self.iri)]
+
+    @lazy
+    def input_values(self):
+        return dict(self.g.query('''
+        select ?port ?val
+        where {
+            <%s> cwl:inputs ?port .
+            ?link   cwl:destination ?port ;
+                    cwl:source ?src .
+            ?val cwl:producedByPort ?src .
+        }
+        ''' % self.iri))
 
 
 class WorkflowRunner(object):
@@ -76,6 +89,7 @@ class WorkflowRunner(object):
         nm = NamespaceManager(Graph())
         nm.bind('cwl', CWL)
         nm.bind('prov', PROV)
+        nm.bind('dcterms', DCTERMS)
         self.g = Graph(namespace_manager=nm)
         self.wf_iri = None
         self.act_iri = None
@@ -83,21 +97,47 @@ class WorkflowRunner(object):
     def load(self, *args, **kwargs):
         return self.g.parse(*args, **kwargs)
 
+    def start(self, proc_iri=None):
+        main_act = False
+        if not proc_iri:
+            proc_iri = self.wf_iri
+            main_act = True
+        proc_iri = URIRef(proc_iri)
+        iri = self.iri_for_activity(proc_iri)
+        log.debug('Starting %s', iri)
+        self.g.add([iri, RDF.type, CWL.Activity])
+        self.g.add([iri, CWL.activityFor, proc_iri])
+        self.g.add([iri, PROV.startedAtTime, Literal(datetime.now(), datatype=XSD.datetime)])
+        if main_act:
+            self.act_iri = iri
+        else:
+            self.g.add([self.act_iri, DCTERMS.hasPart, iri])
+            for k, v in Process(self.g, proc_iri).input_values.iteritems():
+                val = self.g.value(v)
+                log.debug('Value on %s is %s', k, val)
+        return iri
+
+    def end(self, act_iri):
+        act_iri = URIRef(act_iri)
+        self.g.add([act_iri, PROV.endedAtTime, Literal(datetime.now(), datatype=XSD.datetime)])
+
     def iri_for_activity(self, process_iri):
         sep = '/' if '#' in process_iri else '#'
-        return URIRef(process_iri + sep + 'activity')
+        return URIRef(process_iri + sep + '__activity__')
 
     def iri_for_value(self, port_iri):
-        return URIRef(port_iri + '/value')
+        return URIRef(port_iri + '/__value__')
 
-    def get_ready(self):
-        activities = [Activity(self.g, iri) for iri in self.g.subjects(RDF.type, CWL.Activity)]
-        return [a for a in activities if a.has_prereqs and not a.started]
+    def queued(self):
+        ps = [Process(self.g, iri) for iri in self.g.subjects(RDF.type, CWL.Process)]
+        return [p for p in ps if p.has_prereqs and not p.started]
 
     def set_value(self, port_iri, value, creator_iri=None):
         if not port_iri.startswith(self.wf_iri):
             port_iri = self.wf_iri + '#' + port_iri
+        port_iri = URIRef(port_iri)
         iri = self.iri_for_value(port_iri)
+        self.g.add([iri, RDF.type, CWL.Value])
         self.g.add([iri, RDF.value, JsonLiteral(value)])
         self.g.add([iri, CWL.producedByPort, URIRef(port_iri)])
         if creator_iri:
@@ -106,41 +146,35 @@ class WorkflowRunner(object):
 
     @classmethod
     def from_workflow(cls, path):
-        instance = cls()
-        g = instance.g
-        instance.load(path, format='json-ld')
-        instance.wf_iri = URIRef('file://' + path)  # FIXME
-        iri = instance.iri_for_activity(instance.wf_iri)
-        instance.act_iri = iri
-        g.add([iri, RDF.type, CWL.Activity])
-        g.add([iri, CWL.activityFor, instance.wf_iri])
-        g.add([iri, PROV.startedAtTime, Literal(datetime.now(), datatype=XSD.datetime)])
-        for sp in g.objects(instance.wf_iri, CWL.steps):
-            a = instance.iri_for_activity(sp)
-            g.resource(a)
-            g.add([a, RDF.type, CWL.Activity])
-            g.add([a, CWL.activityFor, sp])
-        return instance
+        wfr = cls()
+        wfr.load(path, format='json-ld')
+        wfr.wf_iri = URIRef('file://' + path)  # FIXME
+        wfr.g.add([wfr.wf_iri, RDF.type, CWL.Process])
+        for sp in wfr.g.objects(wfr.wf_iri, CWL.steps):
+            wfr.g.add([sp, RDF.type, CWL.Process])
+        return wfr
 
 
 def main():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/wf_simple.json'))
     rnr = WorkflowRunner.from_workflow(path)
+    rnr.start()
 
     def show_ready():
-        for a in rnr.get_ready():
-            print 'Ready to run:', a.iri
-
-    base = rnr.wf_iri + '#'
+        for p in rnr.queued():
+            print 'Ready to run:', p.iri
+    show_ready()
+    
     print 'Setting inputs...'
     rnr.set_value('a', 2)
     rnr.set_value('b', 3)
     show_ready()
 
     print 'Simulating sum...'
-    rnr.g.add([base + 'sum/activity', PROV.startedAtTime, Literal(1)])
-    rnr.set_value('sum/c', 6)
-    rnr.g.add([base + 'sum/activity', PROV.endedAtTime, Literal(1)])
+    sum_proc = rnr.queued()[0]
+    sum_act_iri = rnr.start(sum_proc.iri)
+    rnr.set_value('sum/c', 5, sum_act_iri)
+    rnr.end(sum_act_iri)
     show_ready()
 
 
