@@ -8,7 +8,7 @@
   "@id": "",
   "@type": "Workflow",
   "inputs": [{"@id": "#a"}, {"@id": "#b"}],
-  "outputs": {"@id": "#result"},
+  "outputs": {"@id": "#aplusbsquared"},
   "steps": [
     {
       "@id": "#sum",

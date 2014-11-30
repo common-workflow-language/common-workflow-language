@@ -119,10 +119,10 @@ class WorkflowRunner(object):
 
     def iri_for_activity(self, process_iri):
         sep = '/' if '#' in process_iri else '#'
-        return URIRef(process_iri + sep + '__activity__')
+        return URIRef(process_iri + sep + '__activity__')  # TODO: Better IRIs
 
     def iri_for_value(self, port_iri):
-        return URIRef(port_iri + '/__value__')
+        return URIRef(port_iri + '/__value__')  # TODO: Better IRIs
 
     def queued(self):
         ps = [Process(self.g, iri) for iri in self.g.subjects(RDF.type, CWL.Process)]
@@ -134,29 +134,33 @@ class WorkflowRunner(object):
         port_iri = URIRef(port_iri)
         iri = self.iri_for_value(port_iri)
         self.g.add([iri, RDF.type, CWL.Value])
-        self.g.add([iri, RDF.value, Literal(value)])
+        self.g.add([iri, RDF.value, Literal(value)])  # TODO: complex types as cnt; add CWL.includesFile
         self.g.add([iri, CWL.producedByPort, URIRef(port_iri)])
         if creator_iri:
             self.g.add([iri, PROV.wasGeneratedBy, URIRef(creator_iri)])
         return iri
-
-    def get_value(self, port_iri):
-        if not port_iri.startswith(self.wf_iri):
-            port_iri = self.wf_iri + '#' + port_iri
-        port_iri = URIRef(port_iri)
-        proc = Process(self.g, self.g.value(None, CWL.inputs, port_iri))
-        return self.g.value(proc.input_values[port_iri]).toPython()
 
     def run_workflow(self):
         self.start()
         while self.queued():
             act = self.start(self.queued()[0].iri)
             proc = self.g.value(act, CWL.activityFor)
+            # TODO: self.g.add [act, PROV.used, value]
             outputs = self.run_script(proc)
             for k, v in outputs.iteritems():
                 self.set_value(proc + '/' + k, v, act)
             self.end(act)
         self.end(self.act_iri)
+        outputs = dict(self.g.query('''
+        select ?port ?val
+        where {
+            <%s> cwl:outputs ?port .
+            ?link   cwl:destination ?port ;
+                    cwl:source ?src .
+            ?val cwl:producedByPort ?src .
+        }
+        ''' % self.wf_iri))
+        return {k: self.g.value(v) for k, v in outputs.iteritems()}
 
     def run_script(self, proc):
         proc = Process(self.g, proc)
@@ -173,15 +177,13 @@ class WorkflowRunner(object):
     def from_workflow(cls, path):
         wfr = cls()
         wfr.load(path, format='json-ld')
-        wfr.wf_iri = URIRef('file://' + path)  # FIXME
+        wfr.wf_iri = URIRef('file://' + path)  # TODO: Find a better way to do this
         wfr.g.add([wfr.wf_iri, RDF.type, CWL.Process])
         for sp in wfr.g.objects(wfr.wf_iri, CWL.steps):
             wfr.g.add([sp, RDF.type, CWL.Process])
             tool = wfr.g.value(sp, CWL.tool)
             log.debug('Loading reference %s', tool)
-            tg = Graph()
-            tg.parse(tool, format='json-ld')
-            wfr.g += tg
+            wfr.g.parse(tool, format='json-ld')
         return wfr
 
 
@@ -190,8 +192,10 @@ def main():
     rnr = WorkflowRunner.from_workflow(path)
     rnr.set_value('a', 2)
     rnr.set_value('b', 3)
-    rnr.run_workflow()
-
+    outs = rnr.run_workflow()
+    print '\nDone. Workflow outputs:'
+    for k, v in outs.iteritems():
+        print k, v
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
