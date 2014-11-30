@@ -7,17 +7,13 @@ from datetime import datetime
 from rdflib import Graph, URIRef, Literal, RDF, XSD
 from rdflib.namespace import Namespace, NamespaceManager
 
+from tool import jseval
 
 log = logging.getLogger(__file__)
 
 CWL = Namespace('http://github.com/common-workflow-language/schema/wf#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
-
-
-class JsonLiteral(Literal):
-    def __init__(self, val):
-        super(JsonLiteral, self).__init__(json.dumps(val), datatype='http://json.org')
 
 
 def lazy(func):
@@ -114,7 +110,7 @@ class WorkflowRunner(object):
             self.g.add([self.act_iri, DCTERMS.hasPart, iri])
             for k, v in Process(self.g, proc_iri).input_values.iteritems():
                 val = self.g.value(v)
-                log.debug('Value on %s is %s', k, val)
+                log.debug('Value on %s is %s', k, val.toPython())
         return iri
 
     def end(self, act_iri):
@@ -138,11 +134,40 @@ class WorkflowRunner(object):
         port_iri = URIRef(port_iri)
         iri = self.iri_for_value(port_iri)
         self.g.add([iri, RDF.type, CWL.Value])
-        self.g.add([iri, RDF.value, JsonLiteral(value)])
+        self.g.add([iri, RDF.value, Literal(value)])
         self.g.add([iri, CWL.producedByPort, URIRef(port_iri)])
         if creator_iri:
             self.g.add([iri, PROV.wasGeneratedBy, URIRef(creator_iri)])
         return iri
+
+    def get_value(self, port_iri):
+        if not port_iri.startswith(self.wf_iri):
+            port_iri = self.wf_iri + '#' + port_iri
+        port_iri = URIRef(port_iri)
+        proc = Process(self.g, self.g.value(None, CWL.inputs, port_iri))
+        return self.g.value(proc.input_values[port_iri]).toPython()
+
+    def run_workflow(self):
+        self.start()
+        while self.queued():
+            act = self.start(self.queued()[0].iri)
+            proc = self.g.value(act, CWL.activityFor)
+            outputs = self.run_script(proc)
+            for k, v in outputs.iteritems():
+                self.set_value(proc + '/' + k, v, act)
+            self.end(act)
+        self.end(self.act_iri)
+        # assert len(self.g.subjects(RDF.type, CWL.Process)) == len(self.g.subjects(RDF.type, CWL.Activity))
+
+    def run_script(self, proc):
+        proc = Process(self.g, proc)
+        inputs = {k[k.rfind('/') + 1:]: self.g.value(v).toPython() for k, v in proc.input_values.iteritems()}
+        job = {'inputs': inputs}
+        expr = self.g.value(proc.iri, CWL.expr)
+        log.debug('Running expr %s\nJob: %s', expr, job)
+        result = jseval(job, expr)
+        logging.debug('Result: %s', result)
+        return result
 
     @classmethod
     def from_workflow(cls, path):
@@ -158,24 +183,28 @@ class WorkflowRunner(object):
 def main():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/wf_simple.json'))
     rnr = WorkflowRunner.from_workflow(path)
-    rnr.start()
-
-    def show_ready():
-        for p in rnr.queued():
-            print 'Ready to run:', p.iri
-    show_ready()
-    
-    print 'Setting inputs...'
     rnr.set_value('a', 2)
     rnr.set_value('b', 3)
-    show_ready()
+    rnr.run_workflow()
 
-    print 'Simulating sum...'
-    sum_proc = rnr.queued()[0]
-    sum_act_iri = rnr.start(sum_proc.iri)
-    rnr.set_value('sum/c', 5, sum_act_iri)
-    rnr.end(sum_act_iri)
-    show_ready()
+    # rnr.start()
+    #
+    # def show_ready():
+    #     for p in rnr.queued():
+    #         print 'Ready to run:', p.iri
+    # show_ready()
+    #
+    # print 'Setting inputs...'
+    # rnr.set_value('a', 2)
+    # rnr.set_value('b', 3)
+    # show_ready()
+    #
+    # print 'Simulating sum...'
+    # sum_proc = rnr.queued()[0]
+    # sum_act_iri = rnr.start(sum_proc.iri)
+    # rnr.set_value('sum/c', 5, sum_act_iri)
+    # rnr.end(sum_act_iri)
+    # show_ready()
 
 
 if __name__ == '__main__':
