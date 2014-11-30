@@ -157,13 +157,13 @@ class WorkflowRunner(object):
                 self.set_value(proc + '/' + k, v, act)
             self.end(act)
         self.end(self.act_iri)
-        # assert len(self.g.subjects(RDF.type, CWL.Process)) == len(self.g.subjects(RDF.type, CWL.Activity))
 
     def run_script(self, proc):
         proc = Process(self.g, proc)
         inputs = {k[k.rfind('/') + 1:]: self.g.value(v).toPython() for k, v in proc.input_values.iteritems()}
         job = {'inputs': inputs}
-        expr = self.g.value(proc.iri, CWL.expr)
+        tool = self.g.value(proc.iri, CWL.tool)
+        expr = self.g.value(tool, CWL.expr)
         log.debug('Running expr %s\nJob: %s', expr, job)
         result = jseval(job, expr)
         logging.debug('Result: %s', result)
@@ -177,6 +177,11 @@ class WorkflowRunner(object):
         wfr.g.add([wfr.wf_iri, RDF.type, CWL.Process])
         for sp in wfr.g.objects(wfr.wf_iri, CWL.steps):
             wfr.g.add([sp, RDF.type, CWL.Process])
+            tool = wfr.g.value(sp, CWL.tool)
+            log.debug('Loading reference %s', tool)
+            tg = Graph()
+            tg.parse(tool, format='json-ld')
+            wfr.g += tg
         return wfr
 
 
@@ -186,25 +191,6 @@ def main():
     rnr.set_value('a', 2)
     rnr.set_value('b', 3)
     rnr.run_workflow()
-
-    # rnr.start()
-    #
-    # def show_ready():
-    #     for p in rnr.queued():
-    #         print 'Ready to run:', p.iri
-    # show_ready()
-    #
-    # print 'Setting inputs...'
-    # rnr.set_value('a', 2)
-    # rnr.set_value('b', 3)
-    # show_ready()
-    #
-    # print 'Simulating sum...'
-    # sum_proc = rnr.queued()[0]
-    # sum_act_iri = rnr.start(sum_proc.iri)
-    # rnr.set_value('sum/c', 5, sum_act_iri)
-    # rnr.end(sum_act_iri)
-    # show_ready()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,10 @@
+{
+  "@context": {
+    "@vocab": "http://github.com/common-workflow-language/schema/wf#"
+  },
+  "@id": "",
+  "@type": "SimpleTransformTool",
+  "inputs": {"@id": "#a"},
+  "outputs": {"@id": "#b"},
+  "expr": "{return {b: $job.inputs.a * $job.inputs.a}}"
+}

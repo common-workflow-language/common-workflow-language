@@ -1,8 +1,6 @@
 {
   "@context": {
     "@vocab": "http://github.com/common-workflow-language/schema/wf#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "prov": "http://www.w3.org/ns/prov#",
     "source": {"@type": "@id"},
     "destination": {"@type": "@id"},
     "tool": {"@type": "@id"}
@@ -12,8 +10,18 @@
   "inputs": [{"@id": "#a"}, {"@id": "#b"}],
   "outputs": {"@id": "#result"},
   "steps": [
-    {"@id": "#sum", "inputs": [{"@id": "#sum/a"}, {"@id": "#sum/b"}], "outputs": {"@id": "#sum/c"}, "expr": "{return {c: $job.inputs.a + $job.inputs.b}}"},
-    {"@id": "#square", "inputs": {"@id": "#square/a"}, "outputs": {"@id": "#square/b"}, "expr": "{return {b: $job.inputs.a * $job.inputs.a}}"}
+    {
+      "@id": "#sum",
+      "tool": "simple_add.json",
+      "inputs": [{"@id": "#sum/a", "impl": "simple_add.json#a"}, {"@id": "#sum/b", "impl": "simple_add.json#b"}],
+      "outputs": {"@id": "#sum/c", "impl": "simple_add.json#c"}
+    },
+    {
+      "@id": "#square",
+      "tool": "simple_square.json",
+      "inputs": {"@id": "#square/a", "impl": "simple_square.json#a"},
+      "outputs": {"@id": "#square/b", "impl": "simple_square.json#b"}
+    }
   ],
   "connections": [
     {"source": "#a", "destination": "#sum/a"},
