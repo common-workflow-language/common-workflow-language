@@ -11,15 +11,6 @@
   "outputs": {"@id": "#aplusbtimesc", "depth": 0},
   "steps": [
     {
-      "@id": "#add",
-      "tool": "simple_add.json",
-      "inputs": [
-        {"@id": "#add/a", "impl": "simple_add.json#a", "depth": 0},
-        {"@id": "#add/b", "impl": "simple_add.json#b", "depth": 0}
-      ],
-      "outputs": {"@id": "#add/c", "impl": "simple_add.json#c", "depth": 0}
-    },
-    {
       "@id": "#mul",
       "tool": "simple_mul.json",
       "inputs": [
@@ -27,13 +18,19 @@
         {"@id": "#mul/b", "impl": "simple_mul.json#b", "depth": 0}
       ],
       "outputs": {"@id": "#mul/c", "impl": "simple_mul.json#c", "depth": 0}
+    },
+    {
+      "@id": "#sum",
+      "tool": "simple_sum.json",
+      "inputs": {"@id": "#sum/arr", "impl": "simple_sum.json#arr", "depth": 1},
+      "outputs": {"@id": "#sum/sum", "impl": "simple_sum.json#sum", "depth": 0}
     }
   ],
   "connections": [
-    {"source": "#a", "destination": "#add/a"},
-    {"source": "#b", "destination": "#add/b"},
+    {"source": "#a", "destination": "#mul/a"},
+    {"source": "#b", "destination": "#mul/a"},
     {"source": "#c", "destination": "#mul/b"},
-    {"source": "#add/c", "destination": "#mul/a"},
-    {"source": "#mul/c", "destination": "#aplusbtimesc"}
+    {"source": "#mul/c", "destination": "#sum/arr"},
+    {"source": "#sum/sum", "destination": "#aplusbtimesc"}
   ]
 }

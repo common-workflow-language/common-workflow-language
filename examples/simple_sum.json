@@ -4,7 +4,7 @@
   },
   "@id": "",
   "@type": "SimpleTransformTool",
-  "inputs": {"@id": "#arr"},
-  "outputs": {"@id": "#sum"},
+  "inputs": {"@id": "#arr", "depth": 1},
+  "outputs": {"@id": "#sum", "depth": 0},
   "expr": "{return {sum: $job.inputs.arr.reduce(function(a,b){return a+b;}, 0)};}"
 }

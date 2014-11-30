@@ -7,20 +7,20 @@
   },
   "@id": "",
   "@type": "Workflow",
-  "inputs": [{"@id": "#a"}, {"@id": "#b"}, {"@id": "#c"}],
-  "outputs": {"@id": "#aplusbtimesc"},
+  "inputs": [{"@id": "#a", "depth": 0}, {"@id": "#b", "depth": 0}, {"@id": "#c", "depth": 0}],
+  "outputs": {"@id": "#aplusbtimesc", "depth": 0},
   "steps": [
     {
       "@id": "#sum",
       "tool": "simple_sum.json",
-      "inputs": {"@id": "#sum/arr", "impl": "simple_sum.json#arr"},
-      "outputs": {"@id": "#sum/sum", "impl": "simple_sum.json#sum"}
+      "inputs": {"@id": "#sum/arr", "impl": "simple_sum.json#arr", "depth": 1},
+      "outputs": {"@id": "#sum/sum", "impl": "simple_sum.json#sum", "depth": 0}
     },
     {
       "@id": "#prod",
       "tool": "simple_prod.json",
-      "inputs": {"@id": "#prod/arr", "impl": "simple_prod.json#arr"},
-      "outputs": {"@id": "#prod/product", "impl": "simple_prod.json#product"}
+      "inputs": {"@id": "#prod/arr", "impl": "simple_prod.json#arr", "depth": 1},
+      "outputs": {"@id": "#prod/product", "impl": "simple_prod.json#product", "depth": 0}
     }
   ],
   "connections": [

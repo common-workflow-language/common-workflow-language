@@ -3,6 +3,7 @@ import logging
 import functools
 import json
 from datetime import datetime
+from copy import deepcopy
 from collections import defaultdict
 
 from rdflib import Graph, URIRef, Literal, RDF, XSD
@@ -156,15 +157,44 @@ class WorkflowRunner(object):
             self.g.add([iri, PROV.wasGeneratedBy, URIRef(creator_iri)])
         return iri
 
+    def _depth_mismatch_port(self, proc, inputs):
+        depth_of = lambda x: 1 if isinstance(x, list) else 0  # TODO: fixme
+        incoming = {k: depth_of(v) for k, v in inputs.d.iteritems()}
+        expected = {k: self.g.value(k, CWL.depth).toPython() for k in proc.inputs}
+        result = None
+        for k, v in incoming.iteritems():
+            if expected[k] != v:
+                if result:
+                    log.error('\nIncoming: %s\nExpected: %s', incoming, expected)
+                    raise NotImplementedError('More than one port has mismatching depth.')
+                if incoming[k] < expected[k]:
+                    raise Exception('depth(incoming) < depth(expected); Wrapping must be done explicitly.')
+                result = k
+        return result
+
     def run_workflow(self):
         self.start()
         while self.queued():
             act = self.start(self.queued()[0].iri)
-            proc = self.g.value(act, CWL.activityFor)
-            # TODO: self.g.add [act, PROV.used, value]
-            outputs = self.run_script(proc)  # TODO: propagate desc<->impl
+            proc = Process(self.g, self.g.value(act, CWL.activityFor))
+            tool = self.g.value(proc.iri, CWL.tool)
+            inputs = Inputs(self.g, proc.input_values)  # TODO: propagate desc<->impl
+            dmp = self._depth_mismatch_port(proc, inputs)
+            if not dmp:
+                job = {'inputs': inputs.to_dict()}
+                outputs = self.run_script(tool, job)
+            else:
+                jobs, outputs = [], defaultdict(list)
+                for i in inputs[dmp]:
+                    inp_copy = deepcopy(inputs)
+                    inp_copy.d[dmp] = i
+                    jobs.append({'inputs': inp_copy.to_dict()})
+                for job in jobs:
+                    outs = self.run_script(tool, job)
+                    for k, v in outs.iteritems():
+                        outputs[k].append(v)
             for k, v in outputs.iteritems():
-                self.set_value(proc + '/' + k, v, act)
+                self.set_value(proc.iri + '/' + k, v, act)
             self.end(act)
         self.end(self.act_iri)
         outputs = dict(self.g.query('''
@@ -178,11 +208,7 @@ class WorkflowRunner(object):
         ''' % self.wf_iri))
         return {k: self.g.value(v).toPython() for k, v in outputs.iteritems()}
 
-    def run_script(self, proc):
-        proc = Process(self.g, proc)
-        inputs = Inputs(self.g, proc.input_values).to_dict()
-        job = {'inputs': inputs}
-        tool = self.g.value(proc.iri, CWL.tool)
+    def run_script(self, tool, job):
         expr = self.g.value(tool, CWL.expr)
         log.debug('Running expr %s\nJob: %s', expr, job)
         result = jseval(job, expr)
@@ -204,6 +230,7 @@ class WorkflowRunner(object):
 
 
 def aplusbtimesc(wf_name, a, b, c):
+    print '\n\n--- %s ---\n\n' % wf_name
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/' + wf_name))
     rnr = WorkflowRunner.from_workflow(path)
     rnr.set_value('a', a)
@@ -218,6 +245,6 @@ def aplusbtimesc(wf_name, a, b, c):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    a, b, c = 2, 3, 4
-    aplusbtimesc('wf_simple.json', a, b, c)
-    aplusbtimesc('wf_lists.json', a, b, c)
+    aplusbtimesc('wf_simple.json', 2, 3, 4)
+    aplusbtimesc('wf_lists.json', 2, 3, 4)
+    aplusbtimesc('wf_map.json', 2, 3, 4)

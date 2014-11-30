@@ -4,7 +4,7 @@
   },
   "@id": "",
   "@type": "SimpleTransformTool",
-  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
-  "outputs": {"@id": "#c"},
+  "inputs": [{"@id": "#a", "depth": 0}, {"@id": "#b", "depth": 0}],
+  "outputs": {"@id": "#c", "depth": 0},
   "expr": "{return {c: $job.inputs.a + $job.inputs.b}}"
 }
