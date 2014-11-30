@@ -1,0 +1,128 @@
+@prefix cwl: <http://github.com/common-workflow-language/schema/wf#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#__activity__> a cwl:Activity ;
+    cwl:activityFor <file:///Users/boysha/code/cwl2/examples/wf_simple.json> ;
+    dcterms:hasPart <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/__activity__>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/__activity__> ;
+    prov:endedAtTime "2014-11-30T14:50:49.766367"^^xsd:datetime ;
+    prov:startedAtTime "2014-11-30T14:50:48.795706"^^xsd:datetime .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#a/__value__> a cwl:Value ;
+    cwl:producedByPort <file:///Users/boysha/code/cwl2/examples/wf_simple.json#a> ;
+    rdf:value 2 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/c/__value__> a cwl:Value ;
+    cwl:producedByPort <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/c> ;
+    rdf:value 5 ;
+    prov:wasGeneratedBy <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/__activity__> .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#b/__value__> a cwl:Value ;
+    cwl:producedByPort <file:///Users/boysha/code/cwl2/examples/wf_simple.json#b> ;
+    rdf:value 3 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#c/__value__> a cwl:Value ;
+    cwl:producedByPort <file:///Users/boysha/code/cwl2/examples/wf_simple.json#c> ;
+    rdf:value 4 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/c/__value__> a cwl:Value ;
+    cwl:producedByPort <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/c> ;
+    rdf:value 20 ;
+    prov:wasGeneratedBy <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/__activity__> .
+
+<file:///Users/boysha/code/cwl2/examples/simple_add.json> a cwl:SimpleTransformTool ;
+    cwl:expr "{return {c: $job.inputs.a + $job.inputs.b}}" ;
+    cwl:inputs <file:///Users/boysha/code/cwl2/examples/simple_add.json#a>,
+        <file:///Users/boysha/code/cwl2/examples/simple_add.json#b> ;
+    cwl:outputs <file:///Users/boysha/code/cwl2/examples/simple_add.json#c> .
+
+<file:///Users/boysha/code/cwl2/examples/simple_add.json#a> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/simple_add.json#b> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/simple_add.json#c> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/simple_mul.json> a cwl:SimpleTransformTool ;
+    cwl:expr "{return {c: $job.inputs.a * $job.inputs.b}}" ;
+    cwl:inputs <file:///Users/boysha/code/cwl2/examples/simple_mul.json#a>,
+        <file:///Users/boysha/code/cwl2/examples/simple_mul.json#b> ;
+    cwl:outputs <file:///Users/boysha/code/cwl2/examples/simple_mul.json#c> .
+
+<file:///Users/boysha/code/cwl2/examples/simple_mul.json#a> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/simple_mul.json#b> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/simple_mul.json#c> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json> a cwl:Process,
+        cwl:Workflow ;
+    cwl:connections [ cwl:destination <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/b> ;
+            cwl:source <file:///Users/boysha/code/cwl2/examples/wf_simple.json#c> ],
+        [ cwl:destination <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/b> ;
+            cwl:source <file:///Users/boysha/code/cwl2/examples/wf_simple.json#b> ],
+        [ cwl:destination <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/a> ;
+            cwl:source <file:///Users/boysha/code/cwl2/examples/wf_simple.json#a> ],
+        [ cwl:destination <file:///Users/boysha/code/cwl2/examples/wf_simple.json#aplusbtimesc> ;
+            cwl:source <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/c> ],
+        [ cwl:destination <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/a> ;
+            cwl:source <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/c> ] ;
+    cwl:inputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#a>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#b>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#c> ;
+    cwl:outputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#aplusbtimesc> ;
+    cwl:steps <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul> .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add> a cwl:Process ;
+    cwl:inputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/a>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/b> ;
+    cwl:outputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/c> ;
+    cwl:tool <file:///Users/boysha/code/cwl2/examples/simple_add.json> .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/__activity__> a cwl:Activity ;
+    cwl:activityFor <file:///Users/boysha/code/cwl2/examples/wf_simple.json#add> ;
+    prov:endedAtTime "2014-11-30T14:50:49.609841"^^xsd:datetime ;
+    prov:startedAtTime "2014-11-30T14:50:49.522853"^^xsd:datetime .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/a> cwl:depth 0 ;
+    cwl:impl "simple_add.json#a" .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/b> cwl:depth 0 ;
+    cwl:impl "simple_add.json#b" .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#aplusbtimesc> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul> a cwl:Process ;
+    cwl:inputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/a>,
+        <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/b> ;
+    cwl:outputs <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/c> ;
+    cwl:tool <file:///Users/boysha/code/cwl2/examples/simple_mul.json> .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/__activity__> a cwl:Activity ;
+    cwl:activityFor <file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul> ;
+    prov:endedAtTime "2014-11-30T14:50:49.744186"^^xsd:datetime ;
+    prov:startedAtTime "2014-11-30T14:50:49.652407"^^xsd:datetime .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/a> cwl:depth 0 ;
+    cwl:impl "simple_mul.json#a" .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/b> cwl:depth 0 ;
+    cwl:impl "simple_mul.json#b" .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#a> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#add/c> cwl:depth 0 ;
+    cwl:impl "simple_add.json#c" .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#b> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#c> cwl:depth 0 .
+
+<file:///Users/boysha/code/cwl2/examples/wf_simple.json#mul/c> cwl:depth 0 ;
+    cwl:impl "simple_mul.json#c" .
+

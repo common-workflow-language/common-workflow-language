@@ -242,6 +242,7 @@ def aplusbtimesc(wf_name, a, b, c):
     for k, v in outs.iteritems():
         print k, v
         assert v == (a+b)*c
+    return rnr
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
