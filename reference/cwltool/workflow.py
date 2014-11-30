@@ -203,18 +203,21 @@ class WorkflowRunner(object):
         return wfr
 
 
-def main():
-    a, b = 2, 3
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/wf_lists.json'))
+def aplusbtimesc(wf_name, a, b, c):
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/' + wf_name))
     rnr = WorkflowRunner.from_workflow(path)
     rnr.set_value('a', a)
     rnr.set_value('b', b)
+    rnr.set_value('c', c)
     outs = rnr.run_workflow()
+    assert outs
     print '\nDone. Workflow outputs:'
     for k, v in outs.iteritems():
         print k, v
-        assert v == (a+b)**2
+        assert v == (a+b)*c
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    main()
+    a, b, c = 2, 3, 4
+    aplusbtimesc('wf_simple.json', a, b, c)
+    aplusbtimesc('wf_lists.json', a, b, c)

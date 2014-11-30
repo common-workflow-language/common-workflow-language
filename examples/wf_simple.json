@@ -7,26 +7,27 @@
   },
   "@id": "",
   "@type": "Workflow",
-  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
-  "outputs": {"@id": "#aplusbsquared"},
+  "inputs": [{"@id": "#a"}, {"@id": "#b"}, {"@id": "#c"}],
+  "outputs": {"@id": "#aplusbtimesc"},
   "steps": [
     {
-      "@id": "#sum",
+      "@id": "#add",
       "tool": "simple_add.json",
-      "inputs": [{"@id": "#sum/a", "impl": "simple_add.json#a"}, {"@id": "#sum/b", "impl": "simple_add.json#b"}],
-      "outputs": {"@id": "#sum/c", "impl": "simple_add.json#c"}
+      "inputs": [{"@id": "#add/a", "impl": "simple_add.json#a"}, {"@id": "#add/b", "impl": "simple_add.json#b"}],
+      "outputs": {"@id": "#add/c", "impl": "simple_add.json#c"}
     },
     {
-      "@id": "#square",
-      "tool": "simple_square.json",
-      "inputs": {"@id": "#square/a", "impl": "simple_square.json#a"},
-      "outputs": {"@id": "#square/b", "impl": "simple_square.json#b"}
+      "@id": "#mul",
+      "tool": "simple_mul.json",
+      "inputs": [{"@id": "#mul/a", "impl": "simple_mul.json#a"}, {"@id": "#mul/b", "impl": "simple_mul.json#b"}],
+      "outputs": {"@id": "#mul/c", "impl": "simple_mul.json#c"}
     }
   ],
   "connections": [
-    {"source": "#a", "destination": "#sum/a"},
-    {"source": "#b", "destination": "#sum/b"},
-    {"source": "#sum/c", "destination": "#square/a"},
-    {"source": "#square/b", "destination": "#aplusbsquared"}
+    {"source": "#a", "destination": "#add/a"},
+    {"source": "#b", "destination": "#add/b"},
+    {"source": "#c", "destination": "#mul/b"},
+    {"source": "#add/c", "destination": "#mul/a"},
+    {"source": "#mul/c", "destination": "#aplusbtimesc"}
   ]
 }

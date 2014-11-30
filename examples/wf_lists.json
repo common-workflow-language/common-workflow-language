@@ -7,27 +7,27 @@
   },
   "@id": "",
   "@type": "Workflow",
-  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
-  "outputs": {"@id": "#aplusbsquared"},
+  "inputs": [{"@id": "#a"}, {"@id": "#b"}, {"@id": "#c"}],
+  "outputs": {"@id": "#aplusbtimesc"},
   "steps": [
     {
       "@id": "#sum",
       "tool": "simple_sum.json",
-      "inputs": [{"@id": "#sum/arr", "impl": "simple_sum.json#arr"}],
+      "inputs": {"@id": "#sum/arr", "impl": "simple_sum.json#arr"},
       "outputs": {"@id": "#sum/sum", "impl": "simple_sum.json#sum"}
     },
     {
-      "@id": "#mul",
-      "tool": "simple_mul.json",
-      "inputs": {"@id": "#mul/arr", "impl": "simple_mul.json#arr"},
-      "outputs": {"@id": "#mul/product", "impl": "simple_mul.json#product"}
+      "@id": "#prod",
+      "tool": "simple_prod.json",
+      "inputs": {"@id": "#prod/arr", "impl": "simple_prod.json#arr"},
+      "outputs": {"@id": "#prod/product", "impl": "simple_prod.json#product"}
     }
   ],
   "connections": [
     {"source": "#a", "destination": "#sum/arr"},
     {"source": "#b", "destination": "#sum/arr"},
-    {"source": "#sum/sum", "destination": "#mul/arr"},
-    {"source": "#sum/sum", "destination": "#mul/arr"},
-    {"source": "#mul/product", "destination": "#aplusbsquared"}
+    {"source": "#c", "destination": "#prod/arr"},
+    {"source": "#sum/sum", "destination": "#prod/arr"},
+    {"source": "#prod/product", "destination": "#aplusbtimesc"}
   ]
 }

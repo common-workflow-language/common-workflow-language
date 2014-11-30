@@ -4,7 +4,7 @@
   },
   "@id": "",
   "@type": "SimpleTransformTool",
-  "inputs": {"@id": "#arr"},
-  "outputs": {"@id": "#product"},
-  "expr": "{return {product: $job.inputs.arr.reduce(function(a,b){return a*b;}, 1)};}"
+  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
+  "outputs": {"@id": "#c"},
+  "expr": "{return {c: $job.inputs.a * $job.inputs.b}}"
 }
