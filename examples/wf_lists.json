@@ -1,0 +1,33 @@
+{
+  "@context": {
+    "@vocab": "http://github.com/common-workflow-language/schema/wf#",
+    "source": {"@type": "@id"},
+    "destination": {"@type": "@id"},
+    "tool": {"@type": "@id"}
+  },
+  "@id": "",
+  "@type": "Workflow",
+  "inputs": [{"@id": "#a"}, {"@id": "#b"}],
+  "outputs": {"@id": "#aplusbsquared"},
+  "steps": [
+    {
+      "@id": "#sum",
+      "tool": "simple_sum.json",
+      "inputs": [{"@id": "#sum/arr", "impl": "simple_sum.json#arr"}],
+      "outputs": {"@id": "#sum/sum", "impl": "simple_sum.json#sum"}
+    },
+    {
+      "@id": "#mul",
+      "tool": "simple_mul.json",
+      "inputs": {"@id": "#mul/arr", "impl": "simple_mul.json#arr"},
+      "outputs": {"@id": "#mul/product", "impl": "simple_mul.json#product"}
+    }
+  ],
+  "connections": [
+    {"source": "#a", "destination": "#sum/arr"},
+    {"source": "#b", "destination": "#sum/arr"},
+    {"source": "#sum/sum", "destination": "#mul/arr"},
+    {"source": "#sum/sum", "destination": "#mul/arr"},
+    {"source": "#mul/product", "destination": "#aplusbsquared"}
+  ]
+}

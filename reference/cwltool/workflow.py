@@ -3,6 +3,7 @@ import logging
 import functools
 import json
 from datetime import datetime
+from collections import defaultdict
 
 from rdflib import Graph, URIRef, Literal, RDF, XSD
 from rdflib.namespace import Namespace, NamespaceManager
@@ -14,6 +15,34 @@ log = logging.getLogger(__file__)
 CWL = Namespace('http://github.com/common-workflow-language/schema/wf#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
+
+
+def value_for(graph, iri):
+    return graph.value(iri).toPython()
+
+
+class Inputs(object):
+    def __init__(self, graph, tuples):
+        self.g = graph
+        self.d = {}
+        self.wrapped = []
+        for k, v in tuples:
+            self[k] = v
+
+    def __getitem__(self, item):
+        return self.d[item]
+
+    def __setitem__(self, key, value):
+        if key not in self.d:
+            self.d[key] = value_for(self.g, value)
+        elif key in self.wrapped:
+            self.d[key].append(value_for(self.g, value))
+        else:
+            self.d[key] = [self.d[key], value_for(self.g, value)]
+            self.wrapped.append(key)
+
+    def to_dict(self):
+        return {k[k.rfind('/') + 1:]: v for k, v in self.d.iteritems()}
 
 
 def lazy(func):
@@ -32,29 +61,16 @@ class Process(object):
         self.g = graph
         self.iri = URIRef(iri)
 
-    @lazy
-    def activity(self):
-        return self.g.value(None, CWL.activityFor, self.iri)
-
-    @lazy
-    def inputs(self):
-        return list(self.g.objects(self.iri, CWL.inputs))
-
-    @lazy
-    def outputs(self):
-        return list(self.g.objects(self.iri, CWL.outputs))
+    activity = lazy(lambda self: self.g.value(None, CWL.activityFor, self.iri))
+    inputs = lazy(lambda self: list(self.g.objects(self.iri, CWL.inputs)))
+    outputs = lazy(lambda self: list(self.g.objects(self.iri, CWL.outputs)))
+    started = lazy(lambda self: self.g.value(self.activity, PROV.startedAtTime) if self.activity else None)
+    ended = lazy(lambda self: self.g.value(self.activity, PROV.endedAtTime) if self.activity else None)
+    has_prereqs = lazy(lambda self: all([None, CWL.producedByPort, src] in self.g for src in self.sources))
 
     @lazy
     def has_prereqs(self):
         return all([None, CWL.producedByPort, src] in self.g for src in self.sources)
-
-    @lazy
-    def started(self):
-        return self.g.value(self.activity, PROV.startedAtTime) if self.activity else None
-
-    @lazy
-    def ended(self):
-        return self.g.value(self.activity, PROV.endedAtTime) if self.activity else None
 
     @lazy
     def sources(self):
@@ -69,7 +85,7 @@ class Process(object):
 
     @lazy
     def input_values(self):
-        return dict(self.g.query('''
+        return self.g.query('''
         select ?port ?val
         where {
             <%s> cwl:inputs ?port .
@@ -77,7 +93,7 @@ class Process(object):
                     cwl:source ?src .
             ?val cwl:producedByPort ?src .
         }
-        ''' % self.iri))
+        ''' % self.iri)
 
 
 class WorkflowRunner(object):
@@ -108,7 +124,7 @@ class WorkflowRunner(object):
             self.act_iri = iri
         else:
             self.g.add([self.act_iri, DCTERMS.hasPart, iri])
-            for k, v in Process(self.g, proc_iri).input_values.iteritems():
+            for k, v in Process(self.g, proc_iri).input_values:
                 val = self.g.value(v)
                 log.debug('Value on %s is %s', k, val.toPython())
         return iri
@@ -146,7 +162,7 @@ class WorkflowRunner(object):
             act = self.start(self.queued()[0].iri)
             proc = self.g.value(act, CWL.activityFor)
             # TODO: self.g.add [act, PROV.used, value]
-            outputs = self.run_script(proc)
+            outputs = self.run_script(proc)  # TODO: propagate desc<->impl
             for k, v in outputs.iteritems():
                 self.set_value(proc + '/' + k, v, act)
             self.end(act)
@@ -160,11 +176,11 @@ class WorkflowRunner(object):
             ?val cwl:producedByPort ?src .
         }
         ''' % self.wf_iri))
-        return {k: self.g.value(v) for k, v in outputs.iteritems()}
+        return {k: self.g.value(v).toPython() for k, v in outputs.iteritems()}
 
     def run_script(self, proc):
         proc = Process(self.g, proc)
-        inputs = {k[k.rfind('/') + 1:]: self.g.value(v).toPython() for k, v in proc.input_values.iteritems()}
+        inputs = Inputs(self.g, proc.input_values).to_dict()
         job = {'inputs': inputs}
         tool = self.g.value(proc.iri, CWL.tool)
         expr = self.g.value(tool, CWL.expr)
@@ -188,14 +204,16 @@ class WorkflowRunner(object):
 
 
 def main():
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/wf_simple.json'))
+    a, b = 2, 3
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/wf_lists.json'))
     rnr = WorkflowRunner.from_workflow(path)
-    rnr.set_value('a', 2)
-    rnr.set_value('b', 3)
+    rnr.set_value('a', a)
+    rnr.set_value('b', b)
     outs = rnr.run_workflow()
     print '\nDone. Workflow outputs:'
     for k, v in outs.iteritems():
         print k, v
+        assert v == (a+b)**2
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
