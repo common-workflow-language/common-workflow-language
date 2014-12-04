@@ -2,3 +2,5 @@
 *.pyc
 *.egg
 *.egg-info
+reference/build/*
+reference/setup.cfg
