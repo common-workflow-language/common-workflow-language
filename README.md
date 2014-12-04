@@ -18,7 +18,7 @@ errors or be out of date.  Current status is best reflected by the
 
 ## Repository contents
 
-[Draft specifications](core/)
+[Draft specifications](specification/)
 
 [Schemas](schemas/)
 
