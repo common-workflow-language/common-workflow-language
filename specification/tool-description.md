@@ -179,7 +179,7 @@ doc2.json:
 }
 ```
 
-After resolving the reference doc1.json has the following contents:
+After resolving the reference, doc1.json has the following contents:
 
 ```json
 {
@@ -210,12 +210,12 @@ doc1.json:
 doc2.json:
 ```json
 {
-  "item1": 10
+  "item1": 10,
   "item2": 12
 }
 ```
 
-After evaluating the mixin doc1.json has the following contents:
+After evaluating the mixin, doc1.json has the following contents:
 
 ```json
 {
@@ -398,36 +398,71 @@ The following optional fields modify the above behavior:
 
 ### Example
 
+Given the following tool input schema:
+
 ```json
 {
-  "type": "object",
-  "required": ["input1", "param1"],
-  "properties": {
-    "input1": {
-      "type": "file",
-      "adapter": {"order": 2}
-    },
-    "param1": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100,
-      "adapter": {
-        "prefix": "-p",
-        "separator": " ",
-        "order": 1
-      }
-    },
-    "param2": {
-      "type": "array",
-      "items": {"type": "string"},
-      "adapter": {
-        "order": 1,
-        "itemSeparator": ","
+  "inputs": {
+    "type": "object",
+    "required": ["input1", "param1"],
+    "properties": {
+      "input1": {
+        "type": "file",
+        "adapter": {"order": 2}
+      },
+      "param1": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100,
+        "adapter": {
+          "prefix": "-p",
+          "separator": " ",
+          "order": 1
+        }
+      },
+      "param2": {
+        "type": "array",
+        "items": {"type": "string"},
+        "adapter": {
+          "order": 1,
+          "itemSeparator": ","
+        }
       }
     }
   }
 }
 ```
+
+The job order record consists of three fields: "input1", "param1", and
+"param2".  Of those, "input1" and "param1" are required and "param2" is
+optional (it may be missing from the job order record).
+
+Given the following job order:
+
+```json
+{
+  "inputs": {
+    "input1": {
+      "path": "/foo/bar.txt"
+    },
+    "param1": 44,
+    "param2": ["a", "b", "c"]
+  }
+}
+```
+
+The input schema adapters will be applied to build the following command line
+fragment.
+
+```json
+["-p", "44", "a,b,c", "/foo/bar.txt"]
+```
+
+Note that `{"order: 2"}` in the "input1" adapter causes it to be sorted after "param1" and "param2" `{"order: 1"}`
+
+Note that this is not the complete command line, it is merged with
+the top level [Command line adapter](#command-line-adapter) section described
+below.
 
 
 ## Output schema
@@ -493,12 +528,6 @@ Example:
   }
 }
 ```
-
-
-### EDAM Classification
-
-TBD.
-
 
 # Command line generation algorithm
 
