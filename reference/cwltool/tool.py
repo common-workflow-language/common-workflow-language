@@ -90,7 +90,7 @@ def jseval(job=None, expression=None):
 def resolve_eval(job, v):
     if isinstance(v, dict):
         if "$expr" in v:
-            return jseval(job, v["$expr"]["value"])
+            return jseval(job, v["$expr"])
         elif "$job" in v:
             return resolve_pointer(job, v["$job"])
     return v

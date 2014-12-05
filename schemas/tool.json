@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id" : "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
     "description": "Common tool description schema",
     "type": "object",
     "definitions": {
@@ -8,12 +9,7 @@
             "required": ["$expr"],
             "properties": {
                 "$expr": {
-                    "type": "object",
-                    "required": ["lang", "value"],
-                    "properties": {
-                        "lang": {"type": "string"},
-                        "value": {"type": "string"}
-                    }
+                    "type": "string"
                 }
             }
         },
@@ -22,47 +18,47 @@
                 { "type": "string" },
                 { "$ref": "#definitions/expression" },
 
-                { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/$job" }
+                { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/$job" }
             ]
         },
         "numOrExpr": {
             "oneOf": [
                 { "type": "number" },
                 { "$ref": "#definitions/expression" },
-                { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/$job" }
+                { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/$job" }
             ]
         },
         "intOrExpr": {
             "oneOf": [
                 { "type": "integer" },
                 { "$ref": "#definitions/expression" },
-                { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/$job" }
+                { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/$job" }
             ]
         },
         "boolOrExpr": {
             "oneOf": [
                 { "type": "boolean" },
                 { "$ref": "#definitions/expression" },
-                { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/$job" }
+                { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/$job" }
             ]
         }
     },
     "properties": {
         "documentAuthor": {
                     "oneOf": [
-                        { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/stringArray" },
+                        { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/stringArray" },
                         { "type": "string" }
                     ]
         },
         "documentDescription": { "type": "string" },
         "softwareDescription": { "type": "object" },
         "softwareRelease": { "type": "object" },
-        "inputs": { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json" },
-        "outputs": { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json" },
+        "inputs": { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json" },
+        "outputs": { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json" },
         "requirements": {
             "type": "object",
             "properties": {
-                "platformFeatures": { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/stringArray" },
+                "platformFeatures": { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/stringArray" },
                 "environment": {
                     "type": "object",
                     "properties": {
@@ -105,7 +101,7 @@
                 },
                 "baseCmd": {
                     "oneOf": [
-                        { "$ref": "https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json#definitions/stringArray" },
+                        { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/stringArray" },
                         { "type": "string" },
                         { "$ref": "#definitions/expression" }
                     ]

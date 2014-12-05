@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id" : "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json",
     "description": "Meta-schema for describing tool inputs and outputs",
     "definitions": {
         "schemaArray": {

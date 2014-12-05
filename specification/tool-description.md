@@ -112,8 +112,10 @@ capture the tool output, or propagate values from input to output.
 # Syntax
 
 The tool description document and job order document are written in
-[JSON](http://json.org) format.  The document consists of a single root json
-object with a number of fields described here.
+[JSON](http://json.org) format.  The formal schema for the tool description
+document is written using [JSON Schema](http://json-schema.org) and available
+at
+<https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json>
 
 Tool description documents must include a "schema" field with the following
 URL indicate it follows the draft 1 format:
@@ -131,22 +133,23 @@ of the tool description document.
 
 ### References
 
-You may use
-[JSON Reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) to
-indicate that the field value should be obtained by following a
-[JSON pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-to another field.
+Use [JSON Reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
+to indicate that the field value should be obtained by following a
+[JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+to another field.  A reference is represented as a json object with a field
+"$ref" with a string value which is interpreted as the pointer to the desired
+value.
 
-#### Example 1
+#### Examples
 
-In this example, "item1" references the value of "item2" within the same
+- In this example, "item1" references the value of "item2" within the same
 document:
 
 doc0.json:
 ```json
 {
-  "item1": {"$ref": "#item1"},
-  "item2": 12
+  "item1": 12,
+  "item2": {"$ref": "#item1"}
 }
 ```
 
@@ -159,15 +162,13 @@ After resolving the reference:
 }
 ```
 
-#### Example 2
-
-In this example, "item1" in "doc1.json" references to the value of "item2" in
+- In this example, "item1" in "doc1.json" references to the value of "item2" in
 "doc2.json":
 
 doc1.json:
 ```json
 {
-  "item1": {"$ref": "doc2.json#item1"}
+  "item1": {"$ref": "doc2.json#item2"}
 }
 ```
 
@@ -178,7 +179,7 @@ doc2.json:
 }
 ```
 
-After resolving the reference:
+After resolving the reference doc1.json has the following contents:
 
 ```json
 {
@@ -188,7 +189,125 @@ After resolving the reference:
 
 ### Mixins
 
+Use the "$mixin" field to indicate that each field of a *source* object should
+be inserted into the *destination* object.  The object containing the "$mixin"
+field is the destination object.  The "$mixin" field specifies a
+[JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+to a source object.  It is an error if the source is not a json object.  If the
+destination object already contains a field that is found on the source object,
+the value will remain unchanged on the destination object.
+
+#### Example
+
+doc1.json:
+```json
+{
+  "item1": 11,
+  "$mixin": "doc2.json#"
+}
+```
+
+doc2.json:
+```json
+{
+  "item1": 10
+  "item2": 12
+}
+```
+
+After evaluating the mixin doc1.json has the following contents:
+
+```json
+{
+  "item1": 11,
+  "item2": 12
+}
+```
+
 ### Expressions
+
+An expression is a code block which will be executed to yield a result which is
+substituted in place of the "$expr" object.  An expression is represented as a
+json object with a single field "$expr" where the "$expr" field is a string
+containing a
+[Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
+expression or code block.
+
+If the "$expr" value string does not start with "{" and end with "}" the code
+must be interpreted as a
+[Javascript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).
+The value of "$expr" is the result of evaluating the expression.
+
+If the "$expr" value string starts with "{" and ends with "}" the code must be
+interpreted as a
+[function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
+anonymous, zero-argument function.  The value of "$expr" will be the return
+value of the function.
+
+Before executing the expression, the runtime shall initialize a global variable
+"$job" which contains a copy of the validated contents of the job order document.
+
+Expressions must evaluate in an isolated context permitting no side effects
+outside of the context.  Expressions also must be evaluated in
+[Javascript strict mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
+The order of evaluation of expressions within a document is undefined.
+Implementations may apply other limits, such as process isolation and timeouts
+to minimize the security risks associated with running untrusted code embedded
+in a tool description document.
+
+#### Examples
+
+- Assume the following job order document in "$job"
+
+```json
+{
+  "inputs": {
+    "i": 3
+  }
+}
+```
+
+The following expression can access the job order:
+
+```json
+{
+  "item": {"$expr": "$job.inputs.i + 2"}
+}
+```
+
+This evaluates to:
+
+```json
+{
+  "item": 5
+}
+```
+
+- The job order document can include array values:
+
+```json
+{
+  "inputs": {
+    "i": [1, 2, 3]
+  }
+}
+```
+
+Expressions can include code blocks:
+
+```json
+{
+  "item": {"$expr": "{ var a; var b = $job.inputs.i; for (a = 0; a < b.length; a += 1) { b[a] += 2; } return b; }"}
+}
+```
+
+Evaluates to:
+
+```json
+{
+  "item1": [3, 4, 5]
+}
+```
 
 ## Input schema
 

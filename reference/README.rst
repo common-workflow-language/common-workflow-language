@@ -10,7 +10,7 @@ Install
 
 From source::
 
-  git clone https://github.com/rabix/common-workflow-language.git
+  git clone https://github.com/common-workflow-language/common-workflow-language.git
   cd common-workflow-language/reference
   easy_install .
 
