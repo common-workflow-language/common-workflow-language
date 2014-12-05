@@ -161,7 +161,6 @@
     "adapter": {
         "type": "object",
         "properties": {
-            "stdin": { "type": "boolean" },
             "prefix": { "type": "string" },
             "order": { "type": "integer" },
             "separator": { "type": "string" },

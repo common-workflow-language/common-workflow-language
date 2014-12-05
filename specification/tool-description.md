@@ -113,7 +113,7 @@ capture the tool output, or propagate values from input to output.
 
 The tool description document and job order document are written in
 [JSON](http://json.org) format.  The formal schema for the tool description
-document is written using [JSON Schema](http://json-schema.org) and available
+document is written using [JSON Schema draft v4](http://json-schema.org) and available
 at
 <https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json>
 
@@ -313,17 +313,91 @@ Evaluates to:
 
 The input schema is stored in the "inputs" field of the root object.  The value
 of "inputs" is a formal description of the format of the input record.  The
-schema language is based on [JSON Schema](http://json-schema.org)
+schema language formally defined at
+<https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json>
 
+The input schema is based on [JSON Schema draft v4](http://json-schema.org),
+with the following differences:
 
+- The
+  ["$schema" keyword](http://json-schema.org/latest/json-schema-core.html#anchor22)
+  is unnecessary and will be ignored.  The input schema is always validated
+  against the "metaschema" linked above.
 
-JSON Schema type for `inputs` field must be `object`.
-Basic schema is extended with `adapter` key that describes how
-the input is translated to command line argument;
-basic types are extended with a literal "file".
+- An additional
+[primitive type](http://json-schema.org/latest/json-schema-core.html#anchor8)
+of "file".  When `{"type": "file"}` is encountered, it should be treated as
+`{"$mixin":
+"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#/definitions/file"}`
+and the value of "type" changed to "object".
 
+- The addition of "adapter" sections, discussed below.
 
-Example:
+Consult
+[JSON Schema Core](http://json-schema.org/latest/json-schema-core.html),
+[JSON Schema Validation](http://json-schema.org/latest/json-schema-validation.html),
+and [JSON Schema examples](http://json-schema.org/examples.html) for detailed
+information about schema structure, keywords, and validation options.
+
+The input schema top level must be `{"type": "object"}`
+
+### Adapters
+
+Any object in the schema where the "type" keyword is meaningful may contain an
+"adapter" object.  The adapter describes how the concrete value from the job
+order record should be translated into command line argument(s).
+
+If no adapter section is present, nothing will be added to the command line for
+that field.
+
+The adapter behavior in building the command line depends on the field type
+from the job order record, modified by the options listed below:
+
+- array: each value of the array will be added as separate command line
+entries, unless "itemSeparator" is specified (see below).
+
+- boolean: Assume command line flag.  If true, indicates that the value in
+  "prefix" should be added to the command line.  If false, nothing is added.
+
+- file: Add the "path" field of the file object to the command line.  Note that
+  the actual path used to invoke the tool may be different due to path
+  rewriting.
+
+- null: nothing is added to the command line.
+
+- number: Convert to decimal text string representation and add an entry to the
+  the command line.
+
+- object: the value of "prefix" is added to the command line.  The contents of
+  the object may be added with a nested adapter.
+
+- string: Added unchanged to the command line.
+
+The following optional fields modify the above behavior:
+
+- "prefix" (type: string, default: none) A string to prefix to the field value when
+  constructing the command line.
+
+- "order" (type: integer, default: 0) The sort order, relative to other command
+  line arguments at the same adapter nesting depth.
+
+- "separator" (type: string, default: none) The separator beween the prefix and
+  the value.  If the value of separator is a single space, the prefix and field
+  value will be separate entries in the command line arguments array; otherwise
+  the command line entry will be a single entry which is the concatination of
+  prefix+separator+value.
+
+- "itemSeparator" (type: string, default: none) If the field value is an array,
+  join each value in the array into a single string separated by the value of
+  itemSeparator.
+
+- "streamable" (type: boolean) For file types only.  Provided as a hint to the
+  workflow infrastructure for how the file will be accessed.  Indicates that
+  the tool reads the file linearly from start to finish with no seeking or
+  random access.
+
+### Example
+
 ```json
 {
   "type": "object",
@@ -425,16 +499,6 @@ Example:
 
 TBD.
 
-
-## Expressions
-
-Some fields may contain
-[ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
-expressions as values.
-They are used for basic string manipulation when generating the command line,
- creating output structures (metadata and indices) and dynamic resource requirements.
-
-The order of evaluation is undefined.
 
 # Command line generation algorithm
 
