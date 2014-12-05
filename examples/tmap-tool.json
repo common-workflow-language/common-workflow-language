@@ -1,4 +1,5 @@
 {
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
     "inputs": {
         "required": [
             "stages"

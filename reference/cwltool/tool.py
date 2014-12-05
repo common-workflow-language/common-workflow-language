@@ -26,8 +26,12 @@ with open(toolpath) as f:
 with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
     metaschema = json.load(f)
 
-ref_resolver.loader.fetched["https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/tool.json"] = tool_schema_doc
-ref_resolver.loader.fetched["https://raw.githubusercontent.com/rabix/common-workflow-language/master/schemas/metaschema.json"] = metaschema
+SCHEMA_URL_PREFIX = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/"
+TOOL_SCHEMA_URL = SCHEMA_URL_PREFIX + "tool.json"
+METASCHEMA_SCHEMA_URL = SCHEMA_URL_PREFIX + "metaschema.json"
+
+ref_resolver.loader.fetched[TOOL_SCHEMA_URL] = tool_schema_doc
+ref_resolver.loader.fetched[METASCHEMA_SCHEMA_URL] = metaschema
 
 tool_schema = Draft4Validator(tool_schema_doc)
 
@@ -278,6 +282,8 @@ class Tool(object):
     def __init__(self, toolpath_object):
         self.tool = toolpath_object
         fix_file_type(self.tool)
+        if "schema" not in self.tool or self.tool["schema"] != TOOL_SCHEMA_URL:
+            raise Exception("Missing or invalid 'schema' field in tool description document, must be %s" % TOOL_SCHEMA_URL)
         tool_schema.validate(self.tool)
 
     def job(self, joborder, basedir, use_container=True):

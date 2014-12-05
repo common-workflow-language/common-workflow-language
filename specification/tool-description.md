@@ -115,7 +115,14 @@ The tool description document and job order document are written in
 [JSON](http://json.org) format.  The document consists of a single root json
 object with a number of fields described here.
 
+Tool description documents must include a "schema" field with the following
+URL indicate it follows the draft 1 format:
 
+```json
+{
+  "schema": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json"
+}
+```
 
 ## References, Mixins and Expressions
 
