@@ -16,14 +16,21 @@ inputs to an actual program invocation.
 
 # Concepts
 
-The *tool description document* consists of five major parts: the input schema,
-the output schema, the command line adapter, tool requirements, and tool metadata.
+In this specification, a *record* refers to a data structure consisting of a
+unordered set of key-value pairs (referred to here as *fields*), where the keys
+are unique strings.  This is functionally equivalent to a JSON "object", python
+"dict", or the "hash" or "map" datatypes available in most programming
+language.  A *document* is a file containing a serialized record.
 
-- The *input schema* formally describes the permissible fields and datatypes that
-  make up input record.  Input fields follow the JSON data model, and may
-  consist of string, number, boolean, object, or array values.  Files are
-  represented as an object with a string field that is the locally-available
-  path to the file.
+The *tool description document* consists of five major parts: the input schema,
+the output schema, the command line adapter, tool requirements, and tool
+metadata.  The exact syntax and semantics is discussed below in [Syntax](#Syntax).
+
+- The *input schema* formally describes the permissible fields and datatypes of
+  the field values that make up input record.  Input fields follow the JSON
+  data model, and may consist of string, number, boolean, object, or array
+  values.  Files are represented as an object with a string field that is the
+  locally-available path to the file.
 
 - The *output schema* describes how to build the output record based on the output
   produced by an invocation of the tool.
@@ -55,14 +62,20 @@ Together, the tool description document and the job order document provide all
 the necessary information to actually set up the environment and build the
 command line to run a specific invocation of the tool.
 
+The *runtime environment* refers to the hardware architecture, hardware
+resources, operating system, software runtime (if applicable, such as the
+Python interpreter or the JVM), along with libraries, modules, packages,
+utilities, and data files required to run the tool.
+
 Tools are executed by the *workflow infrastructure*.  The workflow
 infrastructure is the underlying platform responsible for interpreting the tool
 description and job order, setting up the necessary runtime environment, and
 actually invoking the tool process.  Provided that assumptions and restrictions
 outlined below are met, the workflow infrastructure has broad leeway to
 schedule tool invocations on remote cluster or cloud compute nodes, use virtual
-machines or operating system containers to manage the runtime, and to use
-remote or distributed file systems to manage input and output files.
+machines or operating system containers to manage the runtime, to use remote or
+distributed file systems to manage input and output files, and rewrite file
+paths on the command line.
 
 When tool execution completes, the output record is built based on the output
 schema.  The output schema includes *adapter* sections which describe how to
@@ -73,38 +86,111 @@ capture the tool output, or propagate values from input to output.
 1. Tools run in a POSIX environment.
 
 2. Tools must be non-interactive, command line programs.  Tools must not
-   require any kind of console, GUI, or web based interaction in order to start
-   and run to completion.
+   require any kind of console, GUI, or web based user interaction in order to
+   start and run to completion.
 
-3. Tool input comes from the command line, environment variables, the
-   standard input stream, by reading files, or by accessing network resources.
+3. Tool input comes from the command line, the standard input stream, by
+   reading files, or by accessing network resources.
 
-4. Tool output is emitted via the standard output stream, by writing files, or
+4. Tools only read files or directories which are listed in the input record,
+   or are part of an explicitly declared runtime environment.
+
+5. Tool output is emitted via the standard output stream, by writing files, or
    by accessing a network resource.
 
-5. Tools do not access hardware devices.
-
-6. Input files are read-only.  Tools do not modify existing files, only create
+6. Tool input files are read-only.  Tools do not modify existing files, only create
    new ones.
 
-7. Tool may only write files to a designated output directory or designated
+7. Tools only write files to a designated output directory or designated
    scratch space.
 
 8. Tool may be multithreaded or spawn child processes, however when the
    original tool process exits, the tool is considered finished.
 
-9. By normal POSIX semantics, a tool exit code of 0 is considered success, and
-   a non-zero exit code is considered an error.
+9. Tools do not access hardware devices.
 
 # Syntax
 
-_(Note: everything after this is old and remains to be updated)_
+The tool description document and job order document are written in
+[JSON](http://json.org) format.  The document consists of a single root json
+object with a number of fields described here.
 
-The tool description document is written in [JSON](http://json.org) format.
+
+
+## References, Mixins and Expressions
+
+Where noted, certain fields are evaluated during the loading and interpretation
+of the tool description document.
+
+### References
+
+You may use
+[JSON Reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) to
+indicate that the field value should be obtained by following a
+[JSON pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+to another field.
+
+#### Example 1
+
+In this example, "item1" references the value of "item2" within the same
+document:
+
+doc0.json:
+```json
+{
+  "item1": {"$ref": "#item1"},
+  "item2": 12
+}
+```
+
+After resolving the reference:
+
+```json
+{
+  "item1": 12,
+  "item2": 12
+}
+```
+
+#### Example 2
+
+In this example, "item1" in "doc1.json" references to the value of "item2" in
+"doc2.json":
+
+doc1.json:
+```json
+{
+  "item1": {"$ref": "doc2.json#item1"}
+}
+```
+
+doc2.json:
+```json
+{
+  "item2": 12
+}
+```
+
+After resolving the reference:
+
+```json
+{
+  "item1": 12
+}
+```
+
+### Mixins
+
+### Expressions
 
 ## Input schema
 
-Inputs are described using [JSON Schema](http://json-schema.org).
+The input schema is stored in the "inputs" field of the root object.  The value
+of "inputs" is a formal description of the format of the input record.  The
+schema language is based on [JSON Schema](http://json-schema.org)
+
+
+
 JSON Schema type for `inputs` field must be `object`.
 Basic schema is extended with `adapter` key that describes how
 the input is translated to command line argument;
