@@ -81,6 +81,22 @@ When tool execution completes, the output record is built based on the output
 schema.  The output schema includes *adapter* sections which describe how to
 capture the tool output, or propagate values from input to output.
 
+# Execution
+
+The first item in the [tool command line](#command-line-adapter) must be a file
+with the POSIX execute bit set.  If it is an absolute path, execute the
+specified file.  If there is no path separator, search $PATH in the runtime
+environment for the executable.  Relative paths are not permitted.
+
+The "TMPDIR" environment variable should be set in the tool's environment to
+the designated temporary directory (scratch space).  Any files written to that
+location should be deleted when the tool execution completes.
+
+Output files produced by tool execution must be written to the designated
+output directory.  The designated output directory is empty when execution
+starts (see TODO).  The current working directory when tool execution
+starts shall be the designated output directory.
+
 ## Assumptions and restrictions
 
 1. Tools run in a POSIX environment.
@@ -98,8 +114,8 @@ capture the tool output, or propagate values from input to output.
 5. Tool output is emitted via the standard output stream, by writing files, or
    by accessing a network resource.
 
-6. Tool input files are read-only.  Tools do not modify existing files, only create
-   new ones.
+6. Tool input files are read-only.  Tools do not modify existing files, only
+   create new ones (see TODO).
 
 7. Tools only write files to a designated output directory or designated
    scratch space.
@@ -391,10 +407,11 @@ It consists of the following fields:
 - "args" (type: array) A list of adapter records.  See below.
 
 - "stdin" (type: string, expression, or reference) Optional.  A path to a file to be piped to the
-  standard input stream of the tool instance.
+  standard input stream of the tool process.
 
-- "stdout" (type: string, expression, or reference) Optional.  The name of a file, relative to the output
-  directory, to which the standard output stream will be directed.
+- "stdout" (type: string, expression, or reference) Optional.  The name of a
+  file, relative to the designated output directory, to which the standard
+  output stream of the tool process will be directed.
 
 ### Adapter record
 
@@ -576,18 +593,18 @@ The output schema top level must be `{"type": "object"}`
 ### Ouput adapter record
 
 Any object in the schema where the "type" keyword is meaningful may contain an
-"adapter" object.  The adapter describes how output data from the tool instance should be
-used to build the output record.
+"adapter" object.  The adapter describes how output data from the tool execution
+should be used to build the output record.
 
 If no adapter section is present, the field will not be added to the output record.
 
 The output schema recognizes two fields in the "adapter" record:
 
 - "glob" (type: string) Find files that match a POSIX "glob" pattern, relative
-  to output directory.  If the field type in the schema is "array", the output
-  record will contain a list of all files.  If the field type in the schema is
-  "file", one file from the array will choosen (which one is choosen is
-  undefined).
+  to the designated output directory.  If the field type in the schema is
+  "array", the output record will contain a list of all files.  If the field
+  type in the schema is "file", one file from the array will choosen (which one
+  is choosen is undefined).
 
 - "value" (type: any primitive type, expression or reference) A value to be
   added to the output document under the output schema field.
@@ -611,10 +628,10 @@ The output schema recognizes two fields in the "adapter" record:
 }
 ```
 
-If the output directory contains:
+If the designated output directory contains:
 
 ```
-alice.txt   bob.txt
+alice.txt   bob.txt   carol.bin
 ```
 
 Then building the output record based on the above schema will produce:
@@ -655,6 +672,11 @@ lists are currently unspecified.  See TODO.
 (May be addressed in this draft, or in a later draft)
 
 * Success/fail field in the output record
+
+* Adapter flag to indicate input file should be linked or copied to output
+  directory before executing tool.  Needed to support tools that either want to
+  write files alongside existing files, or modify files in place (update a
+  copy.)
 
 * Use linked data for classification, using EDAM
 
