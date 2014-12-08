@@ -32,14 +32,14 @@ metadata.  The exact syntax and semantics is discussed below in [Syntax](#Syntax
   values.  Files are represented as an object with a string field that is the
   locally-available path to the file.
 
-- The *output schema* describes how to build the output record based on the output
-  produced by an invocation of the tool.
-
 - The *command line adapter* provides the template for generating a concrete
   command line invocation based on an input record.
 
 - The *tool requirements* describes the hardware and software environment required
   to run the tool.
+
+- The *output schema* describes how to build the output record based on the output
+  produced by an invocation of the tool.
 
 - The *tool metadata* consists of information about the tool, such as a human
   readable description, contact information for the author, software catalog
@@ -140,6 +140,9 @@ to another field.  A reference is represented as a json object with a field
 "$ref" with a string value which is interpreted as the pointer to the desired
 value.
 
+The default scope of "$ref" is the tool description document.  To resolve the
+pointer within the job order document, use "$job" in place of "$ref".
+
 #### Examples
 
 - In this example, "item1" references the value of "item2" within the same
@@ -187,6 +190,33 @@ After resolving the reference, doc1.json has the following contents:
 }
 ```
 
+- In this example, use "$job" to refer to the job order document.
+
+doc1.json:
+```json
+{
+  "item1": {"$job": "#/inputs/item1"}
+}
+```
+
+job1.json:
+```json
+{
+  "inputs": {
+    "item1": 13
+  }
+}
+```
+
+After resolving the reference, doc1.json has the following contents:
+
+doc1.json:
+```json
+{
+  "item1": 13
+}
+```
+
 ### Mixins
 
 Use the "$mixin" field to indicate that each field of a *source* object should
@@ -195,7 +225,8 @@ field is the destination object.  The "$mixin" field specifies a
 [JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
 to a source object.  It is an error if the source is not a json object.  If the
 destination object already contains a field that is found on the source object,
-the value will remain unchanged on the destination object.
+the value will remain unchanged on the destination object.  Mixins can be used
+anywhere in the document and are evaluated on document load.
 
 #### Example
 
@@ -311,7 +342,7 @@ Evaluates to:
 
 ## Input schema
 
-The input schema is stored in the "inputs" field of the root object.  The value
+The input schema is stored in the "inputs" field of the tool document.  The value
 of "inputs" is a formal description of the format of the input record.  The
 schema language formally defined at
 <https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json>
@@ -341,17 +372,37 @@ information about schema structure, keywords, and validation options.
 
 The input schema top level must be `{"type": "object"}`
 
-### Adapters
+Any object in the schema where the "type" keyword is meaningful may contain a
+field named "adapter" containing an [Adapter record](#adapter-record).  The
+adapter describes how the value from the job order record should be translated
+into command line argument(s) and is described below.  If no adapter section is
+present, nothing will be added to the command line for that field, unless it is
+referenced some other way.
 
-Any object in the schema where the "type" keyword is meaningful may contain an
-"adapter" object.  The adapter describes how the concrete value from the job
-order record should be translated into command line argument(s).
+## Command line adapter
 
-If no adapter section is present, nothing will be added to the command line for
-that field.
+The command line adapter is stored in the "adapter" field of the tool document.
+It consists of the following fields:
 
-The adapter behavior in building the command line depends on the field type
-from the job order record, modified by the options listed below:
+- "baseCmd" (type: string, expression, or reference or array of such) The program to
+  execute, as well as any command line arguments which must come before all
+  others (such as a subcommand)
+
+- "args" (type: array) A list of adapter records.  See below.
+
+- "stdin" (type: string, expression, or reference) Optional.  A path to a file to be piped to the
+  standard input stream of the tool instance.
+
+- "stdout" (type: string, expression, or reference) Optional.  The name of a file, relative to the output
+  directory, to which the standard output stream will be directed.
+
+### Adapter record
+
+If the adapter record is listed in the input schema, "value" is set to the
+corresponding value in the job order document.  For adapter records listed in
+"args", "value" must be provided or it is an error.  The "value" field may be a
+[reference](#references) or [expression](#expressions).  The adapter behavior
+in building the command line depends on the value type:
 
 - array: each value of the array will be added as separate command line
 entries, unless "itemSeparator" is specified (see below).
@@ -391,7 +442,7 @@ The following optional fields modify the above behavior:
   join each value in the array into a single string separated by the value of
   itemSeparator.
 
-- "streamable" (type: boolean) For file types only.  Provided as a hint to the
+- "streamable" (type: boolean, default: false) For file types only.  Provided as a hint to the
   workflow infrastructure for how the file will be accessed.  Indicates that
   the tool reads the file linearly from start to finish with no seeking or
   random access.
@@ -413,22 +464,29 @@ Given the following tool input schema:
       "param1": {
         "type": "integer",
         "minimum": 0,
-        "maximum": 100,
-        "adapter": {
-          "prefix": "-p",
-          "separator": " ",
-          "order": 1
-        }
+        "maximum": 100
       },
       "param2": {
         "type": "array",
         "items": {"type": "string"},
         "adapter": {
           "order": 1,
+          "separator": " ",
+          "prefix": "--list",
           "itemSeparator": ","
         }
       }
     }
+  },
+  "adapter": {
+    "baseCmd": "example",
+    "args": [
+    {
+      "prefix": "-p",
+      "value": {"$ref": "#/inputs/param1"},
+      "order": 1
+    }
+    ]
   }
 }
 ```
@@ -451,48 +509,156 @@ Given the following job order:
 }
 ```
 
-The input schema adapters will be applied to build the following command line
+The input schema adapters are applied to build the following command line
 fragment.
 
 ```json
-["-p", "44", "a,b,c", "/foo/bar.txt"]
+["example", "-p44", "--list", "a,b,c", "/foo/bar.txt"]
 ```
 
-Note that `{"order: 2"}` in the "input1" adapter causes it to be sorted after "param1" and "param2" `{"order: 1"}`
-
-Note that this is not the complete command line, it is merged with
-the top level [Command line adapter](#command-line-adapter) section described
-below.
-
-
-## Output schema
-
-Describes files that are generated in the process of execution. Also uses JSON-Schema.
-
-Adapter section of individual outputs consists of a glob expression (to capture generated files),
- as well as "meta" and "indices" fields used to describe metadata of generated files.
-
-
-## Command line adapter
-
-An array of either string literals or expressions that generates the executable path and process arguments.
-Annotated inputs will map onto process arguments which are appended to this list.
-Value for the ```stdout``` field is a string or expression that specifies a file name where stdout is piped.
-
+Note that parameters are sorted based on the order field.  Here, `{"order: 2"}`
+in the "input1" adapter causes it to be sorted after "param1" and "param2"
+`{"order: 1"}`.  Where parameters have the same sort order weight, command line
+parameters in the "args" field sort before input schema adapters, in the order
+that they are declared in "args".  Where input schema adapters have the same
+sort order weight, they are sorted based on the lexical ordering of the field
+name.
 
 ## Tool requirements
 
-* Container specification (currently just location of docker image).
-* Computation resources (CPU, RAM, Network).
-* Platform features (enumeration of non-standard platform features).
+The tool requirements is stored in the "requirements" field of the tool
+document.  Tool requirements describe the hardware and software prerequisites
+for running the tool.
+
+There are two fields, "environment" and "resources".
+
+### Environment
+
+The "environment" field of "requirements" describes the runtime environment.
+It has a single field, "container".
+
+#### Container
+
+The "container" field of "environment" specifies a container image that
+encapsulates the runtime environment.  There are three fields:
+
+- "type" (type: string) Type of container.  Currently only "docker".
+
+- "imageId" (type: string) An abstract identifier for the image, such as the docker image hash.
+
+- "uri" (type: string) A locator to download the container image.
+
+### Resources
+
+The "resources" field of "requirements" describes hardware and operating system
+resources.  It has four fields.  The following fields may contain expressions
+or references (this permits calculating the resource requirements based on the
+size of the input).
+
+- "cpu" (type: integer) Minimum number of CPU cores
+
+- "diskSpace" (type: integer) Minimum available disk space required to store
+  both temporary files and output, in megabytes
+
+- "mem" (type: integer) Minimum available RAM, in megabytes
+
+- "network" (type: boolean) Whether unrestricted outgoing network access is required.
+
+## Output schema
+
+The output schema is stored in the "outputs" field of the root object.  The
+value of "outputs" is a template to build the output record.  The output schema
+uses the same format as the input schema, defined at
+<https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json>
+
+The output schema top level must be `{"type": "object"}`
+
+### Ouput adapter record
+
+Any object in the schema where the "type" keyword is meaningful may contain an
+"adapter" object.  The adapter describes how output data from the tool instance should be
+used to build the output record.
+
+If no adapter section is present, the field will not be added to the output record.
+
+The output schema recognizes two fields in the "adapter" record:
+
+- "glob" (type: string) Find files that match a POSIX "glob" pattern, relative
+  to output directory.  If the field type in the schema is "array", the output
+  record will contain a list of all files.  If the field type in the schema is
+  "file", one file from the array will choosen (which one is choosen is
+  undefined).
+
+- "value" (type: any primitive type, expression or reference) A value to be
+  added to the output document under the output schema field.
+
+#### Example
+
+```json
+{
+  "outputs": {
+    "type": "object",
+    "properties": {
+      "product": {
+        "type": "array",
+        "items": {"type":"file"},
+        "adapter": {
+          "glob": "*.txt"
+        }
+      }
+    }
+  }
+}
+```
+
+If the output directory contains:
+
+```
+alice.txt   bob.txt
+```
+
+Then building the output record based on the above schema will produce:
+
+```json
+{
+  "outputs": {
+    "product": [
+      { "path": "alice.txt" },
+      { "path": "bob.txt" }
+    ]
+  }
+}
+```
 
 ## Tool metadata
 
-### Document Author
+Tool metadata fields are not used directly in the execution of the tool, but
+provide additional information about the tool document and the underlying tool.
 
-Name and contact detail of an author of description document.
+### Document author
 
-Example:
+The "documentAuthor" field of the root document lists the authors of the tool
+description document.  May be a string or array of strings.
+
+### Document description
+
+The "documentDescription" field of the root document is a human-readable
+description of the tool, its purpose, and usage.
+
+### Software description and release
+
+The "softwareDescription" and "softwareRelase" fields of the root document
+lists are currently unspecified.  See TODO.
+
+# Things remaining for discussion / TODO
+
+(May be addressed in this draft, or in a later draft)
+
+* Success/fail field in the output record
+
+* Use linked data for classification, using EDAM
+
+* Use linked data for specifying authors:
 
 ```jsonld
 {
@@ -503,9 +669,10 @@ Example:
 }
 ```
 
-The `@id` SHOULD be an [ORCID](http://orcid.org/) identifier, but MAY be any other [Web-ID](http://www.w3.org/TR/webid/).
+(The `@id` SHOULD be an [ORCID](http://orcid.org/) identifier, but MAY be any
+other [Web-ID](http://www.w3.org/TR/webid/))
 
-### Software Description
+* Use linked data for specifying project metadata:
 
 Software description field contains a
 [DOAP](https://github.com/edumbill/doap/wiki)
@@ -528,7 +695,3 @@ Example:
   }
 }
 ```
-
-# Command line generation algorithm
-
-TBD.
