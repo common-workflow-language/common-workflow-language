@@ -31,14 +31,7 @@
                 "path": { "type": "string" },
                 "size": { "type": "number" },
                 "checksum": { "type": "string" },
-                "meta": {
-                    "type": "object",
-                    "properties": {
-                        "file_type": {"type": "string"}
-                    },
-                    "additionalProperties": true,
-                    "required": ["file_type"]
-                }
+                "metadata": { "type": "object" }
             }
         },
         "file": {
@@ -52,14 +45,7 @@
                     "type": "array",
                     "items": { "$ref": "#/definitions/secondaryFile" }
                 },
-                "meta": {
-                    "type": "object",
-                    "properties": {
-                        "file_type": {"type": "string"}
-                    },
-                    "additionalProperties": true,
-                    "required": ["file_type"]
-                }
+                "metadata": { "type": "object" }
             }
         },
         "$job": {

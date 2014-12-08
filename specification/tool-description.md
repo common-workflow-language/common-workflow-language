@@ -83,6 +83,9 @@ capture the tool output, or propagate values from input to output.
 
 # Execution
 
+A [tool command line](#command-line-adapter) is built based on the
+[Job order document](#job-order-document).
+
 The first item in the [tool command line](#command-line-adapter) must be a file
 with the POSIX execute bit set.  If it is an absolute path, execute the
 specified file.  If there is no path separator, search $PATH in the runtime
@@ -93,9 +96,9 @@ the designated temporary directory (scratch space).  Any files written to that
 location should be deleted when the tool execution completes.
 
 Output files produced by tool execution must be written to the designated
-output directory.  The designated output directory is empty when execution
-starts (see TODO).  The current working directory when tool execution
-starts shall be the designated output directory.
+output directory.  The designated output directory is empty except for
+"job.json" which contains the job order.  The current working directory when
+tool execution starts shall be the designated output directory.
 
 ## Assumptions and restrictions
 
@@ -124,6 +127,43 @@ starts shall be the designated output directory.
    original tool process exits, the tool is considered finished.
 
 9. Tools do not access hardware devices.
+
+## Job order document
+
+The job order document consists of two fields, "inputs" which hold the input
+record and "allocatedResources" which holds the allocated resources record.
+
+The input record is validated against the [input schema](#input-schema)
+described in the tool document.
+
+The allocated resources record contains the maximum hardware resources
+available to run the tool.  It is compared with the
+[tool resource requirements](#resources) to determine if the tool can run.  The
+fields are the same as those described in
+[tool resource requirements](#resources).
+
+### Example
+
+```json
+{
+  "inputs": {
+    "input1": {
+      "path": "../files/input1.fasta",
+      "size": 678599850,
+      "checksum": "sha1$6809bc2706188b7b10d99d06fe4f175f8fe8061a",
+      "metadata": {
+        "fileType": "fasta"
+      }
+    }
+  },
+  "allocatedResources": {
+    "cpu": 4,
+    "mem": 5000,
+    "diskSpace": 1000,
+    "network": false
+  }
+}
+```
 
 # Syntax
 
@@ -376,7 +416,7 @@ with the following differences:
 of "file".  When `{"type": "file"}` is encountered, it should be treated as
 `{"$mixin":
 "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#/definitions/file"}`
-and the value of "type" changed to "object".
+and the value of "type" changed to "object".  See [file records](#file-records) below.
 
 - The addition of "adapter" sections, discussed below.
 
@@ -386,14 +426,35 @@ Consult
 and [JSON Schema examples](http://json-schema.org/examples.html) for detailed
 information about schema structure, keywords, and validation options.
 
-The input schema top level must be `{"type": "object"}`
-
 Any object in the schema where the "type" keyword is meaningful may contain a
 field named "adapter" containing an [Adapter record](#adapter-record).  The
 adapter describes how the value from the job order record should be translated
 into command line argument(s) and is described below.  If no adapter section is
 present, nothing will be added to the command line for that field, unless it is
 referenced some other way.
+
+The input schema top level must be `{"type": "object"}`
+
+### File records
+
+File records have five fields.
+
+- "path" (type: string) Required.  An absolute path to the file on the local
+  file system.
+
+- "size" (type: integer) Optional.  File size in bytes.
+
+- "checksum" (type: string) Optional.  A hash of the file contents.  Format is
+  currently unspecified, see TODO.
+
+- "metadata" (type: record) Optional.  A record containing an arbitrary json
+  structure.  Currently there is no explicit behavior related to the "metadata"
+  section, but references or expressions may be used to propagate metadata from
+  the input record to the [output record](#output-adapter-record).
+
+- "secondaryFiles" (type: array of file records) Optional.  A list of files
+  which are dependent on this file, or this file depends on, such as indexes or
+  external references.
 
 ## Command line adapter
 
@@ -449,10 +510,10 @@ The following optional fields modify the above behavior:
 - "order" (type: integer, default: 0) The sort order, relative to other command
   line arguments at the same adapter nesting depth.
 
-- "separator" (type: string, default: none) The separator beween the prefix and
+- "separator" (type: string, default: none) The separator between the prefix and
   the value.  If the value of separator is a single space, the prefix and field
   value will be separate entries in the command line arguments array; otherwise
-  the command line entry will be a single entry which is the concatination of
+  the command line entry will be a single entry which is the concatenation of
   prefix+separator+value.
 
 - "itemSeparator" (type: string, default: none) If the field value is an array,
@@ -574,10 +635,10 @@ size of the input).
 
 - "cpu" (type: integer) Minimum number of CPU cores
 
-- "diskSpace" (type: integer) Minimum available disk space required to store
+- "diskSpace" (type: integer) Minimum disk space required to store
   both temporary files and output, in megabytes
 
-- "mem" (type: integer) Minimum available RAM, in megabytes
+- "mem" (type: integer) Minimum RAM, in megabytes
 
 - "network" (type: boolean) Whether unrestricted outgoing network access is required.
 
@@ -590,7 +651,7 @@ uses the same format as the input schema, defined at
 
 The output schema top level must be `{"type": "object"}`
 
-### Ouput adapter record
+### Output adapter record
 
 Any object in the schema where the "type" keyword is meaningful may contain an
 "adapter" object.  The adapter describes how output data from the tool execution
@@ -603,8 +664,8 @@ The output schema recognizes two fields in the "adapter" record:
 - "glob" (type: string) Find files that match a POSIX "glob" pattern, relative
   to the designated output directory.  If the field type in the schema is
   "array", the output record will contain a list of all files.  If the field
-  type in the schema is "file", one file from the array will choosen (which one
-  is choosen is undefined).
+  type in the schema is "file", one file from the array will chosen (which one
+  is chosen is undefined).
 
 - "value" (type: any primitive type, expression or reference) A value to be
   added to the output document under the output schema field.
@@ -673,12 +734,20 @@ lists are currently unspecified.  See TODO.
 
 * Success/fail field in the output record
 
+* Use [Avro](https://avro.apache.org/docs/current/spec.html) with additional
+  validation fields to describe input schema instead of json-schema.
+
+* <http://json-ld.org> context.
+
 * Adapter flag to indicate input file should be linked or copied to output
   directory before executing tool.  Needed to support tools that either want to
   write files alongside existing files, or modify files in place (update a
   copy.)
 
-* Use linked data for classification, using EDAM
+* Use linked data ontology such as EDAM for classification of tool function, file
+  types.
+
+* Use standardized names for file checksum algorithm e.g. <https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml>
 
 * Use linked data for specifying authors:
 
