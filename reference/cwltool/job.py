@@ -3,6 +3,8 @@ import os
 import tempfile
 import tool
 import glob
+import json
+
 
 class Job(object):
     def run(self, dry_run=False):
@@ -10,6 +12,9 @@ class Job(object):
             outdir = tempfile.mkdtemp()
         else:
             outdir = "/tmp"
+
+        with open(os.path.join(outdir, "job.cwl.json"), "w") as fp:
+            json.dump(self.joborder, fp)
 
         runtime = []
 
@@ -51,6 +56,12 @@ class Job(object):
             return None
 
     def collect_outputs(self, schema, outdir):
+        result_path = os.path.join(outdir, "result.cwl.json")
+        if os.path.isfile(result_path):
+            print "Result file found."
+            with open(result_path) as fp:
+                return json.load(fp)
+
         r = None
         if isinstance(schema, dict):
             if "adapter" in schema:

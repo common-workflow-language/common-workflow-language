@@ -16,6 +16,13 @@ class TestExamples(unittest.TestCase):
                                             './rabix/tests/test-files/example_human_Illumina.pe_1.fastq',
                                             './rabix/tests/test-files/example_human_Illumina.pe_2.fastq'])
 
+    def test_no_adapters(self):
+        t = tool.Tool(from_url("../examples/add_ints-tool.json"))
+        job = t.job(from_url("../examples/add_ints-job.json"), basedir='.')
+        result = job.run()
+        print result
+        self.assertEqual(result['c'], 3)
+
 
 if __name__ == '__main__':
     unittest.main()

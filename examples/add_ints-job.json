@@ -1,7 +1,6 @@
 {
     "inputs": {
-        "file1": {
-            "path": "hello.txt"
-        }
+        "a": 1,
+        "b": 2
     }
 }

@@ -97,7 +97,7 @@ location should be deleted when the tool execution completes.
 
 Output files produced by tool execution must be written to the designated
 output directory.  The designated output directory is empty except for
-"job.json" which contains the job order.  The current working directory when
+"job.cwl.json" which contains the job order.  The current working directory when
 tool execution starts shall be the designated output directory.
 
 ## Assumptions and restrictions
@@ -624,7 +624,9 @@ encapsulates the runtime environment.  There are three fields:
 
 - "imageId" (type: string) An abstract identifier for the image, such as the docker image hash.
 
-- "uri" (type: string) A locator to download the container image.
+- "imageRepo" (type: string) Docker repository identifier (e.g. "ubuntu" or "http://docker.example.com/my/repo").
+
+- "imageTag" (type: string) Docker image tag (without leading hash).
 
 ### Resources
 
@@ -635,12 +637,7 @@ size of the input).
 
 - "cpu" (type: integer) Minimum number of CPU cores
 
-- "diskSpace" (type: integer) Minimum disk space required to store
-  both temporary files and output, in megabytes
-
 - "mem" (type: integer) Minimum RAM, in megabytes
-
-- "network" (type: boolean) Whether unrestricted outgoing network access is required.
 
 ## Output schema
 
@@ -669,6 +666,9 @@ The output schema recognizes two fields in the "adapter" record:
 
 - "value" (type: any primitive type, expression or reference) A value to be
   added to the output document under the output schema field.
+
+After the tool process finishes, if the directory contains a file called "result.cwl.json",
+no output adapters will be used and the content of that file must be the output record.
 
 #### Example
 
