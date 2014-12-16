@@ -41,7 +41,7 @@ def main():
             print '%s%s%s' % (' '.join(job.command_line),
                                 ' < %s' % (job.stdin) if job.stdin else '',
                                 ' > %s' % (job.stdout) if job.stdout else '')
-            job.run(dry_run=args.dry_run)
+            print job.run(dry_run=args.dry_run)
     except jsonschema.exceptions.ValidationError as e:
         print "Job order failed validation"
         print e

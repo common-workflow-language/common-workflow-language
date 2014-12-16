@@ -1,3 +1,7 @@
-.idea/*
+*~
 *.pyc
-
+*.egg
+*.egg-info
+.idea
+reference/build/*
+reference/setup.cfg

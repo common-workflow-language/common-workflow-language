@@ -3,6 +3,7 @@
         "version": "0.7.1"
     },
     "documentAuthor": ["boysha", "peter.amstutz@curoverse.com"],
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
     "requirements": {
         "environment": {
             "container": {
@@ -100,10 +101,7 @@
                 "order": 1,
                 "prefix": "-t",
                 "value": {
-                    "$expr": {
-                        "lang": "javascript",
-                        "value": "$job.allocatedResources.cpu"
-                    }
+                    "$expr": "$job.allocatedResources.cpu"
                 }
             }
         ]

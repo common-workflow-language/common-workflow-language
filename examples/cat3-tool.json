@@ -1,6 +1,7 @@
 {
     "documentAuthor": ["peter.amstutz@curoverse.com"],
     "documentDescription": "Copy the contents of a file to 'output.txt' using 'cat' running in a docker container.",
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
     "requirements": {
         "environment": {
             "container": {
@@ -17,6 +18,17 @@
                 "type": "file",
                 "adapter": {
                     "order": 1
+                }
+            }
+        }
+    },
+    "outputs": {
+        "type": "object",
+        "required": [ "output" ],
+        "properties":{
+            "output": {
+                "adapter": {
+                    "glob":"output.txt"
                 }
             }
         }

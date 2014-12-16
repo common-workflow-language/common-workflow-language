@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id" : "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json",
     "description": "Meta-schema for describing tool inputs and outputs",
     "definitions": {
         "schemaArray": {
@@ -30,14 +31,7 @@
                 "path": { "type": "string" },
                 "size": { "type": "number" },
                 "checksum": { "type": "string" },
-                "meta": {
-                    "type": "object",
-                    "properties": {
-                        "file_type": {"type": "string"}
-                    },
-                    "additionalProperties": true,
-                    "required": ["file_type"]
-                }
+                "metadata": { "type": "object" }
             }
         },
         "file": {
@@ -51,14 +45,7 @@
                     "type": "array",
                     "items": { "$ref": "#/definitions/secondaryFile" }
                 },
-                "meta": {
-                    "type": "object",
-                    "properties": {
-                        "file_type": {"type": "string"}
-                    },
-                    "additionalProperties": true,
-                    "required": ["file_type"]
-                }
+                "metadata": { "type": "object" }
             }
         },
         "$job": {
@@ -160,7 +147,6 @@
     "adapter": {
         "type": "object",
         "properties": {
-            "stdin": { "type": "boolean" },
             "prefix": { "type": "string" },
             "order": { "type": "integer" },
             "separator": { "type": "string" },

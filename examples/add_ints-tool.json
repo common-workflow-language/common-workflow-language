@@ -1,0 +1,28 @@
+{
+    "documentAuthor": ["nebojsa.tijanic@sbgenomics.com"],
+    "documentDescription": "Adds two integers without using files or adapters.",
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
+    "inputs": {
+        "type": "object",
+        "required": [ "a", "b" ],
+        "properties": {
+            "a": {
+                "type": "integer"
+            },
+            "b": {
+                "type": "integer"
+            }
+        }
+    },
+    "outputs": {
+        "type": "object",
+        "properties": {
+            "c": {
+                "type": "integer"
+            }
+        }
+    },
+    "adapter": {
+        "baseCmd": ["python", "add_ints.py"]
+    }
+}
