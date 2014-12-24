@@ -656,7 +656,7 @@ encapsulates the runtime environment.  There are three fields:
 ### Resources
 
 The "resources" field of "requirements" describes hardware and operating system
-resources.  It has four fields.  The following fields may contain expressions
+resources.  It has two fields, which may contain expressions
 or references (this permits calculating the resource requirements based on the
 size of the input).
 
