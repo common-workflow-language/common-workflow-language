@@ -7,9 +7,9 @@ A *tool* is a basic executable element of a workflow.  A tool is a standalone
 program which is invoked on some input to perform computation, produce output,
 and then terminate.  In order to use a tool in a workflow, it is necessary to
 connect the inputs and outputs of the tool to upstream and downstream steps.
-However because there tens of thousands of existing tools with enormous variety
+However, because there are tens of thousands of existing tools with enormous variety
 in the syntax for invocation, input, and output, it is impossible for a
-workflow to use these tools without additional information.  The purpose of the
+workflow to use tools from different environments without additional information.  The purpose of the
 tool description document is to formally describe the inputs and outputs of a
 tool that is compatible with the workflow, and to describe how to translate
 inputs to an actual program invocation.
@@ -20,7 +20,7 @@ In this specification, a *record* refers to a data structure consisting of a
 unordered set of key-value pairs (referred to here as *fields*), where the keys
 are unique strings.  This is functionally equivalent to a JSON "object", python
 "dict", or the "hash" or "map" datatypes available in most programming
-language.  A *document* is a file containing a serialized record.
+language.  A *document* is a file containing a serialized record written as JSON.
 
 The *tool description document* consists of five major parts: the input schema,
 the output schema, the command line adapter, tool requirements, and tool
@@ -45,30 +45,24 @@ metadata.  The exact syntax and semantics is discussed below in [Syntax](#Syntax
   readable description, contact information for the author, software catalog
   entry, and so forth.
 
-The *job order document* consists of an input record and an optional allocated
-resources record.
-
-- The *input record* are the concrete input values for an invocation of the
-  tool.  It is validated against the input schema described in the tool
-  document.
-
-- The *allocated resources record* is a set of fields describing hardware
-  resources available to run the tool, which should be compared to the tool
-  requirements to determine if the minimum requirements are met.  This may
-  alter the behavior of the tool, such as setting the number of threads to
-  create based on the number of available CPU cores.
+The [*job order document*](#job-order-document) specifies the inputs
+and environment for executing an instance of the tool.  It consists of
+an *input record* and an optional *allocated resources record* (see
+the [job order document specification](#job-order-document) for
+details of these records).
 
 Together, the tool description document and the job order document provide all
 the necessary information to actually set up the environment and build the
 command line to run a specific invocation of the tool.
 
-The *runtime environment* refers to the hardware architecture, hardware
-resources, operating system, software runtime (if applicable, such as the
-Python interpreter or the JVM), along with libraries, modules, packages,
-utilities, and data files required to run the tool.
+The *runtime environment* is the hardware and software platform on
+which the tool is run.  It includes, but is not limited to, the
+hardware architecture, hardware resources, operating system, software
+runtime (if applicable, such as the Python interpreter or the JVM),
+libraries, modules, packages, utilities, and data files required to
+run the tool.
 
-Tools are executed by the *workflow infrastructure*.  The workflow
-infrastructure is the underlying platform responsible for interpreting the tool
+Tools are executed by the *workflow infrastructure*, which is the platform responsible for interpreting the tool
 description and job order, setting up the necessary runtime environment, and
 actually invoking the tool process.  Provided that assumptions and restrictions
 outlined below are met, the workflow infrastructure has broad leeway to
@@ -83,22 +77,25 @@ capture the tool output, or propagate values from input to output.
 
 # Execution
 
-A [tool command line](#command-line-adapter) is built based on the
-[Job order document](#job-order-document).
+A *tool command line* is built based on the [adapter field](#command-line-adapter) of the
+[job order document](#job-order-document).
 
-The first item in the [tool command line](#command-line-adapter) must be a file
-with the POSIX execute bit set.  If it is an absolute path, execute the
-specified file.  If there is no path separator, search $PATH in the runtime
-environment for the executable.  Relative paths are not permitted.
+The executable program run by this tool is specified by the `baseCmd`
+field in the command line adapter.  This field must identify a file
+with the POSIX execute bit set.  If `baseCmd` does not include a path
+separator character, the runtime environment's `$PATH` environment
+variable is searched to find the absolute path of the executable.
+Relative paths are not permitted.
 
-The "TMPDIR" environment variable should be set in the tool's environment to
+The `TMPDIR` environment variable should be set in the runtime environment to
 the designated temporary directory (scratch space).  Any files written to that
-location should be deleted when the tool execution completes.
+location should be deleted by the workflow infrastructure when the tool instance is complete.
 
-Output files produced by tool execution must be written to the designated
-output directory.  The designated output directory is empty except for
-"job.cwl.json" which contains the job order.  The current working directory when
-tool execution starts shall be the designated output directory.
+Output files produced by tool execution must be written to the
+*designated output directory*, which is the runtime environment's
+current working directory when the tool begins executing.  The
+designated output directory is empty except for "job.cwl.json", which
+contains the job order record.
 
 ## Assumptions and restrictions
 
@@ -108,39 +105,43 @@ tool execution starts shall be the designated output directory.
    require any kind of console, GUI, or web based user interaction in order to
    start and run to completion.
 
-3. Tool input comes from the command line, the standard input stream, by
-   reading files, or by accessing network resources.
+3. Tool input must come from: the command line, the standard input
+   stream, by reading input files, and/or by accessing network
+   resources.
 
-4. Tools only read files or directories which are listed in the input record,
-   or are part of an explicitly declared runtime environment.
+4. Tool input files and directories must be listed in the input record,
+   or be part of an explicitly declared runtime environment.
 
 5. Tool output is emitted via the standard output stream, by writing files, or
    by accessing a network resource.
 
 6. Tool input files are read-only.  Tools do not modify existing files, only
-   create new ones (see TODO).
+   create new ones (see [TODO](#TODO)).
 
-7. Tools only write files to a designated output directory or designated
-   scratch space.
+7. Tool output files are written only to the designated output
+   directory or designated scratch space.
 
-8. Tool may be multithreaded or spawn child processes, however when the
-   original tool process exits, the tool is considered finished.
+8. Tools may be multithreaded or spawn child processes; however, when
+   the original tool process exits, the tool is considered finished
+   regardless of whether any detached child processes are still
+   running.
 
 9. Tools do not access hardware devices.
 
 ## Job order document
 
-The job order document consists of two fields, "inputs" which hold the input
-record and "allocatedResources" which holds the allocated resources record.
+The job order document consists of two fields: "inputs" and "allocatedResources".
 
-The input record is validated against the [input schema](#input-schema)
-described in the tool document.
+- The "inputs" field is a record providing the concrete input values
+  for an invocation of the tool. These input values are validated
+  against the [input schema](#input-schema) described in the tool
+  document.
 
-The allocated resources record contains the maximum hardware resources
-available to run the tool.  It is compared with the
-[tool resource requirements](#resources) to determine if the tool can run.  The
-fields are the same as those described in
-[tool resource requirements](#resources).
+- The "allocatedResources" field is a record describing the maximum
+  hardware resources available to run the tool.  It is compared with
+  the [tool resource requirements](#resources) to determine if the
+  tool can run.  The fields are the same as those described in [tool
+  resource requirements](#resources).
 
 ### Example
 
@@ -173,8 +174,10 @@ document is written using [JSON Schema draft v4](http://json-schema.org) and ava
 at
 <https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json>
 
-Tool description documents must include a "schema" field with the following
-URL indicate it follows the draft 1 format:
+Tool description documents must include a "schema" field with a URL
+for the formal tool schema. For example, a tool that follows the
+draft-1 schema described here must have a tool description document
+that includes the following "schema" field:
 
 ```json
 {
@@ -184,20 +187,25 @@ URL indicate it follows the draft 1 format:
 
 ## References, Mixins and Expressions
 
-Where noted, certain fields are evaluated during the loading and interpretation
-of the tool description document.
+This section describes certain fields that are evaluated during the
+loading and interpretation of the tool description document.
 
 ### References
 
-Use [JSON Reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
+Use a [JSON reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
 to indicate that the field value should be obtained by following a
-[JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-to another field.  A reference is represented as a json object with a field
-"$ref" with a string value which is interpreted as the pointer to the desired
-value.
+[JSON pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+to another field.
 
-The default scope of "$ref" is the tool description document.  To resolve the
-pointer within the job order document, use "$job" in place of "$ref".
+A field in the tool description document may reference either another
+field within the tool description document, or a field in the job
+order document.
+
+A reference is formatted as a JSON object with one field, named either
+"$ref" or "$job".  The value of this field is a JSON pointer to the
+field being referenced.  If the field name is "$ref", the JSON pointer
+is interpreted relative to the tool description document; if "$job",
+it is interpreted relative to the job order document.
 
 #### Examples
 
@@ -275,14 +283,16 @@ doc1.json:
 
 ### Mixins
 
-Use the "$mixin" field to indicate that each field of a *source* object should
-be inserted into the *destination* object.  The object containing the "$mixin"
-field is the destination object.  The "$mixin" field specifies a
-[JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-to a source object.  It is an error if the source is not a json object.  If the
-destination object already contains a field that is found on the source object,
-the value will remain unchanged on the destination object.  Mixins can be used
-anywhere in the document and are evaluated on document load.
+Use a *mixin* field, specified with the field name "$mixin", to
+indicate that each field of a *source* object should be inserted into
+the *destination* object.  The object containing the "$mixin" field is
+the destination object.  The "$mixin" field specifies a [JSON
+Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+to a source object.  It is an error if the source is not a json
+object.  If the destination object already contains a field that is
+found on the source object, the value will remain unchanged on the
+destination object.  Mixins can be used anywhere in the document and
+are evaluated on document load.
 
 #### Example
 
@@ -313,32 +323,35 @@ After evaluating the mixin, doc1.json has the following contents:
 
 ### Expressions
 
-An expression is a code block which will be executed to yield a result which is
-substituted in place of the "$expr" object.  An expression is represented as a
-json object with a single field "$expr" where the "$expr" field is a string
-containing a
-[Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
-expression or code block.
+An *expression*, identified by an object with a single "$expr" field,
+contains a string of [Javascript/ECMAScript
+5.1](http://www.ecma-international.org/ecma-262/5.1/) code.  When the
+tool description document is loaded, this code is evaluated and its
+output is substituted for the "$expr" object.
 
-If the "$expr" value string does not start with "{" and end with "}" the code
-must be interpreted as a
-[Javascript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).
-The value of "$expr" is the result of evaluating the expression.
+If the "$expr" value string is enclosed in braces ("{" and "}") then
+it will be interpreted as a [function
+body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
+anonymous, zero-argument function, and the value of "$expr" will be
+the value returned when this function is executed.  Otherwise, the
+"$expr" code will be interpreted as a [Javascript
+expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11),
+and the value of "$expr" will be the result of evaluating the
+expression.
 
-If the "$expr" value string starts with "{" and ends with "}" the code must be
-interpreted as a
-[function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
-anonymous, zero-argument function.  The value of "$expr" will be the return
-value of the function.
+Before executing the expression, the runtime shall initialize a
+JavaScript variable "$job" containing a copy of the validated contents
+of the job order document.  This variable will be available in the
+expression's global namespace when the expression is evaluated.
 
-Before executing the expression, the runtime shall initialize a global variable
-"$job" which contains a copy of the validated contents of the job order document.
-
-Expressions must evaluate in an isolated context permitting no side effects
-outside of the context.  Expressions also must be evaluated in
+Expressions must be evaluated in an isolated context (a "sandbox")
+which permits no side effects to leak outside the context.
+Expressions also must be evaluated in
 [Javascript strict mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
-The order of evaluation of expressions within a document is undefined.
-Implementations may apply other limits, such as process isolation and timeouts
+
+The order in which expressions are evaluated is undefined.
+
+Implementations may apply other limits, such as process isolation and timeouts,
 to minimize the security risks associated with running untrusted code embedded
 in a tool description document.
 
@@ -380,7 +393,7 @@ This evaluates to:
 }
 ```
 
-Expressions can include code blocks:
+Example of an expression which defines an anonymous function:
 
 ```json
 {
@@ -392,7 +405,7 @@ Evaluates to:
 
 ```json
 {
-  "item1": [3, 4, 5]
+  "item": [3, 4, 5]
 }
 ```
 
@@ -413,10 +426,12 @@ with the following differences:
 
 - An additional
 [primitive type](http://json-schema.org/latest/json-schema-core.html#anchor8)
-of "file".  When `{"type": "file"}` is encountered, it should be treated as
-`{"$mixin":
+of "file".  When `{"type": "file"}` is encountered, it specifies an
+input that will be validated against the `/definitions/file` stanza
+of the metaschema. (Specifically, it will be treated as though the
+input schema type included `{"$mixin":
 "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#/definitions/file"}`
-and the value of "type" changed to "object".  See [file records](#file-records) below.
+and the value of "type" were changed to "object".) See [file records](#file-records) below.
 
 - The addition of "adapter" sections, discussed below.
 
@@ -433,33 +448,39 @@ into command line argument(s) and is described below.  If no adapter section is
 present, nothing will be added to the command line for that field, unless it is
 referenced some other way.
 
-The input schema top level must be `{"type": "object"}`
+The input schema top level must be `{"type": "object"}`.
 
 ### File records
 
 File records have five fields.
 
-- "path" (type: string) Required.  An absolute path to the file on the local
+**Required**
+
+- "path" (type: string) An absolute path to the file on the local
   file system.
 
-- "size" (type: integer) Optional.  File size in bytes.
+**Optional**
 
-- "checksum" (type: string) Optional.  A hash of the file contents.  Format is
-  currently unspecified, see TODO.
+- "size" (type: integer)  File size in bytes.
 
-- "metadata" (type: record) Optional.  A record containing an arbitrary json
+- "checksum" (type: string)  A hash of the file contents.  (Format is
+  currently unspecified; see [TODO](#TODO).)
+
+- "metadata" (type: record)  A record containing an arbitrary JSON
   structure.  Currently there is no explicit behavior related to the "metadata"
   section, but references or expressions may be used to propagate metadata from
   the input record to the [output record](#output-adapter-record).
 
-- "secondaryFiles" (type: array of file records) Optional.  A list of files
+- "secondaryFiles" (type: array of file records)  A list of files
   which are dependent on this file, or this file depends on, such as indexes or
   external references.
 
 ## Command line adapter
 
-The command line adapter is stored in the "adapter" field of the tool document.
-It consists of the following fields:
+The command line adapter record is stored in the "adapter" field of
+the tool document.  This record consists of the following fields:
+
+**Required**
 
 - "baseCmd" (type: string, expression, or reference or array of such) The program to
   execute, as well as any command line arguments which must come before all
@@ -467,10 +488,12 @@ It consists of the following fields:
 
 - "args" (type: array) A list of adapter records.  See below.
 
-- "stdin" (type: string, expression, or reference) Optional.  A path to a file to be piped to the
+**Optional**
+
+- "stdin" (type: string, expression, or reference)  A path to a file to be piped to the
   standard input stream of the tool process.
 
-- "stdout" (type: string, expression, or reference) Optional.  The name of a
+- "stdout" (type: string, expression, or reference)  The name of a
   file, relative to the designated output directory, to which the standard
   output stream of the tool process will be directed.
 
@@ -485,8 +508,10 @@ in building the command line depends on the value type:
 - array: each value of the array will be added as separate command line
 entries, unless "itemSeparator" is specified (see below).
 
-- boolean: Assume command line flag.  If true, indicates that the value in
-  "prefix" should be added to the command line.  If false, nothing is added.
+- boolean: Indicates that this argument represents a boolean
+  command-line flag. If true, indicates that the value in "prefix"
+  (see below) should be added to the command line.  If false, nothing
+  is added.
 
 - file: Add the "path" field of the file object to the command line.  Note that
   the actual path used to invoke the tool may be different due to path
@@ -498,13 +523,13 @@ entries, unless "itemSeparator" is specified (see below).
   the command line.
 
 - object: the value of "prefix" is added to the command line.  The contents of
-  the object may be added with a nested adapter.
+  the object may be serialized with a nested adapter, and appended to "prefix."
 
 - string: Added unchanged to the command line.
 
 The following optional fields modify the above behavior:
 
-- "prefix" (type: string, default: none) A string to prefix to the field value when
+- "prefix" (type: string, default: none) A string to prepend to the field value when
   constructing the command line.
 
 - "order" (type: integer, default: 0) The sort order, relative to other command
@@ -660,8 +685,8 @@ The output schema recognizes two fields in the "adapter" record:
 
 - "glob" (type: string) Find files that match a POSIX "glob" pattern, relative
   to the designated output directory.  If the field type in the schema is
-  "array", the output record will contain a list of all files.  If the field
-  type in the schema is "file", one file from the array will chosen (which one
+  "array", the output record will contain a list of all files matching the pattern.  If the field
+  type in the schema is "file", one matching file from the array will be chosen (which one
   is chosen is undefined).
 
 - "value" (type: any primitive type, expression or reference) A value to be
@@ -726,11 +751,11 @@ description of the tool, its purpose, and usage.
 ### Software description and release
 
 The "softwareDescription" and "softwareRelase" fields of the root document
-lists are currently unspecified.  See TODO.
+lists are currently unspecified.  See [TODO](#TODO).
 
-# Things remaining for discussion / TODO
+# TODO
 
-(May be addressed in this draft, or in a later draft)
+(Items remaining for discussion. May be addressed in this draft, or in a later draft)
 
 * Success/fail field in the output record
 
@@ -739,7 +764,7 @@ lists are currently unspecified.  See TODO.
 
 * <http://json-ld.org> context.
 
-* Adapter flag to indicate input file should be linked or copied to output
+* Adapter flag to indicate input file should be linked or copied to the designated output
   directory before executing tool.  Needed to support tools that either want to
   write files alongside existing files, or modify files in place (update a
   copy.)
