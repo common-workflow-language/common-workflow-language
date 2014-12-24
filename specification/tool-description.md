@@ -77,8 +77,8 @@ capture the tool output, or propagate values from input to output.
 
 # Execution
 
-A *tool command line* is built based on the [adapter field](#command-line-adapter) of the
-[job order document](#job-order-document).
+A *tool command line* is built based on the [adapter fields](#command-line-adapter) from the
+tool description document and the values contained in [job order document](#job-order-document).
 
 The executable program run by this tool is specified by the `baseCmd`
 field in the command line adapter.  This field must identify a file
@@ -500,7 +500,7 @@ the tool document.  This record consists of the following fields:
 ### Adapter record
 
 If the adapter record is listed in the input schema, "value" is set to the
-corresponding value in the job order document.  For adapter records listed in
+corresponding value for that input join the job order document.  For adapter records listed in
 "args", "value" must be provided or it is an error.  The "value" field may be a
 [reference](#references) or [expression](#expressions).  The adapter behavior
 in building the command line depends on the value type:
@@ -594,7 +594,7 @@ Given the following tool input schema:
 }
 ```
 
-The job order record consists of three fields: "input1", "param1", and
+The inputs record of job order consists of three fields: "input1", "param1", and
 "param2".  Of those, "input1" and "param1" are required and "param2" is
 optional (it may be missing from the job order record).
 
