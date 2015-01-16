@@ -14,6 +14,12 @@ Test [1/1]
 All tests passed
 ```
 
+The cwltool relies on node.js. To install on ubuntu, 
+
+```
+$ sudo apt-get install nodejs npm
+```
+
 The "conformance_test" script runs the tool with a specific command line
 format. The tool must output a json object on standard output consisting of the
 command line arguments in "args".  If specified in the tool description, it
