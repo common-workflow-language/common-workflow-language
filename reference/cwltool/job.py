@@ -20,7 +20,7 @@ class Job(object):
 
         if self.container and self.container.get("type") == "docker":
             if "uri" in self.container:
-                subprocess.call("docker", "pull", self.container["uri"])
+                subprocess.call(["docker", "pull", self.container["uri"]])
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
                 runtime.append("--volume=%s:%s:ro" % (d, self.pathmapper.dirs[d]))
