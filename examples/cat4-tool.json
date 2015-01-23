@@ -6,6 +6,7 @@
         "environment": {
             "container": {
                 "type": "docker",
+                "uri": "arvados/jobs",
                 "imageId": "arvados/jobs"
             }
         }
