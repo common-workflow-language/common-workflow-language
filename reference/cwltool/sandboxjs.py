@@ -5,11 +5,13 @@ import threading
 class JavascriptException(Exception):
     pass
 
-def execjs(js):
+def execjs(js, jslib):
     nodejs = subprocess.Popen(["nodejs"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    fn = "\"use strict\";\n(function()%s)()" % (js if isinstance(js, basestring) and len(js) > 1 and js[0] == '{' else ("{return (%s);}" % js))
+    fn = "\"use strict\";%s\n(function()%s)()" % (jslib, js if isinstance(js, basestring) and len(js) > 1 and js[0] == '{' else ("{return (%s);}" % js))
     script = "console.log(JSON.stringify(require(\"vm\").runInNewContext(%s, {})))" % json.dumps(fn)
+
+    #print script
 
     def term():
         try:

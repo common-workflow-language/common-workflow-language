@@ -4,10 +4,10 @@ import tempfile
 import tool
 import glob
 import json
-
+import yaml
 
 class Job(object):
-    def run(self, dry_run=False):
+    def run(self, dry_run=False, pull_image=True):
         if not dry_run:
             outdir = tempfile.mkdtemp()
         else:
@@ -19,8 +19,8 @@ class Job(object):
         runtime = []
 
         if self.container and self.container.get("type") == "docker":
-            if "uri" in self.container:
-                subprocess.call("docker", "pull", self.container["uri"])
+            if "uri" in self.container and pull_image:
+                subprocess.call(["docker", "pull", self.container["uri"]])
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
                 runtime.append("--volume=%s:%s:ro" % (d, self.pathmapper.dirs[d]))
@@ -43,6 +43,10 @@ class Job(object):
             if self.stdout:
                 stdout = open(os.path.join(outdir, self.stdout), "wb")
 
+            for t in self.generatefiles:
+                with open(os.path.join(outdir, t), "w") as f:
+                    f.write(self.generatefiles[t])
+
             sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
             sp.wait()
 
@@ -53,16 +57,17 @@ class Job(object):
                 stdout.close()
 
             print "Output directory is %s" % outdir
-            return self.collect_outputs(self.tool.tool["outputs"], outdir)
-        else:
-            return None
+            if 'outputs' in self.tool.tool:
+                return self.collect_outputs(self.tool.tool["outputs"], outdir)
+
+        return None
 
     def collect_outputs(self, schema, outdir):
         result_path = os.path.join(outdir, "result.cwl.json")
         if os.path.isfile(result_path):
             print "Result file found."
             with open(result_path) as fp:
-                return json.load(fp)
+                return yaml.load(fp)
 
         r = None
         if isinstance(schema, dict):

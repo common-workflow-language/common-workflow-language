@@ -13,11 +13,40 @@
                 }
             }
         },
+        "import": {
+            "type": "object",
+            "required": ["$import"],
+            "properties": {
+                "$import": {
+                    "type": "string"
+                },
+                "checksum": {
+                    "type": "string"
+                }
+            }
+        },
+        "apply": {
+            "type": "object",
+            "required": ["$apply"],
+            "properties": {
+                "$apply": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            { "type": "string" },
+                            { "$ref": "#definitions/expression" },
+                            { "$ref": "#definitions/import" }
+                        ]
+                    }
+                }
+            }
+        },
         "strOrExpr": {
             "oneOf": [
                 { "type": "string" },
                 { "$ref": "#definitions/expression" },
-
+                { "$ref": "#definitions/import" },
+                { "$ref": "#definitions/apply" },
                 { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/$job" }
             ]
         },
@@ -45,10 +74,10 @@
     },
     "properties": {
         "documentAuthor": {
-                    "oneOf": [
-                        { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/stringArray" },
-                        { "type": "string" }
-                    ]
+            "oneOf": [
+                { "$ref": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/metaschema.json#definitions/stringArray" },
+                { "type": "string" }
+            ]
         },
         "documentDescription": { "type": "string" },
         "softwareDescription": { "type": "object" },
@@ -80,6 +109,15 @@
                         "mem": { "$ref": "#definitions/intOrExpr" },
                         "network": { "$ref": "#definitions/boolOrExpr" }
                     }
+                },
+                "expressionlib": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            { "type": "string" },
+                            { "$ref": "#definitions/import" }
+                        ]
+                    }
                 }
             }
         },
@@ -107,7 +145,17 @@
                     ]
                 },
                 "stdout": { "$ref": "#definitions/strOrExpr" },
-                "stdin": { "$ref": "#definitions/strOrExpr" }
+                "stdin": { "$ref": "#definitions/strOrExpr" },
+                "generatefiles": {
+                    "type":"array",
+                    "items": {
+                        "type":"object",
+                        "properties": {
+                            "name": {"$ref": "#definitions/strOrExpr"},
+                            "value": {"$ref": "#definitions/strOrExpr"}
+                        }
+                    }
+                }
             }
         }
     }

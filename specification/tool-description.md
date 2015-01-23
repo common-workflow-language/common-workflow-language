@@ -159,9 +159,7 @@ The job order document consists of two fields: "inputs" and "allocatedResources"
   },
   "allocatedResources": {
     "cpu": 4,
-    "mem": 5000,
-    "diskSpace": 1000,
-    "network": false
+    "mem": 5000
   }
 }
 ```
@@ -169,9 +167,12 @@ The job order document consists of two fields: "inputs" and "allocatedResources"
 # Syntax
 
 The tool description document and job order document are written in
-[JSON](http://json.org) format.  The formal schema for the tool description
-document is written using [JSON Schema draft v4](http://json-schema.org) and available
-at
+[YAML](http://www.yaml.org/).  Note that YAML type system is very similar to
+[JSON](http://json.org), and all JSON documents are also valid YAML documents;
+so you may choose to use only the JSON-compatible subset of YAML syntax (this
+is the case for all the examples in this specification).  The formal schema for
+the tool description document is written using [JSON Schema draft v4](http://json-schema.org)
+and available at
 <https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json>
 
 Tool description documents must include a "schema" field with a URL
@@ -185,7 +186,7 @@ that includes the following "schema" field:
 }
 ```
 
-## References, Mixins and Expressions
+## References, Mixins, Imports, and Expressions
 
 This section describes certain fields that are evaluated during the
 loading and interpretation of the tool description document.
@@ -321,6 +322,33 @@ After evaluating the mixin, doc1.json has the following contents:
 }
 ```
 
+### Imports
+
+An *import*, identified by an object with a single "$import" field, specifies a
+URL of a file to be loaded.  Relative URL paths are resolved with respect to
+the location of the tool description document.  The "$import" object is
+replaced by the a string with the file contents.
+
+hello.txt:
+```
+hello world
+```
+
+doc1.json:
+```json
+{
+  "item1": {"$import": "hello.txt"}
+}
+```
+
+After evaluating the import:
+
+```json
+{
+  "item1": "hello world"
+}
+```
+
 ### Expressions
 
 An *expression*, identified by an object with a single "$expr" field,
@@ -344,6 +372,9 @@ JavaScript variable "$job" containing a copy of the validated contents
 of the job order document.  This variable will be available in the
 expression's global namespace when the expression is evaluated.
 
+The runtime shall also include any code defined in the ["expressionlib" section
+of "requirements"](#expression-library).
+
 Expressions must be evaluated in an isolated context (a "sandbox")
 which permits no side effects to leak outside the context.
 Expressions also must be evaluated in
@@ -351,9 +382,9 @@ Expressions also must be evaluated in
 
 The order in which expressions are evaluated is undefined.
 
-Implementations may apply other limits, such as process isolation and timeouts,
-to minimize the security risks associated with running untrusted code embedded
-in a tool description document.
+Implementations may apply other limits, such as process isolation, timeouts,
+and operating system containers/jails to minimize the security risks associated
+with running untrusted code embedded in a tool description document.
 
 #### Examples
 
@@ -500,10 +531,14 @@ the tool document.  This record consists of the following fields:
 ### Adapter record
 
 If the adapter record is listed in the input schema, "value" is set to the
-corresponding value for that input join the job order document.  For adapter records listed in
-"args", "value" must be provided or it is an error.  The "value" field may be a
-[reference](#references) or [expression](#expressions).  The adapter behavior
-in building the command line depends on the value type:
+corresponding value for that input join the job order document.  For adapter
+records listed in "args", "value" must be provided or it is an error.  The
+"value" field may be a [reference](#references) or [expression](#expressions).
+The adapter behavior in building the command line depends on the data type of
+the value.  Note: in the event of a mismatch between the data type specified in
+the schema and the data type of the actual value (this can occur when applying
+expressions), use the data type of the actual value to select the appropriate
+behavior:
 
 - array: each value of the array will be added as separate command line
 entries, unless "itemSeparator" is specified (see below).
@@ -532,14 +567,16 @@ The following optional fields modify the above behavior:
 - "prefix" (type: string, default: none) A string to prepend to the field value when
   constructing the command line.
 
-- "order" (type: integer, default: 0) The sort order, relative to other command
-  line arguments at the same adapter nesting depth.
+- "order" (type: integer, default: 1000000) The sort order, relative to other
+  command line arguments at the same adapter nesting depth.  If order is
+  missing, the large default should cause arguments to be generally placed at
+  to the end.
 
-- "separator" (type: string, default: none) The separator between the prefix and
-  the value.  If the value of separator is a single space, the prefix and field
-  value will be separate entries in the command line arguments array; otherwise
-  the command line entry will be a single entry which is the concatenation of
-  prefix+separator+value.
+- "separator" (type: string, default: none) The separator between the prefix
+  and the value.  If separator not defined, or the value of separator is a
+  single space, the prefix and field value will be separate entries in the
+  command line arguments array; otherwise the command line entry will be a
+  single entry which is the concatenation of prefix+separator+value.
 
 - "itemSeparator" (type: string, default: none) If the field value is an array,
   join each value in the array into a single string separated by the value of
@@ -619,13 +656,13 @@ fragment.
 ["example", "-p44", "--list", "a,b,c", "/foo/bar.txt"]
 ```
 
-Note that parameters are sorted based on the order field.  Here, `{"order: 2"}`
-in the "input1" adapter causes it to be sorted after "param1" and "param2"
-`{"order: 1"}`.  Where parameters have the same sort order weight, command line
-parameters in the "args" field sort before input schema adapters, in the order
-that they are declared in "args".  Where input schema adapters have the same
-sort order weight, they are sorted based on the lexical ordering of the field
-name.
+Note that parameters are sorted based on the order field, with lower sort
+orders preceeding higher sort orders.  Here, `{"order: 2"}` in the "input1"
+adapter causes it to be sorted after "param1" and "param2" `{"order: 1"}`.
+Where parameters have the same sort order weight, command line parameters in
+the "args" field sort before input schema adapters, in the order that they are
+declared in "args".  Where input schema adapters have the same sort order
+weight, they are sorted based on the lexical ordering of the field name.
 
 ## Tool requirements
 
@@ -633,7 +670,7 @@ The tool requirements is stored in the "requirements" field of the tool
 document.  Tool requirements describe the hardware and software prerequisites
 for running the tool.
 
-There are two fields, "environment" and "resources".
+There are three fields, "environment", "resources", and "expressionlib".
 
 ### Environment
 
@@ -645,13 +682,11 @@ It has a single field, "container".
 The "container" field of "environment" specifies a container image that
 encapsulates the runtime environment.  There are three fields:
 
-- "type" (type: string) Type of container.  Currently only "docker".
+- "type" (type: string) Type of container.  Currently only supports "docker".
 
-- "imageId" (type: string) An abstract identifier for the image, such as the docker image hash.
+- "uri" (type: string) A Docker image name suitable for use with "docker pull".
 
-- "imageRepo" (type: string) Docker repository identifier (e.g. "ubuntu" or "http://docker.example.com/my/repo").
-
-- "imageTag" (type: string) Docker image tag (without leading hash).
+- "imageId" (type: string) The Docker image name that will be used to for "docker run".
 
 ### Resources
 
@@ -663,6 +698,31 @@ size of the input).
 - "cpu" (type: integer) Minimum number of CPU cores
 
 - "mem" (type: integer) Minimum RAM, in megabytes
+
+## Expression library
+
+The expression library ("expressionlib") is an array consisting of fragments of
+Javascript which will be included before evaluating an expression.  This allows
+defining commonly-used functions in a single place.  Each item of the
+expressionlib array must be a string or [file import](#imports).  Code
+fragments are included in the order they are listed.
+
+### Example
+
+The following example includes the [underscore.js library](http://underscorejs.org/),
+then defines a function "t" as a convenience method for the underscore.js
+template feature.
+
+```json
+{
+  "requirements": {
+    "expressionlib": [
+      { "$import": "underscore.js" },
+      "var t = function(s) { return _.template(s)({'$job': $job}); };"
+    ]
+  }
+}
+```
 
 ## Output schema
 

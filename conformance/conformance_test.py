@@ -20,7 +20,7 @@ for i, t in enumerate(tests):
     sys.stdout.flush()
     out = {}
     try:
-        outstr = subprocess.check_output([args.tool, "--conformance-test", "--basedir=/conformance/test", "--no-container", t["tool"], t["job"]])
+        outstr = subprocess.check_output([args.tool, "--conformance-test", "--basedir=test", "--no-container", t["tool"], t["job"]])
         out = json.loads(outstr)
     except ValueError as v:
         print v

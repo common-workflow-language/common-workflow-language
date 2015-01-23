@@ -20,6 +20,13 @@
                 "adapter": {
                     "order": 1
                 }
+            },
+            "numbering": {
+                "type":"boolean",
+                "adapter": {
+                    "order": 0,
+                    "prefix": "-n"
+                }
             }
         }
     },

@@ -55,8 +55,7 @@
                 "type": "integer",
                 "adapter": {
                     "order": 1,
-                    "prefix": "-m",
-                    "separator": " "
+                    "prefix": "-m"
                 }
             },
             "min_std_max_min": {
@@ -100,6 +99,7 @@
             {
                 "order": 1,
                 "prefix": "-t",
+                "separator": "",
                 "value": {
                     "$expr": "$job.allocatedResources.cpu"
                 }

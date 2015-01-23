@@ -6,6 +6,8 @@ import copy
 import sys
 import jsonschema.exceptions
 import random
+import requests
+import urlparse
 from job import Job
 
 from jsonschema.validators import Draft4Validator
@@ -73,156 +75,194 @@ def fix_file_type(t):
         if isinstance(t[k], dict):
             fix_file_type(t[k])
 
-def jseval(job=None, expression=None):
-    if expression.startswith('{'):
-        exp_tpl = '''{
-        var $job = %s;
-        return function()%s();}
-        '''
-    else:
-        exp_tpl = '''{
-        var $job = %s;
-        return %s;}
-        '''
-    exp = exp_tpl % (json.dumps(job), expression)
-    return sandboxjs.execjs(exp)
+class Builder(object):
 
-def resolve_eval(job, v):
-    if isinstance(v, dict):
-        if "$expr" in v:
-            return jseval(job, v["$expr"])
-        elif "$job" in v:
-            return resolve_pointer(job, v["$job"])
-    return v
+    def jseval(self, job=None, expression=None):
+        if expression.startswith('{'):
+            exp_tpl = '''{
+            return function()%s();}
+            '''
+        else:
+            exp_tpl = '''{
+            return %s;}
+            '''
+        exp = exp_tpl % (expression)
+        return sandboxjs.execjs(exp, "var $job = %s;%s" % (json.dumps(job), self.jslib))
 
-def adapt_inputs(schema, job, inp, key):
-    adapters = []
+    def resolve_eval(self, job, v):
+        if isinstance(v, dict):
+            if "$expr" in v:
+                # Support $import of the $expr
+                return self.jseval(job, self.resolve_eval(job, v["$expr"]))
+            if "$apply" in v:
+                # Support $import of the $expr
+                ex = ""
+                for i, p in enumerate(v["$apply"]):
+                    if i == 0:
+                        ex += p + "("
+                    else:
+                        ex += json.dumps(self.resolve_eval(job, p))
+                        if i < len(v["$apply"])-1:
+                            ex += ","
+                ex += ")"
+                return self.jseval(job, ex)
+            elif "$job" in v:
+                return resolve_pointer(job, v["$job"])
+            elif "$import" in v:
+                # TODO: check checksum
+                url = urlparse.urljoin(self.base_url, v["$import"])
+                split = urlparse.urlsplit(url)
+                scheme, path = split.scheme, split.path
+                if scheme in ['http', 'https']:
+                    resp = requests.get(url)
+                    try:
+                        resp.raise_for_status()
+                    except Exception as e:
+                        raise RuntimeError(url, e)
+                    return resp.text
+                elif scheme == 'file':
+                    try:
+                        with open(path) as fp:
+                            return fp.read()
+                    except (OSError, IOError) as e:
+                        raise RuntimeError('Failed for %s: %s' % (url, e))
+                else:
+                    raise ValueError('Unsupported scheme: %s' % scheme)
+        return v
 
-    if 'oneOf' in schema:
-        for one in schema["oneOf"]:
-            try:
-                Draft4Validator(one).validate(inp)
-                schema = one
-                break
-            except jsonschema.exceptions.ValidationError:
-                pass
+    def adapt_inputs(self, schema, job, inp, key):
+        adapters = []
 
-    if isinstance(inp, dict):
-        if "properties" in schema:
-            for i in inp:
-                a = adapt_inputs(schema["properties"][i], job, inp[i], i)
+        if 'oneOf' in schema:
+            for one in schema["oneOf"]:
+                try:
+                    Draft4Validator(one).validate(inp)
+                    schema = one
+                    break
+                except jsonschema.exceptions.ValidationError:
+                    pass
+
+        if isinstance(inp, dict):
+            if "properties" in schema:
+                for i in inp:
+                    a = self.adapt_inputs(schema["properties"][i], job, inp[i], i)
+                    adapters.extend(a)
+        elif isinstance(inp, list):
+            for n, i in enumerate(inp):
+                a = self.adapt_inputs(schema["items"], job, i, format(n, '06'))
+                for x in a:
+                    x["order"].insert(0, n)
                 adapters.extend(a)
-    elif isinstance(inp, list):
-        for n, i in enumerate(inp):
-            a = adapt_inputs(schema["items"], job, i, format(n, '06'))
-            for x in a:
-                x["order"].insert(0, n)
-            adapters.extend(a)
 
-    if 'adapter' in schema:
-        a = copy.copy(schema['adapter'])
+        if 'adapter' in schema:
+            a = copy.copy(schema['adapter'])
 
-        if "order" in a:
-            a["order"] = [a["order"], key]
-        else:
-            a["order"] = [1000000, key]
-
-        a["schema"] = schema
-
-        for x in adapters:
-            x["order"] = a["order"] + x["order"]
-
-        if not 'value' in a and len(adapters) == 0:
-            a['value'] = inp
-
-        if len(adapters) == 0 or "value" in a:
-            adapters.insert(0, a)
-
-    return adapters
-
-def to_str(schema, value, base_url, path_mapper):
-    if "$ref" in schema:
-        schema = from_url(schema["$ref"], base_url)
-
-    if 'oneOf' in schema:
-        for a in schema['oneOf']:
-            v = to_str(a, value, base_url, path_mapper)
-            if v is not None:
-                return v
-        return None
-    elif 'type' in schema:
-        if schema["type"] == "array" and isinstance(value, list):
-            return [to_str(schema["items"], v, base_url, path_mapper) for v in value]
-        elif schema["type"] == "object" and isinstance(value, dict):
-            if "path" in value:
-                return path_mapper(value["path"])
+            if "order" in a:
+                a["order"] = [a["order"], key]
             else:
-                raise Exception("Not expecting a dict %s" % (value))
-        elif schema["type"] in ("string", "number", "integer"):
-            return str(value)
-        elif schema["type"] == "boolean":
-            # need special handling for flags
-            return str(value)
+                a["order"] = [1000000, key]
 
-    return None
+            a["schema"] = schema
 
-def find_files(adapter, job):
-    if "value" in adapter:
-        value = resolve_eval(job, adapter["value"])
-    else:
+            for x in adapters:
+                x["order"] = a["order"] + x["order"]
+
+            if not 'value' in a and len(adapters) == 0:
+                a['value'] = inp
+
+            if len(adapters) == 0 or "value" in a:
+                adapters.insert(0, a)
+
+        return adapters
+
+    def to_str(self, schema, value, path_mapper):
+        if "$ref" in schema:
+            schema = from_url(schema["$ref"], self.ref_base_url)
+
+        if 'oneOf' in schema:
+            for a in schema['oneOf']:
+                v = self.to_str(a, value, path_mapper)
+                if v is not None:
+                    return v
+            return None
+        elif 'type' in schema:
+            if schema["type"] == "array" and isinstance(value, list):
+                return [self.to_str(schema["items"], v, path_mapper) for v in value]
+            elif schema["type"] == "object" and isinstance(value, dict):
+                if "path" in value:
+                    return path_mapper(value["path"])
+                else:
+                    raise Exception("Not expecting a dict %s" % (value))
+            elif schema["type"] in ("string", "number", "integer"):
+                return str(value)
+            elif schema["type"] == "boolean":
+                # handled specially by adapt()
+                return value
+
         return None
 
-    schema = adapter["schema"]
-
-    if "$ref" in schema:
-        schema = from_url(schema["$ref"], adapter.get("$ref_base_url"))
-
-    if 'oneOf' in schema:
-        for a in schema['oneOf']:
-            v = find_files(a, value)
-            if v is not None:
-                return v
-        return None
-    elif 'type' in schema:
-        if schema["type"] == "array" and isinstance(value, list):
-            return [find_files({"value": v,
-                                "schema": schema["items"]}, job) for v in value]
-        elif schema["type"] == "object" and isinstance(value, dict):
-            if "path" in value:
-                return value["path"]
-            else:
-                raise Exception("Not expecting a dict %s" % (value))
-
-    return None
-
-
-def adapt(adapter, job, path_mapper):
-    if "value" in adapter:
-        value = resolve_eval(job, adapter["value"])
-    else:
-        raise Exception("No value in adapter")
-
-    value = to_str(adapter["schema"], value, adapter.get("$ref_base_url"), path_mapper)
-
-    sep = adapter["separator"] if "separator" in adapter else ''
-
-    if 'itemSeparator' in adapter:
-        if adapter["prefix"]:
-            l = [adapter["prefix"] + adapter['itemSeparator'].join(value)]
+    def find_files(self, adapter, job):
+        if "value" in adapter:
+            value = self.resolve_eval(job, adapter["value"])
         else:
-            l = [adapter['itemSeparator'].join(value)]
-    elif 'prefix' in adapter:
-        l = []
-        for v in each(value):
-            if sep == " ":
+            return None
+
+        schema = adapter["schema"]
+
+        if "$ref" in schema:
+            schema = from_url(schema["$ref"], self.ref_base_url)
+
+        if 'oneOf' in schema:
+            for a in schema['oneOf']:
+                v = self.find_files(a, value)
+                if v is not None:
+                    return v
+            return None
+        elif 'type' in schema:
+            if schema["type"] == "array" and isinstance(value, list):
+                return [self.find_files({"value": v,
+                                    "schema": schema["items"]}, job) for v in value]
+            elif schema["type"] == "object" and isinstance(value, dict):
+                if "path" in value:
+                    return value["path"]
+                else:
+                    raise Exception("Not expecting a dict %s" % (value))
+
+        return None
+
+
+    def adapt(self, adapter, job, path_mapper):
+        if "value" in adapter:
+            value = self.resolve_eval(job, adapter["value"])
+        else:
+            raise Exception("No value in adapter")
+
+        value = self.to_str(adapter["schema"], value, path_mapper)
+
+        sep = adapter["separator"] if "separator" in adapter else " "
+
+        if 'itemSeparator' in adapter:
+            if adapter["prefix"]:
+                l = [adapter["prefix"] + adapter['itemSeparator'].join(value)]
+            else:
+                l = [adapter['itemSeparator'].join(value)]
+        elif 'prefix' in adapter:
+            l = []
+            if value is True:
                 l.append(adapter["prefix"])
-                l.append(v)
+            elif value is False:
+                pass
             else:
-                l.append(adapter["prefix"] + sep + v)
-    else:
-        l = [value]
+                for v in each(value):
+                    if sep == " ":
+                        l.append(adapter["prefix"])
+                        l.append(v)
+                    else:
+                        l.append(adapter["prefix"] + sep + v)
+        else:
+            l = [value]
 
-    return l
+        return l
 
 class PathMapper(object):
     # Maps files to their absolute path
@@ -293,9 +333,18 @@ class Tool(object):
         adapter = self.tool["adapter"]
         adapters = [{"order": [-1000000],
                      "schema": tool_schema_doc["properties"]["adapter"]["properties"]["baseCmd"],
-                     "value": adapter['baseCmd'],
-                     "$ref_base_url": "file:"+toolpath
+                     "value": adapter['baseCmd']
                  }]
+
+        builder = Builder()
+        builder.base_url = "file:"+os.path.abspath(basedir)+"/"
+        builder.ref_base_url = "file:"+toolpath
+
+        requirements = self.tool.get("requirements")
+        builder.jslib = ''
+        if requirements and 'expressionlib' in requirements:
+            for ex in requirements['expressionlib']:
+                builder.jslib += builder.resolve_eval(joborder, ex) + "\n"
 
         if "args" in adapter:
             for i, a in enumerate(adapter["args"]):
@@ -307,11 +356,11 @@ class Tool(object):
                 a["schema"] = tool_schema_doc["definitions"]["strOrExpr"]
                 adapters.append(a)
 
-        adapters.extend(adapt_inputs(self.tool['inputs'], inputs, inputs, ""))
+        adapters.extend(builder.adapt_inputs(self.tool['inputs'], inputs, inputs, ""))
 
         adapters.sort(key=lambda a: a["order"])
 
-        referenced_files = filter(lambda a: a is not None, flatten(map(lambda a: find_files(a, joborder), adapters)))
+        referenced_files = filter(lambda a: a is not None, flatten(map(lambda a: builder.find_files(a, joborder), adapters)))
 
         j = Job()
         j.joborder = joborder
@@ -320,18 +369,16 @@ class Tool(object):
         j.container = None
 
         if 'stdin' in adapter:
-            j.stdin = flatten(adapt({"value": adapter['stdin'],
-                                              "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdin"],
-                                              "$ref_base_url": "file:"+toolpath
+            j.stdin = flatten(builder.adapt({"value": adapter['stdin'],
+                                              "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdin"]
                                           }, joborder, None))[0]
             referenced_files.append(j.stdin)
         else:
             j.stdin = None
 
         if 'stdout' in adapter:
-            j.stdout = flatten(adapt({"value": adapter['stdout'],
-                                               "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdout"],
-                                               "$ref_base_url": "file:"+toolpath
+            j.stdout = flatten(builder.adapt({"value": adapter['stdout'],
+                                               "schema": tool_schema_doc["properties"]["adapter"]["properties"]["stdout"]
                                            }, joborder, None))[0]
 
             if os.path.isabs(j.stdout):
@@ -339,10 +386,13 @@ class Tool(object):
         else:
             j.stdout = None
 
+        j.generatefiles = {}
+        for t in adapter.get("generatefiles", []):
+            j.generatefiles[builder.resolve_eval(inputs, t["name"])] = builder.resolve_eval(inputs, t["value"])
+
         d = None
-        a = self.tool.get("requirements")
-        if a:
-            b = a.get("environment")
+        if requirements:
+            b = requirements.get("environment")
             if b:
                 c = b.get("container")
                 if use_container and c:
@@ -356,7 +406,7 @@ class Tool(object):
         if j.stdin:
             j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
 
-        j.command_line = flatten(map(lambda a: adapt(a, joborder, d.mapper), adapters))
+        j.command_line = flatten(map(lambda a: builder.adapt(a, joborder, d.mapper), adapters))
 
         j.pathmapper = d
 

@@ -6,6 +6,7 @@ import logging
 import collections
 import requests
 import urlparse
+import yaml
 
 log = logging.getLogger(__name__)
 
@@ -82,11 +83,11 @@ class Loader(object):
                 resp.raise_for_status()
             except Exception as e:
                 raise RuntimeError(url, e)
-            result = resp.json()
+            result = yaml.load(resp.text)
         elif scheme == 'file':
             try:
                 with open(path) as fp:
-                    result = json.load(fp)
+                    result = yaml.load(fp)
             except (OSError, IOError) as e:
                 raise RuntimeError('Failed for %s: %s' % (url, e))
         else:
@@ -142,12 +143,3 @@ def to_json(obj, fp=None):
 
 def from_url(url, base_url=None):
     return loader.load(url, base_url)
-
-
-def test_tmap():
-    path = os.path.join(os.path.dirname(__file__), '../examples/tmap.yml')
-    expected_path = os.path.join(os.path.dirname(__file__), '../examples/tmap_resolved.json')
-    doc = loader.load(path)
-    with open(expected_path) as fp:
-        expected = json.load(fp)
-    assert doc == expected
