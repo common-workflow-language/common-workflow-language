@@ -4,11 +4,22 @@ Common Workflow Language
 This repo holds in-development draft description of the specification being developed on the
 [Common Workflow Language mailing list](https://groups.google.com/forum/#!forum/common-workflow-language).
 
-CWL is an informal task force consisting of people from various organizations
-that have an interest in portability of bioinformatics workflows.  The goal is
-to specify a way to describe bioinformatics tools and workflows that is
-powerful, easy to use and allows for portability of tools/workflows and
-reproducibility of runs.
+The Common Workflow Language (CWL) is an informal, multi-vendor working group
+consisting of various organizations and individuals that have an interest in
+portability of data analysis workflows.  Our goal is to create specifications
+that enable data scientists to describe analysis tools and workflows that are
+powerful, easy to use, portable, and support reproducibility.
+
+CWL can be used to describe workflows for a variety of areas such as:
+
+* Data-intensive science, such as Bioinformatics, Chemistry, Physics, Astronomy
+* Log analysis
+* Data mining
+* Extract, Transform and Load (ETL) systems
+* Photo and video processing
+
+Map-Reduce jobs (as popularized by Hadoop) can be implemented in CWL, while CWL
+can easily express workflows that are awkward or impossible with Map-Reduce.
 
 Please be aware that Common Workflow Language is still under heavy development
 and that the following draft specification documents are likely to contain
