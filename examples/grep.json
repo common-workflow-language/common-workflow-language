@@ -1,0 +1,43 @@
+{
+    "description": "Grep without optional parameters.",
+    "requirements": [
+        {
+          "@type": "DockerContainer",
+          "dockerRepo": "arvados/jobs"
+        }
+    ],
+    "inputs": [
+        {
+            "@id": "#file1",
+            "depth": 0,
+            "schema": {
+                "type": "File"
+            }
+        },
+        {
+            "@id": "#pattern",
+            "depth": 0,
+            "schema": {
+                "type": "string",
+                "adapter": {"position": 0}
+            }
+        }
+    ],
+    "outputs": [
+        {
+            "@id": "#output",
+            "depth": 0,
+            "schema": {
+                "type": "File",
+                "adapter": {"glob": "output.txt"}
+            }
+        }
+    ]
+    "baseCmd": "grep",
+    "stdout": "output.txt",
+    "stdin": {
+        "@type": "Transform",
+        "language": "javascript",
+        "value": "$job.inputs.file1.path"
+    }
+}

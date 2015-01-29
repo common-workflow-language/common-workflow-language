@@ -1,0 +1,43 @@
+{
+    "description": "Word count without optional parameters, except for -l",
+    "requirements": [
+        {
+          "@type": "DockerContainer",
+          "dockerRepo": "arvados/jobs"
+        }
+    ],
+    "inputs": [
+        {
+            "@id": "#file1",
+            "depth": 0,
+            "schema": {
+                "type": "File"
+            }
+        },
+        {
+            "@id": "#countLines",
+            "depth": 0,
+            "schema": {
+                "type": "boolean",
+                "adapter": {"prefix": "-l"}
+            }
+        }
+    ],
+    "outputs": [
+        {
+            "@id": "#output",
+            "depth": 0,
+            "schema": {
+                "type": "File",
+                "adapter": {"glob": "output.txt"}
+            }
+        }
+    ]
+    "baseCmd": "wc",
+    "stdout": "output.txt",
+    "stdin": {
+        "@type": "Transform",
+        "language": "javascript",
+        "value": "$job.inputs.file1.path"
+    }
+}

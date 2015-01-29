@@ -1,0 +1,10 @@
+{
+  "@type": "SimpleTransformTool",
+  "inputs": {"@id": "#str", "depth": 0, "schema": {"type": "string"}},
+  "outputs": {"@id": "#int", "depth": 0, "schema": {"type": "int"}},
+  "script": {
+    "@type": "Transform",
+    "language": "javascript",
+    "value": "{return {int: Number($job.inputs.str)};}"
+  }
+}

@@ -1,0 +1,19 @@
+{
+    "@type": "CommandLineTool",
+    "description": "Outputs file contents as string.",
+    "inputs": [
+        {
+            "id": "#file1",
+            "schema": {"type": "File"},
+            "depth": 0
+        }
+    ],
+    "outputs": [
+        {
+            "id": "#result",
+            "schema": {"type": "string"},
+            "depth": 0
+        }
+    ],
+    "baseCmd": ["python", "to_string.py"]
+}
