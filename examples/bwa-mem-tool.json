@@ -1,109 +1,89 @@
 {
-    "softwareDescription": {
-        "version": "0.7.1"
-    },
-    "documentAuthor": ["boysha", "peter.amstutz@curoverse.com"],
-    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
-    "requirements": {
-        "environment": {
-            "container": {
-                "type": "docker",
-                "uri": "images.sbgenomics.com/rabix/bwa:9d3b9b0359cf",
-                "imageId": "9d3b9b0359cf"
-            }
+    "@type": "CommandLineTool",
+    "requirements": [
+        {
+          "@type": "DockerContainer",
+          "dockerRepo": "images.sbgenomics.com/rabix/bwa",
+          "imageId": "9d3b9b0359cf"
         },
-        "resources": {
-            "cpu": 0,
-            "mem": 5000,
-            "network": false
+        {
+          "@type": "MemoryRequirement",
+          "value": 5000
         }
-    },
-    "inputs": {
-        "type": "object",
-        "required": [
-            "reference",
-            "reads"
-        ],
-        "properties": {
-            "reference": {
-                "type": "file",
-                "required": "Yes",
-                "adapter": {
-                    "order": 2,
-                    "secondaryFiles": [
-                        "*.amb",
-                        "*.ann",
-                        "*.bwt",
-                        "*.pac",
-                        "*.sa"
-                    ]
-                }
-            },
-            "reads": {
-                "type": "array",
-                "required": "Yes",
-                "minItems": 1,
-                "maxItems": 2,
-                "items": {
-                    "type": "file"
-                },
-                "adapter": {
-                    "streamable": true
-                }
-            },
-            "minimum_seed_length": {
-                "type": "integer",
-                "adapter": {
-                    "order": 1,
-                    "prefix": "-m"
-                }
-            },
-            "min_std_max_min": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 4,
-                "items": {
-                    "type": "number"
-                },
-                "adapter": {
-                    "order": 1,
-                    "prefix": "-I",
-                    "itemSeparator": ","
-                }
-            }
+    ],
+  "inputs": [
+    {
+      "id": "#reference",
+      "depth": 0,
+      "schema": {
+        "type": "File",
+        "adapter": {
+          "position": 2
         }
+      }
     },
-    "outputs": {
-        "type": "object",
-        "required": [
-            "sam"
-        ],
-        "properties": {
-            "sam": {
-                "type": "file",
-                "adapter": {
-                    "stdout": "Yes",
-                    "glob": "output.sam",
-                    "streamable": "Yes"
-                }
-            }
+    {
+      "id": "#reads",
+      "depth": 1,
+      "schema": {
+        "type": "array",
+        "items": "File",
+        "adapter": {
+          "position": 3
         }
+      },
     },
-    "adapter": {
-        "baseCmd": [
-            "bwa",
-            "mem"
-        ],
-        "stdout": "output.sam",
-        "args": [
-            {
-                "order": 1,
-                "prefix": "-t",
-                "separator": "",
-                "value": {
-                    "$expr": "$job.allocatedResources.cpu"
-                }
-            }
-        ]
+    {
+      "id": "#minimum_seed_length",
+      "depth": 0,
+      "schema": {
+        "type": "int",
+        "adapter": {
+          "position": 1,
+          "prefix": "-m"
+        }
+      }
+    },
+    {
+      "id": "#min_std_max_min",
+      "depth": 1,
+      "schema": {
+        "items": "int",
+        "type": "array",
+        "adapter": {
+          "itemSeparator": ",",
+          "position": 1,
+          "prefix": "-I"
+        }
+      }
     }
+  ],
+  "outputs": [
+    {
+      "id": "#sam",
+      "depth": 0,
+      "schema": {
+        "type": "File",
+        "adapter": {
+          "glob": "output.sam"
+        },
+      }
+    }
+  ],
+  "adapters": [
+    {
+      "argValue": {
+        "@type": "Transform",
+        "language": "javascript",
+        "value": "$job.allocatedResources.cpu"
+      },
+      "position": 1,
+      "prefix": "-t"
+    }
+  ],
+  "baseCmd": [
+    "bwa",
+    "mem"
+  ],
+  "stdout": "output.sam"
 }

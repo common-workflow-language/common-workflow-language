@@ -1,89 +1,181 @@
+
 {
-    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
-    "inputs": {
-        "required": [
-            "stages"
-        ],
-        "type": "object",
-        "properties": {
-            "$mixin": "tmap.json#mixins/global",
-            "stages": {
-                "minItems": 1,
-                "items": {
-                    "required": [
-                        "stageId",
-                        "algos"
-                    ],
-                    "type": "object",
-                    "properties": {
-                        "stageId": {
-                            "adapter": {
-                                "prefix": "stage",
-                                "separator": "",
-                                "order": 0
-                            },
-                            "type": "integer"
-                        },
-                        "stageOption1": {
-                            "adapter": {
-                                "prefix": "-n",
-                                "order": 1
-                            },
-                            "type": "boolean"
-                        },
-                        "algos": {
-                            "minItems": 1,
-                            "items": {
-                                "oneOf": [
-                                    {
-                                        "$ref": "tmap.json#algos/map1"
-                                    },
-                                    {
-                                        "$ref": "tmap.json#algos/map2"
-                                    },
-                                    {
-                                        "$ref": "tmap.json#algos/map3"
-                                    },
-                                    {
-                                        "$ref": "tmap.json#algos/map4"
-                                    }
-                                ],
-                                "type": "object"
-                            },
-                            "adapter": {
-                                "order": 2
-                            },
-                            "type": "array"
-                        }
-                    }
-                },
-                "adapter": {
-                    "order": 2
-                },
-                "type": "array"
+  "@type": "CommandLineTool",
+  "baseCmd": [
+    "tmap", 
+    "mapall"
+  ], 
+  "inputs": [
+    {
+      "depth": 0, 
+      "id": "#reads", 
+      "schema": {
+        "adapter": {
+          "position": 1
+        }, 
+        "type": "File"
+      }
+    }, 
+    {
+      "depth": 1, 
+      "id": "#stages", 
+      "schema": {
+        "adapter": {
+          "position": 2
+        }, 
+        "items": {
+          "fields": [
+            {
+              "adapter": {
+                "position": 0, 
+                "prefix": "stage", 
+                "separator": ""
+              }, 
+              "name": "stageId", 
+              "type": "int"
+            }, 
+            {
+              "adapter": {
+                "position": 1, 
+                "prefix": "-n"
+              }, 
+              "name": "stageOption1", 
+              "type": "boolean"
+            }, 
+            {
+              "adapter": {
+                "position": 2
+              }, 
+              "items": [
+                "Map1", 
+                "Map2", 
+                "Map3", 
+                "Map4"
+              ], 
+              "name": "algos", 
+              "type": "array"
             }
-        }
-    },
-    "adapter": {
-        "baseCmd": [
-            "tmap",
-            "mapall"
-        ],
-        "stdin": { "$job": "#inputs/reads/path" },
-        "stdout": "output.sam"
-    },
-    "outputs": {
-        "required": [
-            "sam"
-        ],
-        "type": "object",
-        "properties": {
-            "sam": {
-                "adapter": {
-                    "glob": "output.sam"
-                },
-                "type": "file"
-            }
-        }
+          ], 
+          "type": "record"
+        }, 
+        "type": "array"
+      }
     }
+  ], 
+  "outputs": [
+    {
+      "depth": 0, 
+      "id": "#sam", 
+      "schema": {
+        "adapter": {
+          "glob": "output.sam"
+        }, 
+        "type": "File"
+      }
+    }
+  ], 
+  "schemaDefs": [
+    {
+      "fields": [
+        {
+          "adapter": {
+            "position": 0
+          }, 
+          "name": "algo", 
+          "symbols": [
+            "map1"
+          ], 
+          "type": "enum"
+        }, 
+        {
+          "adapter": {
+            "position": 1, 
+            "prefix": "--seed-length"
+          }, 
+          "name": "seedLength", 
+          "type": "int"
+        }
+      ], 
+      "name": "Map1", 
+      "type": "record"
+    }, 
+    {
+      "fields": [
+        {
+          "adapter": {
+            "position": 0
+          }, 
+          "name": "algo", 
+          "symbols": [
+            "map2"
+          ], 
+          "type": "enum"
+        }, 
+        {
+          "adapter": {
+            "position": 1, 
+            "prefix": "--max-seed-hits"
+          }, 
+          "name": "maxSeedHits", 
+          "type": "int"
+        }
+      ], 
+      "name": "Map2", 
+      "type": "record"
+    }, 
+    {
+      "fields": [
+        {
+          "adapter": {
+            "position": 0
+          }, 
+          "name": "algo", 
+          "symbols": [
+            "map3"
+          ], 
+          "type": "enum"
+        }, 
+        {
+          "adapter": {
+            "position": 1, 
+            "prefix": "--fwd-search"
+          }, 
+          "name": "fwdSearch", 
+          "type": "boolean"
+        }
+      ], 
+      "name": "Map3", 
+      "type": "record"
+    }, 
+    {
+      "fields": [
+        {
+          "adapter": {
+            "position": 0
+          }, 
+          "name": "algo", 
+          "symbols": [
+            "map4"
+          ], 
+          "type": "enum"
+        }, 
+        {
+          "adapter": {
+            "position": 1, 
+            "prefix": "--seed-step"
+          }, 
+          "name": "seedStep", 
+          "type": "int"
+        }
+      ], 
+      "name": "Map4", 
+      "type": "record"
+    }
+  ], 
+  "stdin": {
+    "@type": "Transform", 
+    "language": "javascript",
+    "value": "$job.inputs.reads.path"
+  }, 
+  "stdout": "output.sam"
 }
