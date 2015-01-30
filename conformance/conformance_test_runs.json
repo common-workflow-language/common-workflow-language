@@ -1,0 +1,7 @@
+[
+    {
+        "tool": "../examples/wf-count-lines.json",
+        "job": "../examples/wf-count-lines-job.json",
+        "expected": {"result": "3"}
+    }
+]

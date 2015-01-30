@@ -15,5 +15,5 @@
             "depth": 0
         }
     ],
-    "baseCmd": ["python", "to_string.py"]
+    "baseCmd": ["to_string.py"]
 }

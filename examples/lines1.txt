@@ -1,0 +1,5 @@
+This file is used as input for tests.
+wf-count-lines is looking for lines that contain "find_me".
+The above line should be counted.
+As should this one: find_me
+This one shouldn't.

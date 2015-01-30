@@ -1,0 +1,15 @@
+{
+    "inputs": {
+        "files": [
+            {
+                "@type": "File",
+                "path": "lines1.txt"
+            },
+            {
+                "@type": "File",
+                "path": "lines2.txt"
+            }
+        ],
+        "pattern": "find_me"
+    }
+}

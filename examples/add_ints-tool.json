@@ -20,5 +20,5 @@
             "depth": 0
         }
     ],
-    "baseCmd": ["python", "add_ints.py"]
+    "baseCmd": ["add_ints.py"]
 }
