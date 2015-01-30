@@ -12,7 +12,7 @@
             "depth": 0,
             "schema": {
                 "type": "File",
-                "adapter": {"order": 1}
+                "adapter": {"position": 1}
             }
         },
         {
@@ -20,7 +20,7 @@
             "depth": 0,
             "schema": {
                 "type": "boolean",
-                "adapter": {"order": 0, "prefix": "-n"}
+                "adapter": {"position": 0, "prefix": "-n"}
             }
         }
     ],

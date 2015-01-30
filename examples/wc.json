@@ -32,7 +32,7 @@
                 "adapter": {"glob": "output.txt"}
             }
         }
-    ]
+    ],
     "baseCmd": "wc",
     "stdout": "output.txt",
     "stdin": {

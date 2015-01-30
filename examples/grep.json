@@ -32,7 +32,7 @@
                 "adapter": {"glob": "output.txt"}
             }
         }
-    ]
+    ],
     "baseCmd": "grep",
     "stdout": "output.txt",
     "stdin": {

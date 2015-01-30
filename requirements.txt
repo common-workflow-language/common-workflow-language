@@ -1,2 +1,4 @@
 jsonschema
 requests
+rdflib
+rdflib-jsonld

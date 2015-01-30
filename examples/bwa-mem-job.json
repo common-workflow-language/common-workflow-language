@@ -1,15 +1,18 @@
 {
     "inputs": {
         "reference": {
+            "@type": "File",
             "path": "rabix/tests/test-files/chr20.fa",
             "size": 123,
             "checksum": "sha1$hash"
         },
         "reads": [
             {
+                "@type": "File",
                 "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
             },
             {
+                "@type": "File",
                 "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
             }
         ],

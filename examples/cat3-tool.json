@@ -12,7 +12,7 @@
             "depth": 0,
             "schema": {
                 "type": "File",
-                "adapter": {"order": 1}
+                "adapter": {"position": 1}
             }
         }
     ],
@@ -25,7 +25,7 @@
                 "adapter": {"glob": "output.txt"}
             }
         }
-    ]
+    ],
     "baseCmd": "cat",
     "stdout": "output.txt"
 }

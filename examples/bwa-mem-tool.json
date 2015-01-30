@@ -13,7 +13,7 @@
     ],
   "inputs": [
     {
-      "id": "#reference",
+      "@id": "#reference",
       "depth": 0,
       "schema": {
         "type": "File",
@@ -23,7 +23,7 @@
       }
     },
     {
-      "id": "#reads",
+      "@id": "#reads",
       "depth": 1,
       "schema": {
         "type": "array",
@@ -31,10 +31,10 @@
         "adapter": {
           "position": 3
         }
-      },
+      }
     },
     {
-      "id": "#minimum_seed_length",
+      "@id": "#minimum_seed_length",
       "depth": 0,
       "schema": {
         "type": "int",
@@ -45,7 +45,7 @@
       }
     },
     {
-      "id": "#min_std_max_min",
+      "@id": "#min_std_max_min",
       "depth": 1,
       "schema": {
         "items": "int",
@@ -60,13 +60,13 @@
   ],
   "outputs": [
     {
-      "id": "#sam",
+      "@id": "#sam",
       "depth": 0,
       "schema": {
         "type": "File",
         "adapter": {
           "glob": "output.sam"
-        },
+        }
       }
     }
   ],

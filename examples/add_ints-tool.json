@@ -3,19 +3,19 @@
     "description": "Adds two integers without using files or adapters.",
     "inputs": [
         {
-            "id": "#a",
+            "@id": "#a",
             "schema": {"type": "int"},
             "depth": 0
         },
         {
-            "id": "#b",
+            "@id": "#b",
             "schema": {"type": "int"},
             "depth": 0
         }
     ],
     "outputs": [
         {
-            "id": "#c",
+            "@id": "#c",
             "schema": {"type": "int"},
             "depth": 0
         }

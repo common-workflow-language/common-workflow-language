@@ -1,6 +1,7 @@
 {
     "inputs": {
         "reads": {
+            "@type": "File",
             "path": "reads.fastq"
         },
         "stages": [

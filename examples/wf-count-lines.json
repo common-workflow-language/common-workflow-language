@@ -48,7 +48,7 @@
     {"source": "#pattern", "destination": "#grep/pattern"},
     {"source": "#grep/output", "destination": "#wc/file1"},
     {"source": "#wc/output", "destination": "#to_string/file1"},
-    {"source": "#to_string/result", "destination": "#str-to-int/str",}
+    {"source": "#to_string/result", "destination": "#str-to-int/str"},
     {"source": "#str-to-int/int", "destination": "#sum/arr"},
     {"source": "#sum/sum", "destination": "#result"}
   ]

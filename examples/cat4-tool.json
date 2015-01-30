@@ -24,7 +24,7 @@
                 "adapter": {"glob": "output.txt"}
             }
         }
-    ]
+    ],
     "baseCmd": "cat",
     "stdout": "output.txt",
     "stdin": {

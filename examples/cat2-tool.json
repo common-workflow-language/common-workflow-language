@@ -11,8 +11,7 @@
             "@id": "#file1",
             "depth": 0,
             "schema": {
-                "type": "File",
-                "adapter": {"order": 1}
+                "type": "File"
             }
         }
     ],
