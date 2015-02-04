@@ -10,9 +10,6 @@
       "depth": 0, 
       "@id": "#reads",
       "schema": {
-        "adapter": {
-          "position": 1
-        }, 
         "type": "File"
       }
     }, 
@@ -21,44 +18,10 @@
       "@id": "#stages",
       "schema": {
         "adapter": {
-          "position": 2
-        }, 
-        "items": {
-          "fields": [
-            {
-              "adapter": {
-                "position": 0, 
-                "prefix": "stage", 
-                "separator": ""
-              }, 
-              "name": "stageId", 
-              "type": "int"
-            }, 
-            {
-              "adapter": {
-                "position": 1, 
-                "prefix": "-n"
-              }, 
-              "name": "stageOption1", 
-              "type": "boolean"
-            }, 
-            {
-              "adapter": {
-                "position": 2
-              }, 
-              "items": [
-                "Map1", 
-                "Map2", 
-                "Map3", 
-                "Map4"
-              ], 
-              "name": "algos", 
-              "type": "array"
-            }
-          ], 
-          "type": "record"
-        }, 
-        "type": "array"
+          "position": 1
+        },
+        "type": "array",
+        "items": "Stage"
       }
     }
   ], 
@@ -76,24 +39,81 @@
   ], 
   "schemaDefs": [
     {
+        "type": "record",
+        "name": "Stage",
+        "fields": [
+            {
+              "adapter": {
+                "position": 0,
+                "prefix": "stage",
+                "separator": ""
+              },
+              "name": "stageId",
+              "type": ["null", "int"]
+            },
+            {
+              "adapter": {
+                "position": 1,
+                "prefix": "-n"
+              },
+              "name": "stageOption1",
+              "type": ["null", "boolean"]
+            },
+            {
+              "adapter": {
+                "position": 2
+              },
+              "name": "algos",
+              "type": {
+                "type": "array",
+                "items": [
+                    "Map1",
+                    "Map2",
+                    "Map3",
+                    "Map4"
+                ]
+              }
+            }
+        ]
+    },
+    {
       "fields": [
         {
           "adapter": {
             "position": 0
           }, 
           "name": "algo", 
-          "symbols": [
-            "map1"
-          ], 
-          "type": "enum"
-        }, 
+          "type": {
+            "type": "enum",
+            "name": "JustMap1",
+            "symbols": ["map1"]
+          }
+        },
+        {
+          "name": "maxSeqLen",
+          "type": ["null", "int"],
+          "adapter": {
+            "prefix": "--max-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "name": "minSeqLen",
+          "type": ["null", "int"],
+          "adapter": {
+            "prefix": "--min-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
         {
           "adapter": {
-            "position": 1, 
+            "position": 2,
             "prefix": "--seed-length"
           }, 
           "name": "seedLength", 
-          "type": "int"
+          "type": ["null", "int"]
         }
       ], 
       "name": "Map1", 
@@ -106,18 +126,37 @@
             "position": 0
           }, 
           "name": "algo", 
-          "symbols": [
-            "map2"
-          ], 
-          "type": "enum"
+          "type": {
+            "type": "enum",
+            "name": "JustMap2",
+            "symbols": ["map2"]
+          }
         }, 
         {
+          "name": "maxSeqLen",
+          "type": ["null", "int"],
           "adapter": {
-            "position": 1, 
+            "prefix": "--max-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "name": "minSeqLen",
+          "type": ["null", "int"],
+          "adapter": {
+            "prefix": "--min-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "adapter": {
+            "position": 2,
             "prefix": "--max-seed-hits"
           }, 
           "name": "maxSeedHits", 
-          "type": "int"
+          "type": ["null", "int"]
         }
       ], 
       "name": "Map2", 
@@ -130,18 +169,37 @@
             "position": 0
           }, 
           "name": "algo", 
-          "symbols": [
-            "map3"
-          ], 
-          "type": "enum"
+          "type": {
+            "type": "enum",
+            "name": "JustMap3",
+            "symbols": ["map3"]
+          }
         }, 
         {
+          "name": "maxSeqLen",
+          "type": ["null", "int"],
           "adapter": {
-            "position": 1, 
+            "prefix": "--max-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "name": "minSeqLen",
+          "type": ["null", "int"],
+          "adapter": {
+            "prefix": "--min-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "adapter": {
+            "position": 2,
             "prefix": "--fwd-search"
           }, 
           "name": "fwdSearch", 
-          "type": "boolean"
+          "type": ["null", "boolean"]
         }
       ], 
       "name": "Map3", 
@@ -154,18 +212,37 @@
             "position": 0
           }, 
           "name": "algo", 
-          "symbols": [
-            "map4"
-          ], 
-          "type": "enum"
+          "type": {
+            "type": "enum",
+            "name": "JustMap4",
+            "symbols": ["map4"]
+          }
         }, 
         {
+          "name": "maxSeqLen",
+          "type": ["null", "int"],
           "adapter": {
-            "position": 1, 
+            "prefix": "--max-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "name": "minSeqLen",
+          "type": ["null", "int"],
+          "adapter": {
+            "prefix": "--min-seq-length",
+            "separator": " ",
+            "position": 2
+          }
+        },
+        {
+          "adapter": {
+            "position": 2,
             "prefix": "--seed-step"
           }, 
           "name": "seedStep", 
-          "type": "int"
+          "type": ["null", "int"]
         }
       ], 
       "name": "Map4", 

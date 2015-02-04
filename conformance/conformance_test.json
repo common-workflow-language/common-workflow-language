@@ -49,13 +49,5 @@
         "args": ["cat"],
         "stdin": "test/hello.txt",
         "stdout": "output.txt"
-    },
-    {
-        "tool": "../examples/template-tool.yaml",
-        "job": "../examples/cat-job.json",
-        "args": ["cat", "foo.txt"],
-        "generatefiles": {
-            "foo.txt": {}
-        }
     }
 ]

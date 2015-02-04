@@ -14,13 +14,25 @@ from tool_new import jseval
 
 log = logging.getLogger(__file__)
 
-CWL = Namespace('http://github.com/common-workflow-language/schema/wf#')
+CWL = Namespace('http://github.com/common-workflow-language/')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCT = Namespace('http://purl.org/dc/terms/')
+CNT = Namespace('http://www.w3.org/2011/content#')
 
 
-def value_for(graph, iri):
+def get_value(graph, iri):
+    chars = graph.value(iri, CNT.chars)
+    if chars:
+        return json.load(chars.toPython())
     return graph.value(iri).toPython()
+
+
+def set_value(graph, iri, val):
+    # TODO: add CWL.includesFile
+    if isinstance(val, (dict, list)):
+        graph.add(iri, CNT.chars, json.dumps(val))
+    else:
+        graph.add(iri, RDF.value, Literal(val))
 
 
 class Inputs(object):
@@ -36,11 +48,11 @@ class Inputs(object):
 
     def __setitem__(self, key, value):
         if key not in self.d:
-            self.d[key] = value_for(self.g, value)
+            self.d[key] = get_value(self.g, value)
         elif key in self.wrapped:
-            self.d[key].append(value_for(self.g, value))
+            self.d[key].append(get_value(self.g, value))
         else:
-            self.d[key] = [self.d[key], value_for(self.g, value)]
+            self.d[key] = [self.d[key], get_value(self.g, value)]
             self.wrapped.append(key)
 
     def to_dict(self):
@@ -99,17 +111,26 @@ class Process(object):
 
 
 class WorkflowRunner(object):
-    def __init__(self):
+    def __init__(self, path):
         nm = NamespaceManager(Graph())
         nm.bind('cwl', CWL)
         nm.bind('prov', PROV)
-        nm.bind('dcterms', DCT)
+        nm.bind('dct', DCT)
+        nm.bind('cnt', CNT)
         self.g = Graph(namespace_manager=nm)
         self.wf_iri = None
         self.act_iri = None
+        self._load(path)
 
-    def load(self, *args, **kwargs):
-        return self.g.parse(*args, **kwargs)
+    def _load(self, path):
+        self.g.parse(path)
+        self.wf_iri = URIRef('file://' + path)  # TODO: Find a better way to do this
+        self.g.add([self.wf_iri, RDF.type, CWL.Process])
+        for sp in self.g.objects(self.wf_iri, CWL.steps):
+            self.g.add([sp, RDF.type, CWL.Process])
+            tool = self.g.value(sp, CWL.tool)
+            log.debug('Loading reference %s', tool)
+            self.g.parse(tool, format='json-ld')
 
     def start(self, proc_iri=None):
         main_act = False
@@ -151,8 +172,8 @@ class WorkflowRunner(object):
             port_iri = self.wf_iri + '#' + port_iri
         port_iri = URIRef(port_iri)
         iri = self.iri_for_value(port_iri)
+        set_value(self.g, iri, value)
         self.g.add([iri, RDF.type, CWL.Value])
-        self.g.add([iri, RDF.value, Literal(value)])  # TODO: complex types as cnt; add CWL.includesFile
         self.g.add([iri, CWL.producedByPort, URIRef(port_iri)])
         if creator_iri:
             self.g.add([iri, PROV.wasGeneratedBy, URIRef(creator_iri)])
@@ -167,11 +188,19 @@ class WorkflowRunner(object):
             if expected[k] != v:
                 if result:
                     log.error('\nIncoming: %s\nExpected: %s', incoming, expected)
-                    raise NotImplementedError('More than one port has mismatching depth.')
+                    raise Exception('More than one port has mismatching depth.')
                 if incoming[k] < expected[k]:
                     raise Exception('depth(incoming) < depth(expected); Wrapping must be done explicitly.')
+                if incoming[k] - expected[k] > 1:
+                    raise NotImplementedError('Only handling one nesting level at the moment.')
                 result = k
         return result
+
+    def run_component(self, tool, job):
+        cmp_type = self.g.value(tool, RDF.type)
+        if cmp_type == CWL.SimpleTransformTool:
+            return self.run_script(tool, job)
+        raise Exception('Unrecognized component type: %s' % cmp_type)
 
     def run_workflow(self):
         self.start()
@@ -183,7 +212,7 @@ class WorkflowRunner(object):
             dmp = self._depth_mismatch_port(proc, inputs)
             if not dmp:
                 job = {'inputs': inputs.to_dict()}
-                outputs = self.run_script(tool, job)
+                outputs = self.run_component(tool, job)
             else:
                 jobs, outputs = [], defaultdict(list)
                 for i in inputs[dmp]:
@@ -191,7 +220,7 @@ class WorkflowRunner(object):
                     inp_copy.d[dmp] = i
                     jobs.append({'inputs': inp_copy.to_dict()})
                 for job in jobs:
-                    outs = self.run_script(tool, job)
+                    outs = self.run_component(tool, job)
                     for k, v in outs.iteritems():
                         outputs[k].append(v)
             for k, v in outputs.iteritems():
@@ -207,33 +236,20 @@ class WorkflowRunner(object):
             ?val cwl:producedByPort ?src .
         }
         ''' % self.wf_iri))
-        return {k: self.g.value(v).toPython() for k, v in outputs.iteritems()}
+        return {k: get_value(self.g, v) for k, v in outputs.iteritems()}
 
     def run_script(self, tool, job):
-        expr = self.g.value(tool, CWL.expr)
+        expr = self.g.value(self.g.value(tool, CWL.script)).toPython()
         log.debug('Running expr %s\nJob: %s', expr, job)
         result = jseval(job, expr)
         logging.debug('Result: %s', result)
         return result
 
-    @classmethod
-    def from_workflow(cls, path):
-        wfr = cls()
-        wfr.load(path, format='json-ld')
-        wfr.wf_iri = URIRef('file://' + path)  # TODO: Find a better way to do this
-        wfr.g.add([wfr.wf_iri, RDF.type, CWL.Process])
-        for sp in wfr.g.objects(wfr.wf_iri, CWL.steps):
-            wfr.g.add([sp, RDF.type, CWL.Process])
-            tool = wfr.g.value(sp, CWL.tool)
-            log.debug('Loading reference %s', tool)
-            wfr.g.parse(tool, format='json-ld')
-        return wfr
-
 
 def aplusbtimesc(wf_name, a, b, c):
     print '\n\n--- %s ---\n\n' % wf_name
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples/' + wf_name))
-    rnr = WorkflowRunner.from_workflow(path)
+    rnr = WorkflowRunner(path)
     rnr.set_value('a', a)
     rnr.set_value('b', b)
     rnr.set_value('c', c)
