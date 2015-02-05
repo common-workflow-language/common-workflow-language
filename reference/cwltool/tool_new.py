@@ -14,7 +14,7 @@ Args = namedtuple('Args', ['position', 'args'])
 merge_args = lambda args: flatten([a.args for a in sorted(args, key=lambda x: x.position)])
 
 
-def jseval(job, expression):
+def jseval(job, expression, context=None):
     if expression.startswith('{'):
         exp_tpl = '''{
         return function()%s();}
@@ -24,16 +24,16 @@ def jseval(job, expression):
         return %s;}
         '''
     exp = exp_tpl % expression
-    return sandboxjs.execjs(exp, "var $job = %s;" % json.dumps(job))
+    return sandboxjs.execjs(exp, "var $job = %s, $self = %s;" % (json.dumps(job), json.dumps(context)))
 
 
-def resolve_transform(job, val):
+def resolve_transform(job, val, context=None):
     if not isinstance(val, dict) or val.get('@type') != 'Transform':
         return val
     lang = val.get('language')
     expr = val.get('value')
     if lang == 'javascript':
-        return jseval(job, expr)
+        return jseval(job, expr, context)
     elif lang == 'jsonpointer':
         return resolve_pointer(job, expr)
     else:
@@ -54,7 +54,7 @@ def get_args(job, adapter, value=None, schema=None, key=None, tool=None):
     pos = [position, key]
 
     if isinstance(arg_val, dict) and arg_val.get('@type') == 'Transform':
-        value = resolve_transform(job, arg_val)
+        value = resolve_transform(job, arg_val, value)
     elif isinstance(value, dict) and value.get('@type') == 'File':
         value = value.get('path')
 
