@@ -20,5 +20,7 @@
             "depth": 0
         }
     ],
-    "baseCmd": ["add_ints.py"]
+    "cliAdapter": {
+      "baseCmd": ["add_ints.py"]
+    }
 }

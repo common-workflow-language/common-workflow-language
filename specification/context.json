@@ -1,0 +1,66 @@
+{
+  "cwl": "http://github.com/common-workflow-language#",
+  "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+  "cnt": "http://www.w3.org/2011/content#",
+  "sch": "http://schema.org/",
+  "dct": "http://purl.org/dc/terms/",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "fields": {
+    "@id": "cwl:avroFields",
+    "@container": "@list"
+  },
+  "argAdapters": {
+    "@id": "cwl:hasArgumentAdapters",
+    "@container": "@list"
+  },
+  "symbols": {
+    "@id": "cwl:avroSymbols",
+    "@container": "@list"
+  },
+  "items": {
+    "@id": "cwl:avroItems",
+    "@container": "@list"
+  },
+  "baseCmd": {
+    "@id": "cwl:hasBaseCmd",
+    "@container": "@list"
+  },
+  "Transform": "cwl:Transform",
+  "CommandLineTool": "cwl:CommandLineTool",
+  "SimpleTransformTool": "cwl:SimpleTransformTool",
+  "Workflow": "cwl:Workflow",
+  "CPURequirement": "cwl:CPURequirement",
+  "MemoryRequirement": "cwl:MemoryRequirement",
+  "DockerContainer": "cwl:DockerContainer",
+  "imageRepo": "cwl:hasDockerRepository",
+  "imageTag": "cwl:hasDockerImageTag",
+  "imageId": "cwl:hasDockerImageId",
+  "requirements": "cwl:hasRequirement",
+  "schemaDefs": "cwl:usesSchema",
+  "schema": "cwl:hasSchema",
+  "name": "cwl:avroName",
+  "type": "cwl:avroType",
+  "doc": "cwl:avroDoc",
+  "adapter": "cwl:hasAdapter",
+  "cliAdapter": "cwl:hasCLIAdapter",
+  "script": "cwl:hasScript",
+  "glob": "cwl:hasGlobPattern",
+  "position": "cwl:hasCommandLinePosition",
+  "prefix": "cwl:hasPrefix",
+  "separator": "cwl:hasSeparator",
+  "itemSeparator": "cwl:hasItemSeparator",
+  "inputs": "wfdesc:hasInput",
+  "outputs": "wfdesc:hasOutput",
+  "depth": "cwl:hasDepth",
+  "language": "cwl:hasLanguage",
+  "stdin": "cwl:hasStdin",
+  "stdout": "cwl:hasStdout",
+  "value": "rdf:value",
+  "argValue": "cwl:hasArgumentValue",
+  "dataLinks": "wfdesc:hasDataLink",
+  "source": "wfdesc:hasSource",
+  "destination": "wfdesc:hasSink",
+  "steps": "wfdesc:hasSubProcess",
+  "app": "cwl:hasImplementation",
+  "impl": "cwl:linksToPort"
+}

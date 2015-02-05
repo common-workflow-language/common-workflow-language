@@ -1,10 +1,6 @@
 
 {
   "@type": "CommandLineTool",
-  "baseCmd": [
-    "tmap", 
-    "mapall"
-  ], 
   "inputs": [
     {
       "depth": 0, 
@@ -248,11 +244,14 @@
       "name": "Map4", 
       "type": "record"
     }
-  ], 
-  "stdin": {
-    "@type": "Transform", 
-    "language": "javascript",
-    "value": "$job.inputs.reads.path"
-  }, 
-  "stdout": "output.sam"
+  ],
+  "cliAdapter": {
+    "baseCmd": ["tmap", "mapall"],
+    "stdin": {
+      "@type": "Transform",
+      "language": "javascript",
+      "value": "$job.inputs.reads.path"
+    },
+    "stdout": "output.sam"
+  }
 }

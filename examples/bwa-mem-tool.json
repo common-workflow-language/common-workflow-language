@@ -70,20 +70,19 @@
       }
     }
   ],
-  "adapters": [
-    {
-      "argValue": {
-        "@type": "Transform",
-        "language": "javascript",
-        "value": "$job.allocatedResources.cpu"
-      },
-      "position": 1,
-      "prefix": "-t"
-    }
-  ],
-  "baseCmd": [
-    "bwa",
-    "mem"
-  ],
-  "stdout": "output.sam"
+  "cliAdapter": {
+    "argAdapters": [
+      {
+        "argValue": {
+          "@type": "Transform",
+          "language": "javascript",
+          "value": "$job.allocatedResources.cpu"
+        },
+        "position": 1,
+        "prefix": "-t"
+      }
+    ],
+    "baseCmd": ["bwa", "mem"],
+    "stdout": "output.sam"
+  }
 }

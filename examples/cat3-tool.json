@@ -1,4 +1,5 @@
 {
+    "@type": "CommandLineTool",
     "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
     "requirements": [
         {
@@ -26,6 +27,8 @@
             }
         }
     ],
-    "baseCmd": "cat",
-    "stdout": "output.txt"
+    "cliAdapter": {
+        "baseCmd": "cat",
+        "stdout": "output.txt"
+    }
 }

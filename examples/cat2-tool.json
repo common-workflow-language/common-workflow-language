@@ -1,4 +1,5 @@
 {
+    "@type": "CommandLineTool",
     "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
     "requirements": [
         {
@@ -15,10 +16,12 @@
             }
         }
     ],
-    "baseCmd": "cat",
-    "stdin": {
-        "@type": "Transform",
-        "language": "javascript",
-        "value": "$job.inputs.file1.path"
+    "cliAdapter": {
+        "baseCmd": "cat",
+        "stdin": {
+            "@type": "Transform",
+            "language": "javascript",
+            "value": "$job.inputs.file1.path"
+        }
     }
 }

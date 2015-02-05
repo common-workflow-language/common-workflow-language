@@ -1,4 +1,5 @@
 {
+    "@type": "CommandLineTool",
     "description": "Grep without optional parameters.",
     "requirements": [
         {
@@ -33,11 +34,13 @@
             }
         }
     ],
-    "baseCmd": "grep",
-    "stdout": "output.txt",
-    "stdin": {
-        "@type": "Transform",
-        "language": "javascript",
-        "value": "$job.inputs.file1.path"
+    "cliAdapter": {
+        "baseCmd": "grep",
+        "stdout": "output.txt",
+        "stdin": {
+            "@type": "Transform",
+            "language": "javascript",
+            "value": "$job.inputs.file1.path"
+        }
     }
 }

@@ -15,5 +15,5 @@
             "depth": 0
         }
     ],
-    "baseCmd": ["to_string.py"]
+    "cliAdapter": {"baseCmd": ["to_string.py"]}
 }

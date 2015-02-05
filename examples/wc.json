@@ -1,4 +1,5 @@
 {
+    "@type": "CommandLineTool",
     "description": "Word count without optional parameters, except for -l",
     "requirements": [
         {
@@ -33,11 +34,13 @@
             }
         }
     ],
-    "baseCmd": "wc",
-    "stdout": "output.txt",
-    "stdin": {
-        "@type": "Transform",
-        "language": "javascript",
-        "value": "$job.inputs.file1.path"
+    "cliAdapter": {
+        "baseCmd": ["wc"],
+        "stdout": "output.txt",
+        "stdin": {
+            "@type": "Transform",
+            "language": "javascript",
+            "value": "$job.inputs.file1.path"
+        }
     }
 }
