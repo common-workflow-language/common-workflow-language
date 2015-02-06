@@ -25,6 +25,14 @@
     "@id": "cwl:hasBaseCmd",
     "@container": "@list"
   },
+  "app": {
+    "@id": "cwl:hasImplementation",
+    "@type": "@id"
+  },
+  "impl": {
+    "@id": "cwl:linksToPort",
+    "@type": "@id"
+  },
   "Transform": "cwl:Transform",
   "CommandLineTool": "cwl:CommandLineTool",
   "SimpleTransformTool": "cwl:SimpleTransformTool",
@@ -60,7 +68,5 @@
   "dataLinks": "wfdesc:hasDataLink",
   "source": "wfdesc:hasSource",
   "destination": "wfdesc:hasSink",
-  "steps": "wfdesc:hasSubProcess",
-  "app": "cwl:hasImplementation",
-  "impl": "cwl:linksToPort"
+  "steps": "wfdesc:hasSubProcess"
 }
