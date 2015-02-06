@@ -15,6 +15,7 @@ from tool_new import jseval
 log = logging.getLogger(__file__)
 
 CWL = Namespace('http://github.com/common-workflow-language/')
+WFD = Namespace('http://purl.org/wf4ever/wfdesc#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCT = Namespace('http://purl.org/dc/terms/')
 CNT = Namespace('http://www.w3.org/2011/content#')
@@ -28,11 +29,10 @@ def get_value(graph, iri):
 
 
 def set_value(graph, iri, val):
-    # TODO: add CWL.includesFile
     if isinstance(val, (dict, list)):
-        graph.add(iri, CNT.chars, json.dumps(val))
+        graph.set([iri, CNT.chars, Literal(json.dumps(val))])
     else:
-        graph.add(iri, RDF.value, Literal(val))
+        graph.set([iri, RDF.value, Literal(val)])
 
 
 class Inputs(object):
@@ -76,8 +76,8 @@ class Process(object):
         self.iri = URIRef(iri)
 
     activity = lazy(lambda self: self.g.value(None, CWL.activityFor, self.iri))
-    inputs = lazy(lambda self: list(self.g.objects(self.iri, CWL.inputs)))
-    outputs = lazy(lambda self: list(self.g.objects(self.iri, CWL.outputs)))
+    inputs = lazy(lambda self: list(self.g.objects(self.iri, WFD.hasInput)))
+    outputs = lazy(lambda self: list(self.g.objects(self.iri, WFD.hasOutput)))
     started = lazy(lambda self: self.g.value(self.activity, PROV.startedAtTime) if self.activity else None)
     ended = lazy(lambda self: self.g.value(self.activity, PROV.endedAtTime) if self.activity else None)
     has_prereqs = lazy(lambda self: all([None, CWL.producedByPort, src] in self.g for src in self.sources))
@@ -91,9 +91,9 @@ class Process(object):
         return [x[0] for x in self.g.query('''
         select ?src
         where {
-            <%s> cwl:inputs ?port .
-            ?link   cwl:destination ?port ;
-                    cwl:source ?src .
+            <%s> wfd:hasInput ?port .
+            ?link   wfd:hasSink ?port ;
+                    wfd:hasSource ?src .
         }
         ''' % self.iri)]
 
@@ -102,9 +102,9 @@ class Process(object):
         return self.g.query('''
         select ?port ?val
         where {
-            <%s> cwl:inputs ?port .
-            ?link   cwl:destination ?port ;
-                    cwl:source ?src .
+            <%s> wfd:hasInput ?port .
+            ?link   wfd:hasSink ?port ;
+                    wfd:hasSource ?src .
             ?val cwl:producedByPort ?src .
         }
         ''' % self.iri)
@@ -114,6 +114,7 @@ class WorkflowRunner(object):
     def __init__(self, path):
         nm = NamespaceManager(Graph())
         nm.bind('cwl', CWL)
+        nm.bind('wfd', WFD)
         nm.bind('prov', PROV)
         nm.bind('dct', DCT)
         nm.bind('cnt', CNT)
@@ -123,12 +124,12 @@ class WorkflowRunner(object):
         self._load(path)
 
     def _load(self, path):
-        self.g.parse(path)
+        self.g.parse(path, format='json-ld')
         self.wf_iri = URIRef('file://' + path)  # TODO: Find a better way to do this
-        self.g.add([self.wf_iri, RDF.type, CWL.Process])
-        for sp in self.g.objects(self.wf_iri, CWL.steps):
-            self.g.add([sp, RDF.type, CWL.Process])
-            tool = self.g.value(sp, CWL.tool)
+        self.g.add([self.wf_iri, RDF.type, WFD.Process])
+        for sp in self.g.objects(self.wf_iri, WFD.hasSubProcess):
+            self.g.add([sp, RDF.type, WFD.Process])
+            tool = self.g.value(sp, CWL.hasImplementation)
             log.debug('Loading reference %s', tool)
             self.g.parse(tool, format='json-ld')
 
@@ -182,7 +183,7 @@ class WorkflowRunner(object):
     def _depth_mismatch_port(self, proc, inputs):
         depth_of = lambda x: 1 if isinstance(x, list) else 0  # TODO: fixme
         incoming = {k: depth_of(v) for k, v in inputs.d.iteritems()}
-        expected = {k: self.g.value(k, CWL.depth).toPython() for k in proc.inputs}
+        expected = {k: self.g.value(k, CWL.hasDepth).toPython() for k in proc.inputs}
         result = None
         for k, v in incoming.iteritems():
             if expected[k] != v:
@@ -207,7 +208,7 @@ class WorkflowRunner(object):
         while self.queued():
             act = self.start(self.queued()[0].iri)
             proc = Process(self.g, self.g.value(act, CWL.activityFor))
-            tool = self.g.value(proc.iri, CWL.tool)
+            tool = self.g.value(proc.iri, CWL.hasImplementation)
             inputs = Inputs(self.g, proc.input_values)  # TODO: propagate desc<->impl
             dmp = self._depth_mismatch_port(proc, inputs)
             if not dmp:
@@ -230,16 +231,16 @@ class WorkflowRunner(object):
         outputs = dict(self.g.query('''
         select ?port ?val
         where {
-            <%s> cwl:outputs ?port .
-            ?link   cwl:destination ?port ;
-                    cwl:source ?src .
+            <%s> wfd:hasOutput ?port .
+            ?link   wfd:hasSink ?port ;
+                    wfd:hasSource ?src .
             ?val cwl:producedByPort ?src .
         }
         ''' % self.wf_iri))
         return {k: get_value(self.g, v) for k, v in outputs.iteritems()}
 
     def run_script(self, tool, job):
-        expr = self.g.value(self.g.value(tool, CWL.script)).toPython()
+        expr = self.g.value(self.g.value(tool, CWL.hasScript)).toPython()
         log.debug('Running expr %s\nJob: %s', expr, job)
         result = jseval(job, expr)
         logging.debug('Result: %s', result)
@@ -261,8 +262,23 @@ def aplusbtimesc(wf_name, a, b, c):
         assert v == (a+b)*c
     return rnr
 
+
+def count_lines():
+    examples = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../examples'))
+    wf_path = os.path.join(examples, 'wf-count-lines.json')
+    job_path = os.path.join(examples, 'wf-count-lines-job.json')
+    with open(job_path) as fp:
+        inputs = json.load(fp)['inputs']
+    rnr = WorkflowRunner(wf_path)
+    for k, v in inputs.iteritems():
+        rnr.set_value(k, v)
+    print rnr.run_workflow()
+    return rnr
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    aplusbtimesc('wf_simple.json', 2, 3, 4)
-    aplusbtimesc('wf_lists.json', 2, 3, 4)
-    aplusbtimesc('wf_map.json', 2, 3, 4)
+    # aplusbtimesc('wf_simple.json', 2, 3, 4)
+    # aplusbtimesc('wf_lists.json', 2, 3, 4)
+    # aplusbtimesc('wf_map.json', 2, 3, 4)
+    count_lines()

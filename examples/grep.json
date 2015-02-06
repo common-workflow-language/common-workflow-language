@@ -1,5 +1,6 @@
 {
     "@type": "CommandLineTool",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
     "description": "Grep without optional parameters.",
     "requirements": [
         {

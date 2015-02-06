@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import logging
+import tempfile
 from collections import namedtuple
 from tool import resolve_pointer, flatten
 import sandboxjs
@@ -190,10 +191,30 @@ def map_paths(obj, base_dir):
     return {k: map_paths(v, base_dir) for k, v in obj.iteritems()}
 
 
+def run(tool_path, job_path):
+    with open(tool_path) as fpt, open(job_path) as fpj:
+        tool = json.load(fpt)
+        job = json.load(fpj)
+    job = map_paths(job, os.path.join(os.path.dirname(__file__), '../../examples/'))
+    argv, stdin, stdout = get_proc_args_and_redirects(tool, job)
+    line = ' '.join(argv)
+    if stdin:
+        line += ' < ' + stdin
+    if stdout:
+        line += ' > ' + stdout
+    print line
+    job_dir = tempfile.mkdtemp()
+    os.chdir(job_dir)
+    if os.system(line):
+        raise Exception('Process failed.')
+    print os.listdir('.')
+
+
 if __name__ == '__main__':
     if '--conformance-test' not in sys.argv:
+        run(*sys.argv[1:])
         # test('bwa-mem-tool.json', 'bwa-mem-job.json')
         # test('cat1-tool.json', 'cat-n-job.json')
-        test('tmap-tool.json', 'tmap-job.json')
+        # test('tmap-tool.json', 'tmap-job.json')
     else:
         conformance_test()

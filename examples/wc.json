@@ -1,5 +1,6 @@
 {
     "@type": "CommandLineTool",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
     "description": "Word count without optional parameters, except for -l",
     "requirements": [
         {

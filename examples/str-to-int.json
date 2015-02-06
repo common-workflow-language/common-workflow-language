@@ -1,5 +1,6 @@
 {
   "@type": "SimpleTransformTool",
+  "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
   "inputs": {"@id": "#str", "depth": 0, "schema": {"type": "string"}},
   "outputs": {"@id": "#int", "depth": 0, "schema": {"type": "int"}},
   "script": {

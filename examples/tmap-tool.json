@@ -1,6 +1,7 @@
 
 {
   "@type": "CommandLineTool",
+  "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
   "inputs": [
     {
       "depth": 0, 

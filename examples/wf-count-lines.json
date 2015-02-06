@@ -1,5 +1,6 @@
 {
   "@type": "Workflow",
+  "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
   "inputs": [
     {"@id": "#files", "depth": 1, "schema": {"type": "array", "items": "File"}},
     {"@id": "#pattern", "depth": 0, "schema": {"type": "string"}}
