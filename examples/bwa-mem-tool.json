@@ -1,11 +1,11 @@
 {
     "@type": "CommandLineTool",
-    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/specification/context.json",
     "requirements": [
         {
-          "@type": "DockerContainer",
-          "dockerRepo": "images.sbgenomics.com/rabix/bwa",
-          "imageId": "9d3b9b0359cf"
+          "@type": "DockerImage",
+          "dockerPull": "images.sbgenomics.com/rabix/bwa",
+          "dockerImageId": "9d3b9b0359cf"
         },
         {
           "@type": "MemoryRequirement",
@@ -15,31 +15,28 @@
   "inputs": [
     {
       "@id": "#reference",
-      "depth": 0,
       "schema": {
         "type": "File",
-        "adapter": {
+        "binding": {
           "position": 2
         }
       }
     },
     {
       "@id": "#reads",
-      "depth": 1,
       "schema": {
         "type": "array",
         "items": "File",
-        "adapter": {
+        "binding": {
           "position": 3
         }
       }
     },
     {
       "@id": "#minimum_seed_length",
-      "depth": 0,
       "schema": {
         "type": "int",
-        "adapter": {
+        "binding": {
           "position": 1,
           "prefix": "-m"
         }
@@ -47,11 +44,10 @@
     },
     {
       "@id": "#min_std_max_min",
-      "depth": 1,
       "schema": {
         "items": "int",
         "type": "array",
-        "adapter": {
+        "binding": {
           "itemSeparator": ",",
           "position": 1,
           "prefix": "-I"
@@ -62,28 +58,26 @@
   "outputs": [
     {
       "@id": "#sam",
-      "depth": 0,
       "schema": {
         "type": "File",
-        "adapter": {
+        "binding": {
           "glob": "output.sam"
         }
       }
     }
   ],
-  "cliAdapter": {
-    "argAdapters": [
+  "commandLine": {
+    "base": ["bwa", "mem"],
+    "arguments": [
       {
-        "argValue": {
-          "@type": "Transform",
-          "language": "javascript",
+        "valueOf": {
+          "@type": "JavascriptExpression",
           "value": "$job.allocatedResources.cpu"
         },
         "position": 1,
         "prefix": "-t"
       }
     ],
-    "baseCmd": ["bwa", "mem"],
     "stdout": "output.sam"
   }
 }

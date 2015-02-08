@@ -4,43 +4,40 @@
   "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
   "inputs": [
     {
-      "depth": 0, 
       "@id": "#reads",
       "schema": {
         "type": "File"
       }
-    }, 
+    },
     {
-      "depth": 1, 
       "@id": "#stages",
       "schema": {
-        "adapter": {
+        "binding": {
           "position": 1
         },
         "type": "array",
         "items": "Stage"
       }
     }
-  ], 
+  ],
   "outputs": [
     {
-      "depth": 0, 
       "@id": "#sam",
       "schema": {
-        "adapter": {
+        "binding": {
           "glob": "output.sam"
-        }, 
+        },
         "type": "File"
       }
     }
-  ], 
+  ],
   "schemaDefs": [
     {
         "type": "record",
         "name": "Stage",
         "fields": [
             {
-              "adapter": {
+              "binding": {
                 "position": 0,
                 "prefix": "stage",
                 "separator": ""
@@ -49,7 +46,7 @@
               "type": ["null", "int"]
             },
             {
-              "adapter": {
+              "binding": {
                 "position": 1,
                 "prefix": "-n"
               },
@@ -57,7 +54,7 @@
               "type": ["null", "boolean"]
             },
             {
-              "adapter": {
+              "binding": {
                 "position": 2
               },
               "name": "algos",
@@ -76,10 +73,10 @@
     {
       "fields": [
         {
-          "adapter": {
+          "binding": {
             "position": 0
-          }, 
-          "name": "algo", 
+          },
+          "name": "algo",
           "type": {
             "type": "enum",
             "name": "JustMap1",
@@ -89,7 +86,7 @@
         {
           "name": "maxSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--max-seq-length",
             "separator": " ",
             "position": 2
@@ -98,41 +95,41 @@
         {
           "name": "minSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--min-seq-length",
             "separator": " ",
             "position": 2
           }
         },
         {
-          "adapter": {
+          "binding": {
             "position": 2,
             "prefix": "--seed-length"
-          }, 
-          "name": "seedLength", 
+          },
+          "name": "seedLength",
           "type": ["null", "int"]
         }
-      ], 
-      "name": "Map1", 
+      ],
+      "name": "Map1",
       "type": "record"
-    }, 
+    },
     {
       "fields": [
         {
-          "adapter": {
+          "binding": {
             "position": 0
-          }, 
-          "name": "algo", 
+          },
+          "name": "algo",
           "type": {
             "type": "enum",
             "name": "JustMap2",
             "symbols": ["map2"]
           }
-        }, 
+        },
         {
           "name": "maxSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--max-seq-length",
             "separator": " ",
             "position": 2
@@ -141,41 +138,41 @@
         {
           "name": "minSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--min-seq-length",
             "separator": " ",
             "position": 2
           }
         },
         {
-          "adapter": {
+          "binding": {
             "position": 2,
             "prefix": "--max-seed-hits"
-          }, 
-          "name": "maxSeedHits", 
+          },
+          "name": "maxSeedHits",
           "type": ["null", "int"]
         }
-      ], 
-      "name": "Map2", 
+      ],
+      "name": "Map2",
       "type": "record"
-    }, 
+    },
     {
       "fields": [
         {
-          "adapter": {
+          "binding": {
             "position": 0
-          }, 
-          "name": "algo", 
+          },
+          "name": "algo",
           "type": {
             "type": "enum",
             "name": "JustMap3",
             "symbols": ["map3"]
           }
-        }, 
+        },
         {
           "name": "maxSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--max-seq-length",
             "separator": " ",
             "position": 2
@@ -184,41 +181,41 @@
         {
           "name": "minSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--min-seq-length",
             "separator": " ",
             "position": 2
           }
         },
         {
-          "adapter": {
+          "binding": {
             "position": 2,
             "prefix": "--fwd-search"
-          }, 
-          "name": "fwdSearch", 
+          },
+          "name": "fwdSearch",
           "type": ["null", "boolean"]
         }
-      ], 
-      "name": "Map3", 
+      ],
+      "name": "Map3",
       "type": "record"
-    }, 
+    },
     {
       "fields": [
         {
-          "adapter": {
+          "binding": {
             "position": 0
-          }, 
-          "name": "algo", 
+          },
+          "name": "algo",
           "type": {
             "type": "enum",
             "name": "JustMap4",
             "symbols": ["map4"]
           }
-        }, 
+        },
         {
           "name": "maxSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--max-seq-length",
             "separator": " ",
             "position": 2
@@ -227,31 +224,30 @@
         {
           "name": "minSeqLen",
           "type": ["null", "int"],
-          "adapter": {
+          "binding": {
             "prefix": "--min-seq-length",
             "separator": " ",
             "position": 2
           }
         },
         {
-          "adapter": {
+          "binding": {
             "position": 2,
             "prefix": "--seed-step"
-          }, 
-          "name": "seedStep", 
+          },
+          "name": "seedStep",
           "type": ["null", "int"]
         }
-      ], 
-      "name": "Map4", 
+      ],
+      "name": "Map4",
       "type": "record"
     }
   ],
-  "cliAdapter": {
-    "baseCmd": ["tmap", "mapall"],
+  "commandLine": {
+    "base": ["tmap", "mapall"],
     "stdin": {
-      "@type": "Transform",
-      "language": "javascript",
-      "value": "$job.inputs.reads.path"
+      "@type": "JavascriptExpression",
+      "valueOf": "$job.inputs.reads.path"
     },
     "stdout": "output.sam"
   }
