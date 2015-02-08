@@ -89,7 +89,7 @@
     "dataLinks": "wfdesc:hasDataLink",
     "source": "wfdesc:hasSource",
     "destination": "wfdesc:hasSink",
-    "steps": "wfdesc:hasSubProcess"
+    "steps": "wfdesc:hasSubProcess",
 
     "app": {
         "@id": "cwl:hasImplementation",
@@ -101,5 +101,5 @@
     },
 
     "script": "cwl:hasScript",
-    "glob": "cwl:hasGlobPattern",
+    "glob": "cwl:hasGlobPattern"
 }
