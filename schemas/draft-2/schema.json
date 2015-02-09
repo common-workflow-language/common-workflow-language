@@ -1,0 +1,311 @@
+{
+    "@context": {
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "cwl": "http://github.com/common-workflow-language#",
+        "avro": "http://github.com/common-workflow-language#avro/",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+        "properties": {
+            "@reverse": "rdfs:domain"
+        }
+    },
+
+    "@graph": [
+        {
+            "@id":"avro:Datatype",
+            "@type":"rdfs:Class"
+        },
+        {
+            "@id":"avro:null",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:boolean",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:int",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:long",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:float",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:double",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:bytes",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:string",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:record",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:enum",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:array",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"avro:map",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+        {
+            "@id":"cwl:File",
+            "@type":"rdfs:Class",
+            "rdfs:subClassOf": "avro:Datatype"
+        },
+
+        {
+            "@id": "cwl:Schema",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "arvo:name",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "arvo:type",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "avro:Datatype"
+                },
+                {
+                    "@id": "arvo:fields",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
+                },
+                {
+                    "@id": "arvo:symbols",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
+                },
+                {
+                    "@id": "arvo:items",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "avro:Datatype"
+                },
+                {
+                    "@id": "arvo:values",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "avro:Datatype"
+                },
+                {
+                    "@id": "cwl:binding",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": ["cwl:InputBinding", "cwl:OutputBinding"]
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:ToolDependency",
+            "@type": "rdfs:Class"
+        },
+
+        {
+            "@id": "cwl:CommandLineTool",
+            "@type": "rdfs:Class",
+            "rdfs:subClassOf": "wfdesc:Process",
+            "properties": [
+                {
+                    "@id": "cwl:baseCommand",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
+                },
+                {
+                    "@id": "cwl:arguments",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
+                },
+                {
+                    "@id": "cwl:stdin",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:stdout",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "wfdesc:hasInput",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "wfdesc:Input"
+                },
+                {
+                    "@id": "wfdesc:hasOutput",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "wfdesc:Output"
+                },
+                {
+                    "@id": "cwl:requirements",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "cwl:ToolDependency"
+                },
+                {
+                    "@id": "cwl:hints",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "cwl:ToolDependency"
+                },
+                {
+                    "@id": "cwl:schemaDefs",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "cwl:Schema"
+                }
+            ]
+        },
+
+        {
+            "@id": "wfdesc:Input",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:schema",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "cwl:Schema"
+                }
+            ]
+        },
+
+        {
+            "@id": "wfdesc:Output",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:schema"
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:InputBinding",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:position",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:integer"
+                },
+                {
+                    "@id": "cwl:prefix",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:separator",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:itemSeparator",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:valueOf",
+                    "@type": "rdfs:Property"
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:OutputBinding",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:glob",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:Expression",
+            "@type": "rdfs:Class"
+        },
+
+        {
+            "@id": "cwl:JavascriptExpression",
+            "@type": "rdfs:Class",
+            "rdfs:subClassOf": "cwl:Expression"
+        },
+
+        {
+            "@id": "cwl:DockerImage",
+            "@type": "cwl:Class",
+            "rdfs:subClassOf": "cwl:ToolDependency",
+            "properties": [
+                {
+                    "@id": "cwl:dockerPull",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:dockerImport",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:dockerImageId",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:CPURequirement",
+            "@type": "cwl:Class",
+            "rdfs:subClassOf": "cwl:ToolDependency",
+            "properties": [
+                {
+                    "@id": "cwl:preferredCPUCores",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:integer"
+                }
+            ]
+        },
+
+        {
+            "@id": "cwl:MemoryRequirement",
+            "@type": "cwl:Class",
+            "rdfs:subClassOf": "cwl:ToolDependency",
+            "properties": [
+                {
+                    "@id": "cwl:memoryInMiB",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:integer"
+                }
+            ]
+        }
+
+    ]
+}

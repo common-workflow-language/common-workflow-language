@@ -1,83 +1,83 @@
 {
     "@type": "CommandLineTool",
-    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/specification/context.json",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
     "requirements": [
         {
-          "@type": "DockerImage",
-          "dockerPull": "images.sbgenomics.com/rabix/bwa",
-          "dockerImageId": "9d3b9b0359cf"
+            "@type": "MemoryRequirement",
+            "value": 5000
+        }
+    ],
+    "hints": [
+        {
+            "@type": "DockerImage",
+            "dockerPull": "images.sbgenomics.com/rabix/bwa",
+            "dockerImageId": "9d3b9b0359cf"
+        },
+    ],
+    "inputs": [
+        {
+            "@id": "#reference",
+            "schema": {
+                "type": "File",
+                "binding": {
+                    "position": 2
+                }
+            }
         },
         {
-          "@type": "MemoryRequirement",
-          "value": 5000
+            "@id": "#reads",
+            "schema": {
+                "type": "array",
+                "items": "File",
+                "binding": {
+                    "position": 3
+                }
+            }
+        },
+        {
+            "@id": "#minimum_seed_length",
+            "schema": {
+                "type": "int",
+                "binding": {
+                    "position": 1,
+                    "prefix": "-m"
+                }
+            }
+        },
+        {
+            "@id": "#min_std_max_min",
+            "schema": {
+                "items": "int",
+                "type": "array",
+                "binding": {
+                    "itemSeparator": ",",
+                    "position": 1,
+                    "prefix": "-I"
+                }
+            }
         }
     ],
-  "inputs": [
-    {
-      "@id": "#reference",
-      "schema": {
-        "type": "File",
-        "binding": {
-          "position": 2
+    "outputs": [
+        {
+            "@id": "#sam",
+            "schema": {
+                "type": "File",
+                "binding": {
+                    "glob": "output.sam"
+                }
+            }
         }
-      }
-    },
-    {
-      "@id": "#reads",
-      "schema": {
-        "type": "array",
-        "items": "File",
-        "binding": {
-          "position": 3
-        }
-      }
-    },
-    {
-      "@id": "#minimum_seed_length",
-      "schema": {
-        "type": "int",
-        "binding": {
-          "position": 1,
-          "prefix": "-m"
-        }
-      }
-    },
-    {
-      "@id": "#min_std_max_min",
-      "schema": {
-        "items": "int",
-        "type": "array",
-        "binding": {
-          "itemSeparator": ",",
-          "position": 1,
-          "prefix": "-I"
-        }
-      }
-    }
-  ],
-  "outputs": [
-    {
-      "@id": "#sam",
-      "schema": {
-        "type": "File",
-        "binding": {
-          "glob": "output.sam"
-        }
-      }
-    }
-  ],
-  "commandLine": {
-    "base": ["bwa", "mem"],
+    ],
+    "baseCommand": ["bwa", "mem"],
     "arguments": [
-      {
-        "valueOf": {
-          "@type": "JavascriptExpression",
-          "value": "$job.allocatedResources.cpu"
-        },
-        "position": 1,
-        "prefix": "-t"
-      }
+        {
+            "valueOf": {
+                "@type": "JavascriptExpression",
+                "value": "$job.allocatedResources.cpu"
+            },
+            "position": 1,
+            "prefix": "-t"
+        }
     ],
     "stdout": "output.sam"
-  }
 }
