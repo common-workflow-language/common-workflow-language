@@ -247,7 +247,7 @@
     "base": ["tmap", "mapall"],
     "stdin": {
       "@type": "JavascriptExpression",
-      "valueOf": "$job.inputs.reads.path"
+      "valueFrom": "$job.inputs.reads.path"
     },
     "stdout": "output.sam"
   }

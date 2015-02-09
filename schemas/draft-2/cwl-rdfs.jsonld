@@ -90,6 +90,47 @@
         },
 
         {
+            "@id": "cwl:Expression",
+            "@type": "rdfs:Class"
+        },
+
+        {
+            "@id": "cwl:Binding",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:position",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:integer"
+                },
+                {
+                    "@id": "cwl:prefix",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:separator",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:itemSeparator",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                {
+                    "@id": "cwl:valueFrom",
+                    "@type": "rdfs:Property"
+                },
+                {
+                    "@id": "cwl:glob",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                }
+            ]
+        },
+
+        {
             "@id": "cwl:Schema",
             "@type": "rdfs:Class",
             "properties": [
@@ -126,10 +167,10 @@
                 {
                     "@id": "cwl:binding",
                     "@type": "rdfs:Property",
-                    "rdfs:range": ["cwl:InputBinding", "cwl:OutputBinding"]
+                    "rdfs:range": "cwl:Binding"
                 }
             ]
-        },
+o        },
 
         {
             "@id": "cwl:ToolDependency",
@@ -192,71 +233,13 @@
         {
             "@id": "wfdesc:Input",
             "@type": "rdfs:Class",
-            "properties": [
-                {
-                    "@id": "cwl:schema",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "cwl:Schema"
-                }
-            ]
+            "rdfs:subClassOf": "cwl:Schema"
         },
 
         {
             "@id": "wfdesc:Output",
             "@type": "rdfs:Class",
-            "properties": [
-                {
-                    "@id": "cwl:schema"
-                }
-            ]
-        },
-
-        {
-            "@id": "cwl:InputBinding",
-            "@type": "rdfs:Class",
-            "properties": [
-                {
-                    "@id": "cwl:position",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "xsd:integer"
-                },
-                {
-                    "@id": "cwl:prefix",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "xsd:string"
-                },
-                {
-                    "@id": "cwl:separator",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "xsd:string"
-                },
-                {
-                    "@id": "cwl:itemSeparator",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "xsd:string"
-                },
-                {
-                    "@id": "cwl:valueOf",
-                    "@type": "rdfs:Property"
-                }
-            ]
-        },
-
-        {
-            "@id": "cwl:OutputBinding",
-            "@type": "rdfs:Class",
-            "properties": [
-                {
-                    "@id": "cwl:glob",
-                    "@type": "rdfs:Property",
-                    "rdfs:range": "xsd:string"
-                }
-            ]
-        },
-
-        {
-            "@id": "cwl:Expression",
-            "@type": "rdfs:Class"
+            "rdfs:subClassOf": "cwl:Schema"
         },
 
         {

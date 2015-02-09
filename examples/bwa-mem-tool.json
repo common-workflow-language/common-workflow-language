@@ -3,75 +3,65 @@
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
     "requirements": [
         {
-            "@type": "MemoryRequirement",
+            "toolDependency": "MemoryRequirement",
             "value": 5000
         }
     ],
     "hints": [
         {
-            "@type": "DockerImage",
+            "toolDependency": "DockerImage",
             "dockerPull": "images.sbgenomics.com/rabix/bwa",
             "dockerImageId": "9d3b9b0359cf"
-        },
+        }
     ],
     "inputs": [
         {
-            "@id": "#reference",
-            "schema": {
-                "type": "File",
-                "binding": {
-                    "position": 2
-                }
+            "port": "#reference",
+            "type": "File",
+            "binding": {
+                "position": 2
             }
         },
         {
-            "@id": "#reads",
-            "schema": {
-                "type": "array",
-                "items": "File",
-                "binding": {
-                    "position": 3
-                }
+            "port": "#reads",
+            "type": "array",
+            "items": "File",
+            "binding": {
+                "position": 3
             }
         },
         {
-            "@id": "#minimum_seed_length",
-            "schema": {
-                "type": "int",
-                "binding": {
-                    "position": 1,
-                    "prefix": "-m"
-                }
+            "port": "#minimum_seed_length",
+            "type": "int",
+            "binding": {
+                "position": 1,
+                "prefix": "-m"
             }
         },
         {
-            "@id": "#min_std_max_min",
-            "schema": {
-                "items": "int",
-                "type": "array",
-                "binding": {
-                    "itemSeparator": ",",
-                    "position": 1,
-                    "prefix": "-I"
-                }
+            "port": "#min_std_max_min",
+            "items": "int",
+            "type": "array",
+            "binding": {
+                "itemSeparator": ",",
+                "position": 1,
+                "prefix": "-I"
             }
         }
     ],
     "outputs": [
         {
-            "@id": "#sam",
-            "schema": {
-                "type": "File",
-                "binding": {
-                    "glob": "output.sam"
-                }
+            "port": "#sam",
+            "type": "File",
+            "binding": {
+                "glob": "output.sam"
             }
         }
     ],
     "baseCommand": ["bwa", "mem"],
     "arguments": [
         {
-            "valueOf": {
+            "valueFrom": {
                 "@type": "JavascriptExpression",
                 "value": "$job.allocatedResources.cpu"
             },

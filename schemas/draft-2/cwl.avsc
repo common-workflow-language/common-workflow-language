@@ -1,0 +1,173 @@
+[
+    {
+        "type": "enum",
+        "name": "Datatype",
+        "symbols": [
+            "null",
+            "boolean",
+            "int",
+            "long",
+            "float",
+            "double",
+            "bytes",
+            "string",
+            "record",
+            "enum",
+            "array",
+            "map",
+            "File"
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "File",
+        "fields": [
+            { "name": "path", "type": "string" }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "Expression",
+        "fields": [
+            { "name": "value", "type": ["null", "string"] }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "Binding",
+        "fields": [
+            { "name": "position", "type": ["null", "int"] },
+            { "name": "prefix", "type": [ "null", "string"] },
+            { "name": "separator", "type": ["null", "string"] },
+            { "name": "itemSeparator", "type": ["null", "string"] },
+            { "name": "valueFrom", "type": ["null", "Expression"] },
+            { "name": "glob", "type": ["null", "string"] }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "Schema",
+        "fields": [
+            { "name": "name", "type": ["null", "string"] },
+            { "name": "port", "type": ["null", "string"] },
+            { "name": "type", "type": "Datatype" },
+            {
+                "name": "fields",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                ]
+            },
+            {
+                "name": "symbols",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ]
+            },
+            {
+                "name": "items",
+                "type": [ "null", "Datatype" ]
+            },
+            {
+                "name": "values",
+                "type": [ "null", "Datatype" ]
+            },
+            {
+                "name": "binding",
+                "type": [ "null", "Binding" ]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "ToolDependency",
+        "fields": [
+            { "name": "toolDependency", "type": "string" }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "CommandLineTool",
+        "fields": [
+            {
+                "name": "baseCommand",
+                "type": {
+                    "type": "array",
+                    "items": "string"
+                }
+            },
+            {
+                "name": "arguments",
+                "type": {
+                    "type": "array",
+                    "items": "Binding"
+                }
+            },
+            {
+                "name": "stdin",
+                "type": ["null", "string"]
+            },
+            {
+                "name": "stdout",
+                "type": ["null", "string"]
+            },
+            {
+                "name": "inputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "outputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "requirements",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "ToolDependency"
+                    }
+                ]
+            },
+            {
+                "name": "hints",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "ToolDependency"
+                    }
+                ]
+            },
+            {
+                "name": "schemaDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                ]
+            }
+        ]
+    }
+]

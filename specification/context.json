@@ -8,7 +8,10 @@
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
 
     "value": "rdf:value",
+    "port": "@id",
+    "dependencyType": "@type",
 
+    "name": "avro:name",
     "null": "avro:null",
     "boolean": "avro:boolean",
     "int": "avro:int",
@@ -21,9 +24,6 @@
     "enum": "avro:enum",
     "array": "avro:array",
     "map": "avro:map",
-    "File": "cwl:File",
-
-    "name": "avro:name",
     "type": {
         "@id": "avro:type",
         "@type": "@vocab"
@@ -44,48 +44,48 @@
         "@id": "avro:values",
         "@type": "@vocab"
     },
-    "binding": "cwl:binding",
 
-    "CommandLineTool": "cwl:CommandLineTool",
-    "baseCommand": {
-        "@id": "cwl:baseCommand",
-        "@container": "@list"
-    },
-    "arguments": {
-        "@id": "cwl:arguments",
-        "@container": "@list"
-    },
-    "stdin": "cwl:stdin",
-    "stdout": "cwl:stdout",
     "inputs": "wfdesc:hasInput",
     "outputs": "wfdesc:hasOutput",
-    "requirements": "cwl:requirements",
-    "hints": "cwl:hints",
-    "schemaDefs": "cwl:schemaDefs",
 
-    "schema": "cwl:schema",
-
-    "position": "cwl:position",
-    "prefix": "cwl:prefix",
-    "separator": "cwl:separator",
-    "itemSeparator": "cwl:itemSeparator",
-    "valueOf": "cwl:valueOf",
-    "glob": "cwl:glob",
-
+    "CommandLineTool": "cwl:CommandLineTool",
     "Expression": "cwl:Expression",
     "JavascriptExpression": "cwl:JavascriptExpression",
+
+    "requirements": "cwl:requirement",
+
+    "CPURequirement": "cwl:CPURequirement",
+    "MemoryRequirement": "cwl:MemoryRequirement",
 
     "DockerImage": "cwl:DockerImage",
     "dockerPull": "cwl:dockerPull",
     "dockerImport": "cwl:dockerImport",
     "dockerImageId": "cwl:dockerImageId",
 
-    "CPURequirement": "cwl:CPURequirement",
-    "preferredCPUCores": "cwl:preferredCPUCores",
+    "schema": "cwl:schema",
+    "schemaDefs": "cwl:schemaDefs",
 
-    "MemoryRequirement": "cwl:MemoryRequirement",
-    "memoryInMiB": "cwl:memoryInMiB",
+    "File": "cwl:File",
 
+    "binding": "cwl:binding",
+
+    "position": "cwl:commandLinePosition",
+    "prefix": "cwl:commandLinePrefix",
+    "separator": "cwl:commandLineSeparator",
+    "itemSeparator": "cwl:itemSeparator",
+
+    "commandLine": "cwl:commandLine",
+    "base": {
+        "@id": "cwl:base",
+        "@container": "@list"
+    },
+    "arguments": {
+        "@id": "cwl:arguments",
+        "@container": "@list"
+    },
+    "valueOf": "cwl:valueOf",
+    "stdin": "cwl:stdin",
+    "stdout": "cwl:stdout",
 
     "Workflow": "cwl:Workflow",
     "dataLinks": "wfdesc:hasDataLink",
@@ -100,6 +100,8 @@
     "impl": {
         "@id": "cwl:linksToPort",
         "@type": "@id"
-    }
+    },
 
+    "script": "cwl:hasScript",
+    "glob": "cwl:hasGlobPattern"
 }
