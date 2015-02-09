@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import tool
+import draft1tool
 import argparse
 from ref_resolver import from_url
 import jsonschema
@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        t = tool.Tool(from_url(args.tool))
+        t = draft1tool.Tool(from_url(args.tool))
     except jsonschema.exceptions.ValidationError as e:
         print "Tool definition failed validation"
         print e

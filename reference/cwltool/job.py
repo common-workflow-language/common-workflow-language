@@ -1,7 +1,7 @@
 import subprocess
 import os
 import tempfile
-import tool
+import draft1tool
 import glob
 import json
 import yaml
@@ -81,7 +81,7 @@ class Job(object):
                         else:
                             r = None
                 if "value" in adapter:
-                    r = tool.resolve_eval(self.joborder, adapter["value"])
+                    r = draft1tool.resolve_eval(self.joborder, adapter["value"])
             if not r and "properties" in schema:
                 r = {}
                 for k, v in schema["properties"].items():
