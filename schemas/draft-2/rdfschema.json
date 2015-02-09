@@ -79,7 +79,14 @@
         {
             "@id":"cwl:File",
             "@type":"rdfs:Class",
-            "rdfs:subClassOf": "avro:Datatype"
+            "rdfs:subClassOf": "avro:Datatype",
+            "properties": [
+                {
+                    "@id": "cwl:path",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                }
+            ]
         },
 
         {

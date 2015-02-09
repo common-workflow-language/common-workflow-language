@@ -1,0 +1,76 @@
+[
+    {
+        "type": "enum",
+        "name": "Datatype",
+        "symbols": ["null",
+                    "boolean",
+                    "int",
+                    "long",
+                    "float",
+                    "double",
+                    "bytes",
+                    "string",
+                    "record",
+                    "enum",
+                    "array",
+                    "map",
+                    "File"]
+    },
+
+    {
+        "type": "record",
+        "name": "File",
+        "fields": [
+            { "name": "path", "type": ["string"] },
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "Schema",
+        "fields": [
+            { "name": "name", "type": "string" },
+            { "name": "type", "type": "Datatype" },
+            {
+                "name": "fields",
+                "type": ["array", "null"],
+                "items": "Schema"
+            },
+            {
+                "name": "enum",
+                "type": ["array", "null"],
+                "items": "string"
+            },
+
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "InputBinding",
+        "fields": [
+            { "name": "position", "type": ["int", "null"] },
+            { "name": "prefix", "type": ["string", "null"] },
+            { "name": "separator", "type": ["string", "null"] },
+            { "name": "itemSeparator", "type": ["string", "null"] }
+            { "name": "valueOf", "type": ["string", "null", "map"] }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name":"CommandLineTool",
+        "fields": [
+            {
+                "name": "baseCommand",
+                "type": "array",
+                "items": ["string", "map"]
+            },
+            {
+                "name": "arguments",
+                "type": "array",
+                "items": "InputBinding"
+            }
+        ]
+    }
+]
