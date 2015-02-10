@@ -66,7 +66,12 @@
                 "name": "type",
                 "type": [
                     "Datatype",
-                    "Schema"
+                    "Schema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [ "Datatype", "Schema", "string" ]
+                    }
                 ]
             },
             {
@@ -91,11 +96,29 @@
             },
             {
                 "name": "items",
-                "type": [ "null", "Datatype", "Schema" ]
+                "type": [
+                    "null",
+                    "Datatype",
+                    "Schema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [ "Datatype", "Schema", "string" ]
+                    }
+                ]
             },
             {
                 "name": "values",
-                "type": [ "null", "Datatype", "Schema" ]
+                "type": [
+                    "null",
+                    "Datatype",
+                    "Schema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [ "Datatype", "Schema", "string" ]
+                    }
+                ]
             },
             {
                 "name": "binding",
@@ -119,7 +142,7 @@
             {"name": "filename", "type": "string"},
             {
                 "name": "value",
-                "type": ["null", "string", "Expression", "Ref"]
+                "type": ["null", "string", "Expression"]
             }
         ]
     },
@@ -130,25 +153,31 @@
         "fields": [
             {
                 "name": "baseCommand",
-                "type": {
-                    "type": "array",
-                    "items": "string"
-                }
+                "type": [
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ]
             },
             {
                 "name": "arguments",
-                "type": {
-                    "type": "array",
-                    "items": "Binding"
-                }
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Binding"
+                    }
+                ]
             },
             {
                 "name": "stdin",
-                "type": ["null", "string"]
+                "type": ["null", "Expression"]
             },
             {
                 "name": "stdout",
-                "type": ["null", "string"]
+                "type": ["null", "string", "Expression"]
             },
             {
                 "name": "inputs",
@@ -200,7 +229,7 @@
                     "null",
                     {
                         "type": "array",
-                        "items": "string"
+                        "items": ["string", "Ref"]
                     }
                 ]
             },

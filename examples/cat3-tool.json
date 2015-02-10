@@ -1,35 +1,27 @@
 {
     "@type": "CommandLineTool",
-    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
     "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
     "requirements": [
         {
-          "@type": "DockerContainer",
-          "dockerRepo": "arvados/jobs"
+          "requirementType": "DockerContainer",
+          "dockerPull": "arvados/jobs"
         }
     ],
     "inputs": [
         {
-            "@id": "#file1",
-            "depth": 0,
-            "schema": {
-                "type": "File",
-                "adapter": {"position": 1}
-            }
+            "port": "#file1",
+            "type": "File",
+            "binding": {"position": 1}
         }
     ],
     "outputs": [
         {
-            "@id": "#output",
-            "depth": 0,
-            "schema": {
-                "type": "File",
-                "adapter": {"glob": "output.txt"}
-            }
+            "port": "#output",
+            "type": "File",
+            "binding": {"glob": "output.txt"}
         }
     ],
-    "cliAdapter": {
-        "baseCmd": "cat",
-        "stdout": "output.txt"
-    }
+    "baseCommand": "cat",
+    "stdout": "output.txt"
 }

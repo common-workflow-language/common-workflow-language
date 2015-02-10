@@ -27,93 +27,99 @@ LONG_MIN_VALUE = -(1 << 63)
 LONG_MAX_VALUE = (1 << 63) - 1
 
 def validate_ex(expected_schema, datum):
-  """Determine if a python datum is an instance of a schema."""
-  schema_type = expected_schema.type
-  if schema_type == 'null':
-    if datum is None:
-        return True
-    else:
-        raise ValidationException("'%s' is not None" % datum)
-  elif schema_type == 'boolean':
-    if isinstance(datum, bool):
-        return True
-    else:
-        raise ValidationException("'%s' is not bool" % datum)
-  elif schema_type == 'string':
-    if isinstance(datum, basestring):
-        return True
-    else:
-        raise ValidationException("'%s' is not string" % datum)
-  elif schema_type == 'bytes':
-    if isinstance(datum, str):
-        return True
-    else:
-        raise ValidationException("'%s' is not bytes" % datum)
-  elif schema_type == 'int':
-    if ((isinstance(datum, int) or isinstance(datum, long))
+    """Determine if a python datum is an instance of a schema."""
+    schema_type = expected_schema.type
+    if schema_type == 'null':
+        if datum is None:
+            return True
+        else:
+            raise ValidationException("`%s` is not null" % datum)
+    elif schema_type == 'boolean':
+        if isinstance(datum, bool):
+            return True
+        else:
+            raise ValidationException("`%s` is not boolean" % datum)
+    elif schema_type == 'string':
+        if isinstance(datum, basestring):
+            return True
+        else:
+            raise ValidationException("`%s` is not string" % datum)
+    elif schema_type == 'bytes':
+        if isinstance(datum, str):
+            return True
+        else:
+            raise ValidationException("`%s` is not bytes" % datum)
+    elif schema_type == 'int':
+        if ((isinstance(datum, int) or isinstance(datum, long))
             and INT_MIN_VALUE <= datum <= INT_MAX_VALUE):
-        return True
-    else:
-        raise ValidationException("'%s' is not int" % datum)
-  elif schema_type == 'long':
-    if ((isinstance(datum, int) or isinstance(datum, long))
+            return True
+        else:
+            raise ValidationException("`%s` is not int" % datum)
+    elif schema_type == 'long':
+        if ((isinstance(datum, int) or isinstance(datum, long))
             and LONG_MIN_VALUE <= datum <= LONG_MAX_VALUE):
-        return True
-    else:
-        raise ValidationException("'%s' is not long" % datum)
-  elif schema_type in ['float', 'double']:
-    if (isinstance(datum, int) or isinstance(datum, long)
+            return True
+        else:
+            raise ValidationException("`%s` is not long" % datum)
+    elif schema_type in ['float', 'double']:
+        if (isinstance(datum, int) or isinstance(datum, long)
             or isinstance(datum, float)):
-        return True
-    else:
-        raise ValidationException("'%s' is not float or double" % datum)
-  elif schema_type == 'fixed':
-    if isinstance(datum, str) and len(datum) == expected_schema.size:
-        return True
-    else:
-        raise ValidationException("'%s' is not fixed" % datum)
-  elif schema_type == 'enum':
-    if datum in expected_schema.symbols:
-        return True
-    else:
-        raise ValidationException("'%s'\n is not a valid enum symbol\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.symbols)))
-  elif schema_type == 'array':
-      if (isinstance(datum, list) and
-          False not in [validate(expected_schema.items, d) for d in datum]):
-          return True
-      else:
-          raise ValidationException("'%s'\n is not a valid list item\n %s" % (pprint.pformat(datum), expected_schema.items))
-  elif schema_type == 'map':
-      if (isinstance(datum, dict) and
-                 False not in [isinstance(k, basestring) for k in datum.keys()] and
-                 False not in
-                 [validate(expected_schema.values, v) for v in datum.values()]):
-          return True
-      else:
-          raise ValidationException("'%s' is not a valid map value %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.values)))
-  elif schema_type in ['union', 'error_union']:
-      if True in [validate(s, datum) for s in expected_schema.schemas]:
-          return True
-      else:
-          raise ValidationException("'%s' is not a valid union %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.schemas)))
-  elif schema_type in ['record', 'error', 'request']:
-      if (isinstance(datum, dict) and
-                 False not in
-                 [validate(f.type, datum.get(f.name)) for f in expected_schema.fields]):
-          return True
-      else:
-          if not isinstance(datum, dict):
-              raise ValidationException("'%s'\n is not a dict" % pprint.pformat(datum))
-          try:
-              [validate_ex(f.type, datum.get(f.name)) for f in expected_schema.fields]
-          except ValidationException as v:
-              raise ValidationException("%s\nValidating record %s" % (v, pprint.pformat(datum)))
-  raise ValidationException("Unrecognized schema_type %s" % schema_type)
+            return True
+        else:
+            raise ValidationException("`%s` is not float or double" % datum)
+    elif schema_type == 'fixed':
+        if isinstance(datum, str) and len(datum) == expected_schema.size:
+            return True
+        else:
+            raise ValidationException("`%s` is not fixed" % datum)
+    elif schema_type == 'enum':
+        if datum in expected_schema.symbols:
+            return True
+        else:
+            raise ValidationException("`%s`\n is not a valid enum symbol, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.symbols)))
+    elif schema_type == 'array':
+        if isinstance(datum, list):
+            for i, d in enumerate(datum):
+                try:
+                    validate_ex(expected_schema.items, d)
+                except ValidationException as v:
+                    raise ValidationException("%s\n while validating item at position %i `%s`" % (v, i, d))
+            return True
+        else:
+            raise ValidationException("`%s`\n is not a list, expected list of\n %s" % (pprint.pformat(datum), expected_schema.items))
+    elif schema_type == 'map':
+        if (isinstance(datum, dict) and
+            False not in [isinstance(k, basestring) for k in datum.keys()] and
+            False not in [validate(expected_schema.values, v) for v in datum.values()]):
+            return True
+        else:
+            raise ValidationException("`%s` is not a valid map value, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.values)))
+    elif schema_type in ['union', 'error_union']:
+        if True in [validate(s, datum) for s in expected_schema.schemas]:
+            return True
+        else:
+            errors = []
+            for s in expected_schema.schemas:
+                try:
+                    validate_ex(s, datum)
+                except ValidationException as e:
+                    errors.append(str(e))
+            raise ValidationException("`%s`\n is not valid, expected one of:\n\n%s\n\n the individual errors are:\n%s" % (pprint.pformat(datum), ",\n\n  ".join([str(s) for s in expected_schema.schemas]), ";\n\n".join(errors)))
+    elif schema_type in ['record', 'error', 'request']:
+        if not isinstance(datum, dict):
+            raise ValidationException("`%s`\n is not a dict" % pprint.pformat(datum))
+        try:
+            for f in expected_schema.fields:
+                validate_ex(f.type, datum.get(f.name))
+            return True
+        except ValidationException as v:
+            raise ValidationException("%s\n while validating field `%s`" % (v, f.name))
+    raise ValidationException("Unrecognized schema_type %s" % schema_type)
 
 class Builder(object):
     def jseval(self, expression, context):
         if isinstance(expression, list):
-            exp = "{return %s(%s);}" % (expression[0], ",".join([self.do_eval(e) for e in expression[1:]]))
+            exp = "{return %s(%s);}" % (expression[0], ",".join([json.dumps(self.do_eval(e)) for e in expression[1:]]))
         elif expression.startswith('{'):
             exp = '{return function()%s();}' % (expression)
         else:
@@ -125,7 +131,7 @@ class Builder(object):
             if ex.get("expressionType") == "javascript":
                 return self.jseval(ex["value"], context)
             elif ex.get("ref"):
-                with open(os.path.join(basedir, ex["ref"]), "r") as f:
+                with open(os.path.join(self.basedir, ex["ref"]), "r") as f:
                     return f.read()
         else:
             return ex
@@ -135,31 +141,45 @@ class Builder(object):
 
         # Handle union types
         if isinstance(schema["type"], list):
+            success = False
             for t in schema["type"]:
-                if validate(t, datum):
-                    return bind_input(t, datum)
-            raise ValidationException("'%s' is not a valid union %s" % (pprint.pformat(datum), pprint.pformat(schema["type"])))
-
-        if isinstance(schema["type"], dict):
+                if t in self.schemaDefs:
+                    t = self.schemaDefs[t]
+                avsc = avro.schema.make_avsc_object(t, None)
+                if validate(avsc, datum):
+                    if isinstance(t, basestring):
+                        t = {"type": t}
+                    bindings.extend(self.bind_input(t, datum, key))
+                    success = True
+                    break
+            if not success:
+                raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
+        elif isinstance(schema["type"], dict):
             bindings.extend(self.bind_input(schema["type"], datum, key))
+        else:
+            if schema["type"] in self.schemaDefs:
+                schema = self.schemaDefs[schema["type"]]
 
-        if schema["type"] == "record":
-            for f in schema["fields"]:
-                bindings.extend(self.bind_input(f, datum[f["name"]], f["name"]))
+            if schema["type"] == "record":
+                for f in schema["fields"]:
+                    if f["name"] in datum:
+                        bindings.extend(self.bind_input(f, datum[f["name"]], f["name"]))
 
-        if schema["type"] == "map":
-            for v in datum:
-                bindings.extend(self.bind_input(schema["values"], datum[v], v))
+            if schema["type"] == "map":
+                for v in datum:
+                    bindings.extend(self.bind_input(schema["values"], datum[v], v))
 
-        if schema["type"] == "array":
-            for n, item in enumerate(datum):
-                #print n, item, schema["items"]
-                b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item, format(n, '06'))
-                bindings.extend(b)
+            if schema["type"] == "array":
+                for n, item in enumerate(datum):
+                    b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item, "")
+                    for bi in b:
+                        bi["position"].insert(0, n)
+                    bindings.extend(b)
 
-        if schema["type"] == "File":
-            self.files.append(datum["path"])
+            if schema["type"] == "File":
+                self.files.append(datum["path"])
 
+        b = None
         if "binding" in schema and isinstance(schema["binding"], dict):
             b = copy.copy(schema["binding"])
 
@@ -179,7 +199,6 @@ class Builder(object):
 
             if schema["type"] == "File":
                 b["is_file"] = True
-
             bindings.append(b)
 
         return bindings
@@ -234,9 +253,11 @@ class Tool(object):
         validate_ex(self.names.get_name("CommandLineTool", ""), self.tool)
 
         # Import schema defs
+        self.schemaDefs = {}
         if self.tool.get("schemaDefs"):
             for i in self.tool["schemaDefs"]:
                 avro.schema.make_avsc_object(i, self.names)
+                self.schemaDefs[i["name"]] = i
 
         # Build record schema from inputs
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
@@ -262,12 +283,21 @@ class Tool(object):
         builder = Builder()
         builder.job = joborder
         builder.jslib = ''
+        builder.basedir = basedir
         builder.files = []
         builder.bindings = []
-        for n, b in enumerate(self.tool["baseCommand"]):
+        builder.schemaDefs = self.schemaDefs
+
+        if isinstance(self.tool["baseCommand"], list):
+            for n, b in enumerate(self.tool["baseCommand"]):
+                builder.bindings.append({
+                    "position": [-1000000, n],
+                    "valueFrom": b
+                })
+        else:
             builder.bindings.append({
-                "position": [-1000000, n],
-                "valueFrom": b
+                "position": [-1000000],
+                "valueFrom": self.tool["baseCommand"]
             })
 
         if self.tool.get("expressionDefs"):
@@ -297,7 +327,7 @@ class Tool(object):
 
         if self.tool.get("stdin"):
             j.stdin = builder.do_eval(self.tool["stdin"])
-            referenced_files.append(j.stdin)
+            builder.files.append(j.stdin)
         else:
             j.stdin = None
 
@@ -313,7 +343,7 @@ class Tool(object):
             j.generatefiles[t["filename"]] = builder.do_eval(t["value"])
 
         for r in self.tool.get("hints", []):
-            if r["requirementType"] == "DockerImage":
+            if r["requirementType"] == "DockerImage" and use_container:
                 j.container = {}
                 j.container["pull"] = r.get("dockerPull")
                 j.container["import"] = r.get("dockerImport")
@@ -323,5 +353,8 @@ class Tool(object):
         if builder.pathmapper is None:
             builder.pathmapper = PathMapper(builder.files, basedir)
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
+        if j.stdin:
+            j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
+
 
         return j

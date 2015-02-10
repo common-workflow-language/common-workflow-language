@@ -1,254 +1,249 @@
 
 {
-  "@type": "CommandLineTool",
-  "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft2/specification/context.json",
-  "inputs": [
-    {
-      "@id": "#reads",
-      "schema": {
-        "type": "File"
-      }
-    },
-    {
-      "@id": "#stages",
-      "schema": {
-        "binding": {
-          "position": 1
+    "@type": "CommandLineTool",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
+
+    "inputs": [
+        {
+            "port": "#reads",
+            "type": "File"
         },
-        "type": "array",
-        "items": "Stage"
-      }
-    }
-  ],
-  "outputs": [
-    {
-      "@id": "#sam",
-      "schema": {
-        "binding": {
-          "glob": "output.sam"
-        },
-        "type": "File"
-      }
-    }
-  ],
-  "schemaDefs": [
-    {
-        "type": "record",
-        "name": "Stage",
-        "fields": [
-            {
-              "binding": {
-                "position": 0,
-                "prefix": "stage",
-                "separator": ""
-              },
-              "name": "stageId",
-              "type": ["null", "int"]
+        {
+            "port": "#stages",
+            "binding": {
+                "position": 1
             },
-            {
-              "binding": {
-                "position": 1,
-                "prefix": "-n"
-              },
-              "name": "stageOption1",
-              "type": ["null", "boolean"]
-            },
-            {
-              "binding": {
-                "position": 2
-              },
-              "name": "algos",
-              "type": {
+            "type": {
                 "type": "array",
-                "items": [
-                    "Map1",
-                    "Map2",
-                    "Map3",
-                    "Map4"
-                ]
-              }
+                "items": "Stage"
             }
-        ]
-    },
-    {
-      "fields": [
-        {
-          "binding": {
-            "position": 0
-          },
-          "name": "algo",
-          "type": {
-            "type": "enum",
-            "name": "JustMap1",
-            "symbols": ["map1"]
-          }
-        },
-        {
-          "name": "maxSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--max-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "name": "minSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--min-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "binding": {
-            "position": 2,
-            "prefix": "--seed-length"
-          },
-          "name": "seedLength",
-          "type": ["null", "int"]
         }
-      ],
-      "name": "Map1",
-      "type": "record"
-    },
-    {
-      "fields": [
+    ],
+    "outputs": [
         {
-          "binding": {
-            "position": 0
-          },
-          "name": "algo",
-          "type": {
-            "type": "enum",
-            "name": "JustMap2",
-            "symbols": ["map2"]
-          }
-        },
-        {
-          "name": "maxSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--max-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "name": "minSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--min-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "binding": {
-            "position": 2,
-            "prefix": "--max-seed-hits"
-          },
-          "name": "maxSeedHits",
-          "type": ["null", "int"]
+            "port": "#sam",
+            "binding": {
+                "glob": "output.sam"
+            },
+            "type": "File"
         }
-      ],
-      "name": "Map2",
-      "type": "record"
-    },
-    {
-      "fields": [
+    ],
+    "schemaDefs": [
         {
-          "binding": {
-            "position": 0
-          },
-          "name": "algo",
-          "type": {
-            "type": "enum",
-            "name": "JustMap3",
-            "symbols": ["map3"]
-          }
+            "fields": [
+                {
+                    "binding": {
+                        "position": 0
+                    },
+                    "name": "algo",
+                    "type": {
+                        "type": "enum",
+                        "name": "JustMap1",
+                        "symbols": ["map1"]
+                    }
+                },
+                {
+                    "name": "maxSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--max-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "name": "minSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--min-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "binding": {
+                        "position": 2,
+                        "prefix": "--seed-length"
+                    },
+                    "name": "seedLength",
+                    "type": ["null", "int"]
+                }
+            ],
+            "name": "Map1",
+            "type": "record"
         },
         {
-          "name": "maxSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--max-seq-length",
-            "separator": " ",
-            "position": 2
-          }
+            "fields": [
+                {
+                    "binding": {
+                        "position": 0
+                    },
+                    "name": "algo",
+                    "type": {
+                        "type": "enum",
+                        "name": "JustMap2",
+                        "symbols": ["map2"]
+                    }
+                },
+                {
+                    "name": "maxSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--max-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "name": "minSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--min-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "binding": {
+                        "position": 2,
+                        "prefix": "--max-seed-hits"
+                    },
+                    "name": "maxSeedHits",
+                    "type": ["null", "int"]
+                }
+            ],
+            "name": "Map2",
+            "type": "record"
         },
         {
-          "name": "minSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--min-seq-length",
-            "separator": " ",
-            "position": 2
-          }
+            "fields": [
+                {
+                    "binding": {
+                        "position": 0
+                    },
+                    "name": "algo",
+                    "type": {
+                        "type": "enum",
+                        "name": "JustMap3",
+                        "symbols": ["map3"]
+                    }
+                },
+                {
+                    "name": "maxSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--max-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "name": "minSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--min-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "binding": {
+                        "position": 2,
+                        "prefix": "--fwd-search"
+                    },
+                    "name": "fwdSearch",
+                    "type": ["null", "boolean"]
+                }
+            ],
+            "name": "Map3",
+            "type": "record"
         },
         {
-          "binding": {
-            "position": 2,
-            "prefix": "--fwd-search"
-          },
-          "name": "fwdSearch",
-          "type": ["null", "boolean"]
+            "fields": [
+                {
+                    "binding": {
+                        "position": 0
+                    },
+                    "name": "algo",
+                    "type": {
+                        "type": "enum",
+                        "name": "JustMap4",
+                        "symbols": ["map4"]
+                    }
+                },
+                {
+                    "name": "maxSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--max-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "name": "minSeqLen",
+                    "type": ["null", "int"],
+                    "binding": {
+                        "prefix": "--min-seq-length",
+                        "separator": " ",
+                        "position": 2
+                    }
+                },
+                {
+                    "binding": {
+                        "position": 2,
+                        "prefix": "--seed-step"
+                    },
+                    "name": "seedStep",
+                    "type": ["null", "int"]
+                }
+            ],
+            "name": "Map4",
+            "type": "record"
+        },
+        {
+            "type": "record",
+            "name": "Stage",
+            "fields": [
+                {
+                    "binding": {
+                        "position": 0,
+                        "prefix": "stage",
+                        "separator": ""
+                    },
+                    "name": "stageId",
+                    "type": ["null", "int"]
+                },
+                {
+                    "binding": {
+                        "position": 1,
+                        "prefix": "-n"
+                    },
+                    "name": "stageOption1",
+                    "type": ["null", "boolean"]
+                },
+                {
+                    "binding": {
+                        "position": 2
+                    },
+                    "name": "algos",
+                    "type": {
+                        "type": "array",
+                        "items": [
+                            "Map1",
+                            "Map2",
+                            "Map3",
+                            "Map4"
+                        ]
+                    }
+                }
+            ]
         }
-      ],
-      "name": "Map3",
-      "type": "record"
-    },
-    {
-      "fields": [
-        {
-          "binding": {
-            "position": 0
-          },
-          "name": "algo",
-          "type": {
-            "type": "enum",
-            "name": "JustMap4",
-            "symbols": ["map4"]
-          }
-        },
-        {
-          "name": "maxSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--max-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "name": "minSeqLen",
-          "type": ["null", "int"],
-          "binding": {
-            "prefix": "--min-seq-length",
-            "separator": " ",
-            "position": 2
-          }
-        },
-        {
-          "binding": {
-            "position": 2,
-            "prefix": "--seed-step"
-          },
-          "name": "seedStep",
-          "type": ["null", "int"]
-        }
-      ],
-      "name": "Map4",
-      "type": "record"
-    }
-  ],
-  "commandLine": {
-    "base": ["tmap", "mapall"],
+    ],
+    "baseCommand": ["tmap", "mapall"],
     "stdin": {
-      "@type": "JavascriptExpression",
-      "valueFrom": "$job.inputs.reads.path"
+        "expressionType": "javascript",
+        "value": "$job.reads.path"
     },
     "stdout": "output.sam"
-  }
 }

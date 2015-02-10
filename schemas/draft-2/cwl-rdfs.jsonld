@@ -203,7 +203,7 @@
                 {
                     "@id": "cwl:baseCommand",
                     "@type": "rdfs:Property",
-                    "rdfs:range": "rdfs:List"
+                    "rdfs:range": ["xsd:string", "rdfs:List"]
                 },
                 {
                     "@id": "cwl:arguments",
