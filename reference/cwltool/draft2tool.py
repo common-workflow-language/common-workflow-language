@@ -4,6 +4,8 @@ import pprint
 import copy
 from flatten import flatten
 import os
+from pathmapper import PathMapper, DockerPathMapper
+import sandboxjs
 
 TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json"
 
@@ -108,50 +110,56 @@ def validate_ex(expected_schema, datum):
   raise ValidationException("Unrecognized schema_type %s" % schema_type)
 
 class Builder(object):
-    def jseval(self, expression):
-        if expression.startswith('{'):
-            exp_tpl = '{return function()%s();}'
+    def jseval(self, expression, context):
+        if isinstance(expression, list):
+            exp = "{return %s(%s);}" % (expression[0], ",".join([self.do_eval(e) for e in expression[1:]]))
+        elif expression.startswith('{'):
+            exp = '{return function()%s();}' % (expression)
         else:
-            exp_tpl = '{return %s;}'
-        exp = exp_tpl % (expression)
-        return sandboxjs.execjs(exp, "var $job = %s;%s" % (json.dumps(self.job), self.jslib))
+            exp = '{return %s;}' % (expression)
+        return sandboxjs.execjs(exp, "var $job = %s; var $self = %s; %s" % (json.dumps(self.job), json.dumps(context), self.jslib))
 
-    def do_eval(self, s):
+    def do_eval(self, ex, context=None):
         if isinstance(ex, dict):
-            if ex.get("@type") == "JavascriptExpression":
-                return jseval(ex["value"])
-            elif ex.get("@id"):
-                with open(os.path.join(basedir, ex["@id"]), "r") as f:
+            if ex.get("expressionType") == "javascript":
+                return self.jseval(ex["value"], context)
+            elif ex.get("ref"):
+                with open(os.path.join(basedir, ex["ref"]), "r") as f:
                     return f.read()
         else:
             return ex
 
-    def input_binding(self, schema, datum, key):
+    def bind_input(self, schema, datum, key):
         bindings = []
+
         # Handle union types
         if isinstance(schema["type"], list):
             for t in schema["type"]:
                 if validate(t, datum):
-                    return input_binding(t, datum)
+                    return bind_input(t, datum)
             raise ValidationException("'%s' is not a valid union %s" % (pprint.pformat(datum), pprint.pformat(schema["type"])))
+
+        if isinstance(schema["type"], dict):
+            bindings.extend(self.bind_input(schema["type"], datum, key))
 
         if schema["type"] == "record":
             for f in schema["fields"]:
-                bindings.extend(self.input_binding(f, datum[f["name"]], f["name"]))
+                bindings.extend(self.bind_input(f, datum[f["name"]], f["name"]))
 
         if schema["type"] == "map":
             for v in datum:
-                bindings.extend(self.input_binding(schema["values"], datum[v], v))
+                bindings.extend(self.bind_input(schema["values"], datum[v], v))
 
         if schema["type"] == "array":
             for n, item in enumerate(datum):
-                b = self.input_binding(schema["items"], item, format(n, '06'))
+                #print n, item, schema["items"]
+                b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item, format(n, '06'))
                 bindings.extend(b)
 
         if schema["type"] == "File":
-            self.files.append(datum)
+            self.files.append(datum["path"])
 
-        if schema.get("binding"):
+        if "binding" in schema and isinstance(schema["binding"], dict):
             b = copy.copy(schema["binding"])
 
             if b.get("position"):
@@ -163,29 +171,50 @@ class Builder(object):
             for bi in bindings:
                 bi["position"] = b["position"] + bi["position"]
 
-            if "valueFrom" not in b:
+            if "valueFrom" in b:
+                b["valueFrom"] = self.do_eval(b["valueFrom"], datum)
+            else:
                 b["valueFrom"] = datum
+
+            if schema["type"] == "File":
+                b["is_file"] = True
 
             bindings.append(b)
 
         return bindings
 
-    def bind(self, binding):
-        value = self.do_eval(binding["valueFrom"])
+    def generate_arg(self, binding):
+        value = binding["valueFrom"]
+        prefix = binding.get("prefix")
+        sep = binding.get("separator")
 
-        ls = []
-
+        l = []
         if isinstance(value, list):
             if binding.get("itemSeparator"):
-                l = [binding["itemSeparator"].join(value)]
-            else:
-                pass
+                l = [binding["itemSeparator"].join([str(v) for v in value])]
+            elif prefix:
+                return [prefix]
+        elif binding.get("is_file"):
+            l = [self.pathmapper.mapper(value["path"])]
         elif isinstance(value, dict):
-            pass
+            if prefix:
+                return [prefix]
         elif isinstance(value, bool):
-            if value and binding.get("prefix"):
-                sv = binding["prefix"]
+            if value and prefix:
+                return [prefix]
+            else:
+                return []
+        else:
+            l = [value]
 
+        args = []
+        for j in l:
+            if sep is None or sep == " ":
+                args.extend([prefix, str(j)])
+            else:
+                args.extend([prefix + sep + str(j)])
+
+        return [a for a in args if a is not None]
 
 class Tool(object):
     def __init__(self, toolpath_object):
@@ -249,15 +278,20 @@ class Tool(object):
                     a["position"] = [a["position"], i]
                 else:
                     a["position"] = [0, i]
+                a["valueFrom"] = builder.do_eval(a["valueFrom"])
                 builder.bindings.append(a)
 
-        builder.bindings.extend(builder.input_binding(self.inputs_record_schema, joborder, ""))
-
+        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder, ""))
         builder.bindings.sort(key=lambda a: a["position"])
 
-        pprint.pprint(builder.bindings)
+        builder.pathmapper = PathMapper(builder.files, basedir)
 
-        # j = Job()
-        # j.joborder = joborder
-        # j.tool = self
-        # j.container = None
+        #pprint.pprint(builder.bindings)
+        #pprint.pprint(builder.files)
+
+
+        j = Job()
+        j.joborder = joborder
+        j.tool = self
+        j.container = None
+        j.command_line = flatten(map(builder.generate_arg, builder.bindings))

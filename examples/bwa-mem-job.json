@@ -22,11 +22,8 @@
         4
     ],
     "minimum_seed_length": 3,
-    "cwl:allocatedResources": {
+    "allocatedResources": {
         "cpu": 4,
-        "mem": 5000,
-        "ports": [],
-        "diskSpace": 20000,
-        "network": "No"
+        "mem": 5000
     }
 }

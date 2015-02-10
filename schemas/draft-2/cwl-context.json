@@ -24,6 +24,8 @@
     "File": "cwl:File",
 
     "Expression": "cwl:Expression",
+    "expressionType": "@type",
+    "ref": "@id",
 
     "position": "cwl:position",
     "prefix": "cwl:prefix",
@@ -56,7 +58,7 @@
     },
     "binding": "cwl:binding",
 
-    "toolDependency": "@type",
+    "requirementType": "@type",
 
     "CommandLineTool": "cwl:CommandLineTool",
     "baseCommand": {
@@ -76,7 +78,7 @@
     "schemaDefs": "cwl:schemaDefs",
     "expressionDefs": "cwl:expressionDefs",
 
-    "JavascriptExpression": "cwl:JavascriptExpression",
+    "javascript": "cwl:JavascriptExpression",
 
     "DockerImage": "cwl:DockerImage",
     "dockerPull": "cwl:dockerPull",

@@ -31,7 +31,7 @@
         "type": "record",
         "name": "Expression",
         "fields": [
-            { "name": "value", "type": ["null", "string"] }
+            { "name": "expressionType", "type": "string" }
         ]
     },
 
@@ -100,7 +100,7 @@
             "type": "record",
             "name": "ToolDependency",
             "fields": [
-                { "name": "toolDependency", "type": "string" }
+                { "name": "requirementType", "type": "string" }
             ]
         },
 
