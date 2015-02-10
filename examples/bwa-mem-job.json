@@ -1,31 +1,28 @@
 {
-    "inputs": {
-        "reference": {
-            "@type": "File",
-            "path": "rabix/tests/test-files/chr20.fa",
-            "size": 123,
-            "checksum": "sha1$hash"
-        },
-        "reads": [
-            {
-                "@type": "File",
-                "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
-            },
-            {
-                "@type": "File",
-                "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
-            }
-        ],
-        "min_std_max_min": [
-            1,
-            2,
-            3,
-            4
-        ],
-        "minimum_seed_length": 3
+    "reference": {
+        "@type": "File",
+        "path": "rabix/tests/test-files/chr20.fa",
+        "size": 123,
+        "checksum": "sha1$hash"
     },
-    "platform": "http://example.org/my_platform/v1",
-    "allocatedResources": {
+    "reads": [
+        {
+            "@type": "File",
+            "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
+        },
+        {
+            "@type": "File",
+            "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
+        }
+    ],
+    "min_std_max_min": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "minimum_seed_length": 3,
+    "cwl:allocatedResources": {
         "cpu": 4,
         "mem": 5000,
         "ports": [],

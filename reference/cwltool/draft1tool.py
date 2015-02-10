@@ -8,7 +8,9 @@ import jsonschema.exceptions
 import random
 import requests
 import urlparse
+from pathmapper import PathMapper, DockerPathMapper
 from job import Job
+from flatten import flatten
 
 from jsonschema.validators import Draft4Validator
 import ref_resolver
@@ -16,16 +18,16 @@ from ref_resolver import from_url, resolve_pointer
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
-jsonschemapath = os.path.join(module_dir, 'schemas/json-schema-draft-04.json')
+jsonschemapath = os.path.join(module_dir, 'schemas/draft-1/json-schema-draft-04.json')
 with open(jsonschemapath) as f:
     jsonschemapath_doc = json.load(f)
 
 ref_resolver.loader.fetched["http://json-schema.org/draft-04/schema"] = jsonschemapath_doc
 
-toolpath = os.path.join(module_dir, 'schemas/tool.json')
+toolpath = os.path.join(module_dir, 'schemas/draft-1/tool.json')
 with open(toolpath) as f:
     tool_schema_doc = json.load(f)
-with open(os.path.join(module_dir, 'schemas/metaschema.json')) as f:
+with open(os.path.join(module_dir, 'schemas/draft-1/metaschema.json')) as f:
     metaschema = json.load(f)
 
 SCHEMA_URL_PREFIX = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/"
@@ -44,27 +46,6 @@ def each(l):
         return l
     else:
         return [l]
-
-# http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html
-def flatten(l, ltypes=(list, tuple)):
-    if l is None:
-        return []
-    if not isinstance(l, ltypes):
-        return [l]
-
-    ltype = type(l)
-    l = list(l)
-    i = 0
-    while i < len(l):
-        while isinstance(l[i], ltypes):
-            if not l[i]:
-                l.pop(i)
-                i -= 1
-                break
-            else:
-                l[i:i + 1] = l[i]
-        i += 1
-    return ltype(l)
 
 def fix_file_type(t):
     if 'type' in t and t['type'] == "file":
@@ -263,60 +244,6 @@ class Builder(object):
             l = [value]
 
         return l
-
-class PathMapper(object):
-    # Maps files to their absolute path
-    def __init__(self, referenced_files, basedir):
-        self._pathmap = {}
-        for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
-            self._pathmap[src] = abs
-
-    def mapper(self, src):
-        return self._pathmap[src]
-
-
-class DockerPathMapper(object):
-    def __init__(self, referenced_files, basedir):
-        self._pathmap = {}
-        self.dirs = {}
-        for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
-            dir, fn = os.path.split(abs)
-
-            subdir = False
-            for d in self.dirs:
-                if dir.startswith(d):
-                  subdir = True
-                  break
-
-            if not subdir:
-                for d in list(self.dirs):
-                    if d.startswith(dir):
-                        # 'dir' is a parent of 'd'
-                        del self.dirs[d]
-                self.dirs[dir] = True
-
-        prefix = "job" + str(random.randint(1, 1000000000)) + "_"
-
-        names = set()
-        for d in self.dirs:
-            name = os.path.join("/tmp", prefix + os.path.basename(d))
-            i = 1
-            while name in names:
-                i += 1
-                name = os.path.join("/tmp", prefix + os.path.basename(d) + str(i))
-            names.add(name)
-            self.dirs[d] = name
-
-        for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
-            for d in self.dirs:
-                if abs.startswith(d):
-                    self._pathmap[src] = os.path.join(self.dirs[d], abs[len(d)+1:])
-
-    def mapper(self, src):
-        return self._pathmap[src]
 
 class Tool(object):
     def __init__(self, toolpath_object):

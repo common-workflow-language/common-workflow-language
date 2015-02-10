@@ -54,120 +54,136 @@
         "fields": [
             { "name": "name", "type": ["null", "string"] },
             { "name": "port", "type": ["null", "string"] },
-            { "name": "type", "type": "Datatype" },
             {
-                "name": "fields",
+                "name": "type",
                 "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
-                    }
+                    "Datatype",
+                    "Schema"
                 ]
             },
-            {
-                "name": "symbols",
-                "type": [
-                    "null",
-                    {
+              {
+                  "name": "fields",
+                  "type": [
+                      "null",
+                      {
+                          "type": "array",
+                          "items": "Schema"
+                      }
+                  ]
+              },
+              {
+                  "name": "symbols",
+                  "type": [
+                      "null",
+                      {
+                          "type": "array",
+                          "items": "string"
+                      }
+                  ]
+              },
+              {
+                  "name": "items",
+                  "type": [ "null", "Datatype", "Schema" ]
+              },
+              {
+                  "name": "values",
+                  "type": [ "null", "Datatype", "Schema" ]
+              },
+              {
+                  "name": "binding",
+                  "type": [ "null", "Binding" ]
+              }
+            ]
+        },
+
+        {
+            "type": "record",
+            "name": "ToolDependency",
+            "fields": [
+                { "name": "toolDependency", "type": "string" }
+            ]
+        },
+
+        {
+            "type": "record",
+            "name": "CommandLineTool",
+            "fields": [
+                {
+                    "name": "baseCommand",
+                    "type": {
                         "type": "array",
                         "items": "string"
                     }
-                ]
-            },
-            {
-                "name": "items",
-                "type": [ "null", "Datatype" ]
-            },
-            {
-                "name": "values",
-                "type": [ "null", "Datatype" ]
-            },
-            {
-                "name": "binding",
-                "type": [ "null", "Binding" ]
-            }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "ToolDependency",
-        "fields": [
-            { "name": "toolDependency", "type": "string" }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "CommandLineTool",
-        "fields": [
-            {
-                "name": "baseCommand",
-                "type": {
-                    "type": "array",
-                    "items": "string"
-                }
-            },
-            {
-                "name": "arguments",
-                "type": {
-                    "type": "array",
-                    "items": "Binding"
-                }
-            },
-            {
-                "name": "stdin",
-                "type": ["null", "string"]
-            },
-            {
-                "name": "stdout",
-                "type": ["null", "string"]
-            },
-            {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "requirements",
-                "type": [
-                    "null",
-                    {
+                },
+                {
+                    "name": "arguments",
+                    "type": {
                         "type": "array",
-                        "items": "ToolDependency"
+                        "items": "Binding"
                     }
-                ]
-            },
-            {
-                "name": "hints",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "ToolDependency"
-                    }
-                ]
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
+                },
+                {
+                    "name": "stdin",
+                    "type": ["null", "string"]
+                },
+                {
+                    "name": "stdout",
+                    "type": ["null", "string"]
+                },
+                {
+                    "name": "inputs",
+                    "type": {
                         "type": "array",
                         "items": "Schema"
                     }
-                ]
-            }
-        ]
-    }
-]
+                },
+                {
+                    "name": "outputs",
+                    "type": {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                },
+                {
+                    "name": "requirements",
+                    "type": [
+                        "null",
+                        {
+                            "type": "array",
+                            "items": "ToolDependency"
+                        }
+                    ]
+                },
+                {
+                    "name": "hints",
+                    "type": [
+                        "null",
+                        {
+                            "type": "array",
+                            "items": "ToolDependency"
+                        }
+                    ]
+                },
+                {
+                    "name": "schemaDefs",
+                    "type": [
+                        "null",
+                        {
+                            "type": "array",
+                            "items": "Schema"
+                        }
+                    ]
+                },
+                {
+                    "name": "expressionDefs",
+                    "type": [
+                        "null",
+                        {
+                            "type": "array",
+                            "items": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]

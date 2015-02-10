@@ -91,7 +91,12 @@
 
         {
             "@id": "cwl:Expression",
-            "@type": "rdfs:Class"
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "rdfs:value"
+                }
+            ]
         },
 
         {
@@ -226,6 +231,11 @@ o        },
                     "@id": "cwl:schemaDefs",
                     "@type": "rdfs:Property",
                     "rdfs:range": "cwl:Schema"
+                },
+                {
+                    "@id": "cwl:expressionDefs",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
                 }
             ]
         },
@@ -245,7 +255,7 @@ o        },
         {
             "@id": "cwl:JavascriptExpression",
             "@type": "rdfs:Class",
-            "rdfs:subClassOf": "cwl:Expression"
+            "rdfs:subClassOf": "cwl:Expression",
         },
 
         {

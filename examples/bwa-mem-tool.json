@@ -24,8 +24,10 @@
         },
         {
             "port": "#reads",
-            "type": "array",
-            "items": "File",
+            "type": {
+                "type": "array",
+                "items": "File",
+            },
             "binding": {
                 "position": 3
             }
@@ -40,8 +42,10 @@
         },
         {
             "port": "#min_std_max_min",
-            "items": "int",
-            "type": "array",
+            "type": {
+                "type": "array",
+                "items": "int"
+            },
             "binding": {
                 "itemSeparator": ",",
                 "position": 1,

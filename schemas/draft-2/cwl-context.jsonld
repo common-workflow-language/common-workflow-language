@@ -74,6 +74,7 @@
     "requirements": "cwl:requirements",
     "hints": "cwl:hints",
     "schemaDefs": "cwl:schemaDefs",
+    "expressionDefs": "cwl:expressionDefs",
 
     "JavascriptExpression": "cwl:JavascriptExpression",
 
