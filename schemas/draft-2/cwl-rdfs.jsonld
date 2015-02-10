@@ -175,11 +175,24 @@
                     "rdfs:range": "cwl:Binding"
                 }
             ]
-o        },
+        },
 
         {
             "@id": "cwl:ToolDependency",
             "@type": "rdfs:Class"
+        },
+
+        {
+            "@id": "cwl:FileDef",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:filename",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                { "@id": "rdf:value"}
+            ]
         },
 
         {
@@ -234,6 +247,11 @@ o        },
                 },
                 {
                     "@id": "cwl:expressionDefs",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "rdfs:List"
+                },
+                {
+                    "@id": "cwl:fileDefs",
                     "@type": "rdfs:Property",
                     "rdfs:range": "rdfs:List"
                 }

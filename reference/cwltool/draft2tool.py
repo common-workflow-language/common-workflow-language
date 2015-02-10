@@ -6,6 +6,7 @@ from flatten import flatten
 import os
 from pathmapper import PathMapper, DockerPathMapper
 import sandboxjs
+from job import Job
 
 TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json"
 
@@ -262,10 +263,12 @@ class Tool(object):
         builder.job = joborder
         builder.jslib = ''
         builder.files = []
-        builder.bindings = [{
-                "position": [-1000000],
-                "valueFrom": self.tool["baseCommand"]
-            }]
+        builder.bindings = []
+        for n, b in enumerate(self.tool["baseCommand"]):
+            builder.bindings.append({
+                "position": [-1000000, n],
+                "valueFrom": b
+            })
 
         if self.tool.get("expressionDefs"):
             for ex in self.tool['expressionDefs']:
@@ -284,14 +287,41 @@ class Tool(object):
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder, ""))
         builder.bindings.sort(key=lambda a: a["position"])
 
-        builder.pathmapper = PathMapper(builder.files, basedir)
-
         #pprint.pprint(builder.bindings)
         #pprint.pprint(builder.files)
 
-
         j = Job()
         j.joborder = joborder
-        j.tool = self
         j.container = None
+        builder.pathmapper = None
+
+        if self.tool.get("stdin"):
+            j.stdin = builder.do_eval(self.tool["stdin"])
+            referenced_files.append(j.stdin)
+        else:
+            j.stdin = None
+
+        if self.tool.get("stdout"):
+            j.stdout = builder.do_eval(self.tool["stdout"])
+            if os.path.isabs(j.stdout):
+                raise Exception("stdout must be a relative path")
+        else:
+            j.stdout = None
+
+        j.generatefiles = {}
+        for t in self.tool.get("fileDefs", []):
+            j.generatefiles[t["filename"]] = builder.do_eval(t["value"])
+
+        for r in self.tool.get("hints", []):
+            if r["requirementType"] == "DockerImage":
+                j.container = {}
+                j.container["pull"] = r.get("dockerPull")
+                j.container["import"] = r.get("dockerImport")
+                j.container["imageId"] = r.get("dockerImageId")
+                builder.pathmapper = DockerPathMapper(builder.files, basedir)
+
+        if builder.pathmapper is None:
+            builder.pathmapper = PathMapper(builder.files, basedir)
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
+
+        return j

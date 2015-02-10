@@ -291,8 +291,6 @@ class Tool(object):
 
         j = Job()
         j.joborder = joborder
-        j.tool = self
-
         j.container = None
 
         if 'stdin' in adapter:

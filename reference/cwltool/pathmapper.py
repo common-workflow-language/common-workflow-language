@@ -1,4 +1,5 @@
 import os
+import random
 
 class PathMapper(object):
     # Maps files to their absolute path
