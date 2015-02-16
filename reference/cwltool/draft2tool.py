@@ -136,7 +136,7 @@ class Builder(object):
         else:
             return ex
 
-    def bind_input(self, schema, datum, key):
+    def bind_input(self, schema, datum):
         bindings = []
 
         # Handle union types
@@ -149,13 +149,13 @@ class Builder(object):
                 if validate(avsc, datum):
                     if isinstance(t, basestring):
                         t = {"type": t}
-                    bindings.extend(self.bind_input(t, datum, key))
+                    bindings.extend(self.bind_input(t, datum))
                     success = True
                     break
             if not success:
                 raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
         elif isinstance(schema["type"], dict):
-            bindings.extend(self.bind_input(schema["type"], datum, key))
+            bindings.extend(self.bind_input(schema["type"], datum))
         else:
             if schema["type"] in self.schemaDefs:
                 schema = self.schemaDefs[schema["type"]]
@@ -163,15 +163,21 @@ class Builder(object):
             if schema["type"] == "record":
                 for f in schema["fields"]:
                     if f["name"] in datum:
-                        bindings.extend(self.bind_input(f, datum[f["name"]], f["name"]))
+                        b = self.bind_input(f, datum[f["name"]])
+                        for bi in b:
+                            bi["position"].append(f["name"])
+                        bindings.extend(b)
 
             if schema["type"] == "map":
                 for v in datum:
-                    bindings.extend(self.bind_input(schema["values"], datum[v], v))
+                    b = self.bind_input(schema["values"], datum[v]))
+                    for bi in b:
+                        bi["position"].insert(0, v)
+                    bindings.extend(b)
 
             if schema["type"] == "array":
                 for n, item in enumerate(datum):
-                    b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item, "")
+                    b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item)
                     for bi in b:
                         bi["position"].insert(0, n)
                     bindings.extend(b)
@@ -184,9 +190,9 @@ class Builder(object):
             b = copy.copy(schema["binding"])
 
             if b.get("position"):
-                b["position"] = [b["position"], key]
+                b["position"] = [b["position"]]
             else:
-                b["position"] = [0, key]
+                b["position"] = [0]
 
             # Position to front of the sort key
             for bi in bindings:
@@ -314,7 +320,7 @@ class Tool(object):
                 a["valueFrom"] = builder.do_eval(a["valueFrom"])
                 builder.bindings.append(a)
 
-        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder, ""))
+        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder))
         builder.bindings.sort(key=lambda a: a["position"])
 
         #pprint.pprint(builder.bindings)
