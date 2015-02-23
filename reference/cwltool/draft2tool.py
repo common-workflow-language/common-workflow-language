@@ -3,6 +3,7 @@ import json
 import pprint
 import copy
 from flatten import flatten
+import functools
 import os
 from pathmapper import PathMapper, DockerPathMapper
 import sandboxjs
@@ -170,7 +171,7 @@ class Builder(object):
 
             if schema["type"] == "map":
                 for v in datum:
-                    b = self.bind_input(schema["values"], datum[v]))
+                    b = self.bind_input(schema["values"], datum[v])
                     for bi in b:
                         bi["position"].insert(0, v)
                     bindings.extend(b)
@@ -351,16 +352,50 @@ class Tool(object):
         for r in self.tool.get("hints", []):
             if r["requirementType"] == "DockerImage" and use_container:
                 j.container = {}
-                j.container["pull"] = r.get("dockerPull")
-                j.container["import"] = r.get("dockerImport")
-                j.container["imageId"] = r.get("dockerImageId")
+                j.container["type"] = "docker"
+                if "dockerPull" in r:
+                    j.container["pull"] = r["dockerPull"]
+                if "dockerImport" in r:
+                    j.container["import"] = r["dockerImport"]
+                if "dockerImageId" in r:
+                    j.container["imageId"] = r["dockerImageId"]
+                else:
+                    j.container["imageId"] = r["dockerPull"]
                 builder.pathmapper = DockerPathMapper(builder.files, basedir)
 
         if builder.pathmapper is None:
             builder.pathmapper = PathMapper(builder.files, basedir)
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
+
         if j.stdin:
             j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
 
+        j.pathmapper = builder.pathmapper
+        j.collect_outputs = functools.partial(self.collect_outputs, self.tool["outputs"], joborder)
 
         return j
+
+
+    def collect_outputs(self, schema, joborder, outdir):
+        r = None
+        if isinstance(schema, dict):
+            if "binding" in schema:
+                binding = schema["binding"]
+                if "glob" in binding:
+                    r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
+                    # if not ("type" in schema and schema["type"] == "array"):
+                    #     if r:
+                    #         r = r[0]
+                    #     else:
+                    #         r = None
+                #if "value" in binding:
+                #    r = draft1tool.resolve_eval(joborder, binding["value"])
+            # if not r and "properties" in schema:
+            #     r = {}
+            #     for k, v in schema["properties"].items():
+            #         out = self.collect_outputs(v, joborder, outdir)
+            #         if out:
+            #             r[k] = out
+
+
+        return r

@@ -24,6 +24,7 @@ do
     esac
 done
 
+runs=0
 failures=0
 
 checkexit() {
@@ -32,11 +33,14 @@ checkexit() {
     fi
 }
 
+DRAFT2="./conformance_test.py --test conformance_test_draft2.json --basedir draft-2"
+
 # cwltool conformance test
 if [[ -n "$CWLTOOL" ]]; then
     echo
     echo "--- Running cwltool tests ---"
-    ./conformance_test.py $CWLTOOL/cwltool/main.py
+    $DRAFT2 $CWLTOOL/cwltool/main.py
+    runs=$((runs+1))
     checkexit
 fi
 
@@ -44,7 +48,8 @@ fi
 if [[ -n "$RABIX" ]]; then
     echo
     echo "--- Running rabix/cliche tests ---"
-    PYTHONPATH="$PYTHONPATH:$RABIX" ./conformance_test.py $RABIX/rabix/cliche/main.py
+    $DRAFT2 $RABIX/rabix/cliche/main.py
+    runs=$((runs+1))
     checkexit
 fi
 
@@ -59,7 +64,11 @@ echo
 if [[ $failures != 0 ]]; then
     echo "$failures tool tests failed"
 else
-    echo "All tool tests succeeded"
+    if [[ $runs == 0 ]]; then
+        echo "Usage: run_tests.sh [CWLTOOL=path] [RABIX=path]"
+    else
+        echo "All tool tests succeeded"
+    fi
 fi
 
 exit $failures

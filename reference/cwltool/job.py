@@ -1,7 +1,6 @@
 import subprocess
 import os
 import tempfile
-import draft1tool
 import glob
 import json
 import yaml
@@ -24,15 +23,14 @@ class Job(object):
                     subprocess.call(["docker", "pull", self.container["pull"]])
                 elif "import" in self.container:
                     subprocess.call(["docker", "import", self.container["import"]])
+
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
-                runtime.append("--volume=%s:%s:ro" % (d, self.pathmapper.dirs[d]))
+                runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
             runtime.append("--volume=%s:%s:ro" % (outdir, "/tmp/job_output"))
             runtime.append("--workdir=%s" % ("/tmp/job_output"))
             runtime.append("--user=%s" % (os.geteuid()))
             runtime.append(self.container["imageId"])
-        else:
-            os.chdir(outdir)
 
         stdin = None
         stdout = None
@@ -43,8 +41,10 @@ class Job(object):
             if self.stdin:
                 stdin = open(self.stdin, "rb")
 
+            os.chdir(outdir)
+
             if self.stdout:
-                stdout = open(os.path.join(outdir, self.stdout), "wb")
+                stdout = open(self.stdout, "wb")
 
             for t in self.generatefiles:
                 with open(os.path.join(outdir, t), "w") as f:
@@ -60,36 +60,13 @@ class Job(object):
                 stdout.close()
 
             print "Output directory is %s" % outdir
-            if 'outputs' in self.tool.tool:
-                return self.collect_outputs(self.tool.tool["outputs"], outdir)
+
+            result_path = os.path.join(outdir, "result.cwl.json")
+            if os.path.isfile(result_path):
+                print "Result file found."
+                with open(result_path) as fp:
+                    return yaml.load(fp)
+            else:
+                return self.collect_outputs(outdir)
 
         return None
-
-    def collect_outputs(self, schema, outdir):
-        result_path = os.path.join(outdir, "result.cwl.json")
-        if os.path.isfile(result_path):
-            print "Result file found."
-            with open(result_path) as fp:
-                return yaml.load(fp)
-
-        r = None
-        if isinstance(schema, dict):
-            if "adapter" in schema:
-                adapter = schema["adapter"]
-                if "glob" in adapter:
-                    r = [{"path": g} for g in glob.glob(os.path.join(outdir, adapter["glob"]))]
-                    if not ("type" in schema and schema["type"] == "array"):
-                        if r:
-                            r = r[0]
-                        else:
-                            r = None
-                if "value" in adapter:
-                    r = draft1tool.resolve_eval(self.joborder, adapter["value"])
-            if not r and "properties" in schema:
-                r = {}
-                for k, v in schema["properties"].items():
-                    out = self.collect_outputs(v, outdir)
-                    if out:
-                        r[k] = out
-
-        return r

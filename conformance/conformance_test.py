@@ -7,11 +7,13 @@ import subprocess
 import sys
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--test", type=str)
+parser.add_argument("--basedir", type=str)
 parser.add_argument("tool", type=str)
 args = parser.parse_args()
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(module_dir, 'conformance_test.json')) as f:
+with open(os.path.join(module_dir, args.test)) as f:
     tests = json.load(f)
 
 failures = 0
@@ -20,7 +22,12 @@ for i, t in enumerate(tests):
     sys.stdout.flush()
     out = {}
     try:
-        outstr = subprocess.check_output([args.tool, "--conformance-test", "--basedir=test", "--no-container", t["tool"], t["job"]])
+        outstr = subprocess.check_output([args.tool,
+                                          "--conformance-test",
+                                          "--basedir=" + args.basedir,
+                                          "--no-container",
+                                          t["tool"],
+                                          t["job"]])
         out = json.loads(outstr)
     except ValueError as v:
         print v

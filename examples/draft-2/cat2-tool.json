@@ -2,27 +2,22 @@
     "@type": "CommandLineTool",
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
     "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
-    "requirements": [
+    "hints": [
         {
-          "requirementType": "DockerContainer",
-          "dockerPull": "arvados/jobs"
+          "requirementType": "DockerImage",
+          "dockerPull": "debian:wheezy"
         }
     ],
     "inputs": [
         {
             "port": "#file1",
-            "type": "File",
-            "binding": {"position": 1}
-        },
-        {
-            "port": "#numbering",
-            "type": ["null", "boolean"],
-            "binding": {
-                "position": 0,
-                "prefix": "-n"
-            }
+            "type": "File"
         }
     ],
     "outputs": [],
-    "baseCommand": "cat"
+    "baseCommand": "cat",
+    "stdin": {
+        "expressionType": "javascript",
+        "value": "$job.file1.path"
+    }
 }

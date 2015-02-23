@@ -8,6 +8,7 @@ import jsonschema.exceptions
 import random
 import requests
 import urlparse
+import functools
 from pathmapper import PathMapper, DockerPathMapper
 from job import Job
 from flatten import flatten
@@ -334,5 +335,35 @@ class Tool(object):
         j.command_line = flatten(map(lambda a: builder.adapt(a, joborder, d.mapper), adapters))
 
         j.pathmapper = d
+        j.collect_outputs = functools.partial(self.collect_outputs, self.tool["outputs"], joborder)
 
         return j
+
+    def collect_outputs(self, schema, joborder, outdir):
+        result_path = os.path.join(outdir, "result.cwl.json")
+        if os.path.isfile(result_path):
+            print "Result file found."
+            with open(result_path) as fp:
+                return yaml.load(fp)
+
+        r = None
+        if isinstance(schema, dict):
+            if "adapter" in schema:
+                adapter = schema["adapter"]
+                if "glob" in adapter:
+                    r = [{"path": g} for g in glob.glob(os.path.join(outdir, adapter["glob"]))]
+                    if not ("type" in schema and schema["type"] == "array"):
+                        if r:
+                            r = r[0]
+                        else:
+                            r = None
+                if "value" in adapter:
+                    r = draft1tool.resolve_eval(joborder, adapter["value"])
+            if not r and "properties" in schema:
+                r = {}
+                for k, v in schema["properties"].items():
+                    out = self.collect_outputs(v, joborder, outdir)
+                    if out:
+                        r[k] = out
+
+        return r

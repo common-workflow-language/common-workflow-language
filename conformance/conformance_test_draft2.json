@@ -1,0 +1,61 @@
+[
+    {
+        "tool": "draft-2/bwa-mem-tool.json",
+        "job": "draft-2/bwa-mem-job.json",
+        "args": ["bwa", "mem", "-t", "4", "-I", "1,2,3,4", "-m", "3",
+                    "draft-2/rabix/tests/test-files/chr20.fa",
+                    "draft-2/rabix/tests/test-files/example_human_Illumina.pe_1.fastq",
+                    "draft-2/rabix/tests/test-files/example_human_Illumina.pe_2.fastq"],
+        "stdout": "output.sam"
+    },
+    {
+        "tool": "draft-2/tmap-tool.json",
+        "job": "draft-2/tmap-job.json",
+        "args": ["tmap", "mapall",
+                 "stage1",
+                 "map1", "--min-seq-length", "20",
+                 "map2", "--min-seq-length", "20",
+                 "stage2",
+                 "map1", "--max-seq-length", "20", "--min-seq-length", "10", "--seed-length", "16",
+                 "map2", "--max-seed-hits", "-1", "--max-seq-length", "20", "--min-seq-length", "10"],
+        "stdin": "draft-2/reads.fastq",
+        "stdout": "output.sam"
+    },
+    {
+        "tool": "draft-2/cat1-tool.json",
+        "job": "draft-2/cat-job.json",
+        "args": ["cat", "draft-2/hello.txt"]
+    },
+    {
+        "tool": "draft-2/cat1-tool.json",
+        "job": "draft-2/cat-n-job.json",
+        "args": ["cat", "-n", "draft-2/hello.txt"]
+    },
+    {
+        "tool": "draft-2/cat2-tool.json",
+        "job": "draft-2/cat-job.json",
+        "args": ["cat"],
+        "stdin": "draft-2/hello.txt"
+    },
+    {
+        "tool": "draft-2/cat3-tool.json",
+        "job": "draft-2/cat-job.json",
+        "args": ["cat", "draft-2/hello.txt"],
+        "stdout": "output.txt"
+    },
+    {
+        "tool": "draft-2/cat4-tool.json",
+        "job": "draft-2/cat-job.json",
+        "args": ["cat"],
+        "stdin": "draft-2/hello.txt",
+        "stdout": "output.txt"
+    },
+    {
+        "tool": "draft-2/template-tool.yaml",
+        "job": "draft-2/cat-job.json",
+        "args": ["cat", "foo.txt"],
+        "generatefiles": {
+            "foo.txt": {}
+        }
+    }
+]
