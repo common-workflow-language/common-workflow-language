@@ -8,6 +8,9 @@ import os
 from pathmapper import PathMapper, DockerPathMapper
 import sandboxjs
 from job import Job
+import yaml
+import glob
+import logging
 
 TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json"
 
@@ -324,8 +327,8 @@ class Tool(object):
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder))
         builder.bindings.sort(key=lambda a: a["position"])
 
-        #pprint.pprint(builder.bindings)
-        #pprint.pprint(builder.files)
+        logging.debug(pprint.pformat(builder.bindings))
+        logging.debug(pprint.pformat(builder.files))
 
         j = Job()
         j.joborder = joborder
@@ -371,31 +374,35 @@ class Tool(object):
             j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
 
         j.pathmapper = builder.pathmapper
-        j.collect_outputs = functools.partial(self.collect_outputs, self.tool["outputs"], joborder)
+        j.collect_outputs = functools.partial(self.collect_output_ports, self.tool["outputs"], builder)
 
         return j
 
+    def collect_output_ports(self, ports, builder, outdir):
+        custom_output = os.path.join(outdir, "output.cwl.json")
+        if os.path.exists(custom_output):
+            outputdoc = yaml.load(custom_output)
+            validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
+            return outputdoc
+        return {port["port"][1:]: self.collect_output(port, builder, outdir) for port in ports}
 
-    def collect_outputs(self, schema, joborder, outdir):
+    def collect_output(self, schema, builder, outdir):
         r = None
-        if isinstance(schema, dict):
-            if "binding" in schema:
-                binding = schema["binding"]
-                if "glob" in binding:
-                    r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
-                    # if not ("type" in schema and schema["type"] == "array"):
-                    #     if r:
-                    #         r = r[0]
-                    #     else:
-                    #         r = None
-                #if "value" in binding:
-                #    r = draft1tool.resolve_eval(joborder, binding["value"])
-            # if not r and "properties" in schema:
-            #     r = {}
-            #     for k, v in schema["properties"].items():
-            #         out = self.collect_outputs(v, joborder, outdir)
-            #         if out:
-            #             r[k] = out
+        if "binding" in schema:
+            binding = schema["binding"]
+            if ("glob" in binding and
+                (schema["type"] == "File" or
+                 (schema["type"] == "array" and
+                  schema["items"] == "File"))):
+                r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
+                if schema["type"] == "File":
+                    r = r[0] if r else None
+            elif "valueFrom" in binding:
+                r = builder.do_eval(binding["valueFrom"])
 
+        if not r and schema["type"] == "record":
+            r = {}
+            for f in schema["fields"]:
+                r[f["name"]] = self.collect_output(f, builder, outdir)
 
         return r

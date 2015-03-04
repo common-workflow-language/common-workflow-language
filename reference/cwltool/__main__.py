@@ -1,3 +1,3 @@
 import main
 
-main.main()
+sys.exit(main.main())

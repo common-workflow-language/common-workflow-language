@@ -55,7 +55,16 @@
         "job": "draft-2/cat-job.json",
         "args": ["cat", "foo.txt"],
         "generatefiles": {
-            "foo.txt": {}
+            "foo.txt": "The file is hello.txt\n"
+        }
+    },
+    {
+        "tool": "draft-2/cat3-tool.json",
+        "job": "draft-2/cat-job.json",
+        "output": {
+            "file": {
+                "path": "conformance_test_tmp/output.txt"
+            }
         }
     }
 ]

@@ -8,6 +8,7 @@ import jsonschema
 import json
 import os
 import sys
+import logging
 
 def main():
     parser = argparse.ArgumentParser()
@@ -15,6 +16,7 @@ def main():
     parser.add_argument("job_order", type=str)
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
+    parser.add_argument("--outdir", type=str)
     parser.add_argument("--no-container", action="store_true", help="Do not execute in a Docker container, even if one is specified in the tool file")
     parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull the Docker image")
     parser.add_argument("--dry-run", action="store_true", help="Do not execute")
@@ -27,13 +29,8 @@ def main():
             t = draft1tool.Tool(u)
         else:
             t = draft2tool.Tool(u)
-    except jsonschema.exceptions.ValidationError as e:
-        print "Tool definition failed validation"
-        print e
-        return 1
-    except draft2tool.ValidationException as e:
-        print "Tool definition failed validation"
-        print e
+    except (jsonschema.exceptions.ValidationError, draft2tool.ValidationException):
+        logging.exception("Tool definition failed validation")
         return 1
 
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
@@ -50,13 +47,14 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            print '%s%s%s' % (' '.join(job.command_line),
+            logging.info('%s%s%s', ' '.join(job.command_line),
                                 ' < %s' % (job.stdin) if job.stdin else '',
                                 ' > %s' % (job.stdout) if job.stdout else '')
-            print "Output json is " + json.dumps(job.run(dry_run=args.dry_run, pull_image=(not args.no_pull)))
-    except jsonschema.exceptions.ValidationError as e:
-        print "Job order failed validation"
-        print e
+
+            runjob = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
+            print json.dumps(runjob)
+    except jsonschema.exceptions.ValidationError:
+        logging.exception("Job order failed validation")
         return 1
 
     return 0

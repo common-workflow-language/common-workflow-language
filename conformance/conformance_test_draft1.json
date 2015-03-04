@@ -55,7 +55,7 @@
         "job": "draft-1/cat-job.json",
         "args": ["cat", "foo.txt"],
         "generatefiles": {
-            "foo.txt": {}
+            "foo.txt": "The file is hello.txt\n"
         }
     }
 ]

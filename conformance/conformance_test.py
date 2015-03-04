@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+import shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", type=str)
@@ -18,16 +19,26 @@ with open(os.path.join(module_dir, args.test)) as f:
 
 failures = 0
 for i, t in enumerate(tests):
+
+    shutil.rmtree("conformance_test_tmp", ignore_errors=True)
+    os.mkdir("conformance_test_tmp")
+
     sys.stdout.write("\rTest [%i/%i] " % (i+1, len(tests)))
     sys.stdout.flush()
     out = {}
     try:
-        outstr = subprocess.check_output([args.tool,
-                                          "--conformance-test",
-                                          "--basedir=" + args.basedir,
-                                          "--no-container",
-                                          t["tool"],
-                                          t["job"]])
+        if "output" in t:
+            outstr = subprocess.check_output([args.tool,
+                                              "--outdir=conformance_test_tmp",
+                                              t["tool"],
+                                              t["job"]])
+        else:
+            outstr = subprocess.check_output([args.tool,
+                                              "--conformance-test",
+                                              "--basedir=" + args.basedir,
+                                              "--no-container",
+                                              t["tool"],
+                                              t["job"]])
         out = json.loads(outstr)
     except ValueError as v:
         print v
@@ -40,14 +51,19 @@ for i, t in enumerate(tests):
     # if "stdin" in t:
     #     t["stdin"] = t["stdin"].replace("$PWD", pwd)
 
-    if t.get("args") == out.get("args") and t.get("stdin") == out.get("stdin") and t.get("stdout") == out.get("stdout"):
+    failed = False
+    if "output" in t:
+        # check the output
         pass
     else:
-        print "\nTest failed: " + str([args.tool, "--conformance-test", t["tool"], t["job"]])
-        print "  expected %s (stdin %s) (stdout %s)" % (json.dumps(t.get("args")), json.dumps(t.get("stdin")), json.dumps(t.get("stdout")))
-        print "   but got %s (stdin %s) (stdout %s)" % (json.dumps(out.get("args")), json.dumps(out.get("stdin")), json.dumps(out.get("stdout")))
-        print "\n"
-        failures += 1
+        for key in ["args", "stdin", "stdout", "generatefiles"]:
+            if t.get(key) != out.get(key):
+                if not failed:
+                    print """Test failed: %s""" % str([args.tool, "--conformance-test", t["tool"], t["job"]])
+                    failed = True
+                print "%s expected %s\n%s      got %s" % (key, t.get(key), " " * len(key), out.get(key))
+        if failed:
+            failures += 1
 
 if failures == 0:
     print "All tests passed"
