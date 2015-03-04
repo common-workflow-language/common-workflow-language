@@ -1,0 +1,8 @@
+{
+    "inputs": {
+        "file1": {
+            "path": "hello.txt"
+        },
+        "numbering": true
+    }
+}

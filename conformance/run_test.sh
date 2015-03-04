@@ -33,29 +33,26 @@ checkexit() {
     fi
 }
 
-DRAFT2="./conformance_test.py --test conformance_test_draft2.json --basedir draft-2"
+runtest() {
+    echo "--- Running $1 tests ---"
 
-# cwltool conformance test
-if [[ -n "$CWLTOOL" ]]; then
-    echo
-    echo "--- Running cwltool tests ---"
-    $DRAFT2 $CWLTOOL/cwltool/main.py
+    echo " [draft 1]"
     runs=$((runs+1))
+    ./conformance_test.py --test conformance_test_draft1.json --basedir draft-1 $1
     checkexit
-fi
 
-# rabix conformance test
-if [[ -n "$RABIX" ]]; then
-    echo
-    echo "--- Running rabix/cliche tests ---"
-    $DRAFT2 $RABIX/rabix/cliche/main.py
+    echo " [draft 2]"
     runs=$((runs+1))
+    ./conformance_test.py --test conformance_test_draft2.json --basedir draft-2 $1
     checkexit
-fi
+}
 
 # Add your tool test here.
-
-
+for t in "$CWLTOOL/cwltool/main.py" "$RABIX/rabix/cliche/main.py" ; do
+    if [[ -x "$t" ]]; then
+        runtest "$t"
+    fi
+done
 
 # Final reporting
 
@@ -65,7 +62,9 @@ if [[ $failures != 0 ]]; then
     echo "$failures tool tests failed"
 else
     if [[ $runs == 0 ]]; then
-        echo "Usage: run_tests.sh [CWLTOOL=path] [RABIX=path]"
+        echo >&2 "$helpmessage"
+        echo >&2
+        exit 1
     else
         echo "All tool tests succeeded"
     fi

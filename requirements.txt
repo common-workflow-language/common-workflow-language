@@ -1,5 +1,0 @@
-jsonschema
-requests
-avro
-rdflib
-rdflib-jsonld

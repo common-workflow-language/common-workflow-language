@@ -1,0 +1,32 @@
+{
+    "inputs": {
+        "reference": {
+            "path": "rabix/tests/test-files/chr20.fa",
+            "size": 123,
+            "checksum": "sha1$hash"
+        },
+        "reads": [
+            {
+                "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
+            },
+            {
+                "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
+            }
+        ],
+        "min_std_max_min": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "minimum_seed_length": 3
+    },
+    "platform": "http://example.org/my_platform/v1",
+    "allocatedResources": {
+        "cpu": 4,
+        "mem": 5000,
+        "ports": [],
+        "diskSpace": 20000,
+        "network": "No"
+    }
+}

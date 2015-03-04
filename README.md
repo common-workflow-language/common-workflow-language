@@ -10,22 +10,20 @@ portability of data analysis workflows.  Our goal is to create specifications
 that enable data scientists to describe analysis tools and workflows that are
 powerful, easy to use, portable, and support reproducibility.
 
+CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
+[Avro](https://avro.apache.org/) for data modeling and
+[Docker](http://docker.com) for portable runtime environments.
+
 CWL can be used to describe workflows for a variety of areas such as:
 
 * Data-intensive science, such as Bioinformatics, Chemistry, Physics, Astronomy
 * Log analysis
 * Data mining
-* Extract, Transform and Load (ETL) systems
+* Extract, Transform and Load (ETL)
 * Photo and video processing
 
-Map-Reduce jobs (as popularized by Hadoop) can be implemented in CWL, while CWL
-can easily express workflows that are awkward or impossible with Map-Reduce.
-
-Please be aware that Common Workflow Language is still under heavy development
-and that the following draft specification documents are likely to contain
-errors or be out of date.  Current status is best reflected by the
-[reference implementation](reference/), [conformance test suite](conformance/) and
-[examples](examples/).
+Please be aware that Common Workflow Language is still under heavy development.
+The current draft is draft 2.
 
 ## Repository contents
 

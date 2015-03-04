@@ -1,0 +1,89 @@
+{
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
+    "inputs": {
+        "required": [
+            "stages"
+        ],
+        "type": "object",
+        "properties": {
+            "$mixin": "tmap.json#mixins/global",
+            "stages": {
+                "minItems": 1,
+                "items": {
+                    "required": [
+                        "stageId",
+                        "algos"
+                    ],
+                    "type": "object",
+                    "properties": {
+                        "stageId": {
+                            "adapter": {
+                                "prefix": "stage",
+                                "separator": "",
+                                "order": 0
+                            },
+                            "type": "integer"
+                        },
+                        "stageOption1": {
+                            "adapter": {
+                                "prefix": "-n",
+                                "order": 1
+                            },
+                            "type": "boolean"
+                        },
+                        "algos": {
+                            "minItems": 1,
+                            "items": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "tmap.json#algos/map1"
+                                    },
+                                    {
+                                        "$ref": "tmap.json#algos/map2"
+                                    },
+                                    {
+                                        "$ref": "tmap.json#algos/map3"
+                                    },
+                                    {
+                                        "$ref": "tmap.json#algos/map4"
+                                    }
+                                ],
+                                "type": "object"
+                            },
+                            "adapter": {
+                                "order": 2
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "adapter": {
+                    "order": 2
+                },
+                "type": "array"
+            }
+        }
+    },
+    "adapter": {
+        "baseCmd": [
+            "tmap",
+            "mapall"
+        ],
+        "stdin": { "$job": "#inputs/reads/path" },
+        "stdout": "output.sam"
+    },
+    "outputs": {
+        "required": [
+            "sam"
+        ],
+        "type": "object",
+        "properties": {
+            "sam": {
+                "adapter": {
+                    "glob": "output.sam"
+                },
+                "type": "file"
+            }
+        }
+    }
+}

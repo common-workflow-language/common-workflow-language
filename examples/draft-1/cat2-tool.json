@@ -1,0 +1,27 @@
+{
+    "documentAuthor": ["peter.amstutz@curoverse.com"],
+    "documentDescription": "Print the contents of a file by piping it into stdin of 'cat' running in a docker container.",
+    "schema":"https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-1/schemas/tool.json",
+    "requirements": {
+        "environment": {
+            "container": {
+                "type": "docker",
+                "uri": "arvados/jobs",
+                "imageId": "arvados/jobs"
+            }
+        }
+    },
+    "inputs": {
+        "type": "object",
+        "required": [ "file1" ],
+        "properties": {
+            "file1": {
+                "type": "file"
+            }
+        }
+    },
+    "adapter": {
+        "baseCmd": "cat",
+        "stdin": {"$job": "#inputs/file1/path"}
+    }
+}

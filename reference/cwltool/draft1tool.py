@@ -335,7 +335,7 @@ class Tool(object):
         j.command_line = flatten(map(lambda a: builder.adapt(a, joborder, d.mapper), adapters))
 
         j.pathmapper = d
-        j.collect_outputs = functools.partial(self.collect_outputs, self.tool["outputs"], joborder)
+        j.collect_outputs = functools.partial(self.collect_outputs, self.tool.get("outputs", {}), joborder)
 
         return j
 
