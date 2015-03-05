@@ -45,14 +45,24 @@
 
     {
         "type": "record",
-        "name": "Binding",
+        "name": "CommandLineBinding",
         "fields": [
             { "name": "position", "type": ["null", "int"] },
             { "name": "prefix", "type": [ "null", "string"] },
             { "name": "separator", "type": ["null", "string"] },
             { "name": "itemSeparator", "type": ["null", "string"] },
             { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
-            { "name": "glob", "type": ["null", "string"] }
+            { "name": "loadContents", "type": ["null", "boolean"] }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "OutputBinding",
+        "fields": [
+            { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
+            { "name": "glob", "type": ["null", "string"] },
+            { "name": "loadContents", "type": ["null", "boolean"] }
         ]
     },
 
@@ -121,8 +131,12 @@
                 ]
             },
             {
-                "name": "binding",
-                "type": [ "null", "Binding" ]
+                "name": "commandLineBinding",
+                "type": [ "null", "CommandLineBinding" ]
+            },
+            {
+                "name": "outputBinding",
+                "type": [ "null", "OutputBinding" ]
             }
         ]
     },
@@ -167,7 +181,7 @@
                     "null",
                     {
                         "type": "array",
-                        "items": "Binding"
+                        "items": "CommandLineBinding"
                     }
                 ]
             },
@@ -240,6 +254,51 @@
                     {
                         "type": "array",
                         "items": "FileDef"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "ExpressionTool",
+        "fields": [
+            {
+                "name": "script",
+                "type": "Expression"
+            },
+            {
+                "name": "inputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "outputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "schemaDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                ]
+            },
+            {
+                "name": "expressionDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": ["string", "Ref"]
                     }
                 ]
             }

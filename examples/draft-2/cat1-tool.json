@@ -12,12 +12,12 @@
         {
             "port": "#file1",
             "type": "File",
-            "binding": {"position": 1}
+            "commandLineBinding": {"position": 1}
         },
         {
             "port": "#numbering",
             "type": ["null", "boolean"],
-            "binding": {
+            "commandLineBinding": {
                 "position": 0,
                 "prefix": "-n"
             }

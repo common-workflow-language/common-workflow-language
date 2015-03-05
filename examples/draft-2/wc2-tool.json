@@ -1,0 +1,23 @@
+{
+    "@type": "CommandLineTool",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
+    "inputs": [{
+        "port": "#file1",
+        "type": "File",
+        "commandLineBinding": {}
+    }],
+    "outputs": [{
+        "port": "#output",
+        "type": "int",
+        "outputBinding": {
+            "glob": "output.txt",
+            "loadContents": true,
+            "valueFrom": {
+                "expressionType": "javascript",
+                "value": "parseInt($self[0])"
+            }
+        }
+    }],
+    "stdout": "output.txt",
+    "baseCommand": ["wc"]
+}

@@ -77,5 +77,29 @@
                 "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b"
             }
         }
+    },
+    {
+        "tool": "draft-2/wc-tool.json",
+        "job": "draft-2/wc-job.json",
+        "output": {
+            "output": {
+                "path": "output.txt",
+                "checksum": "sha1$da00806ff47486cd8f0fe9e2ab594e6800445689"
+            }
+        }
+    },
+    {
+        "tool": "draft-2/parseInt-tool.json",
+        "job": "draft-2/parseInt-job.json",
+        "output": {
+            "output": 42
+        }
+    },
+    {
+        "tool": "draft-2/wc2-tool.json",
+        "job": "draft-2/wc-job.json",
+        "output": {
+            "output": 16
+        }
     }
 ]

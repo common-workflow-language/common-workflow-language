@@ -31,7 +31,7 @@ def main():
         if "schema" in u:
             t = draft1tool.Tool(u)
         else:
-            t = draft2tool.Tool(u)
+            t = draft2tool.makeTool(u)
     except (jsonschema.exceptions.ValidationError, draft2tool.ValidationException):
         _logger.exception("Tool definition failed validation")
         return 1
@@ -50,10 +50,10 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            _logger.info('%s%s%s', ' '.join(job.command_line),
-                                ' < %s' % (job.stdin) if job.stdin else '',
-                                ' > %s' % (job.stdout) if job.stdout else '')
-
+            if isinstance(job, draft1tool.Tool) or isinstance(job, draft2tool.CommandLineTool):
+                _logger.info('%s%s%s', ' '.join(job.command_line),
+                                    ' < %s' % (job.stdin) if job.stdin else '',
+                                    ' > %s' % (job.stdout) if job.stdout else '')
             (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
             _logger.info("Output directory is %s", outdir)
             print json.dumps(runjob)

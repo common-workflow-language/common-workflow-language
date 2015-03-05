@@ -18,7 +18,7 @@
         {
             "port": "#output_file",
             "type": "File",
-            "binding": {"glob": "output.txt"}
+            "outputBinding": {"glob": "output.txt"}
         }
     ],
     "baseCommand": "cat",

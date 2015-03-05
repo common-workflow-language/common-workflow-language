@@ -184,17 +184,20 @@ class Builder(object):
 
             if schema["type"] == "array":
                 for n, item in enumerate(datum):
-                    b = self.bind_input({"type": schema["items"], "binding": schema.get("binding")}, item)
+                    b = self.bind_input({"type": schema["items"], "commandLineBinding": schema.get("commandLineBinding")}, item)
                     for bi in b:
                         bi["position"].insert(0, n)
                     bindings.extend(b)
 
             if schema["type"] == "File":
-                self.files.append(datum["path"])
+                if schema.get("loadContents"):
+                    with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
+                        datum["contents"] = f.read()
+                self.files.append(datum)
 
         b = None
-        if "binding" in schema and isinstance(schema["binding"], dict):
-            b = copy.copy(schema["binding"])
+        if "commandLineBinding" in schema and isinstance(schema["commandLineBinding"], dict):
+            b = copy.copy(schema["commandLineBinding"])
 
             if b.get("position"):
                 b["position"] = [b["position"]]
@@ -249,8 +252,14 @@ class Builder(object):
 
         return [a for a in args if a is not None]
 
+def makeTool(toolpath_object):
+    if toolpath_object["@type"] == "CommandLineTool":
+        return CommandLineTool(toolpath_object)
+    elif toolpath_object["@type"] == "ExpressionTool":
+        return ExpressionTool(toolpath_object)
+
 class Tool(object):
-    def __init__(self, toolpath_object):
+    def __init__(self, toolpath_object, validateAs):
         self.names = avro.schema.Names()
         cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl.avsc')
         with open(cwl_avsc) as f:
@@ -263,7 +272,7 @@ class Tool(object):
             raise Exception("Missing or invalid '@context' field in tool description document, must be %s" % TOOL_CONTEXT_URL)
 
         # Validate tool documument
-        validate_ex(self.names.get_name("CommandLineTool", ""), self.tool)
+        validate_ex(self.names.get_name(validateAs, ""), self.tool)
 
         # Import schema defs
         self.schemaDefs = {}
@@ -289,17 +298,51 @@ class Tool(object):
             self.outputs_record_schema["fields"].append(c)
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
-    def job(self, joborder, basedir, use_container=True):
+    def _init_job(self, joborder, basedir):
         # Validate job order
         validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
         builder = Builder()
-        builder.job = joborder
+        builder.job = copy.deepcopy(joborder)
         builder.jslib = ''
         builder.basedir = basedir
         builder.files = []
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
+
+        if self.tool.get("expressionDefs"):
+            for ex in self.tool['expressionDefs']:
+                builder.jslib += builder.do_eval(ex) + "\n"
+
+        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
+
+        return builder
+
+
+class ExpressionTool(Tool):
+    def __init__(self, toolpath_object):
+        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool")
+
+    class ExpressionJob(object):
+        def run(self, outdir=None, **kwargs):
+            return (outdir, self.builder.do_eval(self.script))
+
+    def job(self, joborder, basedir, **kwargs):
+        builder = self._init_job(joborder, basedir)
+
+        j = ExpressionTool.ExpressionJob()
+        j.builder = builder
+        j.script = self.tool["script"]
+
+        return j
+
+
+class CommandLineTool(Tool):
+    def __init__(self, toolpath_object):
+        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool")
+
+    def job(self, joborder, basedir, use_container=True):
+        builder = self._init_job(joborder, basedir)
 
         if isinstance(self.tool["baseCommand"], list):
             for n, b in enumerate(self.tool["baseCommand"]):
@@ -313,10 +356,6 @@ class Tool(object):
                 "valueFrom": self.tool["baseCommand"]
             })
 
-        if self.tool.get("expressionDefs"):
-            for ex in self.tool['expressionDefs']:
-                builder.jslib += builder.do_eval(ex) + "\n"
-
         if self.tool.get("arguments"):
             for i, a in enumerate(self.tool["arguments"]):
                 a = copy.copy(a)
@@ -327,14 +366,15 @@ class Tool(object):
                 a["valueFrom"] = builder.do_eval(a["valueFrom"])
                 builder.bindings.append(a)
 
-        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder))
         builder.bindings.sort(key=lambda a: a["position"])
 
         _logger.debug(pprint.pformat(builder.bindings))
         _logger.debug(pprint.pformat(builder.files))
 
+        builder.files = [f["path"] for f in builder.files]
+
         j = Job()
-        j.joborder = joborder
+        j.joborder = builder.job
         j.container = None
         builder.pathmapper = None
 
@@ -391,22 +431,30 @@ class Tool(object):
 
     def collect_output(self, schema, builder, outdir):
         r = None
-        if "binding" in schema:
-            binding = schema["binding"]
-            if ("glob" in binding and
-                (schema["type"] == "File" or
-                 (schema["type"] == "array" and
-                  schema["items"] == "File"))):
+        if "outputBinding" in schema:
+            binding = schema["outputBinding"]
+            if "glob" in binding:
                 r = [{"path": g} for g in glob.glob(binding["glob"])]
                 for files in r:
                     checksum = hashlib.sha1()
                     with open(files["path"], "rb") as f:
-                        checksum.update(f.read())
+                        contents = f.read()
+                        checksum.update(contents)
+                        if binding.get("loadContents"):
+                            files["contents"] = contents
                     files["checksum"] = "sha1$%s" % checksum.hexdigest()
-                if schema["type"] == "File":
+
+                if schema["type"] == "array" and schema["items"] == "File":
+                    pass
+                elif schema["type"] == "File":
                     r = r[0] if r else None
-            elif "valueFrom" in binding:
-                r = builder.do_eval(binding["valueFrom"])
+                elif binding.get("loadContents"):
+                    r = [v["contents"] for v in r]
+                else:
+                    r = None
+
+            if "valueFrom" in binding:
+                r = builder.do_eval(binding["valueFrom"], r)
 
         if not r and schema["type"] == "record":
             r = {}

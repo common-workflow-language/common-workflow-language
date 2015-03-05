@@ -10,7 +10,7 @@
         },
         {
             "port": "#stages",
-            "binding": {
+            "commandLineBinding": {
                 "position": 1
             },
             "type": {
@@ -22,7 +22,7 @@
     "outputs": [
         {
             "port": "#sam",
-            "binding": {
+            "outputBinding": {
                 "glob": "output.sam"
             },
             "type": "File"
@@ -32,7 +32,7 @@
         {
             "fields": [
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 0
                     },
                     "name": "algo",
@@ -45,7 +45,7 @@
                 {
                     "name": "maxSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--max-seq-length",
                         "separator": " ",
                         "position": 2
@@ -54,14 +54,14 @@
                 {
                     "name": "minSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--min-seq-length",
                         "separator": " ",
                         "position": 2
                     }
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 2,
                         "prefix": "--seed-length"
                     },
@@ -75,7 +75,7 @@
         {
             "fields": [
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 0
                     },
                     "name": "algo",
@@ -88,7 +88,7 @@
                 {
                     "name": "maxSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--max-seq-length",
                         "separator": " ",
                         "position": 2
@@ -97,14 +97,14 @@
                 {
                     "name": "minSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--min-seq-length",
                         "separator": " ",
                         "position": 2
                     }
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 2,
                         "prefix": "--max-seed-hits"
                     },
@@ -118,7 +118,7 @@
         {
             "fields": [
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 0
                     },
                     "name": "algo",
@@ -131,7 +131,7 @@
                 {
                     "name": "maxSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--max-seq-length",
                         "separator": " ",
                         "position": 2
@@ -140,14 +140,14 @@
                 {
                     "name": "minSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--min-seq-length",
                         "separator": " ",
                         "position": 2
                     }
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 2,
                         "prefix": "--fwd-search"
                     },
@@ -161,7 +161,7 @@
         {
             "fields": [
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 0
                     },
                     "name": "algo",
@@ -174,7 +174,7 @@
                 {
                     "name": "maxSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--max-seq-length",
                         "separator": " ",
                         "position": 2
@@ -183,14 +183,14 @@
                 {
                     "name": "minSeqLen",
                     "type": ["null", "int"],
-                    "binding": {
+                    "commandLineBinding": {
                         "prefix": "--min-seq-length",
                         "separator": " ",
                         "position": 2
                     }
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 2,
                         "prefix": "--seed-step"
                     },
@@ -206,7 +206,7 @@
             "name": "Stage",
             "fields": [
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 0,
                         "prefix": "stage",
                         "separator": ""
@@ -215,7 +215,7 @@
                     "type": ["null", "int"]
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 1,
                         "prefix": "-n"
                     },
@@ -223,7 +223,7 @@
                     "type": ["null", "boolean"]
                 },
                 {
-                    "binding": {
+                    "commandLineBinding": {
                         "position": 2
                     },
                     "name": "algos",

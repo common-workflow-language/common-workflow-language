@@ -1,0 +1,17 @@
+{
+    "@type": "ExpressionTool",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
+    "inputs": [{
+        "port": "#file1",
+        "type": "File",
+        "loadContents": true
+    }],
+    "outputs": [{
+        "port": "#output",
+        "type": "int"
+    }],
+    "script": {
+        "expressionType": "javascript",
+        "value": "{return {'output': parseInt($job.file1.contents)};}"
+    }
+}

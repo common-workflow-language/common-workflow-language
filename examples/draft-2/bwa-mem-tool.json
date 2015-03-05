@@ -18,7 +18,7 @@
         {
             "port": "#reference",
             "type": "File",
-            "binding": {
+            "commandLineBinding": {
                 "position": 2
             }
         },
@@ -27,7 +27,7 @@
             "type": {
                 "type": "array",
                 "items": "File",
-                "binding": {
+                "commandLineBinding": {
                     "position": 3
                 }
             }
@@ -35,7 +35,7 @@
         {
             "port": "#minimum_seed_length",
             "type": "int",
-            "binding": {
+            "commandLineBinding": {
                 "position": 1,
                 "prefix": "-m"
             }
@@ -46,7 +46,7 @@
                 "type": "array",
                 "items": "int"
             },
-            "binding": {
+            "commandLineBinding": {
                 "itemSeparator": ",",
                 "position": 1,
                 "prefix": "-I"
@@ -57,7 +57,7 @@
         {
             "port": "#sam",
             "type": "File",
-            "binding": {
+            "outputBinding": {
                 "glob": "output.sam"
             }
         }

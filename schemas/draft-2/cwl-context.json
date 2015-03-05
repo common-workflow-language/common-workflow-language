@@ -24,7 +24,9 @@
     "File": "cwl:File",
 
     "Expression": "cwl:Expression",
+    "ExpressionTool": "cwl:ExpressionTool",
     "expressionType": "@type",
+    "script":"cwl:expressionProcess",
     "ref": "@id",
 
     "position": "cwl:position",
@@ -93,20 +95,21 @@
     "MemoryRequirement": "cwl:MemoryRequirement",
     "memoryInMiB": "cwl:memoryInMiB",
 
-
-    "Workflow": "cwl:Workflow",
-    "dataLinks": "wfdesc:hasDataLink",
-    "source": "wfdesc:hasSource",
-    "destination": "wfdesc:hasSink",
     "steps": "wfdesc:hasSubProcess",
-
-    "app": {
-        "@id": "cwl:hasImplementation",
+    "impl": {
+        "@id": "cwl:processImplementation",
         "@type": "@id"
     },
-    "impl": {
-        "@id": "cwl:linksToPort",
+    "def": {
+        "@id": "cwl:parameterDefinition",
+        "@type": "@id"
+    },
+    "source": {
+        "@id": "wfdesc:hasSource",
+        "@type":"@id"
+    },
+    "connect": {
+        "@reverse": "wfdesc:hasSink",
         "@type": "@id"
     }
-
 }
