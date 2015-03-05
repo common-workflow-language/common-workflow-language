@@ -5,6 +5,9 @@ import glob
 import json
 import yaml
 import logging
+import sys
+
+_logger = logging.getLogger("cwltool")
 
 class Job(object):
     def run(self, dry_run=False, pull_image=True, outdir=None):
@@ -22,9 +25,9 @@ class Job(object):
         if self.container and self.container.get("type") == "docker":
             if pull_image:
                 if "pull" in self.container:
-                    subprocess.check_call(["docker", "pull", self.container["pull"]])
+                    subprocess.check_call(["docker", "pull", self.container["pull"]], stdout=sys.stderr)
                 elif "import" in self.container:
-                    subprocess.check_call(["docker", "import", self.container["import"]])
+                    subprocess.check_call(["docker", "import", self.container["import"]], stdout=sys.stderr)
 
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
@@ -37,31 +40,38 @@ class Job(object):
         stdin = None
         stdout = None
 
-        logging.info(str(runtime + self.command_line))
+        _logger.info(str(runtime + self.command_line))
 
         if not dry_run:
             if self.stdin:
                 stdin = open(self.stdin, "rb")
+            else:
+                stdin = subprocess.PIPE
 
             os.chdir(outdir)
 
             if self.stdout:
                 stdout = open(self.stdout, "wb")
+            else:
+                stdout = sys.stderr
 
             for t in self.generatefiles:
                 with open(os.path.join(outdir, t), "w") as f:
                     f.write(self.generatefiles[t])
 
             sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
+
+            if stdin == subprocess.PIPE:
+                sp.stdin.close()
+
             sp.wait()
 
-            if stdin:
+            if stdin != subprocess.PIPE:
                 stdin.close()
 
             if stdout:
                 stdout.close()
 
-            logging.info("Output directory is %s", outdir)
-            return self.collect_outputs(outdir)
+            return (outdir, self.collect_outputs(outdir))
 
         return None

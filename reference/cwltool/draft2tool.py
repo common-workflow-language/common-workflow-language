@@ -11,6 +11,9 @@ from job import Job
 import yaml
 import glob
 import logging
+import hashlib
+
+_logger = logging.getLogger("cwltool")
 
 TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json"
 
@@ -327,8 +330,8 @@ class Tool(object):
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, joborder))
         builder.bindings.sort(key=lambda a: a["position"])
 
-        logging.debug(pprint.pformat(builder.bindings))
-        logging.debug(pprint.pformat(builder.files))
+        _logger.debug(pprint.pformat(builder.bindings))
+        _logger.debug(pprint.pformat(builder.files))
 
         j = Job()
         j.joborder = joborder
@@ -394,7 +397,12 @@ class Tool(object):
                 (schema["type"] == "File" or
                  (schema["type"] == "array" and
                   schema["items"] == "File"))):
-                r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
+                r = [{"path": g} for g in glob.glob(binding["glob"])]
+                for files in r:
+                    checksum = hashlib.sha1()
+                    with open(files["path"], "rb") as f:
+                        checksum.update(f.read())
+                    files["checksum"] = "sha1$%s" % checksum.hexdigest()
                 if schema["type"] == "File":
                     r = r[0] if r else None
             elif "valueFrom" in binding:

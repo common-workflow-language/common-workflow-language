@@ -16,7 +16,7 @@
     ],
     "outputs": [
         {
-            "port": "#output",
+            "port": "#output_file",
             "type": "File",
             "binding": {"glob": "output.txt"}
         }

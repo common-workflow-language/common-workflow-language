@@ -10,6 +10,9 @@ import os
 import sys
 import logging
 
+_logger = logging.getLogger("cwltool")
+_logger.addHandler(logging.StreamHandler())
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("tool", type=str)
@@ -30,7 +33,7 @@ def main():
         else:
             t = draft2tool.Tool(u)
     except (jsonschema.exceptions.ValidationError, draft2tool.ValidationException):
-        logging.exception("Tool definition failed validation")
+        _logger.exception("Tool definition failed validation")
         return 1
 
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
@@ -47,14 +50,15 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            logging.info('%s%s%s', ' '.join(job.command_line),
+            _logger.info('%s%s%s', ' '.join(job.command_line),
                                 ' < %s' % (job.stdin) if job.stdin else '',
                                 ' > %s' % (job.stdout) if job.stdout else '')
 
-            runjob = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
+            (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
+            _logger.info("Output directory is %s", outdir)
             print json.dumps(runjob)
     except jsonschema.exceptions.ValidationError:
-        logging.exception("Job order failed validation")
+        _logger.exception("Job order failed validation")
         return 1
 
     return 0

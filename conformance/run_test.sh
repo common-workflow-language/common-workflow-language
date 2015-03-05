@@ -9,6 +9,10 @@ Syntax:
 Options:
 EOF
 
+DRAFT=draft-2
+CWLTOOL=../reference
+TEST_N=""
+
 while [[ -n "$1" ]]
 do
     arg="$1"; shift
@@ -17,6 +21,9 @@ do
             echo >&2 "$helpmessage"
             echo >&2
             exit 1
+            ;;
+        -n*)
+            TEST_N=$arg
             ;;
         *=*)
             eval $(echo $arg | cut -d= -f1)=\"$(echo $arg | cut -d= -f2-)\"
@@ -34,16 +41,10 @@ checkexit() {
 }
 
 runtest() {
-    echo "--- Running $1 tests ---"
+    echo "--- Running conformance test $DRAFT on $1 ---"
 
-    echo " [draft 1]"
     runs=$((runs+1))
-    ./conformance_test.py --test conformance_test_draft1.json --basedir draft-1 $1
-    checkexit
-
-    echo " [draft 2]"
-    runs=$((runs+1))
-    ./conformance_test.py --test conformance_test_draft2.json --basedir draft-2 $1
+    ./conformance_test.py --test conformance_test_$DRAFT.json $TEST_N --basedir $DRAFT $1
     checkexit
 }
 
