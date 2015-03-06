@@ -303,5 +303,76 @@
                 ]
             }
         ]
+    },
+
+    {
+        "type": "record",
+        "name": "Process",
+        "fields": [
+            {
+                "name": "inputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "outputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "schemaDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "Workflow",
+        "fields": [
+            {
+                "name": "inputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "outputs",
+                "type": {
+                    "type": "array",
+                    "items": "Schema"
+                }
+            },
+            {
+                "name": "schemaDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Schema"
+                    }
+                ]
+            },
+            {
+                "name": "steps",
+                "type": [
+                    {
+                        "type": "array",
+                        "items": ["Process"]
+                    }
+                ]
+            }
+        ]
     }
 ]

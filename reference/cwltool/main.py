@@ -9,6 +9,8 @@ import json
 import os
 import sys
 import logging
+import workflow
+import validate
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
@@ -23,16 +25,19 @@ def main():
     parser.add_argument("--no-container", action="store_true", help="Do not execute in a Docker container, even if one is specified in the tool file")
     parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull the Docker image")
     parser.add_argument("--dry-run", action="store_true", help="Do not execute")
+    parser.add_argument("--verbose", action="store_true", help="Print more logging")
+    parser.add_argument("--debug", action="store_true", help="Print even more logging")
 
     args = parser.parse_args()
 
+    if args.verbose:
+        logging.getLogger("cwltool").setLevel(logging.INFO)
+    if args.debug:
+        logging.getLogger("cwltool").setLevel(logging.DEBUG)
+
     try:
-        u = from_url(args.tool)
-        if "schema" in u:
-            t = draft1tool.Tool(u)
-        else:
-            t = draft2tool.makeTool(u)
-    except (jsonschema.exceptions.ValidationError, draft2tool.ValidationException):
+        t = workflow.makeTool(from_url(args.tool))
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
         _logger.exception("Tool definition failed validation")
         return 1
 
@@ -50,10 +55,6 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            if isinstance(job, draft1tool.Tool) or isinstance(job, draft2tool.CommandLineTool):
-                _logger.info('%s%s%s', ' '.join(job.command_line),
-                                    ' < %s' % (job.stdin) if job.stdin else '',
-                                    ' > %s' % (job.stdout) if job.stdout else '')
             (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
             _logger.info("Output directory is %s", outdir)
             print json.dumps(runjob)

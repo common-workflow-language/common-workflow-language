@@ -7,123 +7,20 @@ import functools
 import os
 from pathmapper import PathMapper, DockerPathMapper
 import sandboxjs
-from job import Job
+from job import CommandLineJob
 import yaml
 import glob
 import logging
 import hashlib
 import random
+from process import Process
+import validate
 
 _logger = logging.getLogger("cwltool")
 
-TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 CONTENT_LIMIT = 1024 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
-
-class ValidationException(Exception):
-    pass
-
-def validate(expected_schema, datum):
-    try:
-        return validate_ex(expected_schema, datum)
-    except ValidationException:
-        return False
-
-INT_MIN_VALUE = -(1 << 31)
-INT_MAX_VALUE = (1 << 31) - 1
-LONG_MIN_VALUE = -(1 << 63)
-LONG_MAX_VALUE = (1 << 63) - 1
-
-def validate_ex(expected_schema, datum):
-    """Determine if a python datum is an instance of a schema."""
-    schema_type = expected_schema.type
-    if schema_type == 'null':
-        if datum is None:
-            return True
-        else:
-            raise ValidationException("`%s` is not null" % datum)
-    elif schema_type == 'boolean':
-        if isinstance(datum, bool):
-            return True
-        else:
-            raise ValidationException("`%s` is not boolean" % datum)
-    elif schema_type == 'string':
-        if isinstance(datum, basestring):
-            return True
-        else:
-            raise ValidationException("`%s` is not string" % datum)
-    elif schema_type == 'bytes':
-        if isinstance(datum, str):
-            return True
-        else:
-            raise ValidationException("`%s` is not bytes" % datum)
-    elif schema_type == 'int':
-        if ((isinstance(datum, int) or isinstance(datum, long))
-            and INT_MIN_VALUE <= datum <= INT_MAX_VALUE):
-            return True
-        else:
-            raise ValidationException("`%s` is not int" % datum)
-    elif schema_type == 'long':
-        if ((isinstance(datum, int) or isinstance(datum, long))
-            and LONG_MIN_VALUE <= datum <= LONG_MAX_VALUE):
-            return True
-        else:
-            raise ValidationException("`%s` is not long" % datum)
-    elif schema_type in ['float', 'double']:
-        if (isinstance(datum, int) or isinstance(datum, long)
-            or isinstance(datum, float)):
-            return True
-        else:
-            raise ValidationException("`%s` is not float or double" % datum)
-    elif schema_type == 'fixed':
-        if isinstance(datum, str) and len(datum) == expected_schema.size:
-            return True
-        else:
-            raise ValidationException("`%s` is not fixed" % datum)
-    elif schema_type == 'enum':
-        if datum in expected_schema.symbols:
-            return True
-        else:
-            raise ValidationException("`%s`\n is not a valid enum symbol, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.symbols)))
-    elif schema_type == 'array':
-        if isinstance(datum, list):
-            for i, d in enumerate(datum):
-                try:
-                    validate_ex(expected_schema.items, d)
-                except ValidationException as v:
-                    raise ValidationException("%s\n while validating item at position %i `%s`" % (v, i, d))
-            return True
-        else:
-            raise ValidationException("`%s`\n is not a list, expected list of\n %s" % (pprint.pformat(datum), expected_schema.items))
-    elif schema_type == 'map':
-        if (isinstance(datum, dict) and
-            False not in [isinstance(k, basestring) for k in datum.keys()] and
-            False not in [validate(expected_schema.values, v) for v in datum.values()]):
-            return True
-        else:
-            raise ValidationException("`%s` is not a valid map value, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.values)))
-    elif schema_type in ['union', 'error_union']:
-        if True in [validate(s, datum) for s in expected_schema.schemas]:
-            return True
-        else:
-            errors = []
-            for s in expected_schema.schemas:
-                try:
-                    validate_ex(s, datum)
-                except ValidationException as e:
-                    errors.append(str(e))
-            raise ValidationException("`%s`\n is not valid, expected one of:\n\n%s\n\n the individual errors are:\n%s" % (pprint.pformat(datum), ",\n\n  ".join([str(s) for s in expected_schema.schemas]), ";\n\n".join(errors)))
-    elif schema_type in ['record', 'error', 'request']:
-        if not isinstance(datum, dict):
-            raise ValidationException("`%s`\n is not a dict" % pprint.pformat(datum))
-        try:
-            for f in expected_schema.fields:
-                validate_ex(f.type, datum.get(f.name))
-            return True
-        except ValidationException as v:
-            raise ValidationException("%s\n while validating field `%s`" % (v, f.name))
-    raise ValidationException("Unrecognized schema_type %s" % schema_type)
 
 class Builder(object):
     def jseval(self, expression, context):
@@ -161,7 +58,7 @@ class Builder(object):
                 if t in self.schemaDefs:
                     t = self.schemaDefs[t]
                 avsc = avro.schema.make_avsc_object(t, None)
-                if validate(avsc, datum):
+                if validate.validate(avsc, datum):
                     if isinstance(t, basestring):
                         t = {"type": t}
                     bindings.extend(self.bind_input(t, datum))
@@ -260,55 +157,11 @@ class Builder(object):
 
         return [a for a in args if a is not None]
 
-def makeTool(toolpath_object):
-    if toolpath_object["class"] == "CommandLineTool":
-        return CommandLineTool(toolpath_object)
-    elif toolpath_object["class"] == "ExpressionTool":
-        return ExpressionTool(toolpath_object)
 
-class Tool(object):
-    def __init__(self, toolpath_object, validateAs):
-        self.names = avro.schema.Names()
-        cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl.avsc')
-        with open(cwl_avsc) as f:
-            j = json.load(f)
-            for t in j:
-                avro.schema.make_avsc_object(t, self.names)
-
-        self.tool = toolpath_object
-        if self.tool.get("@context") != TOOL_CONTEXT_URL:
-            raise Exception("Missing or invalid '@context' field in tool description document, must be %s" % TOOL_CONTEXT_URL)
-
-        # Validate tool documument
-        validate_ex(self.names.get_name(validateAs, ""), self.tool)
-
-        # Import schema defs
-        self.schemaDefs = {}
-        if self.tool.get("schemaDefs"):
-            for i in self.tool["schemaDefs"]:
-                avro.schema.make_avsc_object(i, self.names)
-                self.schemaDefs[i["name"]] = i
-
-        # Build record schema from inputs
-        self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
-        for i in self.tool["inputs"]:
-            c = copy.copy(i)
-            c["name"] = c["id"][1:]
-            del c["id"]
-            self.inputs_record_schema["fields"].append(c)
-        avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
-
-        self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
-        for i in self.tool["outputs"]:
-            c = copy.copy(i)
-            c["name"] = c["id"][1:]
-            del c["id"]
-            self.outputs_record_schema["fields"].append(c)
-        avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
-
+class Tool(Process):
     def _init_job(self, joborder, basedir):
         # Validate job order
-        validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
         builder = Builder()
         builder.job = copy.deepcopy(joborder)
@@ -344,6 +197,11 @@ class ExpressionTool(Tool):
 
         return j
 
+def aslist(l):
+    if isinstance(l, list):
+        return l
+    else:
+        return [l]
 
 class CommandLineTool(Tool):
     def __init__(self, toolpath_object):
@@ -352,17 +210,12 @@ class CommandLineTool(Tool):
     def job(self, joborder, basedir, use_container=True):
         builder = self._init_job(joborder, basedir)
 
-        if isinstance(self.tool["baseCommand"], list):
-            for n, b in enumerate(self.tool["baseCommand"]):
+        if self.tool["baseCommand"]:
+            for n, b in enumerate(aslist(self.tool["baseCommand"])):
                 builder.bindings.append({
                     "position": [-1000000, n],
                     "valueFrom": b
                 })
-        else:
-            builder.bindings.append({
-                "position": [-1000000],
-                "valueFrom": self.tool["baseCommand"]
-            })
 
         if self.tool.get("arguments"):
             for i, a in enumerate(self.tool["arguments"]):
@@ -381,7 +234,7 @@ class CommandLineTool(Tool):
 
         builder.files = [f["path"] for f in builder.files]
 
-        j = Job()
+        j = CommandLineJob()
         j.joborder = builder.job
         j.container = None
         j.stdin = None
@@ -444,7 +297,7 @@ class CommandLineTool(Tool):
         custom_output = os.path.join(outdir, "output.cwl.json")
         if os.path.exists(custom_output):
             outputdoc = yaml.load(custom_output)
-            validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
+            validate.validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
             return outputdoc
         return {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
 

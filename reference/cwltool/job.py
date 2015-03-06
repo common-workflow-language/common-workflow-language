@@ -9,7 +9,7 @@ import sys
 
 _logger = logging.getLogger("cwltool")
 
-class Job(object):
+class CommandLineJob(object):
     def run(self, dry_run=False, pull_image=True, outdir=None):
         if not outdir:
             if not dry_run:
@@ -25,9 +25,15 @@ class Job(object):
         if self.container and self.container.get("type") == "docker":
             if pull_image:
                 if "pull" in self.container:
-                    subprocess.check_call(["docker", "pull", self.container["pull"]], stdout=sys.stderr)
+                    cmd = ["docker", "pull", self.container["pull"]]
+                    _logger.info(str(cmd))
+                    if not dry_run:
+                        subprocess.check_call(["docker", "pull", self.container["pull"]], stdout=sys.stderr)
                 elif "import" in self.container:
-                    subprocess.check_call(["docker", "import", self.container["import"]], stdout=sys.stderr)
+                    cmd = ["docker", "import", self.container["import"]]
+                    _logger.info(str(cmd))
+                    if not dry_run:
+                        subprocess.check_call(["docker", "import", self.container["import"]], stdout=sys.stderr)
 
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
@@ -40,38 +46,41 @@ class Job(object):
         stdin = None
         stdout = None
 
-        _logger.info(str(runtime + self.command_line))
+        _logger.info("%s%s%s",
+                     " ".join(runtime + self.command_line),
+                     ' < %s' % (self.stdin) if self.stdin else '',
+                     ' > %s' % (self.stdout) if self.stdout else '')
 
-        if not dry_run:
-            if self.stdin:
-                stdin = open(self.stdin, "rb")
-            else:
-                stdin = subprocess.PIPE
+        if dry_run:
+            return (outdir, {})
 
-            os.chdir(outdir)
+        if self.stdin:
+            stdin = open(self.stdin, "rb")
+        else:
+            stdin = subprocess.PIPE
 
-            if self.stdout:
-                stdout = open(self.stdout, "wb")
-            else:
-                stdout = sys.stderr
+        os.chdir(outdir)
 
-            for t in self.generatefiles:
-                with open(os.path.join(outdir, t), "w") as f:
-                    f.write(self.generatefiles[t])
+        if self.stdout:
+            stdout = open(self.stdout, "wb")
+        else:
+            stdout = sys.stderr
 
-            sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
+        for t in self.generatefiles:
+            with open(os.path.join(outdir, t), "w") as f:
+                f.write(self.generatefiles[t])
 
-            if stdin == subprocess.PIPE:
-                sp.stdin.close()
+        sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
 
-            sp.wait()
+        if stdin == subprocess.PIPE:
+            sp.stdin.close()
 
-            if stdin != subprocess.PIPE:
-                stdin.close()
+        sp.wait()
 
-            if stdout:
-                stdout.close()
+        if stdin != subprocess.PIPE:
+            stdin.close()
 
-            return (outdir, self.collect_outputs(outdir))
+        if stdout:
+            stdout.close()
 
-        return None
+        return (outdir, self.collect_outputs(outdir))
