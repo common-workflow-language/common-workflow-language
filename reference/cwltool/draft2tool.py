@@ -12,10 +12,12 @@ import yaml
 import glob
 import logging
 import hashlib
+import random
 
 _logger = logging.getLogger("cwltool")
 
 TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
+CONTENT_LIMIT = 1024 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -135,11 +137,17 @@ class Builder(object):
 
     def do_eval(self, ex, context=None):
         if isinstance(ex, dict):
-            if ex.get("expressionType") == "javascript":
-                return self.jseval(ex["value"], context)
-            elif ex.get("ref"):
-                with open(os.path.join(self.basedir, ex["ref"]), "r") as f:
-                    return f.read()
+            if ex.get("class") == "JavascriptExpression":
+                if "value" in ex:
+                    return self.jseval(ex["value"], context)
+                elif "invoke" in ex:
+                    return self.jseval(ex["invoke"], context)
+            elif ex.get("id"):
+                if ex["id"].startswith("#"):
+                    return self.job[ex["id"][1:]]
+                else:
+                    with open(os.path.join(self.basedir, ex["id"]), "r") as f:
+                        return f.read()
         else:
             return ex
 
@@ -192,7 +200,7 @@ class Builder(object):
             if schema["type"] == "File":
                 if schema.get("loadContents"):
                     with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
-                        datum["contents"] = f.read()
+                        datum["contents"] = f.read(CONTENT_LIMIT)
                 self.files.append(datum)
 
         b = None
@@ -253,9 +261,9 @@ class Builder(object):
         return [a for a in args if a is not None]
 
 def makeTool(toolpath_object):
-    if toolpath_object["@type"] == "CommandLineTool":
+    if toolpath_object["class"] == "CommandLineTool":
         return CommandLineTool(toolpath_object)
-    elif toolpath_object["@type"] == "ExpressionTool":
+    elif toolpath_object["class"] == "ExpressionTool":
         return ExpressionTool(toolpath_object)
 
 class Tool(object):
@@ -285,16 +293,16 @@ class Tool(object):
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
         for i in self.tool["inputs"]:
             c = copy.copy(i)
-            c["name"] = c["port"][1:]
-            del c["port"]
+            c["name"] = c["id"][1:]
+            del c["id"]
             self.inputs_record_schema["fields"].append(c)
         avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
 
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
         for i in self.tool["outputs"]:
             c = copy.copy(i)
-            c["name"] = c["port"][1:]
-            del c["port"]
+            c["name"] = c["id"][1:]
+            del c["id"]
             self.outputs_record_schema["fields"].append(c)
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
@@ -376,27 +384,38 @@ class CommandLineTool(Tool):
         j = Job()
         j.joborder = builder.job
         j.container = None
+        j.stdin = None
+        j.stdout = None
         builder.pathmapper = None
 
         if self.tool.get("stdin"):
             j.stdin = builder.do_eval(self.tool["stdin"])
+            if isinstance(j.stdin, dict):
+                j.stdin = j.stdin["path"]
             builder.files.append(j.stdin)
-        else:
-            j.stdin = None
 
         if self.tool.get("stdout"):
-            j.stdout = builder.do_eval(self.tool["stdout"])
+            if isinstance(self.tool["stdout"], dict) and "id" in self.tool["stdout"]:
+                for out in self.tool.get("outputs", []):
+                    if out["id"] == self.tool["stdout"]["id"]:
+                        filename = self.tool["stdout"]["id"][1:]
+                        j.stdout = filename
+                        out["outputBinding"] = out.get("outputBinding", {})
+                        out["outputBinding"]["glob"] = filename
+                if not j.stdout:
+                    raise Exception("stdout refers to invalid output")
+            else:
+                j.stdout = builder.do_eval(self.tool["stdout"])
             if os.path.isabs(j.stdout):
                 raise Exception("stdout must be a relative path")
-        else:
-            j.stdout = None
 
         j.generatefiles = {}
         for t in self.tool.get("fileDefs", []):
             j.generatefiles[t["filename"]] = builder.do_eval(t["value"])
 
-        for r in self.tool.get("hints", []):
-            if r["requirementType"] == "DockerImage" and use_container:
+        reqsAndHints = self.tool.get("requirements", []) + self.tool.get("hints", [])
+        for r in reqsAndHints:
+            if r["class"] == "DockerRequirement" and use_container:
                 j.container = {}
                 j.container["type"] = "docker"
                 if "dockerPull" in r:
@@ -427,7 +446,7 @@ class CommandLineTool(Tool):
             outputdoc = yaml.load(custom_output)
             validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
             return outputdoc
-        return {port["port"][1:]: self.collect_output(port, builder, outdir) for port in ports}
+        return {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
 
     def collect_output(self, schema, builder, outdir):
         r = None
@@ -438,11 +457,16 @@ class CommandLineTool(Tool):
                 for files in r:
                     checksum = hashlib.sha1()
                     with open(files["path"], "rb") as f:
-                        contents = f.read()
-                        checksum.update(contents)
+                        contents = f.read(CONTENT_LIMIT)
                         if binding.get("loadContents"):
                             files["contents"] = contents
+                        filesize = 0
+                        while contents != "":
+                            checksum.update(contents)
+                            filesize += len(contents)
+                            contents = f.read(1024*1024)
                     files["checksum"] = "sha1$%s" % checksum.hexdigest()
+                    files["size"] = filesize
 
                 if schema["type"] == "array" and schema["items"] == "File":
                     pass

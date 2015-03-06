@@ -23,11 +23,12 @@
     "map": "avro:map",
     "File": "cwl:File",
 
+    "id": "@id",
+    "class": "@type",
+
     "Expression": "cwl:Expression",
     "ExpressionTool": "cwl:ExpressionTool",
-    "expressionType": "@type",
     "script":"cwl:expressionProcess",
-    "ref": "@id",
 
     "position": "cwl:position",
     "prefix": "cwl:prefix",
@@ -37,7 +38,6 @@
     "glob": "cwl:glob",
 
     "name": "avro:name",
-    "port": "@id",
     "type": {
         "@id": "avro:type",
         "@type": "@vocab"
@@ -60,8 +60,6 @@
     },
     "binding": "cwl:binding",
 
-    "requirementType": "@type",
-
     "CommandLineTool": "cwl:CommandLineTool",
     "baseCommand": {
         "@id": "cwl:baseCommand",
@@ -82,9 +80,13 @@
     "fileDefs": "cwl:fileDefs",
 
     "filename": "cwl:filename",
-    "javascript": "cwl:JavascriptExpression",
+    "JavascriptExpression": "cwl:JavascriptExpression",
+    "invoke": {
+        "@id": "cwl:invoke",
+        "@container": "@list"
+    },
 
-    "DockerImage": "cwl:DockerImage",
+    "DockerRequirement": "cwl:DockerRequirement",
     "dockerPull": "cwl:dockerPull",
     "dockerImport": "cwl:dockerImport",
     "dockerImageId": "cwl:dockerImageId",

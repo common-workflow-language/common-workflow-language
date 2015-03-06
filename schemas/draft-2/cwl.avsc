@@ -31,7 +31,7 @@
         "type": "record",
         "name": "Expression",
         "fields": [
-            { "name": "expressionType", "type": "string" }
+            { "name": "class", "type": "string" }
         ]
     },
 
@@ -39,7 +39,7 @@
         "type": "record",
         "name": "Ref",
         "fields": [
-            { "name": "ref", "type": "string" }
+            { "name": "id", "type": "string" }
         ]
     },
 
@@ -71,7 +71,7 @@
         "name": "Schema",
         "fields": [
             { "name": "name", "type": ["null", "string"] },
-            { "name": "port", "type": ["null", "string"] },
+            { "name": "id", "type": ["null", "string"] },
             {
                 "name": "type",
                 "type": [
@@ -145,7 +145,7 @@
         "type": "record",
         "name": "ToolDependency",
         "fields": [
-            { "name": "requirementType", "type": "string" }
+            { "name": "class", "type": "string" }
         ]
     },
 
@@ -187,11 +187,11 @@
             },
             {
                 "name": "stdin",
-                "type": ["null", "Expression"]
+                "type": ["null", "Expression", "Ref"]
             },
             {
                 "name": "stdout",
-                "type": ["null", "string", "Expression"]
+                "type": ["null", "string", "Expression", "Ref"]
             },
             {
                 "name": "inputs",

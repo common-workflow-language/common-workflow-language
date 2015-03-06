@@ -1,6 +1,5 @@
 {
     "file1": {
-        "@type": "File",
         "path": "hello.txt"
     }
 }

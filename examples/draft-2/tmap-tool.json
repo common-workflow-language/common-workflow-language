@@ -1,15 +1,15 @@
 
 {
-    "@type": "CommandLineTool",
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
+    "class": "CommandLineTool",
 
     "inputs": [
         {
-            "port": "#reads",
+            "id": "#reads",
             "type": "File"
         },
         {
-            "port": "#stages",
+            "id": "#stages",
             "commandLineBinding": {
                 "position": 1
             },
@@ -21,7 +21,7 @@
     ],
     "outputs": [
         {
-            "port": "#sam",
+            "id": "#sam",
             "outputBinding": {
                 "glob": "output.sam"
             },
@@ -242,7 +242,7 @@
     ],
     "baseCommand": ["tmap", "mapall"],
     "stdin": {
-        "expressionType": "javascript",
+        "class": "JavascriptExpression",
         "value": "$job.reads.path"
     },
     "stdout": "output.sam"

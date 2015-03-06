@@ -1,18 +1,17 @@
 {
-    "@type": "ExpressionTool",
-
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
+    "class": "ExpressionTool",
     "inputs": [{
-        "port": "#file1",
+        "id": "#file1",
         "type": "File",
         "loadContents": true
     }],
     "outputs": [{
-        "port": "#output",
+        "id": "#output",
         "type": "int"
     }],
     "script": {
-        "expressionType": "javascript",
+        "class": "JavascriptExpression",
         "value": "{return {'output': parseInt($job.file1.contents)};}"
     }
 }

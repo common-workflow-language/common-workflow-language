@@ -1,29 +1,29 @@
 {
-    "@type": "CommandLineTool",
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
+    "class": "CommandLineTool",
     "requirements": [
         {
-            "requirementType": "MemoryRequirement",
+            "class": "MemoryRequirement",
             "value": 5000
         }
     ],
     "hints": [
         {
-            "requirementType": "DockerImage",
+            "class": "DockerRequirement",
             "dockerPull": "images.sbgenomics.com/rabix/bwa",
             "dockerImageId": "9d3b9b0359cf"
         }
     ],
     "inputs": [
         {
-            "port": "#reference",
+            "id": "#reference",
             "type": "File",
             "commandLineBinding": {
                 "position": 2
             }
         },
         {
-            "port": "#reads",
+            "id": "#reads",
             "type": {
                 "type": "array",
                 "items": "File",
@@ -33,7 +33,7 @@
             }
         },
         {
-            "port": "#minimum_seed_length",
+            "id": "#minimum_seed_length",
             "type": "int",
             "commandLineBinding": {
                 "position": 1,
@@ -41,7 +41,7 @@
             }
         },
         {
-            "port": "#min_std_max_min",
+            "id": "#min_std_max_min",
             "type": {
                 "type": "array",
                 "items": "int"
@@ -55,7 +55,7 @@
     ],
     "outputs": [
         {
-            "port": "#sam",
+            "id": "#sam",
             "type": "File",
             "outputBinding": {
                 "glob": "output.sam"
@@ -66,7 +66,7 @@
     "arguments": [
         {
             "valueFrom": {
-                "expressionType": "javascript",
+                "class": "JavascriptExpression",
                 "value": "$job.allocatedResources.cpu"
             },
             "position": 1,
