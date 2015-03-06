@@ -15,7 +15,7 @@ import hashlib
 
 _logger = logging.getLogger("cwltool")
 
-TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json"
+TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 

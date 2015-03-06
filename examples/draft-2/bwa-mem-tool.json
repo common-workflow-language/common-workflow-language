@@ -1,6 +1,6 @@
 {
     "@type": "CommandLineTool",
-    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/draft-2-pa/schemas/draft-2/context.json",
+    "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
     "requirements": [
         {
             "requirementType": "MemoryRequirement",
