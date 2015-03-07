@@ -48,7 +48,7 @@
             }],
             "script": {
                 "class": "JavascriptExpression",
-                "value": "{return {'output': parseInt($job.file1.contents)};}"
+                "value": "{return {'step2_output': parseInt($job.step2_file1.contents)};}"
             }
         }
     ],

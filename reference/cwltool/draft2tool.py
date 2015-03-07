@@ -306,7 +306,7 @@ class CommandLineTool(Tool):
         if "outputBinding" in schema:
             binding = schema["outputBinding"]
             if "glob" in binding:
-                r = [{"path": g} for g in glob.glob(binding["glob"])]
+                r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
                 for files in r:
                     checksum = hashlib.sha1()
                     with open(files["path"], "rb") as f:
