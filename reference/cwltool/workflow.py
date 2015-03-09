@@ -14,12 +14,15 @@ def makeTool(toolpath_object):
         return draft1tool.Tool(toolpath_object)
     elif "impl" in toolpath_object and toolpath_object.get("class", "External") == "External":
         return External(toolpath_object)
-    elif toolpath_object["class"] == "CommandLineTool":
-        return draft2tool.CommandLineTool(toolpath_object)
-    elif toolpath_object["class"] == "ExpressionTool":
-        return draft2tool.ExpressionTool(toolpath_object)
-    elif toolpath_object["class"] == "Workflow":
-        return Workflow(toolpath_object)
+    if "class" in toolpath_object:
+        if toolpath_object["class"] == "CommandLineTool":
+            return draft2tool.CommandLineTool(toolpath_object)
+        elif toolpath_object["class"] == "ExpressionTool":
+            return draft2tool.ExpressionTool(toolpath_object)
+        elif toolpath_object["class"] == "Workflow":
+            return Workflow(toolpath_object)
+    else:
+        raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 class WorkflowJob(object):
     def try_make_job(self, s):

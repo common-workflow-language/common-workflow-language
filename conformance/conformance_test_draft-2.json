@@ -106,6 +106,13 @@
         }
     },
     {
+        "tool": "draft-2/count-lines1-wf.cwl",
+        "job": "draft-2/wc-job.json",
+        "output": {
+            "count_output": 16
+        }
+    },
+    {
         "tool": "draft-2/count-lines2-wf.cwl",
         "job": "draft-2/wc-job.json",
         "output": {

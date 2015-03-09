@@ -212,7 +212,7 @@
                     "null",
                     {
                         "type": "array",
-                        "items": "CommandLineBinding"
+                        "items": ["string", "CommandLineBinding"]
                     }
                 ]
             },

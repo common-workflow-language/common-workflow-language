@@ -219,13 +219,19 @@ class CommandLineTool(Tool):
 
         if self.tool.get("arguments"):
             for i, a in enumerate(self.tool["arguments"]):
-                a = copy.copy(a)
-                if a.get("position"):
-                    a["position"] = [a["position"], i]
+                if isinstance(a, dict):
+                    a = copy.copy(a)
+                    if a.get("position"):
+                        a["position"] = [a["position"], i]
+                    else:
+                        a["position"] = [0, i]
+                    a["valueFrom"] = builder.do_eval(a["valueFrom"])
+                    builder.bindings.append(a)
                 else:
-                    a["position"] = [0, i]
-                a["valueFrom"] = builder.do_eval(a["valueFrom"])
-                builder.bindings.append(a)
+                    builder.bindings.append({
+                        "position": [0, i],
+                        "valueFrom": a
+                    })
 
         builder.bindings.sort(key=lambda a: a["position"])
 
