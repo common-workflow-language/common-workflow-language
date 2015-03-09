@@ -1,6 +1,6 @@
 [
     {
-        "tool": "draft-2/bwa-mem-tool.json",
+        "tool": "draft-2/bwa-mem-tool.cwl",
         "job": "draft-2/bwa-mem-job.json",
         "args": ["bwa", "mem", "-t", "4", "-I", "1,2,3,4", "-m", "3",
                     "draft-2/rabix/tests/test-files/chr20.fa",
@@ -9,7 +9,7 @@
         "stdout": "output.sam"
     },
     {
-        "tool": "draft-2/tmap-tool.json",
+        "tool": "draft-2/tmap-tool.cwl",
         "job": "draft-2/tmap-job.json",
         "args": ["tmap", "mapall",
                  "stage1",
@@ -22,36 +22,36 @@
         "stdout": "output.sam"
     },
     {
-        "tool": "draft-2/cat1-tool.json",
+        "tool": "draft-2/cat1-tool.cwl",
         "job": "draft-2/cat-job.json",
         "args": ["cat", "draft-2/hello.txt"]
     },
     {
-        "tool": "draft-2/cat1-tool.json",
+        "tool": "draft-2/cat1-tool.cwl",
         "job": "draft-2/cat-n-job.json",
         "args": ["cat", "-n", "draft-2/hello.txt"]
     },
     {
-        "tool": "draft-2/cat2-tool.json",
+        "tool": "draft-2/cat2-tool.cwl",
         "job": "draft-2/cat-job.json",
         "args": ["cat"],
         "stdin": "draft-2/hello.txt"
     },
     {
-        "tool": "draft-2/cat3-tool.json",
+        "tool": "draft-2/cat3-tool.cwl",
         "job": "draft-2/cat-job.json",
         "args": ["cat", "draft-2/hello.txt"],
         "stdout": "output.txt"
     },
     {
-        "tool": "draft-2/cat4-tool.json",
+        "tool": "draft-2/cat4-tool.cwl",
         "job": "draft-2/cat-job.json",
         "args": ["cat"],
         "stdin": "draft-2/hello.txt",
         "stdout": "output.txt"
     },
     {
-        "tool": "draft-2/template-tool.yaml",
+        "tool": "draft-2/template-tool.cwl",
         "job": "draft-2/cat-job.json",
         "args": ["cat", "foo.txt"],
         "generatefiles": {
@@ -59,7 +59,7 @@
         }
     },
     {
-        "tool": "draft-2/cat3-tool.json",
+        "tool": "draft-2/cat3-tool.cwl",
         "job": "draft-2/cat-job.json",
         "output": {
             "output_file": {
@@ -70,7 +70,7 @@
         }
     },
     {
-        "tool": "draft-2/cat4-tool.json",
+        "tool": "draft-2/cat4-tool.cwl",
         "job": "draft-2/cat-job.json",
         "output": {
             "output.txt": {
@@ -81,7 +81,7 @@
         }
     },
     {
-        "tool": "draft-2/wc-tool.json",
+        "tool": "draft-2/wc-tool.cwl",
         "job": "draft-2/wc-job.json",
         "output": {
             "output": {
@@ -92,14 +92,14 @@
         }
     },
     {
-        "tool": "draft-2/parseInt-tool.json",
+        "tool": "draft-2/parseInt-tool.cwl",
         "job": "draft-2/parseInt-job.json",
         "output": {
             "output": 42
         }
     },
     {
-        "tool": "draft-2/wc2-tool.json",
+        "tool": "draft-2/wc2-tool.cwl",
         "job": "draft-2/wc-job.json",
         "output": {
             "output": 16

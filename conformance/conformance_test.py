@@ -60,6 +60,9 @@ def run_test(i, t):
     failed = False
     if "output" in t:
         checkkeys = ["output"]
+        for a in t["output"]:
+            if isinstance(t["output"][a], dict) and "path" in t["output"][a]:
+                t["output"][a]["path"] = os.path.join(outdir, t["output"][a]["path"])
     else:
         checkkeys = ["args", "stdin", "stdout", "generatefiles"]
 
