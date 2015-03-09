@@ -68,6 +68,33 @@
 
     {
         "type": "record",
+        "name": "DataLink",
+        "fields": [
+            { "name": "source", "type": "string" }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "ExternallyDefinedInput",
+        "fields": [
+            { "name": "def", "type": "string" },
+            { "name": "connect", "type": "DataLink" },
+            { "name": "id", "type": ["null", "string"] }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "ExternallyDefinedOutput",
+        "fields": [
+            { "name": "def", "type": "string" },
+            { "name": "id", "type": "string" }
+        ]
+    },
+
+    {
+        "type": "record",
         "name": "Schema",
         "fields": [
             { "name": "name", "type": ["null", "string"] },
@@ -137,6 +164,10 @@
             {
                 "name": "outputBinding",
                 "type": [ "null", "OutputBinding" ]
+            },
+            {
+                "name": "connect",
+                "type": [ "null", "DataLink" ]
             }
         ]
     },
@@ -313,14 +344,14 @@
                 "name": "inputs",
                 "type": {
                     "type": "array",
-                    "items": "Schema"
+                    "items": ["Schema", "ExternallyDefinedInput"]
                 }
             },
             {
                 "name": "outputs",
                 "type": {
                     "type": "array",
-                    "items": "Schema"
+                    "items": ["Schema", "ExternallyDefinedOutput"]
                 }
             },
             {
