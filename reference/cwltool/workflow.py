@@ -159,17 +159,27 @@ class External(Process):
         for i in toolpath_object["inputs"]:
             d = i["def"][len(self.impl):]
             toolid = i.get("id", self.id + "." + d[1:])
+            found = False
             for a in self.embedded_tool.tool["inputs"]:
                 if a["id"] == d:
                     i.update(a)
+                    found = True
+            if not found:
+                raise Exception("Did not find input '%s' in external process" % (i["def"]))
+
             i["id"] = toolid
 
         for i in toolpath_object["outputs"]:
             d = i["def"][len(self.impl):]
             toolid = i["id"]
+            found = False
             for a in self.embedded_tool.tool["outputs"]:
                 if a["id"] == d:
                     i.update(a)
+                    found = True
+            if not found:
+                raise Exception("Did not find output '%s' in external process" % (i["def"]))
+
             i["id"] = toolid
 
         super(External, self).__init__(toolpath_object, "Process")
