@@ -1,6 +1,7 @@
 import job
 import draft1tool
 import draft2tool
+from draft2tool import aslist
 from process import Process
 import copy
 import logging
@@ -24,17 +25,28 @@ def makeTool(toolpath_object):
     else:
         raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
+def check_types(src, dest):
+    return src["type"] == dest["type"]
+
 class WorkflowJob(object):
     def try_make_job(self, s):
         jo = {}
         for i in s.tool["inputs"]:
             _logger.debug(i)
             if "connect" in i:
-                src = i["connect"]["source"][1:]
-                if self.state.get(src):
-                    jo[i["id"][1:]] = self.state.get(src)
+                connect = i["connect"]
+                if isinstance(connect, list):
+                    # Handle multiple inputs
+                    pass
                 else:
-                    return None
+                    src = connect["source"][1:]
+                    if src in self.state:
+                        if check_types(self.state[src][0], i):
+                            jo[i["id"][1:]] = self.state[src][1]
+                        else:
+                            raise Exception("Type mismatch '%s' and '%s'" % (src, i["id"][1:]))
+                    else:
+                        return None
         _logger.info("Creating job with input: %s", jo)
         return s.job(jo, self.basedir)
 
@@ -54,7 +66,7 @@ class WorkflowJob(object):
                             _logger.info("Job got output: %s", output)
                             if "id" in i:
                                 if i["id"][1:] in output:
-                                    self.state[i["id"][1:]] = output[i["id"][1:]]
+                                    self.state[i["id"][1:]] = (i, output[i["id"][1:]])
                                 else:
                                     raise Exception("Output is missing expected field %s" % i["id"][1:])
                         s.completed = True
@@ -67,7 +79,7 @@ class WorkflowJob(object):
         for i in self.outputs:
             if "connect" in i:
                 src = i["connect"]["source"][1:]
-                wo[i["id"][1:]] = self.state[src]
+                wo[i["id"][1:]] = self.state[src][1]
 
         return (outdir, wo)
 
@@ -81,7 +93,12 @@ class Workflow(Process):
         wj.basedir = basedir
         wj.steps = [makeTool(s) for s in self.tool.get("steps", [])]
         random.shuffle(wj.steps)
-        wj.state = copy.deepcopy(joborder)
+
+        wj.state = {}
+        for i in self.tool["inputs"]:
+            iid = i["id"][1:]
+            wj.state[iid] = (i, copy.deepcopy(joborder[iid]))
+        print wj.state
         wj.outputs = self.tool["outputs"]
         return wj
 
