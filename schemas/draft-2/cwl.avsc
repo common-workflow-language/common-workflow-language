@@ -79,7 +79,16 @@
         "name": "ExternallyDefinedInput",
         "fields": [
             { "name": "def", "type": "string" },
-            { "name": "connect", "type": "DataLink" },
+            {
+                "name": "connect",
+                "type": [
+                    "DataLink",
+                    {
+                        "type": "array",
+                        "items": "DataLink"
+                    }
+                ]
+            },
             { "name": "id", "type": ["null", "string"] }
         ]
     },
@@ -167,7 +176,14 @@
             },
             {
                 "name": "connect",
-                "type": [ "null", "DataLink" ]
+                "type": [
+                    "null",
+                    "DataLink",
+                    {
+                        "type": "array",
+                        "items": "DataLink"
+                    }
+                ]
             }
         ]
     },

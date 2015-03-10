@@ -35,13 +35,13 @@ def main():
     if args.debug:
         logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
+    basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
+
     try:
-        t = workflow.makeTool(from_url(args.tool))
+        t = workflow.makeTool(from_url(args.tool), basedir)
     except (jsonschema.exceptions.ValidationError, validate.ValidationException):
         _logger.exception("Tool definition failed validation")
         return 1
-
-    basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
 
     try:
         job = t.job(from_url(args.job_order), basedir, use_container=(not args.no_container))

@@ -58,7 +58,9 @@
         "@id": "avro:values",
         "@type": "@vocab"
     },
-    "binding": "cwl:binding",
+    "commandLineBinding": "cwl:commandLineBinding",
+    "outputBinding": "cwl:outputBinding",
+    "default": "cwl:default",
 
     "CommandLineTool": "cwl:CommandLineTool",
     "baseCommand": {

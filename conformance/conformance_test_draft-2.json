@@ -118,5 +118,33 @@
         "output": {
             "count_output": 16
         }
+    },
+    {
+        "tool": "draft-2/count-lines3-wf.cwl",
+        "job": "draft-2/count-lines3-job.json",
+        "output": {
+            "count_output": [16, 1]
+        }
+    },
+    {
+        "tool": "draft-2/count-lines4-wf.cwl",
+        "job": "draft-2/count-lines4-job.json",
+        "output": {
+            "count_output": [16, 1]
+        }
+    },
+    {
+        "tool": "draft-2/count-lines5-wf.cwl",
+        "job": "draft-2/empty.json",
+        "output": {
+            "count_output": 1
+        }
+    },
+    {
+        "tool": "draft-2/count-lines5-wf.cwl",
+        "job": "draft-2/wc-job.json",
+        "output": {
+            "count_output": 16
+        }
     }
 ]

@@ -115,6 +115,7 @@ class Builder(object):
 
             if "valueFrom" in b:
                 b["valueFrom"] = self.do_eval(b["valueFrom"], datum)
+                b["is_eval"] = True
             else:
                 b["valueFrom"] = datum
 
@@ -133,18 +134,20 @@ class Builder(object):
         if isinstance(value, list):
             if binding.get("itemSeparator"):
                 l = [binding["itemSeparator"].join([str(v) for v in value])]
+            elif binding.get("is_eval"):
+                return ([prefix] if prefix else []) + value
             elif prefix:
-                return [prefix]
-        elif binding.get("is_file"):
-            l = [self.pathmapper.mapper(value["path"])]
-        elif isinstance(value, dict):
-            if prefix:
-                return [prefix]
-        elif isinstance(value, bool):
-            if value and prefix:
                 return [prefix]
             else:
                 return []
+        elif binding.get("is_file"):
+            l = [self.pathmapper.mapper(value["path"])]
+        elif isinstance(value, dict):
+            return [prefix] if prefix else []
+        elif value is True and prefix:
+            return [prefix]
+        elif value is False or value is None:
+            return []
         else:
             l = [value]
 

@@ -7,14 +7,15 @@ import copy
 import logging
 import random
 from ref_resolver import from_url
+import os
 
 _logger = logging.getLogger("cwltool")
 
-def makeTool(toolpath_object):
+def makeTool(toolpath_object, basedir):
     if "schema" in toolpath_object:
         return draft1tool.Tool(toolpath_object)
     elif "impl" in toolpath_object and toolpath_object.get("class", "External") == "External":
-        return External(toolpath_object)
+        return External(toolpath_object, basedir)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
             return draft2tool.CommandLineTool(toolpath_object)
@@ -25,29 +26,55 @@ def makeTool(toolpath_object):
     else:
         raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
-def check_types(src, dest):
-    return src["type"] == dest["type"]
+
+def should_fanout(src_type, dest_type):
+    if isinstance(src_type, dict):
+        if src_type["type"] == "array" and src_type["items"] == dest_type:
+            return True
+    return False
 
 class WorkflowJob(object):
     def try_make_job(self, s):
         jo = {}
+        fanout = None
         for i in s.tool["inputs"]:
             _logger.debug(i)
             if "connect" in i:
                 connect = i["connect"]
                 if isinstance(connect, list):
                     # Handle multiple inputs
-                    pass
-                else:
-                    src = connect["source"][1:]
+                    if not fanout:
+                        fanout = i["id"][1:]
+                        jo[i["id"][1:]] = []
+                    else:
+                        raise Exception("Can only fanout on one port")
+                for c in aslist(connect):
+                    src = c["source"][1:]
                     if src in self.state:
-                        if check_types(self.state[src][0], i):
-                            jo[i["id"][1:]] = self.state[src][1]
+                        if self.state[src][0]["type"] == i["type"]:
+                            if fanout:
+                                jo[i["id"][1:]].append(self.state[src][1])
+                            else:
+                                jo[i["id"][1:]] = self.state[src][1]
+                        elif should_fanout(self.state[src][0]["type"], i["type"]):
+                            if fanout:
+                                if fanout == i["id"][1:]:
+                                    jo[i["id"][1:]].extend(self.state[src][1])
+                                else:
+                                    raise Exception("Can only fanout on one port")
+                            else:
+                                fanout = i["id"][1:]
+                                jo[i["id"][1:]] = self.state[src][1]
                         else:
                             raise Exception("Type mismatch '%s' and '%s'" % (src, i["id"][1:]))
                     else:
                         return None
+            elif "default" in i:
+                jo[i["id"][1:]] = i["default"]
+
         _logger.info("Creating job with input: %s", jo)
+        if fanout:
+            s = Fanout(s, fanout)
         return s.job(jo, self.basedir)
 
     def run(self, outdir=None, **kwargs):
@@ -91,14 +118,16 @@ class Workflow(Process):
     def job(self, joborder, basedir, use_container=True):
         wj = WorkflowJob()
         wj.basedir = basedir
-        wj.steps = [makeTool(s) for s in self.tool.get("steps", [])]
+        wj.steps = [makeTool(s, basedir) for s in self.tool.get("steps", [])]
         random.shuffle(wj.steps)
 
         wj.state = {}
         for i in self.tool["inputs"]:
             iid = i["id"][1:]
-            wj.state[iid] = (i, copy.deepcopy(joborder[iid]))
-        print wj.state
+            if iid in joborder:
+                wj.state[iid] = (i, copy.deepcopy(joborder[iid]))
+            elif "default" in i:
+                wj.state[iid] = (i, copy.deepcopy(i["default"]))
         wj.outputs = self.tool["outputs"]
         return wj
 
@@ -118,9 +147,9 @@ class ExternalJob(object):
         return (outdir, output)
 
 class External(Process):
-    def __init__(self, toolpath_object):
+    def __init__(self, toolpath_object, basedir):
         self.impl = toolpath_object["impl"]
-        self.embedded_tool = makeTool(from_url(self.impl))
+        self.embedded_tool = makeTool(from_url(os.path.join(basedir, self.impl)), basedir)
 
         if "id" in toolpath_object:
             self.id = toolpath_object["id"]
@@ -152,3 +181,37 @@ class External(Process):
             del joborder[i["id"][1:]]
 
         return ExternalJob(self.tool, self.embedded_tool.job(joborder, basedir, **kwargs))
+
+class FanoutJob(object):
+    def __init__(self, outputports, jobs):
+        self.outputports = outputports
+        self.jobs = jobs
+
+    def run(self, **kwargs):
+        outputs = {}
+        for outschema in self.outputports:
+            outputs[outschema["id"][1:]] = []
+        for j in self.jobs:
+            (_, out) = j.run(**kwargs)
+            for outschema in self.outputports:
+                outputs[outschema["id"][1:]].append(out[outschema["id"][1:]])
+        return (None, outputs)
+
+class Fanout(object):
+    def __init__(self, process, fanout_key):
+        self.process = process
+        self.fanout_key = fanout_key
+        self.outputports = []
+        for out in self.process.tool["outputs"]:
+            newout = copy.deepcopy(out)
+            newout["type"] = {"type": "array", "items": out["type"]}
+            self.outputports.append(newout)
+        self.tool = {"outputs": self.outputports}
+
+    def job(self, joborder, basedir, **kwargs):
+        jobs = []
+        for fn in joborder[self.fanout_key]:
+            jo = copy.copy(joborder)
+            jo[self.fanout_key] = fn
+            jobs.append(self.process.job(jo, basedir, **kwargs))
+        return FanoutJob(self.outputports, jobs)
