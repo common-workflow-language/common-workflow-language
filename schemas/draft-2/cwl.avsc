@@ -23,7 +23,19 @@
         "type": "record",
         "name": "File",
         "fields": [
-            { "name": "path", "type": "string" }
+            { "name": "path", "type": "string" },
+            { "name": "checksum", "type": ["null", "string"] },
+            { "name": "size", "type": ["null", "long"] },
+            {
+                "name": "secondaryFiles",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "File"
+                    }
+                ]
+            }
         ]
     },
 

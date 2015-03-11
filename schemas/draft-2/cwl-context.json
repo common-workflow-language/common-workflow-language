@@ -90,7 +90,7 @@
 
     "DockerRequirement": "cwl:DockerRequirement",
     "dockerPull": "cwl:dockerPull",
-    "dockerImport": "cwl:dockerImport",
+    "dockerImport": "cwl:dockerLoad",
     "dockerImageId": "cwl:dockerImageId",
 
     "CPURequirement": "cwl:CPURequirement",

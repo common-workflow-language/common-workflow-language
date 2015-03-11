@@ -58,7 +58,7 @@ def main():
             (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
             _logger.info("Output directory is %s", outdir)
             print json.dumps(runjob)
-    except jsonschema.exceptions.ValidationError:
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
         _logger.exception("Job order failed validation")
         return 1
 

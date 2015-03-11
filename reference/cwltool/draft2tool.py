@@ -114,10 +114,8 @@ class Builder(object):
                 bi["position"] = b["position"] + bi["position"]
 
             if "valueFrom" in b:
-                b["valueFrom"] = self.do_eval(b["valueFrom"], datum)
-                b["is_eval"] = True
-            else:
-                b["valueFrom"] = datum
+                b["do_eval"] = b["valueFrom"]
+            b["valueFrom"] = datum
 
             if schema["type"] == "File":
                 b["is_file"] = True
@@ -127,6 +125,9 @@ class Builder(object):
 
     def generate_arg(self, binding):
         value = binding["valueFrom"]
+        if "do_eval" in binding:
+            value = self.do_eval(binding["do_eval"], value)
+
         prefix = binding.get("prefix")
         sep = binding.get("separator")
 
@@ -134,7 +135,7 @@ class Builder(object):
         if isinstance(value, list):
             if binding.get("itemSeparator"):
                 l = [binding["itemSeparator"].join([str(v) for v in value])]
-            elif binding.get("is_eval"):
+            elif binding.get("do_eval"):
                 return ([prefix] if prefix else []) + value
             elif prefix:
                 return [prefix]
@@ -228,7 +229,8 @@ class CommandLineTool(Tool):
                         a["position"] = [a["position"], i]
                     else:
                         a["position"] = [0, i]
-                    a["valueFrom"] = builder.do_eval(a["valueFrom"])
+                    a["do_eval"] = a["valueFrom"]
+                    a["valueFrom"] = None
                     builder.bindings.append(a)
                 else:
                     builder.bindings.append({
@@ -241,7 +243,7 @@ class CommandLineTool(Tool):
         _logger.debug(pprint.pformat(builder.bindings))
         _logger.debug(pprint.pformat(builder.files))
 
-        builder.files = [f["path"] for f in builder.files]
+        reffiles = [f["path"] for f in builder.files]
 
         j = CommandLineJob()
         j.joborder = builder.job
@@ -254,7 +256,7 @@ class CommandLineTool(Tool):
             j.stdin = builder.do_eval(self.tool["stdin"])
             if isinstance(j.stdin, dict):
                 j.stdin = j.stdin["path"]
-            builder.files.append(j.stdin)
+            reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
             if isinstance(self.tool["stdout"], dict) and "id" in self.tool["stdout"]:
@@ -282,16 +284,23 @@ class CommandLineTool(Tool):
                 j.container["type"] = "docker"
                 if "dockerPull" in r:
                     j.container["pull"] = r["dockerPull"]
-                if "dockerImport" in r:
-                    j.container["import"] = r["dockerImport"]
+                if "dockerLoad" in r:
+                    if r["dockerLoad"].startswith("http"):
+                        j.container["load"] = r["dockerLoad"]
+                    else:
+                        j.container["load"] = os.path.join(basedir, r["dockerLoad"])
                 if "dockerImageId" in r:
                     j.container["imageId"] = r["dockerImageId"]
                 else:
                     j.container["imageId"] = r["dockerPull"]
-                builder.pathmapper = DockerPathMapper(builder.files, basedir)
+                builder.pathmapper = DockerPathMapper(reffiles, basedir)
 
         if builder.pathmapper is None:
-            builder.pathmapper = PathMapper(builder.files, basedir)
+            builder.pathmapper = PathMapper(reffiles, basedir)
+
+        for f in builder.files:
+            f["path"] = builder.pathmapper.mapper(f["path"])
+
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
         if j.stdin:
@@ -308,7 +317,8 @@ class CommandLineTool(Tool):
             outputdoc = yaml.load(custom_output)
             validate.validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
             return outputdoc
-        return {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
+        ret = {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
+        return ret if ret is not None else {}
 
     def collect_output(self, schema, builder, outdir):
         r = None

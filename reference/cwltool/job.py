@@ -6,6 +6,7 @@ import json
 import yaml
 import logging
 import sys
+import requests
 
 _logger = logging.getLogger("cwltool")
 
@@ -23,25 +24,53 @@ class CommandLineJob(object):
         runtime = []
 
         if self.container and self.container.get("type") == "docker":
-            if pull_image:
+            found = False
+            for ln in subprocess.check_output(["docker", "images", "--no-trunc"]).splitlines():
+                try:
+                    ln.index(self.container["imageId"])
+                    found = True
+                except ValueError:
+                    pass
+
+            if not found and pull_image:
                 if "pull" in self.container:
                     cmd = ["docker", "pull", self.container["pull"]]
                     _logger.info(str(cmd))
                     if not dry_run:
-                        subprocess.check_call(["docker", "pull", self.container["pull"]], stdout=sys.stderr)
-                elif "import" in self.container:
-                    cmd = ["docker", "import", self.container["import"]]
+                        subprocess.check_call(cmd, stdout=sys.stderr)
+                        found = True
+                elif "load" in self.container:
+                    cmd = ["docker", "load"]
                     _logger.info(str(cmd))
                     if not dry_run:
-                        subprocess.check_call(["docker", "import", self.container["import"]], stdout=sys.stderr)
+                        if os.path.exists(self.container["load"]):
+                            _logger.info("Loading docker image from %s", self.container["load"])
+                            with open(self.container["load"], "rb") as f:
+                                loadproc = subprocess.Popen(cmd, stdin=f, stdout=sys.stderr)
+                        else:
+                            _logger.info("Sending GET request to %s", self.container["load"])
+                            req = requests.get(self.container["load"], stream=True)
+                            n = 0
+                            for chunk in req.iter_content(1024*1024):
+                                n += len(chunk)
+                                _logger.info(str(n))
+                                loadproc.stdin.write(chunk)
+                            loadproc.stdin.close()
+                        rcode = loadproc.wait()
+                        if rcode != 0:
+                            raise Exception("Docker load returned non-zero exit status %i" % (rcode))
+                        found = True
 
-            runtime = ["docker", "run", "-i"]
-            for d in self.pathmapper.dirs:
-                runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
-            runtime.append("--volume=%s:%s:ro" % (os.path.abspath(outdir), "/tmp/job_output"))
-            runtime.append("--workdir=%s" % ("/tmp/job_output"))
-            runtime.append("--user=%s" % (os.geteuid()))
-            runtime.append(self.container["imageId"])
+            if found:
+                runtime = ["docker", "run", "-i"]
+                for d in self.pathmapper.dirs:
+                    runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
+                runtime.append("--volume=%s:%s:rw" % (os.path.abspath(outdir), "/tmp/job_output"))
+                runtime.append("--workdir=%s" % ("/tmp/job_output"))
+                runtime.append("--user=%s" % (os.geteuid()))
+                runtime.append(self.container["imageId"])
+            else:
+                raise Exception("Docker image %s not found" % (self.container["imageId"]))
 
         stdin = None
         stdout = None
@@ -80,7 +109,7 @@ class CommandLineJob(object):
         if stdin != subprocess.PIPE:
             stdin.close()
 
-        if stdout:
+        if stdout != sys.stderr:
             stdout.close()
 
         return (outdir, self.collect_outputs(outdir))
