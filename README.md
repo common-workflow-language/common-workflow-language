@@ -60,7 +60,7 @@ the repository and send a pull request!
 * [BioDatomics](http://www.biodatomics.com/)
 * [Michigan State University](http://ged.msu.edu/)
 
-## Individual Contributers
+## Individual Contributors
 
 * Peter Amstutz <peter.amstutz@curoverse.com>
 * John Chilton <jmchilton@gmail.com>
