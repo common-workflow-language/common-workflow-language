@@ -53,22 +53,22 @@ the repository and send a pull request!
 
 ## Participating Organizations
 
-[Curoverse](http://curoverse.com)
-[Seven Bridges Genomics](http://sbgenomics.com)
-[Galaxy](http://galaxyproject.org/)
-[Institut Pasteur](http://www.pasteur.fr)
-[BioDatomics](http://www.biodatomics.com/)
-[Michigan State University](http://ged.msu.edu/)
+* [Curoverse](http://curoverse.com)
+* [Seven Bridges Genomics](http://sbgenomics.com)
+* [Galaxy](http://galaxyproject.org/)
+* [Institut Pasteur](http://www.pasteur.fr)
+* [BioDatomics](http://www.biodatomics.com/)
+* [Michigan State University](http://ged.msu.edu/)
 
 ## Individual Contributers
 
-Peter Amstutz <peter.amstutz@curoverse.com>
-John Chilton <jmchilton@gmail.com>
-Michael Crusoe <michael.crusoe@gmail.com>
-John Kern <kern3020@gmail.com>
-Hervé Ménager <herve.menager@gmail.com>
-Maxim Mikheev <mikhmv@biodatomics.com>
-Tim Pierce <twp@unchi.org>
-Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
-Luka Stojanovic <luka.stojanovic@sbgenomics.com>
-Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>
+* Peter Amstutz <peter.amstutz@curoverse.com>
+* John Chilton <jmchilton@gmail.com>
+* Michael Crusoe <michael.crusoe@gmail.com>
+* John Kern <kern3020@gmail.com>
+* Hervé Ménager <herve.menager@gmail.com>
+* Maxim Mikheev <mikhmv@biodatomics.com>
+* Tim Pierce <twp@unchi.org>
+* Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
+* Luka Stojanovic <luka.stojanovic@sbgenomics.com>
+* Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>
