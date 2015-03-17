@@ -142,7 +142,7 @@ class Builder(object):
             else:
                 return []
         elif binding.get("is_file"):
-            l = [self.pathmapper.mapper(value["path"])]
+            l = [value["path"]]
         elif isinstance(value, dict):
             return [prefix] if prefix else []
         elif value is True and prefix:

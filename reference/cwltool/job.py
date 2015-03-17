@@ -25,7 +25,7 @@ class CommandLineJob(object):
 
         if self.container and self.container.get("type") == "docker":
             found = False
-            for ln in subprocess.check_output(["docker", "images", "--no-trunc"]).splitlines():
+            for ln in subprocess.check_output(["docker", "images", "--no-trunc", "--all"]).splitlines():
                 try:
                     ln.index(self.container["imageId"])
                     found = True
