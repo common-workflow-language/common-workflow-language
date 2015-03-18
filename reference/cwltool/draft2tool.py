@@ -277,6 +277,10 @@ class CommandLineTool(Tool):
         for t in self.tool.get("fileDefs", []):
             j.generatefiles[t["filename"]] = builder.do_eval(t["value"])
 
+        j.environment = {}
+        for t in self.tool.get("environmentDefs", []):
+            j.environment[t["env"]] = builder.do_eval(t["value"])
+
         reqsAndHints = self.tool.get("requirements", []) + self.tool.get("hints", [])
         for r in reqsAndHints:
             if r["class"] == "DockerRequirement" and use_container:

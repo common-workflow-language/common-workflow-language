@@ -196,6 +196,19 @@
         },
 
         {
+            "@id": "cwl:EnvironmentDef",
+            "@type": "rdfs:Class",
+            "properties": [
+                {
+                    "@id": "cwl:env",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "xsd:string"
+                },
+                { "@id": "rdf:value"}
+            ]
+        },
+
+        {
             "@id": "cwl:CommandLineTool",
             "@type": "rdfs:Class",
             "rdfs:subClassOf": "wfdesc:Process",
@@ -253,7 +266,12 @@
                 {
                     "@id": "cwl:fileDefs",
                     "@type": "rdfs:Property",
-                    "rdfs:range": "rdfs:List"
+                    "rdfs:range": "cwl:FileDef"
+                },
+                {
+                    "@id": "cwl:environmentDefs",
+                    "@type": "rdfs:Property",
+                    "rdfs:range": "cwl:EnvironmentDef"
                 }
             ]
         },

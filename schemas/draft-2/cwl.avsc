@@ -222,6 +222,18 @@
 
     {
         "type": "record",
+        "name": "EnvironmentDef",
+        "fields": [
+            {"name": "env", "type": "string"},
+            {
+                "name": "value",
+                "type": ["null", "string", "Expression"]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
         "name": "CommandLineTool",
         "fields": [
             {
@@ -313,6 +325,16 @@
                     {
                         "type": "array",
                         "items": "FileDef"
+                    }
+                ]
+            },
+            {
+                "name": "environmentDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "EnvironmentDef"
                     }
                 ]
             }

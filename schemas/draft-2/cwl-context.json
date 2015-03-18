@@ -80,8 +80,11 @@
     "schemaDefs": "cwl:schemaDefs",
     "expressionDefs": "cwl:expressionDefs",
     "fileDefs": "cwl:fileDefs",
+    "environmentDefs": "cwl:environmentDefs",
 
     "filename": "cwl:filename",
+    "env": "cwl:env",
+
     "JavascriptExpression": "cwl:JavascriptExpression",
     "invoke": {
         "@id": "cwl:invoke",

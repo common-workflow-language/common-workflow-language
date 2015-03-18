@@ -4,16 +4,13 @@
     "class": "CommandLineTool",
     "inputs": [{
         "id": "#file1",
-        "type": "File",
-        "commandLineBinding": {}
+        "type": "File"
     }],
     "outputs": [{
         "id": "#output",
-        "type": "File",
-        "outputBinding": {
-            "glob": "output.txt"
-        }
+        "type": "File"
     }],
-    "stdout": "output.txt",
+    "stdin": {"id": "#file1"},
+    "stdout": {"id": "#output"},
     "baseCommand": ["wc"]
 }

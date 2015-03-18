@@ -85,9 +85,9 @@
         "job": "draft-2/wc-job.json",
         "output": {
             "output": {
-                "path": "output.txt",
-                "checksum": "sha1$da00806ff47486cd8f0fe9e2ab594e6800445689",
-                "size": 87
+                "path": "output",
+                "checksum": "sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae",
+                "size": 15
             }
         }
     },
@@ -145,6 +145,17 @@
         "job": "draft-2/wc-job.json",
         "output": {
             "count_output": 16
+        }
+    },
+    {
+        "tool": "draft-2/env-tool.cwl",
+        "job": "draft-2/env-job.json",
+        "output": {
+            "out": {
+                "path": "out",
+                "size": 15,
+                "checksum": "sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519"
+            }
         }
     }
 ]

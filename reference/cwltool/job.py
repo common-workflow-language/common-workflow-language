@@ -22,6 +22,7 @@ class CommandLineJob(object):
             json.dump(self.joborder, fp)
 
         runtime = []
+        env = {}
 
         if self.container and self.container.get("type") == "docker":
             found = False
@@ -68,9 +69,13 @@ class CommandLineJob(object):
                 runtime.append("--volume=%s:%s:rw" % (os.path.abspath(outdir), "/tmp/job_output"))
                 runtime.append("--workdir=%s" % ("/tmp/job_output"))
                 runtime.append("--user=%s" % (os.geteuid()))
+                for t,v in self.environment.items():
+                    runtime.append("--env=%s=%s" % (t, v))
                 runtime.append(self.container["imageId"])
             else:
                 raise Exception("Docker image %s not found" % (self.container["imageId"]))
+        else:
+            env = self.environment
 
         stdin = None
         stdout = None
@@ -99,7 +104,13 @@ class CommandLineJob(object):
             with open(os.path.join(outdir, t), "w") as f:
                 f.write(self.generatefiles[t])
 
-        sp = subprocess.Popen(runtime + self.command_line, shell=False, stdin=stdin, stdout=stdout)
+        sp = subprocess.Popen(runtime + self.command_line,
+                              shell=False,
+                              close_fds=True,
+                              stdin=stdin,
+                              stdout=stdout,
+                              env=env,
+                              cwd=outdir)
 
         if stdin == subprocess.PIPE:
             sp.stdin.close()
