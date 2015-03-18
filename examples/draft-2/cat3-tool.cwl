@@ -13,6 +13,8 @@
         {
             "id": "#file1",
             "type": "File",
+            "label": "Input File",
+            "description": "The file that will be copied using 'cat'",
             "commandLineBinding": {"position": 1}
         }
     ],
