@@ -102,6 +102,9 @@
     "MemoryRequirement": "cwl:MemoryRequirement",
     "memoryInMiB": "cwl:memoryInMiB",
 
+    "Workflow": "cwl:Workflow",
+    "ExpressionTool": "cwl:ExpressionTool",
+
     "steps": "wfdesc:hasSubProcess",
     "impl": {
         "@id": "cwl:processImplementation",

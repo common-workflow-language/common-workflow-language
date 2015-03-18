@@ -15,18 +15,28 @@ import validate
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
 
+
+def printrdf(workflow, sr):
+    from rdflib import Graph, plugin
+    from rdflib.serializer import Serializer
+    wf = from_url(workflow)
+    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
+    print(g.serialize(format=sr))
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("tool", type=str)
-    parser.add_argument("job_order", type=str)
+    parser.add_argument("workflow", type=str)
+    parser.add_argument("job_order", type=str, nargs="?", default=None)
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
     parser.add_argument("--outdir", type=str)
-    parser.add_argument("--no-container", action="store_true", help="Do not execute in a Docker container, even if one is specified in the tool file")
+    parser.add_argument("--no-container", action="store_true", help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool")
     parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull the Docker image")
     parser.add_argument("--dry-run", action="store_true", help="Do not execute")
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
+    parser.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for workflow")
+    parser.add_argument("--rdf-serializer", help="Output RDF serialization format (one of turtle (default), n3, nt, xml)", default="turtle")
 
     args = parser.parse_args()
 
@@ -35,10 +45,14 @@ def main():
     if args.debug:
         logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
+    if args.print_rdf:
+        printrdf(args.workflow, args.rdf_serializer)
+        return 0
+
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
 
     try:
-        t = workflow.makeTool(from_url(args.tool), basedir)
+        t = workflow.makeTool(from_url(args.workflow), basedir)
     except (jsonschema.exceptions.ValidationError, validate.ValidationException):
         _logger.exception("Tool definition failed validation")
         return 1

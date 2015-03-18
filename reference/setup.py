@@ -31,7 +31,9 @@ setup(name='cwltool',
           'jsonschema >= 2.4.0',
           'requests',
           'PyYAML',
-          'avro'
+          'avro',
+          'rdflib',
+          'rdflib-jsonld'
         ],
       test_suite='tests',
       tests_require=[],
