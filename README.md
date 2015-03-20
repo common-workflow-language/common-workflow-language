@@ -14,13 +14,8 @@ CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
 [Avro](https://avro.apache.org/) for data modeling and
 [Docker](http://docker.com) for portable runtime environments.
 
-CWL can be used to describe workflows for a variety of areas such as:
-
-* Data-intensive science, such as Bioinformatics, Chemistry, Physics, Astronomy
-* Log analysis
-* Data mining
-* Extract, Transform and Load (ETL)
-* Photo and video processing
+CWL is intended to express workflows for data-intensive science, such as
+Bioinformatics, Chemistry, Physics, and Astronomy.
 
 Please be aware that Common Workflow Language is still under heavy development.
 The current draft is draft 2.
@@ -59,6 +54,7 @@ the repository and send a pull request!
 * [Institut Pasteur](http://www.pasteur.fr)
 * [BioDatomics](http://www.biodatomics.com/)
 * [Michigan State University](http://ged.msu.edu/)
+* [Broad Institute](https://www.broadinstitute.org)
 
 ## Individual Contributors
 
