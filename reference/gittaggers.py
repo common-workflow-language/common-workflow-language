@@ -11,7 +11,7 @@ class EggInfoFromGit(egg_info):
     def git_timestamp_tag(self):
         gitinfo = subprocess.check_output(
             ['git', 'log', '--first-parent', '--max-count=1',
-             '--format=format:%ct', '..']).strip()
+             '--format=format:%ct']).strip()
         return time.strftime('.%Y%m%d%H%M%S', time.gmtime(int(gitinfo)))
 
     def tags(self):
