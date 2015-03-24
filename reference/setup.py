@@ -33,6 +33,7 @@ setup(name='cwltool',
       download_url="https://github.com/common-workflow-language/common-workflow-language",
       license='Apache 2.0',
       packages=["cwltool"],
+      package_data={'cwltool': ['schemas/draft-1/*', 'schemas/draft-2/*']},
       install_requires=[
           'jsonschema >= 2.4.0',
           'requests',
