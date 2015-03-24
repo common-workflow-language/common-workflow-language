@@ -20,8 +20,11 @@ except ImportError:
 # This is a total hack, but older versions of setuptools
 # won't follow symlinks or follow relative paths outside the
 # source directory (ugh!)
-os.unlink("cwltool/schemas")
-shutil.copytree("../schemas", "cwltool/schemas")
+restore = False
+if os.path.islink("cwltool/schemas") and os.path.exists("../schemas"):
+    os.unlink("cwltool/schemas")
+    shutil.copytree("../schemas", "cwltool/schemas")
+    restore = True
 
 setup(name='cwltool',
       version='1.0',
@@ -51,6 +54,7 @@ setup(name='cwltool',
       cmdclass={'egg_info': tagger},
 )
 
-# Restore the symlink
-shutil.rmtree("cwltool/schemas")
-os.symlink("../../schemas", "cwltool/schemas")
+if restore:
+    # Restore the symlink
+    shutil.rmtree("cwltool/schemas")
+    os.symlink("../../schemas", "cwltool/schemas")
