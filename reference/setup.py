@@ -26,7 +26,6 @@ setup(name='cwltool',
       license='Apache 2.0',
       packages=["cwltool"],
       package_data={'cwltool': ['schemas/draft-1/*', 'schemas/draft-2/*']},
-      include_package_data=True,
       install_requires=[
           'jsonschema >= 2.4.0',
           'requests',
