@@ -14,7 +14,7 @@ CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
 [Avro](https://avro.apache.org/) for data modeling and
 [Docker](http://docker.com) for portable runtime environments.
 
-CWL is intended to express workflows for data-intensive science, such as
+CWL is designed to express workflows for data-intensive science, such as
 Bioinformatics, Chemistry, Physics, and Astronomy.
 
 Please be aware that Common Workflow Language is still under heavy development.
