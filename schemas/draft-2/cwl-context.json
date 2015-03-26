@@ -27,6 +27,7 @@
     "File": "cwl:File",
 
     "id": "@id",
+    "ref": "@id",
     "class": "@type",
 
     "Expression": "cwl:Expression",

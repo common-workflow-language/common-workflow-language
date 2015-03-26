@@ -98,6 +98,7 @@ with open(cwl_avsc) as f:
             f["doc"] = ""
 
         f["type"] = copy.deepcopy(f)
+        f["doc"] = ""
         f = f["type"]
         if "doc" not in f:
             f["doc"] = ""
@@ -106,7 +107,7 @@ with open(cwl_avsc) as f:
                 if "doc" not in field:
                     field["doc"] = ""
         if "extends" in f:
-            f["doc"] += "Extends [%s](#/schema/%s)" % (f["extends"], f["extends"])
+            f["doc"] += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
         if f["name"] in subs:
             f["doc"] += "\n\nExtended by"
             f["doc"] += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])

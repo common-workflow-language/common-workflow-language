@@ -1,7 +1,10 @@
 
-Authors:
+Author:
 
 * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
+
+Contributers:
+
 * Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
 # Abstract
@@ -65,7 +68,7 @@ performance computing systems.
 
 ## Scope
 
-This document describes the CWL syntax, data and execution model.  It
+This document describes the CWL syntax, execution, and object model.  It
 is not intended to document a specific implementation of CWL, however it may
 serve as a reference for the behavior of conforming implementations.
 
@@ -101,7 +104,7 @@ enable or disable the behavior described.
 
 A **object** is a data structure equivalent to the "object" type in JSON,
 consisting of a unordered set of name/value pairs (referred to here as
-*fields*) and where the name is a string and the value is a string, number,
+**fields**) and where the name is a string and the value is a string, number,
 boolean, array, or object.
 
 A **document** is a file containing a serialized object.
@@ -180,88 +183,45 @@ located at:
 
 https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-rdfs.jsonld
 
+## Identifiers and references
 
-# Data types
+If an object contains an `id` field, that is used to uniquely identify the
+object in that document.  The value of the `id` field must be unique over the
+entire document.  The format of the `id` field is that of a [relative fragment
+identifier](https://tools.ietf.org/html/rfc3986#section-3.5), and must start
+with a hash `#` character.
 
+Where an object field permits a [`Ref`](#/schema/Ref) value containing a
+fragment identifier, the implementation must look up object using the
+referenced `id` field.
 
-## File object
+An implementation may choose to only honor references to objects for which the
+`id` field is explicitly listed in this specification.
 
+# Execution
 
-# Object model
+The root object defined in a CWL document must be a
+[`Process`](#/schema/Process) object.
 
-## Process
+## Generic execution sequence
 
-To execute a CWL document means to execute the `Process` object defined by the
-document.
+The generic execution sequence of a CWL process is as follows:
 
-Field|Data type|Default
------|---------|-------
-`class`|enum one of [`CommandLineTool`](#command-line-tools), [`ExpressionTool`](#expression-tools), [`Workflow`](#workflows), [`External`](#external-process-definitions)|External
-`inputs`|array of [`InputSchema`](#input-schema)|none (required field)
-`outputs`|array of [`OutputSchema`](#output-schema)|none (required field)
-`schemaDefs`|array of [`SchemaDef`](#schema)|null
-
-The type of process is defined by the `class` field.  Valid values for this
-field are [`CommandLineTool`](#command-line-tools),
-[`ExpressionTool`](#expression-tools), [`Workflow`](#workflows) or
-[`External`](#external-process-definitions).  If the `class` field is not
-specified, the implementation must default to the process class `External`.
-
-Process objects must include `inputs` and `outputs`.  These define the input
-and output parameters of the process, and must be used to validate the input
-object and generate and validate the output object.
-
-Process objects may include the `schemaDefs` field.  This field consists of an
-array of type definitions which must be used when interpreting the `inputs` and
-`outputs` fields.  When a symbolic type is encountered that is not in the
-[Datatype](#datatype) enum described above, the implementation must check if
-the type is defined in schemaDefs and use that definition.  If the type is not
-found in schemaDefs, it is an error.  The entries in schema definitions must be
-processed in the order listed such that later schema definitions may refer to
-earlier schema definitions.
-
-## External process definitions
-
-An external process provides a level of indirection to instantiate a process
-defined by an external resource (another CWL document).
-
-Field|Data type|Default
------|---------|-------
-`impl`|URI|none, required
-
-The `impl` field specifies the resource that should be loaded to find the
-actual process.
-
-## Schema
-
-Field|Data type|Default
------|---------|-------
-`id`|fragment URI|null
-`name`|string|none, required when part of `schemaDefs` or `record`
-`def`|URI|none, required when part of `inputs` or `outputs` of [`External`](#external-process-definitions)
-`type`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|none, required
-`fields`|array of [`Schema`](#schema)|null, required when `type` is `record`
-`symbols`|array of [`Schema`](#schema)|null, required when `type` is `enum`
-`items`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|null, required when `type` is `array`
-`values`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|null, required when `type` is `map`
-`commandLineBinding`|[`CommandLineBinding`](#command-line-binding)|null, used when process object is [`CommandLineTool`](#command-line-tools)
-`outputBinding`|[`OutputBinding`](#output-binding)|null, used when process object is [`CommandLineTool`](#command-line-tools)
-
-
-
-## References
+1. Load and validate CWL document, yielding a process object.
+2. Load input object.
+3. Validate input object against the `inputs` defined by the process.
+4. Validate that process requirements are met.
+5. Perform any further setup required by the specific process type.
+6. Execute the process.
+7. Build output object to capture results of process execution.
+8. Validate output object against the `outputs` defined by the process.
+9. Report output object to the caller.
 
 ## Expressions
 
+An expression is a fragment of executable code which is evaluated by workflow
+platform to affect the inputs, outputs, or behavior of a process.  In the
+generic execution sequence, expressions may be evaluated during step 5 (process
+setup), step 6 (execute process), and/or step 7 (build output).
 
-# Command line tools
-
-## Command line binding
-
-## Output binding
-
-## Executing tools in Docker
-
-# Expression tools
-
-# Workflows
+# Objects

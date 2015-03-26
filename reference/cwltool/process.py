@@ -40,6 +40,7 @@ def extend_avro(items):
                 r["fields"] = specialize(r["fields"], t["specialize"])
             r["fields"].extend(t["fields"])
             r["extends"] = t["extends"]
+            r["doc"] = t.get("doc", "")
             types[t["name"]] = r
             t = r
         n.append(t)
