@@ -80,7 +80,7 @@ performance computing systems.
 * [JSON](http://json.org)
 * [JSON-LD](http://json-ld.org)
 * [YAML](http://yaml.org)
-* [Avro](https://avro.apache.org/docs/current/spec.html)
+* [Avro](https://avro.apache.org)
 * [ECMAScript 5.1 (Javascript)](http://www.ecma-international.org/ecma-262/5.1/)
 
 ## Scope
@@ -96,63 +96,65 @@ The terminology used to describe CWL documents is defined in the
 following list are used in building those definitions and in describing the
 actions of an CWL implementation:
 
-*may*: Conforming CWL documents and CWL implementations are permitted to but need
+**may**: Conforming CWL documents and CWL implementations are permitted to but need
 not behave as described.
 
-*must*: Conforming CWL documents and CWL implementations are required to behave
+**must**: Conforming CWL documents and CWL implementations are required to behave
 as described; otherwise they are in error.
 
-error: A violation of the rules of this specification; results are
+**error**: A violation of the rules of this specification; results are
 undefined. Conforming implementations may detect and report a error and may
 recover from it.
 
-fatal error: A violation of the rules of this specification; results are
+**fatal error**: A violation of the rules of this specification; results are
 undefined. Conforming implementations must not continue to execute the current
 process and may report an error.
 
-at user option: Conforming software may or must (depending on the modal verb in
+**at user option**: Conforming software may or must (depending on the modal verb in
 the sentence) behave as described; if it does, it must provide users a means to
 enable or disable the behavior described.
 
 
 # Concepts
 
-- A *object* is a data structure equivalent to the "object" type in JSON,
+## Data
+
+A **object** is a data structure equivalent to the "object" type in JSON,
 consisting of a unordered set of name/value pairs (referred to here as
 *fields*) and where the name is a string and the value is a string, number,
 boolean, array, or object.
 
-- A *document* is a file containing a serialized object.
+A **document** is a file containing a serialized object.
 
-- A *process* is the basic unit of computation.  It accepts some input data,
+A **process** is the basic unit of computation.  It accepts some input data,
 performs some computation, produces a some output data.
 
-- A *input object* is a object describing the inputs to a invocation of process.
+A **input object** is a object describing the inputs to a invocation of process.
 
-- A *output object* is a object describing the output of an invocation of a process.
+A **output object** is a object describing the output of an invocation of a process.
 
-- A *input schema* describes valid format (required fields, data types)
+A **input schema** describes valid format (required fields, data types)
   for a input object.
 
-- A *output schema* describes the valid format for a output object.
+A **output schema** describes the valid format for a output object.
 
-- A *command line tool* is a process characterized by the
+## Execution
+
+A **command line tool** is a process characterized by the
 execution of a standalone, non-interactive program which is invoked on some
 input, produces output, and then terminates.
 
-- A *workflow* is a process characterized by multiple subprocesses, where
+A **workflow** is a process characterized by multiple subprocesses, where
 subprocess outputs are connected to the inputs of other downstream
 subprocesses, and independent subprocesses may run concurrently.
 
-- A *runtime environment* is the actual hardware and software environment when
+A **runtime environment** is the actual hardware and software environment when
 executing a command line tool.  It includes, but is not limited to, the
 hardware architecture, hardware resources, operating system, software runtime
 (if applicable, such as the Python interpreter or the JVM), libraries, modules,
 packages, utilities, and data files required to run the tool.
 
-## Workflow platform
-
-A *workflow platform* is a specific hardware and software and implementation
+A **workflow platform** is a specific hardware and software and implementation
 capable of interpreting a CWL document and executing the processes specified by
 the document.  The responsibilities of the workflow infrastructure may include
 scheduling process invocation, setting up the necessary runtime environment,
@@ -186,23 +188,27 @@ A conforming implementation must accept all valid YAML documents.
 
 A CWL document may be formally validated using the Avro schema located at:
 
-<https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl.avsc>
+https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl.avsc
 
 An implementation may interpret a CWL document as [JSON-LD](http://json-ld.org)
 and convert a CWL document to a [Resource Definition Framework
 (RDF)](http://www.w3.org/RDF/) graph using the context located at:
 
-<https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-context.json>
+https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-context.json
 
 An implementation may reason about the resulting RDF graph using the RDF Schema
 located at:
 
-<https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-rdfs.jsonld>
+https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-rdfs.jsonld
 
 
-# Datatypes
+# Data types
 
-CWL is based on the Avro type system.
+CWL data types are based on Avro schema declarations.  The data types used in
+CWL are briefly listed below.  Refer to the [Avro schema declaration
+documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
+detailed information.  In addition, CWL also defines [`File`](#file) as a
+special record type, described below.
 
 ## Primitive types
 
@@ -223,30 +229,30 @@ Name|Description
 ----|-----------
 record|An object with one or more fields defined by name and type
 enum|A value from a finite set of symbolic values
-array|An ordered sequence of values of
+array|An ordered sequence of values
 map|An unordered collection of key/value pairs
 
-## File
+## File object
 
 
 # Object model
 
 ## Process
 
-To execute a CWL document means to execute the *Process* object defined by the
+To execute a CWL document means to execute the `Process` object defined by the
 document.
 
 Field|Data type|Default
 -----|---------|-------
-class|External|enum one of CommandLineTool, ExpressionTool, Workflow, External|External
-inputs|array of Schema|none (required field)
-outputs|array of Schema|none (required field)
-schemaDefs|array of Schema|null
+`class`|enum one of [`CommandLineTool`](#command-line-tools), [`ExpressionTool`](#expression-tools), [`Workflow`](#workflows), [`External`](#external-process-definitions)|External
+`inputs`|array of [`InputSchema`](#input-schema)|none (required field)
+`outputs`|array of [`OutputSchema`](#output-schema)|none (required field)
+`schemaDefs`|array of [`SchemaDef`](#schema)|null
 
 The type of process is defined by the `class` field.  Valid values for this
-field are `[CommandLineTool](#command-line-tools)`,
-`[ExpressionTool](#expression-tools)`, `[Workflow](#workflows)` or
-`[External](#external-process-definitions)`.  If the `class` field is not
+field are [`CommandLineTool`](#command-line-tools),
+[`ExpressionTool`](#expression-tools), [`Workflow`](#workflows) or
+[`External`](#external-process-definitions).  If the `class` field is not
 specified, the implementation must default to the process class `External`.
 
 Process objects must include `inputs` and `outputs`.  These define the input
@@ -262,21 +268,34 @@ found in schemaDefs, it is an error.  The entries in schema definitions must be
 processed in the order listed such that later schema definitions may refer to
 earlier schema definitions.
 
+## External process definitions
+
+An external process provides a level of indirection to instantiate a process
+defined by an external resource (another CWL document).
+
+Field|Data type|Default
+-----|---------|-------
+`impl`|URI|none, required
+
+The `impl` field specifies the resource that should be loaded to find the
+actual process.
+
 ## Schema
 
 Field|Data type|Default
 -----|---------|-------
-id|fragment identifier|none, required when part of `inputs` or `outputs`
-name|string|none, required when part of `schemaDefs` or `record`
-type|Datatype, Schema, string, or array of Datatype, Schema, string|none, required
-fields|array of Schema|null, required when `type` is `record`
-symbols|array of Schema|null, required when `type` is `enum`
-items|Datatype, Schema, string, or array of Datatype, Schema, string|null, required when `type` is `array`
-values|Datatype, Schema, string, or array of Datatype, Schema, string|null, required when `type` is `map`
-commandLineBinding|[CommandLineBinding](#command-line-binding)|null, used when process object is [CommandLineTool](#command-line-tools)
-outputBinding|[OutputBinding](#output-binding)|null, used when process object is [CommandLineTool](#command-line-tools)
+`id`|fragment URI|null
+`name`|string|none, required when part of `schemaDefs` or `record`
+`def`|URI|none, required when part of `inputs` or `outputs` of [`External`](#external-process-definitions)
+`type`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|none, required
+`fields`|array of [`Schema`](#schema)|null, required when `type` is `record`
+`symbols`|array of [`Schema`](#schema)|null, required when `type` is `enum`
+`items`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|null, required when `type` is `array`
+`values`|[`Datatype`](#data-types), [`Schema`](#schema), string, or array of [`Datatype`](#data-types), [`Schema`](#schema), string|null, required when `type` is `map`
+`commandLineBinding`|[`CommandLineBinding`](#command-line-binding)|null, used when process object is [`CommandLineTool`](#command-line-tools)
+`outputBinding`|[`OutputBinding`](#output-binding)|null, used when process object is [`CommandLineTool`](#command-line-tools)
 
-## External process definitions
+
 
 ## References
 

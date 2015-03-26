@@ -33,6 +33,8 @@
     "ExpressionTool": "cwl:ExpressionTool",
     "script":"cwl:expressionProcess",
 
+    "External": "cwl:External",
+
     "position": "cwl:position",
     "prefix": "cwl:prefix",
     "separator": "cwl:separator",

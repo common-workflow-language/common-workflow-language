@@ -118,10 +118,9 @@
         "type": "record",
         "name": "Schema",
         "fields": [
-            { "name": "name", "type": ["null", "string"] },
-            { "name": "id", "type": ["null", "string"] },
             {
                 "name": "type",
+                "doc": "The type",
                 "type": [
                     "Datatype",
                     "Schema",
@@ -177,18 +176,25 @@
                         "items": [ "Datatype", "Schema", "string" ]
                     }
                 ]
-            },
-            {
-                "name": "commandLineBinding",
-                "type": [ "null", "CommandLineBinding" ]
-            },
-            {
-                "name": "outputBinding",
-                "type": [ "null", "OutputBinding" ]
-            },
-            {
-                "name": "connect",
-                "type": [
+            }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "SchemaDef",
+        "extends": "Schema",
+        "fields": [ { "name": "name", "type": "string" } ]
+    },
+
+    {
+        "type": "record",
+        "name": "InputSchema",
+        "extends": "Schema",
+        "specialize": {"Schema": "InputSchema"},
+        "fields": [ {
+        "name": "connect",
+        "type": [
                     "null",
                     "DataLink",
                     {
@@ -199,6 +205,55 @@
             }
         ]
     },
+
+    {
+        "type": "record",
+        "name": "InputSchemaRoot",
+        "extends": "InputSchema",
+        "fields": [ { "name": "id", "type": "string" } ]
+    },
+
+    {
+        "type": "record",
+        "name": "CommandLineInputSchema",
+        "extends": "InputSchema",
+        "specialize": {"InputSchema": "CommandLineInputSchema"},
+        "fields": [
+            {
+                "name": "commandLineBinding",
+                "type": [ "null", "CommandLineBinding" ]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
+        "name": "CommandLineInputSchemaRoot",
+        "extends": "CommandLineInputSchema",
+        "fields": [ { "name": "id", "type": "string" } ]
+    },
+
+    {
+        "type": "record",
+        "name": "OutputSchema",
+        "extends": "Schema",
+        "specialize": {"Schema": "OutputSchema"},
+        "fields": [
+            {
+                "name": "outputBinding",
+                "type": [ "null", "OutputBinding" ]
+            }
+        ]
+    },
+
+
+    {
+        "type": "record",
+        "name": "OutputSchemaRoot",
+        "extends": "OutputSchema",
+        "fields": [ { "name": "id", "type": "string" } ]
+    },
+
 
     {
         "type": "record",
@@ -234,7 +289,41 @@
 
     {
         "type": "record",
+        "name": "Process",
+        "fields": [
+            { "name": "class", "type": "string" },
+            {
+                "name": "inputs",
+                "type": {
+                    "type": "array",
+                    "items": "InputSchemaRoot"
+                }
+            },
+            {
+                "name": "outputs",
+                "type": {
+                    "type": "array",
+                    "items": "OutputSchemaRoot"
+                }
+            },
+            {
+                "name": "schemaDefs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "SchemaDef"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "type": "record",
         "name": "CommandLineTool",
+        "extends": "Process",
+        "specialize": {"InputSchemaRoot": "CommandLineInputSchemaRoot"},
         "fields": [
             {
                 "name": "baseCommand",
@@ -265,20 +354,6 @@
                 "type": ["null", "string", "Expression", "Ref"]
             },
             {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
                 "name": "requirements",
                 "type": [
                     "null",
@@ -295,16 +370,6 @@
                     {
                         "type": "array",
                         "items": "ToolDependency"
-                    }
-                ]
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
                     }
                 ]
             },
@@ -344,34 +409,11 @@
     {
         "type": "record",
         "name": "ExpressionTool",
+        "extends": "Process",
         "fields": [
             {
                 "name": "script",
                 "type": "Expression"
-            },
-            {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
-                    }
-                ]
             },
             {
                 "name": "expressionDefs",
@@ -388,31 +430,14 @@
 
     {
         "type": "record",
-        "name": "Process",
+        "name": "External",
+        "extends": "Process",
+        "specialize": {"InputSchemaRoot": "ExternallyDefinedInput",
+                       "OutputSchemaRoot": "ExternallyDefinedOutput"},
         "fields": [
             {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": ["Schema", "ExternallyDefinedInput"]
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": ["Schema", "ExternallyDefinedOutput"]
-                }
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
-                    }
-                ]
+                "name": "impl",
+                "type": "string"
             }
         ]
     },
@@ -420,40 +445,16 @@
     {
         "type": "record",
         "name": "Workflow",
+        "extends": "Process",
         "fields": [
             {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": "Schema"
-                }
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
-                    }
-                ]
-            },
-            {
                 "name": "steps",
-                "type": [
-                    {
+                "type": {
                         "type": "array",
-                        "items": ["Process"]
+                        "items": ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
                     }
-                ]
             }
         ]
-    }
+    },
+
 ]
