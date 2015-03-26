@@ -254,7 +254,6 @@
         "fields": [ { "name": "id", "type": "string" } ]
     },
 
-
     {
         "type": "record",
         "name": "ToolDependency",
@@ -291,7 +290,16 @@
         "type": "record",
         "name": "Process",
         "fields": [
-            { "name": "class", "type": "string" },
+            {
+              "name": "class",
+              "type": "string",
+              "doc":
+"The type of process is defined by the `class` field.  Valid values for this
+field are [`CommandLineTool`](#/schema/CommandLineTool),
+[`ExpressionTool`](#/schema/ExpressionTool), [`Workflow`](#/schema/Workflow) or
+[`External`](#/schema/External).  If the `class` field is not
+specified, the implementation must default to the process class [`External`](#/schema/External)."
+            },
             {
                 "name": "inputs",
                 "type": {
@@ -314,7 +322,16 @@
                         "type": "array",
                         "items": "SchemaDef"
                     }
-                ]
+                ],
+                "doc":
+"Process objects may include the `schemaDefs` field.  This field consists of an
+array of type definitions which must be used when interpreting the `inputs` and
+`outputs` fields.  When a symbolic type is encountered that is not in
+[Datatype](#datatype), the implementation must check if
+the type is defined in `schemaDefs` and use that definition.  If the type is not
+found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
+processed in the order listed such that later schema definitions may refer to
+earlier schema definitions."
             }
         ]
     },

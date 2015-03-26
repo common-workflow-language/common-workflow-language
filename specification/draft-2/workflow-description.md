@@ -1,7 +1,6 @@
-Common Workflow Language, Draft 2
-=================================
 
 Authors:
+
 * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
 * Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
@@ -21,32 +20,13 @@ the Expression Tool, for applying ECMAScript functions to the data set.
 This document is the product of the [Common Workflow Language working
 group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
 latest version of this document is available in the "specification" directory at
+
 https://github.com/common-workflow-language/common-workflow-language
 
 The products of the CWL working group (including this document) are made available
 under the terms of the Apache License, version 2.
 
 # Table of Contents
-
-1. [Introduction](#introduction)
-  1. [Introduction to draft 2](#introduction-to-draft-2)
-  2. [Purpose](#purpose)
-  3. [Dependencies on Other Specifications](#dependencies-on-other-specifications)
-  4. [Scope](#scope)
-  5. [Terminology](#terminology)
-2. [Concepts](#concepts)
-  1. [Workflow platform](#workflow-platform)
-3. [Syntax](#syntax)
-4. [Data model](#data-model)
-  1. [Files](#files)
-  2. [References](#references)
-  3. [Expressions](#expressions)
-5. [Process objects](#process-objects)
-  1. [Input and Output Schemas](#input-and-output-schemas)
-6. [Command line tool processes](#command-line-tool-processes)
-  1. [Executing tools in Docker](#executing-tools-in-docker)
-7. [Expression tool processes](#expression-tool-processes)
-8. [Workflow processes](#workflow-processes)
 
 # Introduction
 
