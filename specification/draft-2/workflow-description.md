@@ -72,7 +72,7 @@ serve as a reference for the behavior of conforming implementations.
 ## Terminology
 
 The terminology used to describe CWL documents is defined in the
-[Concepts](#concepts) section of the specification. The terms defined in the
+Concepts section of the specification. The terms defined in the
 following list are used in building those definitions and in describing the
 actions of an CWL implementation:
 
@@ -157,9 +157,8 @@ be handled by a specific workflow platform are:
 * Pausing and resume processes or workflows.
 
 Conforming CWL documents must not assume anything about the runtime environment
-or workflow platform unless explicitly declared though the use of
-[Requirements](#requirements) or [Hints](#hints).
-
+or workflow platform unless explicitly declared though the use of [process
+requirements](#/schema/ProcessRequirement).
 
 # Syntax
 
@@ -184,33 +183,6 @@ https://github.com/common-workflow-language/common-workflow-language/blob/master
 
 # Data types
 
-CWL data types are based on Avro schema declarations.  The data types used in
-CWL are briefly listed below.  Refer to the [Avro schema declaration
-documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
-detailed information.  In addition, CWL also defines [`File`](#file) as a
-special record type, described below.
-
-## Primitive types
-
-Name|Description
-----|-----------
-null|no value
-boolean|a binary value
-int|32-bit signed integer
-long|64-bit signed integer
-float|single precision (32-bit) IEEE 754 floating-point number
-double|double precision (64-bit) IEEE 754 floating-point number
-bytes|sequence of 8-bit unsigned bytes
-string|unicode character sequence
-
-## Complex types
-
-Name|Description
-----|-----------
-record|An object with one or more fields defined by name and type
-enum|A value from a finite set of symbolic values
-array|An ordered sequence of values
-map|An unordered collection of key/value pairs
 
 ## File object
 

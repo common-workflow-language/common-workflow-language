@@ -1,28 +1,49 @@
-[
-    {
-        "type": "enum",
-        "name": "Datatype",
-        "symbols": [
-            "null",
-            "boolean",
-            "int",
-            "long",
-            "float",
-            "double",
-            "bytes",
-            "string",
-            "record",
-            "enum",
-            "array",
-            "map",
-            "File"
-        ]
-    },
+- type: enum
+  name: Datatype
+  symbols:
+    - null
+    - boolean
+    - int
+    - long
+    - float
+    - double
+    - bytes
+    - string
+    - record
+    - enum
+    - array
+    - map
+    - File
+  doc: |
+   CWL data types are based on Avro schema declarations.  The data types used
+   in CWL are listed in the [Datatype](\#/schema/Datatype) enum.  Refer to the
+   \#[Avro schema declaration
+   documentation](https://avro.apache.org/docs/current/spec.html\#schemas) for
+   detailed information.  In addition, CWL also defines [`File`](\#/schema/File)
+   as a special record type.
 
-    {
-        "type": "record",
-        "name": "File",
-        "fields": [
+   ## Primitive types
+
+   * **boolean**: a binary value
+   * **int**: 32-bit signed integer
+   * **long**: 64-bit signed integer
+   * **float**: single precision (32-bit) IEEE 754 floating-point number
+   * **double**: double precision (64-bit) IEEE 754 floating-point number
+   * **bytes**: sequence of 8-bit unsigned bytes
+   * **string**: unicode character sequence
+
+   ## Complex types
+
+   Name|Description
+   ----|-----------
+   * **record**: An object with one or more fields defined by name and type
+   * **enum**: A value from a finite set of symbolic values
+   * **array**: An ordered sequence of values
+   * **map**: An unordered collection of key/value pairs
+
+- type: record
+  name: File
+  fields: [
             { "name": "path", "type": "string" },
             { "name": "checksum", "type": ["null", "string"] },
             { "name": "size", "type": ["null", "long"] },
@@ -37,441 +58,379 @@
                 ]
             }
         ]
-    },
 
-    {
-        "type": "record",
-        "name": "Expression",
-        "fields": [
+- type: record
+  name: Expression
+  fields: [
             { "name": "class", "type": "string" }
         ]
-    },
 
+- "type": "record"
+  "name": "Ref"
+  "fields": [
+    { "name": "id", "type": "string" }
+  ]
+
+- "type": "record"
+  "name": "CommandLineBinding"
+  "fields": [
+    { "name": "position", "type": ["null", "int"] },
+    { "name": "prefix", "type": [ "null", "string"] },
+    { "name": "separator", "type": ["null", "string"] },
+    { "name": "itemSeparator", "type": ["null", "string"] },
+    { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
+    { "name": "loadContents", "type": ["null", "boolean"] }
+  ]
+
+- "type": "record"
+  "name": "OutputBinding"
+  "fields": [
+    { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
+    { "name": "glob", "type": ["null", "string"] },
+    { "name": "loadContents", "type": ["null", "boolean"] }
+    ]
+
+- "type": "record"
+  "name": "DataLink"
+  "fields": [
+    { "name": "source", "type": "string" }
+  ]
+
+- "type": "record"
+  "name": "ExternallyDefinedInput"
+  "fields": [
+    { "name": "def", "type": "string" },
     {
-        "type": "record",
-        "name": "Ref",
-        "fields": [
-            { "name": "id", "type": "string" }
+      "name": "connect",
+      "type": [
+        "DataLink",
+        {
+          "type": "array",
+          "items": "DataLink"
+        }
+      ]
+    },
+    { "name": "id", "type": ["null", "string"] }
+  ]
+
+- "type": "record"
+  "name": "ExternallyDefinedOutput"
+  "fields": [
+    { "name": "def", "type": "string" },
+    { "name": "id", "type": "string" }
+  ]
+
+- "type": "record"
+  "name": "Schema"
+  "fields": [
+    {
+      "name": "type",
+      "doc": "The type",
+      "type": [
+        "Datatype",
+        "Schema",
+        "string",
+        {
+          "type": "array",
+          "items": [ "Datatype", "Schema", "string" ]
+        }
+      ]
+    },
+    {
+      "name": "fields",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "Schema"
+        }
+      ]
+    },
+    {
+      "name": "symbols",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "string"
+        }
+      ]
+    },
+    {
+      "name": "items",
+      "type": [
+        "null",
+        "Datatype",
+        "Schema",
+        "string",
+        {
+          "type": "array",
+          "items": [ "Datatype", "Schema", "string" ]
+        }
+      ]
+    },
+    {
+      "name": "values",
+      "type": [
+        "null",
+        "Datatype",
+        "Schema",
+        "string",
+        {
+          "type": "array",
+          "items": [ "Datatype", "Schema", "string" ]
+        }
+      ]
+    }
+  ]
+
+- "type": "record"
+  "name": "SchemaDef"
+  "extends": "Schema"
+  "fields": [ { "name": "name", "type": "string" } ]
+
+- "type": "record"
+  "name": "InputSchema"
+  "extends": "Schema"
+  "specialize": {"Schema": "InputSchema"}
+  "fields": [ {
+    "name": "connect",
+    "type": [
+      "null",
+      "DataLink",
+      {
+        "type": "array",
+        "items": "DataLink"
+      }
+    ]
+  } ]
+
+- "type": "record"
+  "name": "InputSchemaRoot"
+  "extends": "InputSchema"
+  "fields": [ { "name": "id", "type": "string" } ]
+
+- "type": "record"
+  "name": "CommandLineInputSchema"
+  "extends": "InputSchema"
+  "specialize": {"InputSchema": "CommandLineInputSchema"}
+  "fields": [
+    {
+      "name": "commandLineBinding",
+      "type": [ "null", "CommandLineBinding" ]
+    }
+  ]
+
+- "type": "record"
+  "name": "CommandLineInputSchemaRoot"
+  "extends": "CommandLineInputSchema"
+  "fields": [ { "name": "id", "type": "string" } ]
+
+- "type": "record"
+  "name": "OutputSchema"
+  "extends": "Schema"
+  "specialize": {"Schema": "OutputSchema"}
+  "fields": [
+    {
+      "name": "outputBinding",
+      "type": [ "null", "OutputBinding" ]
+    }
+  ]
+
+- "type": "record"
+  "name": "OutputSchemaRoot"
+  "extends": "OutputSchema"
+  "fields": [ { "name": "id", "type": "string" } ]
+
+- "type": "record"
+  "name": "ProcessRequirement"
+  "fields": [
+    { "name": "class", "type": "string" }
+  ]
+
+- "type": "record"
+  "name": "FileDef"
+  "fields": [
+    {"name": "filename", "type": "string"},
+    {
+      "name": "value",
+      "type": ["null", "string", "Expression"]
+    }
+  ]
+
+- "type": "record"
+  "name": "EnvironmentDef"
+  "fields": [
+    {"name": "env", "type": "string"},
+    {
+      "name": "value",
+      "type": ["null", "string", "Expression"]
+    }
+  ]
+
+- "type": "record"
+  "name": "Process"
+  "fields":
+    - "name": "class"
+      "type": "string"
+      "doc": |
+        The type of process is defined by the `class` field.  Valid values for this
+        field are [`CommandLineTool`](\#/schema/CommandLineTool),
+        [`ExpressionTool`](\#/schema/ExpressionTool), [`Workflow`](\#/schema/Workflow) or
+        [`External`](\#/schema/External).  If the `class` field is not
+        specified, the implementation must default to the process class [`External`](\#/schema/External).
+    - "name": "inputs"
+      "type": {
+        "type": "array",
+        "items": "InputSchemaRoot"
+      }
+    - "name": "outputs"
+      "type": {
+        "type": "array",
+        "items": "OutputSchemaRoot"
+      }
+    - "name": "schemaDefs"
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "SchemaDef"
+        }
+      ]
+      "doc": |
+        Process objects may include the `schemaDefs` field.  This field consists of an
+        array of type definitions which must be used when interpreting the `inputs` and
+        `outputs` fields.  When a symbolic type is encountered that is not in
+        [Datatype](#datatype), the implementation must check if
+        the type is defined in `schemaDefs` and use that definition.  If the type is not
+        found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
+        processed in the order listed such that later schema definitions may refer to
+        earlier schema definitions.
+    - "name": "requirements"
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "ProcessRequirement"
+        }
+      ]
+    - "name": "hints"
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "ProcessRequirement"
+        }
+      ]
+
+- "type": "record"
+  "name": "CommandLineTool"
+  "extends": "Process"
+  "specialize": {"InputSchemaRoot": "CommandLineInputSchemaRoot"}
+  "fields": [
+    {
+      "name": "baseCommand",
+      "type": [
+        "string",
+        {
+          "type": "array",
+            "items": "string"
+        }
         ]
-    },
-
-    {
-        "type": "record",
-        "name": "CommandLineBinding",
-        "fields": [
-            { "name": "position", "type": ["null", "int"] },
-            { "name": "prefix", "type": [ "null", "string"] },
-            { "name": "separator", "type": ["null", "string"] },
-            { "name": "itemSeparator", "type": ["null", "string"] },
-            { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
-            { "name": "loadContents", "type": ["null", "boolean"] }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "OutputBinding",
-        "fields": [
-            { "name": "valueFrom", "type": ["null", "Expression", "Ref"] },
-            { "name": "glob", "type": ["null", "string"] },
-            { "name": "loadContents", "type": ["null", "boolean"] }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "DataLink",
-        "fields": [
-            { "name": "source", "type": "string" }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "ExternallyDefinedInput",
-        "fields": [
-            { "name": "def", "type": "string" },
-            {
-                "name": "connect",
-                "type": [
-                    "DataLink",
-                    {
-                        "type": "array",
-                        "items": "DataLink"
-                    }
-                ]
-            },
-            { "name": "id", "type": ["null", "string"] }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "ExternallyDefinedOutput",
-        "fields": [
-            { "name": "def", "type": "string" },
-            { "name": "id", "type": "string" }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "Schema",
-        "fields": [
-            {
-                "name": "type",
-                "doc": "The type",
-                "type": [
-                    "Datatype",
-                    "Schema",
-                    "string",
-                    {
-                        "type": "array",
-                        "items": [ "Datatype", "Schema", "string" ]
-                    }
-                ]
-            },
-            {
-                "name": "fields",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "Schema"
-                    }
-                ]
-            },
-            {
-                "name": "symbols",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "string"
-                    }
-                ]
-            },
-            {
-                "name": "items",
-                "type": [
-                    "null",
-                    "Datatype",
-                    "Schema",
-                    "string",
-                    {
-                        "type": "array",
-                        "items": [ "Datatype", "Schema", "string" ]
-                    }
-                ]
-            },
-            {
-                "name": "values",
-                "type": [
-                    "null",
-                    "Datatype",
-                    "Schema",
-                    "string",
-                    {
-                        "type": "array",
-                        "items": [ "Datatype", "Schema", "string" ]
-                    }
-                ]
-            }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "SchemaDef",
-        "extends": "Schema",
-        "fields": [ { "name": "name", "type": "string" } ]
-    },
-
-    {
-        "type": "record",
-        "name": "InputSchema",
-        "extends": "Schema",
-        "specialize": {"Schema": "InputSchema"},
-        "fields": [ {
-        "name": "connect",
+      },
+      {
+        "name": "arguments",
         "type": [
-                    "null",
-                    "DataLink",
-                    {
-                        "type": "array",
-                        "items": "DataLink"
-                    }
-                ]
-            }
+          "null",
+          {
+            "type": "array",
+            "items": ["string", "CommandLineBinding"]
+          }
         ]
-    },
-
-    {
-        "type": "record",
-        "name": "InputSchemaRoot",
-        "extends": "InputSchema",
-        "fields": [ { "name": "id", "type": "string" } ]
-    },
-
-    {
-        "type": "record",
-        "name": "CommandLineInputSchema",
-        "extends": "InputSchema",
-        "specialize": {"InputSchema": "CommandLineInputSchema"},
-        "fields": [
-            {
-                "name": "commandLineBinding",
-                "type": [ "null", "CommandLineBinding" ]
-            }
+      },
+      {
+        "name": "stdin",
+        "type": ["null", "Expression", "Ref"]
+      },
+      {
+        "name": "stdout",
+        "type": ["null", "string", "Expression", "Ref"]
+      },
+      {
+        "name": "expressionDefs",
+        "type": [
+          "null",
+          {
+            "type": "array",
+            "items": ["string", "Ref"]
+          }
         ]
-    },
-
-    {
-        "type": "record",
-        "name": "CommandLineInputSchemaRoot",
-        "extends": "CommandLineInputSchema",
-        "fields": [ { "name": "id", "type": "string" } ]
-    },
-
-    {
-        "type": "record",
-        "name": "OutputSchema",
-        "extends": "Schema",
-        "specialize": {"Schema": "OutputSchema"},
-        "fields": [
-            {
-                "name": "outputBinding",
-                "type": [ "null", "OutputBinding" ]
-            }
+      },
+      {
+        "name": "fileDefs",
+        "type": [
+          "null",
+          {
+            "type": "array",
+            "items": "FileDef"
+          }
         ]
-    },
-
-
-    {
-        "type": "record",
-        "name": "OutputSchemaRoot",
-        "extends": "OutputSchema",
-        "fields": [ { "name": "id", "type": "string" } ]
-    },
-
-    {
-        "type": "record",
-        "name": "ToolDependency",
-        "fields": [
-            { "name": "class", "type": "string" }
+      },
+      {
+        "name": "environmentDefs",
+        "type": [
+          "null",
+          {
+            "type": "array",
+            "items": "EnvironmentDef"
+          }
         ]
-    },
+      }
+    ]
 
+
+- "type": "record"
+  "name": "ExpressionTool"
+  "extends": "Process"
+  "fields": [
     {
-        "type": "record",
-        "name": "FileDef",
-        "fields": [
-            {"name": "filename", "type": "string"},
-            {
-                "name": "value",
-                "type": ["null", "string", "Expression"]
-            }
-        ]
+      "name": "script",
+      "type": "Expression"
     },
-
     {
-        "type": "record",
-        "name": "EnvironmentDef",
-        "fields": [
-            {"name": "env", "type": "string"},
-            {
-                "name": "value",
-                "type": ["null", "string", "Expression"]
-            }
-        ]
-    },
+      "name": "expressionDefs",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": ["string", "Ref"]
+        }
+      ]
+    }
+  ]
 
+- "type": "record"
+  "name": "External"
+  "extends": "Process"
+  "specialize":
+    "InputSchemaRoot": "ExternallyDefinedInput"
+    "OutputSchemaRoot": "ExternallyDefinedOutput"
+  "fields": [
     {
-        "type": "record",
-        "name": "Process",
-        "fields": [
-            {
-              "name": "class",
-              "type": "string",
-              "doc":
-"The type of process is defined by the `class` field.  Valid values for this
-field are [`CommandLineTool`](#/schema/CommandLineTool),
-[`ExpressionTool`](#/schema/ExpressionTool), [`Workflow`](#/schema/Workflow) or
-[`External`](#/schema/External).  If the `class` field is not
-specified, the implementation must default to the process class [`External`](#/schema/External)."
-            },
-            {
-                "name": "inputs",
-                "type": {
-                    "type": "array",
-                    "items": "InputSchemaRoot"
-                }
-            },
-            {
-                "name": "outputs",
-                "type": {
-                    "type": "array",
-                    "items": "OutputSchemaRoot"
-                }
-            },
-            {
-                "name": "schemaDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "SchemaDef"
-                    }
-                ],
-                "doc":
-"Process objects may include the `schemaDefs` field.  This field consists of an
-array of type definitions which must be used when interpreting the `inputs` and
-`outputs` fields.  When a symbolic type is encountered that is not in
-[Datatype](#datatype), the implementation must check if
-the type is defined in `schemaDefs` and use that definition.  If the type is not
-found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
-processed in the order listed such that later schema definitions may refer to
-earlier schema definitions."
-            }
-        ]
-    },
+      "name": "impl",
+      "type": "string"
+    }
+  ]
 
+- "type": "record"
+  "name": "Workflow"
+  "extends": "Process"
+  "fields": [
     {
-        "type": "record",
-        "name": "CommandLineTool",
-        "extends": "Process",
-        "specialize": {"InputSchemaRoot": "CommandLineInputSchemaRoot"},
-        "fields": [
-            {
-                "name": "baseCommand",
-                "type": [
-                    "string",
-                    {
-                        "type": "array",
-                        "items": "string"
-                    }
-                ]
-            },
-            {
-                "name": "arguments",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": ["string", "CommandLineBinding"]
-                    }
-                ]
-            },
-            {
-                "name": "stdin",
-                "type": ["null", "Expression", "Ref"]
-            },
-            {
-                "name": "stdout",
-                "type": ["null", "string", "Expression", "Ref"]
-            },
-            {
-                "name": "requirements",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "ToolDependency"
-                    }
-                ]
-            },
-            {
-                "name": "hints",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "ToolDependency"
-                    }
-                ]
-            },
-            {
-                "name": "expressionDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": ["string", "Ref"]
-                    }
-                ]
-            },
-            {
-                "name": "fileDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "FileDef"
-                    }
-                ]
-            },
-            {
-                "name": "environmentDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": "EnvironmentDef"
-                    }
-                ]
-            }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "ExpressionTool",
-        "extends": "Process",
-        "fields": [
-            {
-                "name": "script",
-                "type": "Expression"
-            },
-            {
-                "name": "expressionDefs",
-                "type": [
-                    "null",
-                    {
-                        "type": "array",
-                        "items": ["string", "Ref"]
-                    }
-                ]
-            }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "External",
-        "extends": "Process",
-        "specialize": {"InputSchemaRoot": "ExternallyDefinedInput",
-                       "OutputSchemaRoot": "ExternallyDefinedOutput"},
-        "fields": [
-            {
-                "name": "impl",
-                "type": "string"
-            }
-        ]
-    },
-
-    {
-        "type": "record",
-        "name": "Workflow",
-        "extends": "Process",
-        "fields": [
-            {
-                "name": "steps",
-                "type": {
-                        "type": "array",
-                        "items": ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
-                    }
-            }
-        ]
-    },
-
-]
+      "name": "steps",
+      "type": {
+        "type": "array",
+        "items": ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
+      }
+    }
+  ]
