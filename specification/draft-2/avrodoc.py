@@ -90,7 +90,8 @@ with open(cwl_avsc) as f:
                 for tp in p:
                     if tp not in uses:
                         uses[tp] = []
-                    uses[tp].append((t["name"], f["name"]))
+                    if (t["name"], f["name"]) not in uses[tp]:
+                        uses[tp].append((t["name"], f["name"]))
 
     for f in out["fields"]:
         if "doc" not in f:

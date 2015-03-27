@@ -200,7 +200,7 @@
           items: "Schema"
         }
       ],
-      doc: "If `type` is `record`, defines the fields of the record."
+      doc: "When `type` is `record`, defines the fields of the record."
     },
     {
       name: "symbols",
@@ -211,7 +211,7 @@
           items: "string"
         }
       ],
-      doc: If `type` is `enum`, defines the set of valid symbols.
+      doc: "When `type` is `enum`, defines the set of valid symbols."
     },
     {
       name: items,
@@ -225,7 +225,7 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
-      doc: If `type` is `array`, defines the type of the array elements.
+      doc: "When `type` is `array`, defines the type of the array elements."
     },
     {
       name: "values",
@@ -239,7 +239,7 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
-      doc: If `type` is `map`, defines the value type for the key/value pairs.
+      doc: "When `type` is `map`, defines the value type for the key/value pairs."
     }
   ]
 
@@ -420,63 +420,152 @@
   extends: "Process"
   specialize: {"InputSchemaRoot": "CommandLineInputSchemaRoot"}
   doc: |
+
+    A *tool* is a standalone, non-interactive command line application which is
+    invoked on some input to perform computation, produce output, and then
+    terminate.  In order to use a tool in a workflow, it is necessary to
+    connect the inputs and outputs of the tool to upstream and downstream
+    steps.  However, because of the enormous variety in syntax for input,
+    invocation, and output, it is necessary to provide describe the invocation
+    in detail.  The CommandLineTool process describes how to translate inputs
+    to an actual program invocation and collect the resulting output.
+
     ## Command line binding
 
-    ## Output binding
+    The tool command line is built by applying command line bindings to the
+    input object.
+
+    If the binding object is listed in the input schema, "value" is set to the
+    corresponding value for that input join the job order document.  For adapter
+    records listed in "args", "value" must be provided or it is an error.  The
+    "value" field may be a [reference](#references) or [expression](#expressions).
+    The adapter behavior in building the command line depends on the data type of
+    the value.  Note: in the event of a mismatch between the data type specified in
+    the schema and the data type of the actual value (this can occur when applying
+    expressions), use the data type of the actual value to select the appropriate
+    behavior:
+
+      - array: each value of the array will be added as separate command line
+        entries, unless "itemSeparator" is specified (see below).
+
+      - boolean: Indicates that this argument represents a boolean
+          command-line flag. If true, indicates that the value in "prefix"
+          (see below) should be added to the command line.  If false, nothing
+          is added.
+
+      - file: Add the "path" field of the file object to the command line.  Note that
+            the actual path used to invoke the tool may be different due to path
+            rewriting.
+
+      - null: nothing is added to the command line.
+
+      - number: Convert to decimal text string representation and add an entry to the
+                the command line.
+
+      - object: the value of "prefix" is added to the command line.  The contents of
+                  the object may be serialized with a nested adapter, and appended to "prefix."
+
+      - string: Added unchanged to the command line.
+
+    ## Execution
+
+    Once the command line is built, the tool is ready for execution.
+
+    Tools are assumed to run in a POSIX environment.  Tools must be
+    non-interactive, command line programs.  Tools must not require any kind of
+    console, GUI, or web based user interaction in order to start and run to
+    completion.
+
+    The `TMPDIR` environment variable must be set in the runtime environment to
+    the **designated temporary directory**.  Any files written to the
+    designated temporary directory may be deleted by the workflow
+    infrastructure when the tool invocation is complete.
+
+    When the tool is initially executed, the designated designated temporary
+    directory must contain a single file "job.cwl.json", which contains the
+    input object.
+
+    Output files produced by tool execution must be written to the **designated
+    output directory**.  The designated output directory must be the initial
+    current working in when the tool is executed.
+
+    An implementation may forbid the tool from writing to any location in the
+    runtime environment file system other than the designated temporary
+    directory and designated output directory.  An implementation may provide
+    read-only input files, and disallow in-place update of input files.
+
+    Tools may be multithreaded or spawn child processes; however, when the
+    parent process exits, the tool is considered finished regardless of whether
+    any detached child processes are still running.
 
     ## Executing tools in Docker
 
-  fields: [
-    {
-      name: "baseCommand",
+    ## Output binding
+
+  fields:
+    - name: "baseCommand"
+      doc: |
+        Specifies the program to execute.  If the value is an array, the first
+        element is the program to execute, and subsequent elements are placed
+        at the beginning of the command line in prior to any command line
+        bindings.  If the program includes a path separator character it must
+        be an absolute path, otherwise it is an error.  If the program does not
+        include a path separator, search the `$PATH` variable in the runtime
+        environment find the absolute path of the executable.
       type: [
         "string",
         {
           type: "array",
             items: "string"
         }
-        ]
-      },
-      {
-        name: "arguments",
-        type: [
-          "null",
-          {
-            type: "array",
-            items: ["string", "CommandLineBinding"]
-          }
-        ]
-      },
-      {
-        name: "stdin",
-        type: ["null", "Expression", "Ref"]
-      },
-      {
-        name: "stdout",
-        type: ["null", "string", "Expression", "Ref"]
-      },
-      {
-        name: "fileDefs",
-        type: [
-          "null",
-          {
-            type: "array",
-            items: "FileDef"
-          }
-        ]
-      },
-      {
-        name: "environmentDefs",
-        type: [
-          "null",
-          {
-            type: "array",
-            items: "EnvironmentDef"
-          }
-        ]
-      }
-    ]
+      ]
+    - name: "arguments"
+      type: [
+        "null",
+        {
+          type: "array",
+          items: ["string", "CommandLineBinding"]
+        }
+      ]
+    - name: "stdin"
+      type: ["null", "Ref"]
+      doc: |
+        A reference to an input [`File`](#/schema/File) parameter whose contents must be piped
+        into the command's standard input stream."
+    - name: "stdout"
+      type: ["null", "string", "Expression", "Ref"]
+      doc: |
+        Capture the command's standard output stream to a file written to
+        the designated output directory.
 
+        If `stdout` is a string, it specifies the file name to use.
+
+        If `stdout` is an expression, the expression is evaluated and must
+        return a string with the file name to use to capture stdout.  If the
+        return value is not a string, or the resulting path contains illegal
+        characters (such as the path separator `/`) it is an error.
+
+        If `stdout` is a reference, the corresponding output
+        [`File`](#/schema/File) parameter will be set to the file.  The output
+        output file name is undefined, but may be based on the output parameter
+        name.
+
+    - name: "fileDefs"
+      type: [
+        "null",
+        {
+          type: "array",
+          items: "FileDef"
+        }
+      ]
+    - name: "environmentDefs"
+      type: [
+        "null",
+        {
+          type: "array",
+          items: "EnvironmentDef"
+        }
+      ]
 
 - type: record
   name: "ExpressionTool"
