@@ -9,19 +9,18 @@ import subprocess
 import copy
 import pprint
 import re
+import sys
 
 # Uses avrodoc https://github.com/ept/avrodoc
 # npm install avrodoc -g
 
-shutil.rmtree("out", True)
-os.mkdir("out")
-
 module_dir = os.path.dirname(os.path.abspath(__file__))
-cwl_avsc = os.path.join(module_dir, '../../schemas/draft-2/cwl-avro.yml')
+cwl_avsc = sys.argv[1] # os.path.join(module_dir, '../../schemas/draft-2/cwl-avro.yml')
 
 n = []
 
-with open("workflow-description.md") as md:
+#with open("workflow-description.md") as md:
+with open(sys.argv[2]) as md:
     maindoc = md.read()
 
 n1 = 0
@@ -115,9 +114,5 @@ with open(cwl_avsc) as f:
             f["doc"] += "\n\nReferenced by"
             f["doc"] += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
 
-fn = "out/in.avsc"
-with open(fn, "w") as f:
+with open("in.avsc", "w") as f:
     json.dump(out, f, indent=True)
-
-with open("out/doc.html", "w") as f:
-    subprocess.check_call(["avrodoc", "out/in.avsc"], stdout=f)

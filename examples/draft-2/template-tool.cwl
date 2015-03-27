@@ -8,7 +8,7 @@ requirements:
     dockerPull: arvados/jobs
     dockerImageId: arvados/jobs
 expressionDefs:
-  - { id: underscore.js }
+  - { ref: underscore.js }
   - "var t = function(s) { return _.template(s)({'$job': $job}); };"
 fileDefs:
   - filename: foo.txt

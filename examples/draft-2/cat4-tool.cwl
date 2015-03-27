@@ -23,6 +23,6 @@
         }
     ],
     "baseCommand": "cat",
-    "stdout": { "id": "#output.txt" },
-    "stdin": { "id": "#file1" }
+    "stdout": { "ref": "#output.txt" },
+    "stdin": { "ref": "#file1" }
 }

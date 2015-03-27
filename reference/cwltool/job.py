@@ -11,7 +11,7 @@ import requests
 _logger = logging.getLogger("cwltool")
 
 class CommandLineJob(object):
-    def run(self, dry_run=False, pull_image=True, outdir=None):
+    def run(self, dry_run=False, pull_image=True, outdir=None, rm_container=True):
         if not outdir:
             if not dry_run:
                 outdir = tempfile.mkdtemp()
@@ -34,6 +34,15 @@ class CommandLineJob(object):
                     pass
 
             if not found and pull_image:
+                if "file" in self.container:
+                    dockerfile_dir = tempfile.mkdtemp()
+                    with open(os.path.join(dockerfile_dir, "Dockerfile"), "w") as df:
+                        df.write(self.container["file"])
+                    cmd = ["docker", "build", "--tag=%s" % self.container["imageId"], dockerfile_dir]
+                    _logger.info(str(cmd))
+                    if not dry_run:
+                        subprocess.check_call(cmd, stdout=sys.stderr)
+                        found = True
                 if "pull" in self.container:
                     cmd = ["docker", "pull", self.container["pull"]]
                     _logger.info(str(cmd))
@@ -69,6 +78,8 @@ class CommandLineJob(object):
                 runtime.append("--volume=%s:%s:rw" % (os.path.abspath(outdir), "/tmp/job_output"))
                 runtime.append("--workdir=%s" % ("/tmp/job_output"))
                 runtime.append("--user=%s" % (os.geteuid()))
+                if rm_container:
+                    runtime.append("--rm")
                 for t,v in self.environment.items():
                     runtime.append("--env=%s=%s" % (t, v))
                 runtime.append(self.container["imageId"])

@@ -88,7 +88,7 @@ class WorkflowJob(object):
                 if not s.completed:
                     job = self.try_make_job(s)
                     if job:
-                        (joutdir, output) = job.run(outdir=outdir)
+                        (joutdir, output) = job.run(outdir=outdir, **kwargs)
                         for i in s.tool["outputs"]:
                             _logger.info("Job got output: %s", output)
                             if "id" in i:

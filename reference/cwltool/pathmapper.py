@@ -18,7 +18,7 @@ class DockerPathMapper(object):
         self._pathmap = {}
         self.dirs = {}
         for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
+            abs = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
             dir, fn = os.path.split(abs)
 
             subdir = False
@@ -47,7 +47,7 @@ class DockerPathMapper(object):
             self.dirs[d] = name
 
         for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.join(basedir, src)
+            abs = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
             for d in self.dirs:
                 if abs.startswith(d):
                     self._pathmap[src] = os.path.join(self.dirs[d], abs[len(d)+1:])

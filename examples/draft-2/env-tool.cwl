@@ -11,4 +11,4 @@ environmentDefs:
       class: JavascriptExpression
       value: "$job.in"
 baseCommand: ["/bin/bash", "-c", "echo $TEST_ENV"]
-stdout: {id: "#out"}
+stdout: {ref: "#out"}

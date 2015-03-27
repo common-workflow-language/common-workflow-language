@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--basedir", type=str)
     parser.add_argument("--outdir", type=str)
     parser.add_argument("--no-container", action="store_true", help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool")
+    parser.add_argument("--leave-container", action="store_true", help="Do not delete Docker container after it exits")
     parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull the Docker image")
     parser.add_argument("--dry-run", action="store_true", help="Do not execute")
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
@@ -48,6 +49,10 @@ def main():
     if args.print_rdf:
         printrdf(args.workflow, args.rdf_serializer)
         return 0
+
+    if not args.job_order:
+        _logger.error("Input object required")
+        return 1
 
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
 
@@ -69,7 +74,7 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir)
+            (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir, rm_container=(not args.leave_container))
             _logger.info("Output directory is %s", outdir)
             print json.dumps(runjob)
     except (jsonschema.exceptions.ValidationError, validate.ValidationException):

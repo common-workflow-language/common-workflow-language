@@ -10,7 +10,7 @@
         "id": "#output",
         "type": "File"
     }],
-    "stdin": {"id": "#file1"},
-    "stdout": {"id": "#output"},
+    "stdin": {"ref": "#file1"},
+    "stdout": {"ref": "#output"},
     "baseCommand": ["wc"]
 }

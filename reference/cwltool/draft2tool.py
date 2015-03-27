@@ -39,11 +39,11 @@ class Builder(object):
                     return self.jseval(ex["value"], context)
                 elif "invoke" in ex:
                     return self.jseval(ex["invoke"], context)
-            elif ex.get("id"):
-                if ex["id"].startswith("#"):
-                    return self.job[ex["id"][1:]]
+            elif ex.get("ref"):
+                if ex["ref"].startswith("#"):
+                    return self.job[ex["ref"][1:]]
                 else:
-                    with open(os.path.join(self.basedir, ex["id"]), "r") as f:
+                    with open(os.path.join(self.basedir, ex["ref"]), "r") as f:
                         return f.read()
         else:
             return ex
@@ -259,10 +259,10 @@ class CommandLineTool(Tool):
             reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
-            if isinstance(self.tool["stdout"], dict) and "id" in self.tool["stdout"]:
+            if isinstance(self.tool["stdout"], dict) and "ref" in self.tool["stdout"]:
                 for out in self.tool.get("outputs", []):
-                    if out["id"] == self.tool["stdout"]["id"]:
-                        filename = self.tool["stdout"]["id"][1:]
+                    if out["id"] == self.tool["stdout"]["ref"]:
+                        filename = self.tool["stdout"]["ref"][1:]
                         j.stdout = filename
                         out["outputBinding"] = out.get("outputBinding", {})
                         out["outputBinding"]["glob"] = filename
@@ -281,6 +281,10 @@ class CommandLineTool(Tool):
         for t in self.tool.get("environmentDefs", []):
             j.environment[t["env"]] = builder.do_eval(t["value"])
 
+        for r in self.tool.get("requirements", []):
+            if r["class"] not in ("DockerRequirement", "MemoryRequirement"):
+                raise Exception("Unknown requirement %s" % (r["class"]))
+
         reqsAndHints = self.tool.get("requirements", []) + self.tool.get("hints", [])
         for r in reqsAndHints:
             if r["class"] == "DockerRequirement" and use_container:
@@ -288,6 +292,8 @@ class CommandLineTool(Tool):
                 j.container["type"] = "docker"
                 if "dockerPull" in r:
                     j.container["pull"] = r["dockerPull"]
+                if "dockerFile" in r:
+                    j.container["file"] = r["dockerFile"]
                 if "dockerLoad" in r:
                     if r["dockerLoad"].startswith("http"):
                         j.container["load"] = r["dockerLoad"]

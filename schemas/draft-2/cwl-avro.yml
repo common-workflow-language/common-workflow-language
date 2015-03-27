@@ -302,7 +302,7 @@
   fields: [ { name: "id", type: "string" } ]
 
 - type: record
-  name: "ProcessRequirement"
+  name: ProcessRequirement
   fields: [
     { name: "class", type: "string" }
   ]
@@ -338,7 +338,7 @@
 
   fields:
     - name: "class"
-      type: "string"
+      type: ["null", "string"]
       "doc": |
         The type of process is defined by the `class` field.  Valid values for this
         field are [`CommandLineTool`](\#/schema/CommandLineTool),
@@ -491,9 +491,11 @@
 - type: record
   name: "External"
   extends: "Process"
-  "specialize":
-    "InputSchemaRoot": "ExternallyDefinedInput"
-    "OutputSchemaRoot": "ExternallyDefinedOutput"
+  specialize:
+    InputSchemaRoot: ExternallyDefinedInput
+    OutputSchemaRoot: ExternallyDefinedOutput
+  doc: "An external process provides a level of indirection to instantiate a process
+    defined by an external resource (another CWL document)."
   fields: [
     {
       name: "impl",
@@ -501,8 +503,6 @@
       doc:  Specifies the resource that should be loaded to find the actual process definition.
     }
   ]
-  doc: "An external process provides a level of indirection to instantiate a process
-  defined by an external resource (another CWL document)."
 
 
 - type: record
@@ -516,4 +516,14 @@
         items: ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
       }
     }
+  ]
+
+- type: record
+  name: DockerRequirement
+  extends: ProcessRequirement
+  fields: [
+    { name: "dockerPull", type: ["null", "string"] },
+    { name: "dockerLoad", type: ["null", "string"] },
+    { name: "dockerFile", type: ["null", "string"] },
+    { name: "dockerImageId", type: ["null", "string"] }
   ]
