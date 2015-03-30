@@ -106,14 +106,16 @@ with open(cwl_avsc) as f:
             for field in f["fields"]:
                 if "doc" not in field:
                     field["doc"] = ""
+        doc = ""
         if "extends" in f:
-            f["doc"] += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
+            doc += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
         if f["name"] in subs:
-            f["doc"] += "\n\nExtended by"
-            f["doc"] += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])
+            doc += "\n\nExtended by"
+            doc += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])
         if f["name"] in uses:
-            f["doc"] += "\n\nReferenced by"
-            f["doc"] += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
+            doc += "\n\nReferenced by"
+            doc += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
+        f["doc"] = doc + "\n\n" + f["doc"]
 
 with open("in.avsc", "w") as f:
     json.dump(out, f, indent=True)

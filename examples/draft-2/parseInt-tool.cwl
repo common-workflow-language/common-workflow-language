@@ -13,6 +13,6 @@
     }],
     "script": {
         "class": "JavascriptExpression",
-        "value": "{return {'output': parseInt($job.file1.contents)};}"
+        "script": "{return {'output': parseInt($job.file1.contents)};}"
     }
 }

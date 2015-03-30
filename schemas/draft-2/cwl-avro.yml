@@ -93,7 +93,7 @@
     risks associated with running untrusted code.
 
   fields:
-    - name: "value"
+    - name: "script"
       type: ["null", "string"]
       doc: |
         A fragment of JavaScript code.  If `value` is enclosed in braces ("{"
@@ -105,14 +105,6 @@
         expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11),
         and the value of the expression will be the result of evaluating that
         expression.
-
-    - name: "invoke"
-      type:
-        - "null"
-        - type: array
-          items: string
-          doc: "Construct a Javascript function invocation.  The first element of
-          the array is the function name, subsequent elements are invocation parameter."
 
 - type: record
   name: "Ref"
@@ -127,14 +119,66 @@
 
 - type: record
   name: "CommandLineBinding"
-  fields: [
-    { name: "position", type: ["null", "int"] },
-    { name: "prefix", type: [ "null", "string"] },
-    { name: "separator", type: ["null", "string"] },
-    { name: "itemSeparator", type: ["null", "string"] },
-    { name: "valueFrom", type: ["null", "Expression", "Ref"] },
-    { name: "loadContents", type: ["null", "boolean"] }
-  ]
+  doc: |
+
+    When listed under `commandLineBinding` in the input schema, the term
+    "value" refers to the the corresponding value in the input object.  For
+    binding objects listed in `CommandLineTool.arguments`, the term "value"
+    refers to the effective value after evaluating `valueFrom`.
+
+    The binding behavior when building the command line depends on the data
+    type of the value.  If there is a mismatch between the type described by
+    the input schema and the effective value, such as resulting from an
+    expression evaluation, an implementation must use the data type of the
+    effective value.
+
+      - **string**: Add `prefix`, `separator` and string to the command line.
+
+      - **number**: Add `prefix`, `separator` and decimal string representation
+        and add to command line.
+
+      - **boolean**: If true, add `prefix` to the command line.  If false, add
+          nothing.
+
+      - **File**: Add `prefix`, `separator`, and the value of
+        [`File.path`](#/schemas/File) to the command line.
+
+      - **array**: If `itemSeparator` is specified, add `prefix`, `separator`,
+          and the join the array as described below.  Otherwise add `prefix`
+          only.
+
+      - **object**: Add `prefix` only.
+
+      - **null**: Add nothing.
+
+  fields:
+    - name: "position"
+      type: ["null", "int"]
+      doc: "The sorting key"
+    - name: "prefix"
+      type: [ "null", "string"]
+      doc: "Command line prefix to add before the value."
+    - name: "separator"
+      type: ["null", "string"]
+      doc: |
+        Separator to insert between `prefix` and the actual value.  If not
+        specified, null, or a single space " ", then the prefix and value must be
+        added as separate command line arguments; for any other value
+        (including the empty string ""), the prefix, separator and value must
+        be concatenated into a single command line argument.
+    - name: "itemSeparator"
+      type: ["null", "string"]
+      doc: |
+        Join the array elements into a single string with the elements
+        separated by by `itemSeparator`.
+    - name: "valueFrom"
+      type: ["null", "Expression", "Ref"]
+      doc: |
+        An expression or reference to a field in the input object which must be
+        evaluted to yield the effective value to use to build the command line.
+        Required when evaluating the binding as part of the `CommandLineTool.arguments` field.
+    - name: "loadContents"
+      type: ["null", "boolean"]
 
 - type: record
   name: "OutputBinding"
@@ -146,9 +190,18 @@
 
 - type: record
   name: "DataLink"
-  fields: [
-    { name: "source", type: "string" }
-  ]
+  doc: |
+    A data link connects the value of one parameter to another such that when a
+    value becomes available for the parameter specified by `source`, that value
+    of the parameter is propagated to the destination parameter.
+  fields:
+    - name: "source"
+      type: "string"
+      doc: |
+        An input parameter on the parent workflow as identified by the
+        [`InputSchemaRoot.id`](#/schema/InputSchemaRoot), or an output
+        parameter of another step in the same workflow as identified by the
+        [`OutputSchemaRoot.id`](#/schema/OutputSchemaRoot) field.
 
 - type: record
   name: ExternallyDefinedInput
@@ -246,23 +299,48 @@
 - type: record
   name: "SchemaDef"
   extends: "Schema"
-  fields: [ { name: name, type: "string" } ]
+  fields:
+    - name: name
+      type: "string"
+      doc: "The type name being defined."
 
 - type: record
   name: "InputSchema"
   extends: "Schema"
-  "specialize": {"Schema": "InputSchema"}
-  fields: [ {
-    name: "connect",
-    type: [
-      "null",
-      "DataLink",
-      {
-        type: "array",
-        items: "DataLink"
-      }
-    ]
-  } ]
+  specialize: {"Schema": "InputSchema"}
+  doc: |
+
+    Define an input parameter to a process.
+
+    If the process is part of a workflow, the `connect` field must define
+    either a connection to an input parameter on the parent workflow, or to the
+    output parameter of another step in the same workflow.
+
+    There may be multiple inbound data links.  If so, the following rules apply
+    to combine the inputs:
+
+      1. The parameter type must be an array, or named in a [workflow scatter](#/schema/Workflow)
+         operation
+      2. The source parameter must be the same type, or the type of array
+         element type defined by `items`.
+      3. Source parameters which are array of the same type are concatenated;
+         source parameters which are single element types are appended added as
+         single elements.
+
+  fields:
+    - name: "connect"
+      type:
+        - "null"
+        - "DataLink"
+        - type: "array"
+          items: "DataLink"
+      doc: "Connect this input parameter to upstream parameters, described above."
+    # - name: "default"
+    #   type:
+    #     - "null"
+    #   doc: |
+    #     The default value for this parameter if there is no `connect`
+    #     field.
 
 - type: record
   name: "InputSchemaRoot"
@@ -303,27 +381,49 @@
 
 - type: record
   name: ProcessRequirement
-  fields: [
-    { name: "class", type: "string" }
-  ]
+  doc: |
+    A process requirement declares a prerequisite that may or must be fufilled
+    before executing a process.  See [`Process.hints`](#/schema/Process) and
+    [`Process.requirements`](#/schema/Process).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "The specific requirement type."
 
 - type: record
   name: "FileDef"
-  fields: [
-    {name: "filename", type: "string"},
-    {
-      name: "value",
-      type: ["null", "string", "Expression"]
-    }
-  ]
+  doc: |
+    Define a file that will be created by the workflow platform in the
+    designated output directory prior to executing the command line tool.  May
+    be the result of executing an expression, such as building a configuration
+    file from a template.
+  fields:
+    - name: "filename"
+      type: ["string", "Expression"]
+      doc: "The name of the file to create in the output directory."
+    - name: "value"
+      type: ["string", "Expression", "Ref"]
+      doc: |
+        The contents of the file.
+
+        If the value is a [`Ref`](#/schema/Ref) to an input parameter of type
+        File, this indicates that the input file should be added to the
+        designated output directory prior to executing the tool.  The input
+        file entry in the designated output directory may read-only, and may be
+        implemented through bind mounts or file system links in such a way as
+        to avoid copying the input file.
 
 - type: record
   name: "EnvironmentDef"
+  doc: |
+    Define an environment variable that will be set in the runtime environment
+    by the workflow platform when executing the command line tool.  May be the
+    result of executing an expression, such as getting a parameter from input.
   fields: [
     {name: "env", type: "string"},
     {
       name: "value",
-      type: ["null", "string", "Expression"]
+      type: ["string", "Expression", "Ref"]
     }
   ]
 
@@ -369,8 +469,8 @@
           items: "SchemaDef"
         }
       ]
-      "doc": |
-        Process objects may include the `schemaDefs` field.  This field consists of an
+      doc: |
+        This field consists of an
         array of type definitions which must be used when interpreting the `inputs` and
         `outputs` fields.  When a symbolic type is encountered that is not in
         [`Datatype`](#/schema/Datatype), the implementation must check if
@@ -414,6 +514,12 @@
           items: ["string", "Ref"]
         }
       ]
+    - name: scatter
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
 
 - type: record
   name: "CommandLineTool"
@@ -433,48 +539,39 @@
     ## Command line binding
 
     The tool command line is built by applying command line bindings to the
-    input object.
+    input object.  Bindings can be listed directly under input parameters using
+    the `commandLineBinding` field, or separately using the `arguments` field.
 
-    If the binding object is listed in the input schema, "value" is set to the
-    corresponding value for that input join the job order document.  For adapter
-    records listed in "args", "value" must be provided or it is an error.  The
-    "value" field may be a [reference](#references) or [expression](#expressions).
-    The adapter behavior in building the command line depends on the data type of
-    the value.  Note: in the event of a mismatch between the data type specified in
-    the schema and the data type of the actual value (this can occur when applying
-    expressions), use the data type of the actual value to select the appropriate
-    behavior:
+    The algorithm to build the command line is as follows:
 
-      - array: each value of the array will be added as separate command line
-        entries, unless "itemSeparator" is specified (see below).
+      1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
+      key `[position, i]` where `position` is
+      [`CommandLineBinding.position`](#/schema/CommandLineBinding) and the `i`
+      is the index in the `arguments` list.
 
-      - boolean: Indicates that this argument represents a boolean
-          command-line flag. If true, indicates that the value in "prefix"
-          (see below) should be added to the command line.  If false, nothing
-          is added.
+      2. Collect `CommandLineBinding` objects from the `inputs` schema and
+      associate them with values from the input object.  Where the input type
+      is a record, array, or map, recursively walk the schema and input object,
+      collecting nested `CommandLineBinding` objects and associating them with
+      values from the input object.  Assign a sorting key for each leaf binding
+      object by appending nested `position` fields together with the record
+      name, array index, or map key of the data at each nesting level.
 
-      - file: Add the "path" field of the file object to the command line.  Note that
-            the actual path used to invoke the tool may be different due to path
-            rewriting.
+      3. Sort elements on the assigned sorting keys.
 
-      - null: nothing is added to the command line.
+      4. Apply the rules defined in
+      [`CommandLineBinding`](#/schema/CommandLineBinding) to convert bindings
+      to actual command line elements.
 
-      - number: Convert to decimal text string representation and add an entry to the
-                the command line.
-
-      - object: the value of "prefix" is added to the command line.  The contents of
-                  the object may be serialized with a nested adapter, and appended to "prefix."
-
-      - string: Added unchanged to the command line.
+      5. Insert elements from `baseCommand` at the beginning of the command
+      line.
 
     ## Execution
 
-    Once the command line is built, the tool is ready for execution.
+    Once the command line is built, the tool is almost ready to execute.
 
-    Tools are assumed to run in a POSIX environment.  Tools must be
-    non-interactive, command line programs.  Tools must not require any kind of
-    console, GUI, or web based user interaction in order to start and run to
-    completion.
+    The workflow platform must set up `fileDefs` and set `environmentDefs` as
+    describe below.
 
     The `TMPDIR` environment variable must be set in the runtime environment to
     the **designated temporary directory**.  Any files written to the
@@ -482,12 +579,15 @@
     infrastructure when the tool invocation is complete.
 
     When the tool is initially executed, the designated designated temporary
-    directory must contain a single file "job.cwl.json", which contains the
-    input object.
+    directory must contain a single file "cwl.input.json", which contains the
+    input object encoded in JSON.
 
     Output files produced by tool execution must be written to the **designated
     output directory**.  The designated output directory must be the initial
-    current working in when the tool is executed.
+    current working in when executing the tool.
+
+    The standard input stream and standard output stream may be redirected as
+    described below.
 
     An implementation may forbid the tool from writing to any location in the
     runtime environment file system other than the designated temporary
@@ -496,11 +596,44 @@
 
     Tools may be multithreaded or spawn child processes; however, when the
     parent process exits, the tool is considered finished regardless of whether
-    any detached child processes are still running.
+    any detached child processes are still running.  Tools must not require any
+    kind of console, GUI, or web based user interaction in order to start and
+    run to completion.
+
+    The standard error stream and standard output stream (unless redirected)
+    may be captured by platform logging facilities for storage and reporting.
 
     ## Executing tools in Docker
 
+    If the command line tool lists
+    [`DockerRequirement`](#/schemas/DockerRequirement) under `hints` or
+    `requirements`, it may (or must) be run in the specified Docker container.
+
+    The platform must first acquire or install the correct Docker image, as
+    described by [`DockerRequirement`](#/schemas/DockerRequirement).
+
+    The platform must execute the tool in the container using `docker run` with
+    the appropriate Docker image and the tool command line.
+
+    The workflow platform may provide input files and the designated output
+    directory through the use of volume bind mounts.  The platform may rewrite
+    file paths in the input object to correspond to the Docker bind mounted
+    locations.
+
+    When running a tool contained in Docker, the workflow platform must not
+    assume anything about the contents of the Docker container, such as the
+    presence or absence of specific software, except to assume that the
+    generated command line represents a valid command within the runtime
+    environment of the container.
+
     ## Output binding
+
+    If the output directory contains a file called "cwl.output.json", that file
+    must be loaded and used as the output object.  Otherwise, the output object
+    must be generated by walking the output schema and applying output bindings
+    to the tool output.  Output bindings are listed directly in output
+    parameters using the `outputBinding` field.  See
+    [`OutputBinding`](#/schema/OutputBinding) for details.
 
   fields:
     - name: "baseCommand"
@@ -520,6 +653,9 @@
         }
       ]
     - name: "arguments"
+      doc: |
+        Command line bindings which are not directly associated with values
+        from the input object.
       type: [
         "null",
         {
@@ -531,7 +667,7 @@
       type: ["null", "Ref"]
       doc: |
         A reference to an input [`File`](#/schema/File) parameter whose contents must be piped
-        into the command's standard input stream."
+        into the command's standard input stream.
     - name: "stdout"
       type: ["null", "string", "Expression", "Ref"]
       doc: |
@@ -551,6 +687,10 @@
         name.
 
     - name: "fileDefs"
+      doc: |
+        Define a list of files that will be created by the workflow platform in
+        the designated output directory prior to executing the command line
+        tool.  See `FileDef` for details.
       type: [
         "null",
         {
@@ -559,6 +699,9 @@
         }
       ]
     - name: "environmentDefs"
+      doc: |
+        Define a list of environment variables which will be set in the
+        execution environment of the tool.  See `EnvironmentDef` for details.
       type: [
         "null",
         {
@@ -597,22 +740,57 @@
 - type: record
   name: "Workflow"
   extends: "Process"
-  fields: [
-    {
-      name: "steps",
+  doc: |
+
+    A workflow is a process consisting of one or more process `steps`.  Each
+    step has input and output parameters defined by the `inputs` and `outputs`
+    fields.
+
+    Steps are connected to other steps by data links.  Data links also connect
+    the input and output of steps to the input and output parameters of the
+    workflow.
+
+    A data link connects the value of one parameter to another such that when a
+    value becomes available for the parameter specified by
+    [`DataLink.source`](#/schema/DataLink), that value of the parameter is
+    propagated to the destination parameter.  When all data links inbound to a
+    given step are fufilled, the step is ready to execute.
+
+    ## Scatter/gather
+
+
+
+  fields:
+    - name: "steps"
+      doc: |
+        Subprocesses to execute as workflow steps.  Steps are executed when all
+        input data links are fufilled.  Steps may execute concurrently.  The
+        order in which steps are listed does not affect the actual execution
+        order of steps.
       type: {
         type: "array",
         items: ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
       }
-    }
-  ]
 
 - type: record
   name: DockerRequirement
   extends: ProcessRequirement
-  fields: [
-    { name: "dockerPull", type: ["null", "string"] },
-    { name: "dockerLoad", type: ["null", "string"] },
-    { name: "dockerFile", type: ["null", "string"] },
-    { name: "dockerImageId", type: ["null", "string"] }
-  ]
+  doc: |
+    Indicates that a workflow component should be run in a
+    [Docker](http://docker.com) container, and specifies how to fetch or build
+    the image.
+  fields:
+    - name: "dockerPull"
+      type: ["null", "string"]
+      doc: "Get a Docker image using `docker pull`."
+    - name: "dockerLoad"
+      type: ["null", "string"]
+      doc: "Specify a HTTP URL from which to download a Docker image using `docker load`."
+    - name: "dockerFile"
+      type: ["null", "string"]
+      doc: "Supply the contents of a Dockerfile which will be build using `docker build`."
+    - name: "dockerImageId"
+      type: "string"
+      doc: |
+        The image id that will be used for `docker run`.  May be a
+        human-readable image name or the image identifier hash.

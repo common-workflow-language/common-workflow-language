@@ -68,7 +68,7 @@
         {
             "valueFrom": {
                 "class": "JavascriptExpression",
-                "value": "$job.allocatedResources.cpu"
+                "script": "$job.allocatedResources.cpu"
             },
             "position": 1,
             "prefix": "-t"

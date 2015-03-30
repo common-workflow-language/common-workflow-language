@@ -35,4 +35,4 @@ steps:
           type: int
       script:
         class: JavascriptExpression
-        value: "{return {'step2_output': parseInt($job.step2_file1.contents)};}"
+        script: "{return {'step2_output': parseInt($job.step2_file1.contents)};}"

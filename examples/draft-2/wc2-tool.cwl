@@ -13,6 +13,6 @@ outputs:
         loadContents: true
         valueFrom:
             class: JavascriptExpression
-            value: "parseInt($self[0])"
+            script: "parseInt($self[0])"
 stdout: output.txt
 baseCommand: wc

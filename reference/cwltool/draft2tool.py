@@ -35,10 +35,8 @@ class Builder(object):
     def do_eval(self, ex, context=None):
         if isinstance(ex, dict):
             if ex.get("class") == "JavascriptExpression":
-                if "value" in ex:
-                    return self.jseval(ex["value"], context)
-                elif "invoke" in ex:
-                    return self.jseval(ex["invoke"], context)
+                if "script" in ex:
+                    return self.jseval(ex["script"], context)
             elif ex.get("ref"):
                 if ex["ref"].startswith("#"):
                     return self.job[ex["ref"][1:]]
@@ -322,7 +320,7 @@ class CommandLineTool(Tool):
         return j
 
     def collect_output_ports(self, ports, builder, outdir):
-        custom_output = os.path.join(outdir, "output.cwl.json")
+        custom_output = os.path.join(outdir, "cwl.output.json")
         if os.path.exists(custom_output):
             outputdoc = yaml.load(custom_output)
             validate.validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)

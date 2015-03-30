@@ -14,7 +14,7 @@ fileDefs:
   - filename: foo.txt
     value:
       class: JavascriptExpression
-      invoke: ["t", "The file is <%= $job.file1.path %>\n"]
+      script: 't("The file is <%= $job.file1.path %>\n")'
 inputs:
   - id: "#file1"
     type: File

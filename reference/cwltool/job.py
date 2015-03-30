@@ -18,7 +18,7 @@ class CommandLineJob(object):
             else:
                 outdir = "/tmp"
 
-        with open(os.path.join(outdir, "job.cwl.json"), "w") as fp:
+        with open(os.path.join(outdir, "cwl.input.json"), "w") as fp:
             json.dump(self.joborder, fp)
 
         runtime = []

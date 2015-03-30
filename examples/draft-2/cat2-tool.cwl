@@ -17,8 +17,5 @@
     ],
     "outputs": [],
     "baseCommand": "cat",
-    "stdin": {
-        "class": "JavascriptExpression",
-        "value": "$job.file1.path"
-    }
+    "stdin": {"ref": "#file1"}
 }

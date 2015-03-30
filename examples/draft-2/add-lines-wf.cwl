@@ -34,4 +34,4 @@ steps:
         type: int
     script:
       class: JavascriptExpression
-      value: "{return {'step2_output': ($job.a[0] + $job.a[1])}; }"
+      script: "{return {'step2_output': ($job.a[0] + $job.a[1])}; }"

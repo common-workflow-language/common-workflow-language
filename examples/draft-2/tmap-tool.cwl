@@ -241,9 +241,6 @@
         }
     ],
     "baseCommand": ["tmap", "mapall"],
-    "stdin": {
-        "class": "JavascriptExpression",
-        "value": "$job.reads.path"
-    },
+    "stdin": {"ref": "#reads"},
     "stdout": "output.sam"
 }
