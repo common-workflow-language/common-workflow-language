@@ -71,6 +71,7 @@ performance computing systems.
 * [YAML](http://yaml.org)
 * [Avro](https://avro.apache.org)
 * [ECMAScript 5.1 (Javascript)](http://www.ecma-international.org/ecma-262/5.1/)
+* [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
 
 ## Scope
 
@@ -115,15 +116,15 @@ boolean, array, or object.
 
 A **document** is a file containing a serialized object.
 
-A **process** is the basic unit of computation.  It accepts some input data,
+A **process** is a basic unit of computation.  It accepts some input data,
 performs some computation, produces a some output data.
 
 A **input object** is a object describing the inputs to a invocation of process.
 
 A **output object** is a object describing the output of an invocation of a process.
 
-A **input schema** describes valid format (required fields, data types)
-  for a input object.
+A **input schema** describes the valid format (required fields, data types)
+for an input object.
 
 A **output schema** describes the valid format for a output object.
 
@@ -176,7 +177,7 @@ A conforming implementation must accept all valid YAML documents.
 
 A CWL document may be formally validated using the Avro schema located at:
 
-https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl.avsc
+https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
 
 An implementation may interpret a CWL document as [JSON-LD](http://json-ld.org)
 and convert a CWL document to a [Resource Definition Framework
@@ -206,12 +207,9 @@ An implementation may choose to only honor references to objects for which the
 
 # Execution
 
-The root object defined in a CWL document must be a
-[`Process`](#/schema/Process) object.
-
-## Generic execution sequence
-
-The generic execution sequence of a CWL process is as follows:
+The generic execution sequence of a CWL document is as follows.  The root
+object defined in a CWL document must be a [`Process`](#/schema/Process)
+object.
 
 1. Load and validate CWL document, yielding a process object.
 2. Load input object.

@@ -431,10 +431,10 @@
   name: "Process"
   doc: |
 
-    To execute a CWL document means to execute the `Process` object defined by
-    the document.  Note that the `Process` object is abstract and cannot be
+    The base executable type in CWL is the `Process` object defined by the
+    document.  Note that the `Process` object is abstract and cannot be
     directly executed.  If the `class` field is not specified, the
-    implementation must default to the process class [`External`](\#/schema/External).
+    implementation must default to the class [`External`](\#/schema/External).
 
   fields:
     - name: "class"
