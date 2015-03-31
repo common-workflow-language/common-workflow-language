@@ -20,6 +20,10 @@ Bioinformatics, Chemistry, Physics, and Astronomy.
 Please be aware that Common Workflow Language is still under heavy development.
 The current draft is draft 2.
 
+## Specification
+
+http://common-workflow-language.github.io/
+
 ## Repository contents
 
 [Draft specifications](specification/)
