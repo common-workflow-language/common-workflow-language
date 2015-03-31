@@ -17,12 +17,12 @@ CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
 CWL is designed to express workflows for data-intensive science, such as
 Bioinformatics, Chemistry, Physics, and Astronomy.
 
-Please be aware that Common Workflow Language is still under heavy development.
-The current draft is draft 2.
-
-## Specification
+## Current specification
 
 http://common-workflow-language.github.io/
+
+Please be aware that Common Workflow Language is still under heavy development.
+The current draft is draft 2.  This draft is not final.
 
 ## Repository contents
 
