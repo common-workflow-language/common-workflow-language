@@ -20,7 +20,7 @@ sequence of operations that transform an input data set to output.  This
 specification defines the Common Workflow Language (CWL), a vendor-neutral
 standard for representing Workflows intended to be portable across a variety of
 computing platforms.  This specification defines two concrete workflow
-operations, the Comand Line Tool, for invoking a command line program
+operations, the Command Line Tool, for invoking a command line program
 (optionally within an operating system container) and capturing the output, and
 the Expression Tool, for applying ECMAScript functions to the data set.
 
