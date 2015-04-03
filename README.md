@@ -64,7 +64,7 @@ the repository and send a pull request!
 
 * Peter Amstutz <peter.amstutz@curoverse.com>
 * John Chilton <jmchilton@gmail.com>
-* Michael Crusoe <michael.crusoe@gmail.com>
+* Michael R. Crusoe <mcrusoe@msu.edu>
 * John Kern <kern3020@gmail.com>
 * Hervé Ménager <herve.menager@gmail.com>
 * Maxim Mikheev <mikhmv@biodatomics.com>
