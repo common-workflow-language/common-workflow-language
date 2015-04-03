@@ -8,7 +8,7 @@ Contributers:
 * Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>, Seven Bridges Genomics
 * John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
-* Michael Crusoe <michael.crusoe@gmail.com>, Michigan State University
+* Michael R. Crusoe <mcrusoe@msu.edu>, Michigan State University
 * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
 * Maxim Mikheev <mikhmv@biodatomics.com>, BioDatomics
 * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>, University of Manchester
