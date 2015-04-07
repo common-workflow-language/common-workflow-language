@@ -204,7 +204,7 @@
         [`OutputSchemaRoot.id`](#/schema/OutputSchemaRoot) field.
 
 - type: record
-  name: ExternallyDefinedInput
+  name: ExternalInputParameter
   fields: [
     { name: "def", type: "string" },
     {
@@ -221,7 +221,7 @@
   ]
 
 - type: record
-  name: ExternallyDefinedOutput
+  name: ExternalOutputParameter
   fields: [
     { name: "def", type: "string" },
     { name: "id", type: "string" }
@@ -305,12 +305,10 @@
       doc: "The type name being defined."
 
 - type: record
-  name: "InputSchema"
-  extends: "Schema"
-  specialize: {"Schema": "InputSchema"}
+  name: "Parameter"
   doc: |
 
-    Define an input parameter to a process.
+    Define an input or output parameter to a process.
 
     If the process is part of a workflow, the `connect` field must define
     either a connection to an input parameter on the parent workflow, or to the
@@ -328,13 +326,17 @@
          single elements.
 
   fields:
-    - name: "connect"
+    - name: id
+      type: string
+    - name: type
+      type: ["Datatype", "Schema"]
+    - name: connect
       type:
         - "null"
-        - "DataLink"
-        - type: "array"
-          items: "DataLink"
-      doc: "Connect this input parameter to upstream parameters, described above."
+        - DataLink
+        - type: array
+          items: DataLink
+      doc: "Connect this parameter to upstream parameters, described above."
     # - name: "default"
     #   type:
     #     - "null"
@@ -343,41 +345,45 @@
     #     field.
 
 - type: record
-  name: "InputSchemaRoot"
-  extends: "InputSchema"
-  fields: [ { name: "id", type: "string" } ]
+  name: InputParameter
+  extends: Parameter
+  fields: []
 
 - type: record
-  name: "CommandLineInputSchema"
-  extends: "InputSchema"
-  "specialize": {"InputSchema": "CommandLineInputSchema"}
-  fields: [
-    {
-      name: "commandLineBinding",
+  name: OutputParameter
+  extends: Parameter
+  fields: []
+
+- type: record
+  name: CommandLineInputSchema
+  extends: Schema
+  specialize: {"Schema": "CommandLineInputSchema"}
+  fields:
+    - name: "commandLineBinding"
       type: [ "null", "CommandLineBinding" ]
-    }
-  ]
 
 - type: record
-  name: "CommandLineInputSchemaRoot"
-  extends: "CommandLineInputSchema"
-  fields: [ { name: "id", type: "string" } ]
+  name: CommandLineInputParameter
+  extends: InputParameter
+  specialize: {"Schema": "CommandLineInputSchema"}
+  fields:
+    - name: commandLineBinding
+      type: [ "null", "CommandLineBinding" ]
 
 - type: record
-  name: "OutputSchema"
-  extends: "Schema"
-  "specialize": {"Schema": "OutputSchema"}
-  fields: [
-    {
-      name: "outputBinding",
+  name: CommandLineOutputSchema
+  extends: Schema
+  specialize: {"Schema": "CommandLineOutputSchema"}
+  fields:
+    - name: outputBinding
       type: [ "null", "OutputBinding" ]
-    }
-  ]
 
 - type: record
-  name: "OutputSchemaRoot"
-  extends: "OutputSchema"
-  fields: [ { name: "id", type: "string" } ]
+  name: CommandLineOutputParameter
+  extends: OutputParameter
+  fields:
+    - name: outputBinding
+      type: [ "null", "OutputBinding" ]
 
 - type: record
   name: ProcessRequirement
@@ -448,7 +454,7 @@
     - name: "inputs"
       type: {
         type: "array",
-        items: "InputSchemaRoot",
+        items: "InputParameter",
       }
       doc:
         "Defines the input parameters of the process.  This may be used to
@@ -457,7 +463,7 @@
     - name: "outputs"
       type: {
         type: "array",
-        items: "OutputSchemaRoot"
+        items: "OutputParameter"
       }
       doc: "Defines the input parameters of the process, and
         may be used to generate and/or validate the input object."
@@ -524,7 +530,9 @@
 - type: record
   name: "CommandLineTool"
   extends: "Process"
-  specialize: {"InputSchemaRoot": "CommandLineInputSchemaRoot"}
+  specialize:
+    InputParameter: CommandLineInputParameter
+    OutputParameter: CommandLineOutputParameter
   doc: |
 
     A *tool* is a standalone, non-interactive command line application which is
@@ -724,8 +732,8 @@
   name: "External"
   extends: "Process"
   specialize:
-    InputSchemaRoot: ExternallyDefinedInput
-    OutputSchemaRoot: ExternallyDefinedOutput
+    InputParameter: ExternalInputParameter
+    OutputParameter: ExternalOutputParameter
   doc: "An external process provides a level of indirection to instantiate a process
     defined by an external resource (another CWL document)."
   fields: [
