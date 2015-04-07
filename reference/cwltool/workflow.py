@@ -8,8 +8,19 @@ import logging
 import random
 from ref_resolver import from_url
 import os
+from collections import namedtuple
+import pprint
 
 _logger = logging.getLogger("cwltool")
+
+WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
+
+def idk(key):
+    if len(key) <= 1:
+        raise Exception("Identifier is too short")
+    if key[0] != '#':
+        raise Exception("Must start with #")
+    return key[1:]
 
 def makeTool(toolpath_object, basedir):
     if "schema" in toolpath_object:
@@ -27,55 +38,61 @@ def makeTool(toolpath_object, basedir):
         raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 
-def should_fanout(src_type, dest_type):
-    if isinstance(src_type, dict):
-        if src_type["type"] == "array" and src_type["items"] == dest_type:
-            return True
-    return False
-
 class WorkflowJob(object):
-    def try_make_job(self, s):
-        jo = {}
-        fanout = None
-        for i in s.tool["inputs"]:
+    def try_make_job(self, step):
+        inputobj = {}
+
+        if "scatter" in step.tool:
+            inputparms = copy.deepcopy(step.tool["inputs"])
+            scatter = aslist(step.tool["scatter"])
+            for i in inputparms:
+                if i["id"] in scatter:
+                    i["type"] = {"type": "array", "items": i["type"]}
+        else:
+            inputparms = step.tool["inputs"]
+
+        for i in inputparms:
             _logger.debug(i)
             if "connect" in i:
                 connect = i["connect"]
-                if isinstance(connect, list):
-                    # Handle multiple inputs
-                    if not fanout:
-                        fanout = i["id"][1:]
-                        jo[i["id"][1:]] = []
-                    else:
-                        raise Exception("Can only fanout on one port")
+                is_array = isinstance(i["type"], dict) and i["type"]["type"] == "array"
+
                 for c in aslist(connect):
-                    src = c["source"][1:]
+                    src = idk(c["source"])
                     if src in self.state:
-                        if self.state[src][0]["type"] == i["type"]:
-                            if fanout:
-                                jo[i["id"][1:]].append(self.state[src][1])
+                        if self.state[src].parameter["type"] == i["type"]:
+                            # source and input types are the same
+                            if is_array and idk(i["id"]) in inputobj:
+                                # concatenate arrays
+                                inputobj[idk(i["id"])].extend(self.state[src].value)
                             else:
-                                jo[i["id"][1:]] = self.state[src][1]
-                        elif should_fanout(self.state[src][0]["type"], i["type"]):
-                            if fanout:
-                                if fanout == i["id"][1:]:
-                                    jo[i["id"][1:]].extend(self.state[src][1])
-                                else:
-                                    raise Exception("Can only fanout on one port")
+                                # just assign the value from state to input
+                                inputobj[idk(i["id"])] = copy.deepcopy(self.state[src].value)
+                        elif is_array and self.state[src].parameter["type"] == i["type"]["items"]:
+                            # source type is the item type on the input array
+                            # promote single item to array entry
+                            if idk(i["id"]) in inputobj:
+                                inputobj[idk(i["id"])].append(self.state[src][1])
                             else:
-                                fanout = i["id"][1:]
-                                jo[i["id"][1:]] = self.state[src][1]
+                                inputobj[idk(i["id"])] = [self.state[src][1]]
                         else:
                             raise Exception("Type mismatch '%s' and '%s'" % (src, i["id"][1:]))
                     else:
                         return None
             elif "default" in i:
-                jo[i["id"][1:]] = i["default"]
+                inputobj[idk(i["id"])] = i["default"]
+            else:
+                raise Exception("Value for %s not specified" % (i["id"]))
 
-        _logger.info("Creating job with input: %s", jo)
-        if fanout:
-            s = Fanout(s, fanout)
-        return s.job(jo, self.basedir)
+        _logger.info("Creating job with input: %s", inputobj)
+        if "scatter" in step.tool:
+            if step.tool.get("scatterType") == "dotproduct" or step.tool.get("scatterType") is None:
+                step = DotProductScatter(step, aslist(step.tool["scatter"]))
+            elif step.tool.get("scatterType") == "nested_crossproduct":
+                step = NestedCrossProductScatter(step, aslist(step.tool["scatter"]))
+            elif step.tool.get("scatterType") == "flat_crossproduct":
+                step = FlatCrossProductScatter(step, aslist(step.tool["scatter"]))
+        return step.job(inputobj, self.basedir)
 
     def run(self, outdir=None, **kwargs):
         for s in self.steps:
@@ -92,10 +109,10 @@ class WorkflowJob(object):
                         for i in s.tool["outputs"]:
                             _logger.info("Job got output: %s", output)
                             if "id" in i:
-                                if i["id"][1:] in output:
-                                    self.state[i["id"][1:]] = (i, output[i["id"][1:]])
+                                if idk(i["id"]) in output:
+                                    self.state[idk(i["id"])] = WorkflowStateItem(i, output[idk(i["id"])])
                                 else:
-                                    raise Exception("Output is missing expected field %s" % i["id"][1:])
+                                    raise Exception("Output is missing expected field %s" % idk(i["id"]))
                         s.completed = True
                         made_progress = True
                         run_all -= 1
@@ -105,8 +122,8 @@ class WorkflowJob(object):
         wo = {}
         for i in self.outputs:
             if "connect" in i:
-                src = i["connect"]["source"][1:]
-                wo[i["id"][1:]] = self.state[src][1]
+                src = idk(i["connect"]["source"])
+                wo[idk(i["id"])] = self.state[src][1]
 
         return (outdir, wo)
 
@@ -123,11 +140,11 @@ class Workflow(Process):
 
         wj.state = {}
         for i in self.tool["inputs"]:
-            iid = i["id"][1:]
+            iid = idk(i["id"])
             if iid in joborder:
-                wj.state[iid] = (i, copy.deepcopy(joborder[iid]))
+                wj.state[iid] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
             elif "default" in i:
-                wj.state[iid] = (i, copy.deepcopy(i["default"]))
+                wj.state[iid] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
         wj.outputs = self.tool["outputs"]
         return wj
 
@@ -141,7 +158,7 @@ class ExternalJob(object):
         (outdir, output) = self.innerjob.run(**kwargs)
         for i in self.tool["outputs"]:
             d = i["def"][len(self.impl)+1:]
-            output[i["id"][1:]] = output[d]
+            output[idk(i["id"])] = output[d]
             del output[d]
 
         return (outdir, output)
@@ -158,7 +175,7 @@ class External(Process):
 
         for i in toolpath_object["inputs"]:
             d = i["def"][len(self.impl):]
-            toolid = i.get("id", self.id + "." + d[1:])
+            toolid = i.get("id", self.id + "." + idk(d))
             found = False
             for a in self.embedded_tool.tool["inputs"]:
                 if a["id"] == d:
@@ -187,12 +204,12 @@ class External(Process):
     def job(self, joborder, basedir, **kwargs):
         for i in self.tool["inputs"]:
             d = i["def"][len(self.impl)+1:]
-            joborder[d] = joborder[i["id"][1:]]
-            del joborder[i["id"][1:]]
+            joborder[d] = joborder[idk(i["id"])]
+            del joborder[idk(i["id"])]
 
         return ExternalJob(self.tool, self.embedded_tool.job(joborder, basedir, **kwargs))
 
-class FanoutJob(object):
+class ScatterJob(object):
     def __init__(self, outputports, jobs):
         self.outputports = outputports
         self.jobs = jobs
@@ -200,17 +217,18 @@ class FanoutJob(object):
     def run(self, **kwargs):
         outputs = {}
         for outschema in self.outputports:
-            outputs[outschema["id"][1:]] = []
+            outputs[idk(outschema["id"])] = []
         for j in self.jobs:
             (_, out) = j.run(**kwargs)
             for outschema in self.outputports:
-                outputs[outschema["id"][1:]].append(out[outschema["id"][1:]])
+                outputs[idk(outschema["id"])].append(out[idk(outschema["id"])])
         return (None, outputs)
 
-class Fanout(object):
-    def __init__(self, process, fanout_key):
+class DotProductScatter(object):
+    def __init__(self, process, scatter_keys):
         self.process = process
-        self.fanout_key = fanout_key
+        self.scatter_keys = scatter_keys
+
         self.outputports = []
         for out in self.process.tool["outputs"]:
             newout = copy.deepcopy(out)
@@ -220,8 +238,18 @@ class Fanout(object):
 
     def job(self, joborder, basedir, **kwargs):
         jobs = []
-        for fn in joborder[self.fanout_key]:
+
+        l = None
+        for s in self.scatter_keys:
+            if l is None:
+                l = len(joborder[idk(s)])
+            elif l != len(joborder[idk(s)]):
+                raise Exception("Length of input arrays must be equal when performing dotproduct scatter.")
+
+        for i in range(0, l):
             jo = copy.copy(joborder)
-            jo[self.fanout_key] = fn
+            for s in self.scatter_keys:
+                jo[idk(s)] = joborder[idk(s)][i]
             jobs.append(self.process.job(jo, basedir, **kwargs))
-        return FanoutJob(self.outputports, jobs)
+
+        return ScatterJob(self.outputports, jobs)

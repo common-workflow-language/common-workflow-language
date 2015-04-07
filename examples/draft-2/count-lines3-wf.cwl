@@ -16,8 +16,10 @@ steps:
   - id: "#step1"
     impl: wc2-tool.cwl
     inputs:
-      - def: "wc2-tool.cwl#file1"
+      - id: "#step1file"
+        def: "wc2-tool.cwl#file1"
         connect: {"source": "#file1"}
     outputs:
       - def: "wc2-tool.cwl#output"
         id: "#step1_output"
+    scatter: "#step1file"

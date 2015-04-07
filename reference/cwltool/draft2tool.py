@@ -163,7 +163,11 @@ class Builder(object):
 class Tool(Process):
     def _init_job(self, joborder, basedir):
         # Validate job order
-        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        try:
+            validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        except validate.ValidationException as v:
+            _logger.error("Failed to validate %s\n%s" % (pprint.pformat(joborder), v))
+            raise
 
         builder = Builder()
         builder.job = copy.deepcopy(joborder)

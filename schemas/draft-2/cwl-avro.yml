@@ -329,7 +329,13 @@
     - name: id
       type: string
     - name: type
-      type: ["Datatype", "Schema"]
+      type:
+        - Datatype
+        - Schema
+        - type: array
+          items:
+            - Datatype
+            - Schema
     - name: connect
       type:
         - "null"
@@ -433,6 +439,13 @@
     }
   ]
 
+- type: enum
+  name: ScatterMethod
+  symbols:
+    - dotproduct
+    - nested_crossproduct
+    - flat_crossproduct
+
 - type: record
   name: "Process"
   doc: |
@@ -526,6 +539,10 @@
         - string
         - type: array
           items: string
+    - name: scatterMethod
+      type:
+        - "null"
+        - ScatterMethod
 
 - type: record
   name: "CommandLineTool"
