@@ -5,15 +5,22 @@ documentDescription: Print the contents of a file to stdout using 'cat' running 
 class: CommandLineTool
 requirements:
   - class: DockerRequirement
-    dockerPull: arvados/jobs
-    dockerImageId: arvados/jobs
-expressionDefs:
-  - { ref: underscore.js }
-  - "var t = function(s) { return _.template(s)({'$job': $job}); };"
+    dockerPull: "debian:wheezy"
+  - class: ExpressionEngineRequirement
+    id: "#js"
+    requirements:
+      class: DockerRequirement
+      dockerFile: |
+        FROM debian:8
+        RUN apt-get update && apt-get install -qq nodejs
+      dockerImageId: debian/nodejs
+    expressionDefs:
+      - { ref: underscore.js }
+      - "var t = function(s) { return _.template(s)({'$job': $job}); };"
 fileDefs:
   - filename: foo.txt
     value:
-      class: JavascriptExpression
+      engine: "#js"
       script: 't("The file is <%= $job.file1.path %>\n")'
 inputs:
   - id: "#file1"

@@ -57,54 +57,6 @@
             }
         ]
 
-- type: record
-  name: Expression
-  doc: "An expression is a fragment of executable code that is evaluated by workflow
-  platform in order to affect the behavior of a process."
-  fields:
-    - name: "class"
-      type: "string"
-      doc: Currently only `JavascriptExpression`
-
-- type: record
-  name: JavascriptExpression
-  extends: Expression
-  doc: |
-    Execute [Javascript/ECMAScript
-    5.1](http://www.ecma-international.org/ecma-262/5.1/) code and return a JSON value.
-
-    Before executing the expression, the runtime must initialize a JavaScript
-    variable "$job" containing a copy of the validated contents of the input object
-    document.  This variable must be available in the expression's global
-    namespace when the expression is evaluated.
-
-    The runtime must also include any code defined in [`Process.expressionDefs`](#/schema/Process).
-
-    Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.  Expressions must be evaluated in
-    [Javascript strict
-    mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
-
-    The order in which expressions are evaluated is undefined.
-
-    Implementations may apply other limits, such as process isolation,
-    timeouts, and operating system containers/jails to minimize the security
-    risks associated with running untrusted code.
-
-  fields:
-    - name: "script"
-      type: ["null", "string"]
-      doc: |
-        A fragment of JavaScript code.  If `value` is enclosed in braces ("{"
-        and "}") then it will be interpreted as a [function
-        body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
-        anonymous, zero-argument function, and the value of the expression will
-        be the value returned when this function is executed.  Otherwise, the
-        code in `value` will be interpreted as a [Javascript
-        expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11),
-        and the value of the expression will be the result of evaluating that
-        expression.
 
 - type: record
   name: "Ref"
@@ -403,6 +355,82 @@
       doc: "The specific requirement type."
 
 - type: record
+  name: ExpressionEngineRequirement
+  extends: ProcessRequirement
+  doc: |
+    Define an expression engine.  Expressions are fragments of code which
+    affect the control of the workflow engine.
+
+    An expression engine is a command line program following the following
+    protocol:
+
+      * On standard input, receive a JSON object with the following fields:
+
+        - expressionDefs: A list of strings from the `expressionDefs` field, or
+          `null` if `expressionDefs` is not specified.
+
+        - input: The input object of the current Process (context dependent).
+
+        - self: The specific value being transformed (context dependent).  May
+          be null.
+
+        - script: The code fragment to evaluate.
+
+      * On standard output, print a single JSON value (string, number, array, object,
+        boolean, or null) for the return value.
+
+    Implementations may apply limits, such as process isolation, timeouts, and
+    operating system containers/jails to minimize the security risks associated
+    with running untrusted code.
+
+  fields:
+    - name: id
+      type: string
+      doc: "Used to identify the expression engine in the `engine` field of Expressions."
+    - name: requirements
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: |
+        Requirements to run this expression engine, such as DockerRequirement
+        for specifying a container with the engine.
+    - name: engineCommand
+      type:
+        - string
+        - type: array
+          items: string
+      doc: "The command line to invoke the expression engine."
+    - name: expressionDefs
+      type:
+        - "null"
+        - type: array
+          items: ["string", "Ref"]
+      doc: |
+        Code fragments that should be evaluated before evaluating the script.
+        Can be used to provide function definitions used in multiple places.
+
+- type: record
+  name: Expression
+  doc: |
+    An expression is a fragment of executable code that is evaluated by
+    workflow the expression engine specified in `engine` in order to affect the
+    behavior of a process.
+
+    Expressions must be evaluated in an isolated context (a "sandbox") which
+    permits no side effects to leak outside the context, and permit no outside
+    data to leak into the context.
+
+    The order in which expressions are evaluated is undefined.
+  fields:
+    - name: engine
+      type: string
+      doc: "The engine to use, must be defined with ExpressionEngineRequirement"
+    - name: script
+      type: string
+      doc: "The code to be executed by the expression engine."
+
+- type: record
   name: "FileDef"
   doc: |
     Define a file that will be created by the workflow platform in the
@@ -525,14 +553,6 @@
         workflow engine that may be helpful in executing this process.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
-    - name: "expressionDefs"
-      type: [
-        "null",
-        {
-          type: "array",
-          items: ["string", "Ref"]
-        }
-      ]
     - name: scatter
       type:
         - "null"
