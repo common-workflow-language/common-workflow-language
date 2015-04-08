@@ -70,6 +70,94 @@
     an external document, the object must be labeled with an `id` field.
 
 - type: record
+  name: ProcessRequirement
+  doc: |
+    A process requirement declares a prerequisite that may or must be fufilled
+    before executing a process.  See [`Process.hints`](#/schema/Process) and
+    [`Process.requirements`](#/schema/Process).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "The specific requirement type."
+
+- type: record
+  name: ExpressionEngineRequirement
+  extends: ProcessRequirement
+  doc: |
+    Define an expression engine.  Expressions are fragments of code which
+    affect the control of the workflow engine.
+
+    An expression engine is a command line program following the following
+    protocol:
+
+      * On standard input, receive a JSON object with the following fields:
+
+        - expressionDefs: A list of strings from the `expressionDefs` field, or
+          `null` if `expressionDefs` is not specified.
+
+        - input: The input object of the current Process (context dependent).
+
+        - self: The specific value being transformed (context dependent).  May
+          be null.
+
+        - script: The code fragment to evaluate.
+
+      * On standard output, print a single JSON value (string, number, array, object,
+        boolean, or null) for the return value.
+
+    Implementations may apply limits, such as process isolation, timeouts, and
+    operating system containers/jails to minimize the security risks associated
+    with running untrusted code.
+
+  fields:
+    - name: id
+      type: string
+      doc: "Used to identify the expression engine in the `engine` field of Expressions."
+    - name: requirements
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: |
+        Requirements to run this expression engine, such as DockerRequirement
+        for specifying a container with the engine.
+    - name: engineCommand
+      type:
+        - string
+        - type: array
+          items: string
+      doc: "The command line to invoke the expression engine."
+    - name: expressionDefs
+      type:
+        - "null"
+        - type: array
+          items: ["string", "Ref"]
+      doc: |
+        Code fragments that should be evaluated before evaluating the script.
+        Can be used to provide function definitions used in multiple places.
+
+- type: record
+  name: Expression
+  doc: |
+    An expression is a fragment of executable code that is evaluated by
+    workflow the expression engine specified in `engine` in order to affect the
+    behavior of a process.
+
+    Expressions must be evaluated in an isolated context (a "sandbox") which
+    permits no side effects to leak outside the context, and permit no outside
+    data to leak into the context.
+
+    The order in which expressions are evaluated is undefined.
+  fields:
+    - name: engine
+      type: string
+      doc: "The engine to use, must be defined with ExpressionEngineRequirement"
+    - name: script
+      type: string
+      doc: "The code to be executed by the expression engine."
+
+
+- type: record
   name: "CommandLineBinding"
   doc: |
 
@@ -343,92 +431,6 @@
     - name: outputBinding
       type: [ "null", "OutputBinding" ]
 
-- type: record
-  name: ProcessRequirement
-  doc: |
-    A process requirement declares a prerequisite that may or must be fufilled
-    before executing a process.  See [`Process.hints`](#/schema/Process) and
-    [`Process.requirements`](#/schema/Process).
-  fields:
-    - name: "class"
-      type: "string"
-      doc: "The specific requirement type."
-
-- type: record
-  name: ExpressionEngineRequirement
-  extends: ProcessRequirement
-  doc: |
-    Define an expression engine.  Expressions are fragments of code which
-    affect the control of the workflow engine.
-
-    An expression engine is a command line program following the following
-    protocol:
-
-      * On standard input, receive a JSON object with the following fields:
-
-        - expressionDefs: A list of strings from the `expressionDefs` field, or
-          `null` if `expressionDefs` is not specified.
-
-        - input: The input object of the current Process (context dependent).
-
-        - self: The specific value being transformed (context dependent).  May
-          be null.
-
-        - script: The code fragment to evaluate.
-
-      * On standard output, print a single JSON value (string, number, array, object,
-        boolean, or null) for the return value.
-
-    Implementations may apply limits, such as process isolation, timeouts, and
-    operating system containers/jails to minimize the security risks associated
-    with running untrusted code.
-
-  fields:
-    - name: id
-      type: string
-      doc: "Used to identify the expression engine in the `engine` field of Expressions."
-    - name: requirements
-      type:
-        - "null"
-        - type: array
-          items: ProcessRequirement
-      doc: |
-        Requirements to run this expression engine, such as DockerRequirement
-        for specifying a container with the engine.
-    - name: engineCommand
-      type:
-        - string
-        - type: array
-          items: string
-      doc: "The command line to invoke the expression engine."
-    - name: expressionDefs
-      type:
-        - "null"
-        - type: array
-          items: ["string", "Ref"]
-      doc: |
-        Code fragments that should be evaluated before evaluating the script.
-        Can be used to provide function definitions used in multiple places.
-
-- type: record
-  name: Expression
-  doc: |
-    An expression is a fragment of executable code that is evaluated by
-    workflow the expression engine specified in `engine` in order to affect the
-    behavior of a process.
-
-    Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.
-
-    The order in which expressions are evaluated is undefined.
-  fields:
-    - name: engine
-      type: string
-      doc: "The engine to use, must be defined with ExpressionEngineRequirement"
-    - name: script
-      type: string
-      doc: "The code to be executed by the expression engine."
 
 - type: record
   name: "FileDef"
