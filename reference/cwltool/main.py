@@ -11,6 +11,7 @@ import sys
 import logging
 import workflow
 import validate
+import tempfile
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
@@ -63,8 +64,13 @@ def main():
         return 1
 
     try:
-        job = t.job(from_url(args.job_order), basedir, use_container=(not args.no_container))
+        final_output = []
+        def output_callback(out):
+            final_output.append(out)
+
+        jobiter = t.job(from_url(args.job_order), basedir, output_callback, use_container=(not args.no_container))
         if args.conformance_test:
+            job = jobiter.next()
             a = {"args": job.command_line}
             if job.stdin:
                 a["stdin"] = job.stdin
@@ -74,9 +80,18 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir, rm_container=(not args.leave_container))
+            for r in jobiter:
+                if r:
+                    if args.dry_run:
+                        outdir = "/tmp"
+                    elif args.outdir:
+                        outdir = args.outdir
+                    else:
+                        outdir = tempfile.mkdtemp()
+                    r.run(outdir, dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=(not args.leave_container))
+
             _logger.info("Output directory is %s", outdir)
-            print json.dumps(runjob)
+            print json.dumps(final_output[0])
     except (jsonschema.exceptions.ValidationError, validate.ValidationException):
         _logger.exception("Job order failed validation")
         return 1

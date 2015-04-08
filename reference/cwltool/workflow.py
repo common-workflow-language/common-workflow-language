@@ -10,6 +10,7 @@ from ref_resolver import from_url
 import os
 from collections import namedtuple
 import pprint
+import functools
 
 _logger = logging.getLogger("cwltool")
 
@@ -38,130 +39,130 @@ def makeTool(toolpath_object, basedir):
         raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 
-class WorkflowJob(object):
-    def try_make_job(self, step):
-        inputobj = {}
-
-        if "scatter" in step.tool:
-            inputparms = copy.deepcopy(step.tool["inputs"])
-            scatter = aslist(step.tool["scatter"])
-            for i in inputparms:
-                if i["id"] in scatter:
-                    i["type"] = {"type": "array", "items": i["type"]}
-        else:
-            inputparms = step.tool["inputs"]
-
-        for i in inputparms:
-            _logger.debug(i)
-            if "connect" in i:
-                connect = i["connect"]
-                is_array = isinstance(i["type"], dict) and i["type"]["type"] == "array"
-
-                for c in aslist(connect):
-                    src = idk(c["source"])
-                    if src in self.state:
-                        if self.state[src].parameter["type"] == i["type"]:
-                            # source and input types are the same
-                            if is_array and idk(i["id"]) in inputobj:
-                                # concatenate arrays
-                                inputobj[idk(i["id"])].extend(self.state[src].value)
-                            else:
-                                # just assign the value from state to input
-                                inputobj[idk(i["id"])] = copy.deepcopy(self.state[src].value)
-                        elif is_array and self.state[src].parameter["type"] == i["type"]["items"]:
-                            # source type is the item type on the input array
-                            # promote single item to array entry
-                            if idk(i["id"]) in inputobj:
-                                inputobj[idk(i["id"])].append(self.state[src][1])
-                            else:
-                                inputobj[idk(i["id"])] = [self.state[src][1]]
-                        else:
-                            raise Exception("Type mismatch '%s' and '%s'" % (src, i["id"][1:]))
-                    else:
-                        return None
-            elif "default" in i:
-                inputobj[idk(i["id"])] = i["default"]
-            else:
-                raise Exception("Value for %s not specified" % (i["id"]))
-
-        _logger.info("Creating job with input: %s", inputobj)
-        if "scatter" in step.tool:
-            if step.tool.get("scatterType") == "dotproduct" or step.tool.get("scatterType") is None:
-                step = DotProductScatter(step, aslist(step.tool["scatter"]))
-            elif step.tool.get("scatterType") == "nested_crossproduct":
-                step = NestedCrossProductScatter(step, aslist(step.tool["scatter"]))
-            elif step.tool.get("scatterType") == "flat_crossproduct":
-                step = FlatCrossProductScatter(step, aslist(step.tool["scatter"]))
-        return step.job(inputobj, self.basedir)
-
-    def run(self, outdir=None, **kwargs):
-        for s in self.steps:
-            s.completed = False
-
-        run_all = len(self.steps)
-        while run_all:
-            made_progress = False
-            for s in self.steps:
-                if not s.completed:
-                    job = self.try_make_job(s)
-                    if job:
-                        (joutdir, output) = job.run(outdir=outdir, **kwargs)
-                        for i in s.tool["outputs"]:
-                            _logger.info("Job got output: %s", output)
-                            if "id" in i:
-                                if idk(i["id"]) in output:
-                                    self.state[idk(i["id"])] = WorkflowStateItem(i, output[idk(i["id"])])
-                                else:
-                                    raise Exception("Output is missing expected field %s" % idk(i["id"]))
-                        s.completed = True
-                        made_progress = True
-                        run_all -= 1
-            if not made_progress:
-                raise Exception("Deadlocked")
-
-        wo = {}
-        for i in self.outputs:
-            if "connect" in i:
-                src = idk(i["connect"]["source"])
-                wo[idk(i["id"])] = self.state[src][1]
-
-        return (outdir, wo)
-
-
 class Workflow(Process):
     def __init__(self, toolpath_object):
         super(Workflow, self).__init__(toolpath_object, "Workflow")
 
-    def job(self, joborder, basedir, use_container=True):
-        wj = WorkflowJob()
-        wj.basedir = basedir
-        wj.steps = [makeTool(s, basedir) for s in self.tool.get("steps", [])]
-        random.shuffle(wj.steps)
+    def receive_output(self, step, outputparms, jobout):
+        _logger.info("Job got output: %s", jobout)
+        for i in outputparms:
+            if "id" in i:
+                if idk(i["id"]) in jobout:
+                    self.state[idk(i["id"])] = WorkflowStateItem(i, jobout[idk(i["id"])])
+                else:
+                    raise Exception("Output is missing expected field %s" % idk(i["id"]))
+        step.completed = True
 
-        wj.state = {}
+    def try_make_job(self, step, basedir, **kwargs):
+        inputobj = {}
+
+        if "scatter" in step.tool:
+            inputparms = copy.deepcopy(step.tool["inputs"])
+            outputparms = copy.deepcopy(step.tool["outputs"])
+            scatter = aslist(step.tool["scatter"])
+            for i in inputparms:
+                if i["id"] in scatter:
+                    i["type"] = {"type": "array", "items": i["type"]}
+
+            if step.tool.get("scatterType") == "nested_crossproduct":
+                nesting = len(aslist(step.tool["scatter"]))
+            else:
+                nesting = 1
+
+            for r in xrange(0, nesting):
+                for i in outputparms:
+                    i["type"] = {"type": "array", "items": i["type"]}
+        else:
+            inputparms = step.tool["inputs"]
+            outputparms = step.tool["outputs"]
+
+        for inp in inputparms:
+            _logger.debug(inp)
+            iid = idk(inp["id"])
+            if "connect" in inp:
+                connections = inp["connect"]
+                is_array = isinstance(inp["type"], dict) and inp["type"]["type"] == "array"
+                for connection in aslist(connections):
+                    src = idk(connection["source"])
+                    if src in self.state:
+                        if self.state[src].parameter["type"] == inp["type"]:
+                            # source and input types are the same
+                            if is_array and iid in inputobj:
+                                # there's already a value in the input object, so extend the existing array
+                                inputobj[iid].extend(self.state[src].value)
+                            else:
+                                # simply assign the value from state to input
+                                inputobj[iid] = copy.deepcopy(self.state[src].value)
+                        elif is_array and self.state[src].parameter["type"] == inp["type"]["items"]:
+                            # source type is the item type on the input array
+                            # promote single item to array entry
+                            if iid in inputobj:
+                                inputobj[iid].append(self.state[src].value)
+                            else:
+                                inputobj[iid] = [self.state[src].value]
+                        else:
+                            raise Exception("Type mismatch '%s' and '%s'" % (src, inp["id"][1:]))
+                    else:
+                        return
+            elif "default" in inp:
+                inputobj[iid] = inp["default"]
+            else:
+                raise Exception("Value for %s not specified" % (inp["id"]))
+
+        _logger.info("Creating job with input: %s", inputobj)
+
+        callback = functools.partial(self.receive_output, step, outputparms)
+
+        if step.tool.get("scatter"):
+            if step.tool.get("scatterType") == "dotproduct" or step.tool.get("scatterType") is None:
+                jobs = dotproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
+            elif step.tool.get("scatterType") == "nested_crossproduct":
+                jobs = nested_rossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
+            elif step.tool.get("scatterType") == "flat_crossproduct":
+                jobs = flat_crossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, 0, **kwargs)
+        else:
+            jobs = step.job(inputobj, basedir, callback, **kwargs)
+
+        for j in jobs:
+            yield j
+
+    def job(self, joborder, basedir, output_callback, **kwargs):
+        steps = [makeTool(step, basedir) for step in self.tool.get("steps", [])]
+        random.shuffle(steps)
+
+        self.state = {}
         for i in self.tool["inputs"]:
             iid = idk(i["id"])
             if iid in joborder:
-                wj.state[iid] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
+                self.state[iid] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
             elif "default" in i:
-                wj.state[iid] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
-        wj.outputs = self.tool["outputs"]
-        return wj
+                self.state[iid] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
 
-class ExternalJob(object):
-    def __init__(self, tool, innerjob):
-        self.tool = tool
-        self.innerjob = innerjob
+        for s in steps:
+            s.completed = False
 
-    def run(self, **kwargs):
-        self.impl = self.tool["impl"]
-        (outdir, output) = self.innerjob.run(**kwargs)
+        completed = 0
+        while completed < len(steps):
+            made_progress = False
+            completed = 0
+            for step in steps:
+                if step.completed:
+                    completed += 1
+                else:
+                    for newjob in self.try_make_job(step, basedir, **kwargs):
+                        if newjob:
+                            made_progress = True
+                            yield newjob
+            if not made_progress:
+                yield None
+
+        wo = {}
         for i in self.tool["outputs"]:
-            d = i["def"][len(self.impl)+1:]
-            output[idk(i["id"])] = output[d]
-            del output[d]
+            if "connect" in i:
+                src = idk(i["connect"]["source"])
+                wo[idk(i["id"])] = self.state[src].value
 
-        return (outdir, output)
+        output_callback(wo)
 
 class External(Process):
     def __init__(self, toolpath_object, basedir):
@@ -201,55 +202,133 @@ class External(Process):
 
         super(External, self).__init__(toolpath_object, "Process")
 
-    def job(self, joborder, basedir, **kwargs):
+    def receive_output(self, jobout):
+        self.output  = {}
+        for i in self.tool["outputs"]:
+            if i["def"][:len(self.impl)] != self.impl:
+                raise Exception("'def' is '%s' but must refer to fragment of resource '%s' listed in 'impl'" % (i["def"], self.impl))
+            d = idk(i["def"][len(self.impl):])
+            self.output[idk(i["id"])] = jobout[d]
+
+    def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
             d = i["def"][len(self.impl)+1:]
             joborder[d] = joborder[idk(i["id"])]
             del joborder[idk(i["id"])]
 
-        return ExternalJob(self.tool, self.embedded_tool.job(joborder, basedir, **kwargs))
+        self.output = None
+        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, **kwargs):
+            yield t
 
-class ScatterJob(object):
-    def __init__(self, outputports, jobs):
-        self.outputports = outputports
-        self.jobs = jobs
+        while self.output is None:
+            yield None
 
-    def run(self, **kwargs):
-        outputs = {}
-        for outschema in self.outputports:
-            outputs[idk(outschema["id"])] = []
-        for j in self.jobs:
-            (_, out) = j.run(**kwargs)
-            for outschema in self.outputports:
-                outputs[idk(outschema["id"])].append(out[idk(outschema["id"])])
-        return (None, outputs)
+        output_callback(self.output)
 
-class DotProductScatter(object):
-    def __init__(self, process, scatter_keys):
-        self.process = process
-        self.scatter_keys = scatter_keys
 
-        self.outputports = []
-        for out in self.process.tool["outputs"]:
-            newout = copy.deepcopy(out)
-            newout["type"] = {"type": "array", "items": out["type"]}
-            self.outputports.append(newout)
-        self.tool = {"outputs": self.outputports}
+class ReceiveScatterOutput(object):
+    def __init__(self, dest):
+        self.dest = dest
+        self.completed = 0
 
-    def job(self, joborder, basedir, **kwargs):
-        jobs = []
+    def receive_scatter_output(self, index, jobout):
+        for k,v in jobout.items():
+            self.dest[k][index] = v
+        self.completed += 1
 
-        l = None
-        for s in self.scatter_keys:
-            if l is None:
-                l = len(joborder[idk(s)])
-            elif l != len(joborder[idk(s)]):
-                raise Exception("Length of input arrays must be equal when performing dotproduct scatter.")
+def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
+    l = None
+    for s in scatter_keys:
+        if l is None:
+            l = len(joborder[idk(s)])
+        elif l != len(joborder[idk(s)]):
+            raise Exception("Length of input arrays must be equal when performing dotproduct scatter.")
 
-        for i in range(0, l):
+    output = {}
+    for i in process.tool["outputs"]:
+        output[idk(i["id"])] = [None] * l
+
+    rc = ReceiveScatterOutput(output)
+
+    for n in range(0, l):
+        jo = copy.copy(joborder)
+        for s in scatter_keys:
+            jo[idk(s)] = joborder[idk(s)][n]
+
+        for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
+            yield j
+
+    while rc.completed < l:
+        yield None
+
+    output_callback(output)
+
+
+def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
+    scatter_key = idk(scatter_keys[0])
+    l = len(joborder[scatter_key])
+    output = {}
+    for i in process["outputs"]:
+        output[idk(i["id"])] = [None] * l
+
+    rc = ReceiveScatterOutput(output)
+
+    for n in range(0, l):
+        jo = copy.copy(joborder)
+        jo[scatter_key] = joborder[scatter_key][n]
+
+        if len(scatter_keys) == 1:
+            for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
+               yield j
+        else:
+            for j in nested_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, n)):
+               yield j
+
+    while rc.completed < l:
+        yield None
+
+    output_callback(output)
+
+def crossproduct_size(joborder, scatter_keys):
+    scatter_key = idk(scatter_keys[0])
+    if len(scatter_keys) == 1:
+        sum = len(joborder[scatter_key])
+    else:
+        sum = 0
+        for n in range(0, l):
             jo = copy.copy(joborder)
-            for s in self.scatter_keys:
-                jo[idk(s)] = joborder[idk(s)][i]
-            jobs.append(self.process.job(jo, basedir, **kwargs))
+            jo[scatter_key] = joborder[scatter_key][n]
+            sum += crossproduct_size(joborder, scatter_keys[1:])
+    return sum
 
-        return ScatterJob(self.outputports, jobs)
+def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, startindex, **kwargs):
+    scatter_key = idk(scatter_keys[0])
+    l = len(joborder[scatter_key])
+
+    if startindex == 0:
+        output = {}
+        for i in process["outputs"]:
+            output[idk(i["id"])] = [None] * crossproduct_size(joborder, scatter_keys)
+        rc = ReceiveScatterOutput(output)
+    else:
+        rc = output_callback
+
+    put = startindex
+    for n in range(0, l):
+        jo = copy.copy(joborder)
+        jo[scatter_key] = joborder[scatter_key][n]
+
+        if len(scatter_keys) == 1:
+            for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, put), **kwargs):
+                yield j
+            put += 1
+        else:
+            for j in flat_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, put)):
+                put += 1
+                yield j
+
+    if startindex == 0:
+        while rc.completed < put:
+            yield None
+
+        output_callback(output)

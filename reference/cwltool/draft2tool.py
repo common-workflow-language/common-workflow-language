@@ -192,16 +192,16 @@ class ExpressionTool(Tool):
 
     class ExpressionJob(object):
         def run(self, outdir=None, **kwargs):
-            return (outdir, self.builder.do_eval(self.script))
+            self.output_callback(self.builder.do_eval(self.script))
 
-    def job(self, joborder, basedir, **kwargs):
+    def job(self, joborder, basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, basedir)
 
         j = ExpressionTool.ExpressionJob()
         j.builder = builder
         j.script = self.tool["script"]
-
-        return j
+        j.output_callback = output_callback
+        yield j
 
 def aslist(l):
     if isinstance(l, list):
@@ -213,7 +213,7 @@ class CommandLineTool(Tool):
     def __init__(self, toolpath_object):
         super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool")
 
-    def job(self, joborder, basedir, use_container=True):
+    def job(self, joborder, basedir, output_callback, use_container=True, **kwargs):
         builder = self._init_job(joborder, basedir)
 
         if self.tool["baseCommand"]:
@@ -320,8 +320,9 @@ class CommandLineTool(Tool):
 
         j.pathmapper = builder.pathmapper
         j.collect_outputs = functools.partial(self.collect_output_ports, self.tool["outputs"], builder)
+        j.output_callback = output_callback
 
-        return j
+        yield j
 
     def collect_output_ports(self, ports, builder, outdir):
         custom_output = os.path.join(outdir, "cwl.output.json")
