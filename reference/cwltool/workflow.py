@@ -11,16 +11,20 @@ import os
 from collections import namedtuple
 import pprint
 import functools
+import validate
 
 _logger = logging.getLogger("cwltool")
 
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
+class WorkflowException(Exception):
+    pass
+
 def idk(key):
     if len(key) <= 1:
-        raise Exception("Identifier is too short")
+        raise WorkflowException("Identifier is too short")
     if key[0] != '#':
-        raise Exception("Must start with #")
+        raise WorkflowException("Must start with #")
     return key[1:]
 
 def makeTool(toolpath_object, basedir):
@@ -36,7 +40,7 @@ def makeTool(toolpath_object, basedir):
         elif toolpath_object["class"] == "Workflow":
             return Workflow(toolpath_object)
     else:
-        raise Exception("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
+        raise WorkflowException("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 
 class Workflow(Process):
@@ -50,7 +54,7 @@ class Workflow(Process):
                 if idk(i["id"]) in jobout:
                     self.state[idk(i["id"])] = WorkflowStateItem(i, jobout[idk(i["id"])])
                 else:
-                    raise Exception("Output is missing expected field %s" % idk(i["id"]))
+                    raise WorkflowException("Output is missing expected field %s" % idk(i["id"]))
         step.completed = True
 
     def try_make_job(self, step, basedir, **kwargs):
@@ -60,11 +64,15 @@ class Workflow(Process):
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])
             scatter = aslist(step.tool["scatter"])
-            for i in inputparms:
-                if i["id"] in scatter:
-                    i["type"] = {"type": "array", "items": i["type"]}
 
-            if step.tool.get("scatterType") == "nested_crossproduct":
+            inp_map = {i["id"]: i for i in inputparms}
+            for s in aslist(step.tool["scatter"]):
+                if s not in inp_map:
+                    raise WorkflowException("Invalid Scatter parameter '%s'" % s)
+
+                inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
+
+            if step.tool.get("scatterMethod") == "nested_crossproduct":
                 nesting = len(aslist(step.tool["scatter"]))
             else:
                 nesting = 1
@@ -101,24 +109,28 @@ class Workflow(Process):
                             else:
                                 inputobj[iid] = [self.state[src].value]
                         else:
-                            raise Exception("Type mismatch '%s' and '%s'" % (src, inp["id"][1:]))
+                            raise WorkflowException("Type mismatch between '%s' (%s) and '%s' (%s)" % (src, self.state[src].parameter["type"], idk(inp["id"]), inp["type"]))
                     else:
-                        return
+                        raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % ())
             elif "default" in inp:
                 inputobj[iid] = inp["default"]
             else:
-                raise Exception("Value for %s not specified" % (inp["id"]))
+                raise WorkflowException("Value for %s not specified" % (inp["id"]))
 
         _logger.info("Creating job with input: %s", inputobj)
 
         callback = functools.partial(self.receive_output, step, outputparms)
 
         if step.tool.get("scatter"):
-            if step.tool.get("scatterType") == "dotproduct" or step.tool.get("scatterType") is None:
+            method = step.tool.get("scatterMethod")
+            if method is None and len(aslist(step.tool["scatter"])) != 1:
+                raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
+
+            if method == "dotproduct" or method is None:
                 jobs = dotproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
-            elif step.tool.get("scatterType") == "nested_crossproduct":
-                jobs = nested_rossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
-            elif step.tool.get("scatterType") == "flat_crossproduct":
+            elif method == "nested_crossproduct":
+                jobs = nested_crossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
+            elif method == "flat_crossproduct":
                 jobs = flat_crossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, 0, **kwargs)
         else:
             jobs = step.job(inputobj, basedir, callback, **kwargs)
@@ -127,6 +139,9 @@ class Workflow(Process):
             yield j
 
     def job(self, joborder, basedir, output_callback, **kwargs):
+        # Validate job order
+        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+
         steps = [makeTool(step, basedir) for step in self.tool.get("steps", [])]
         random.shuffle(steps)
 
@@ -137,8 +152,12 @@ class Workflow(Process):
                 self.state[iid] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
             elif "default" in i:
                 self.state[iid] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
+            else:
+                raise WorkflowException("Input '%s' not in input object and does not have a default value." % (i["id"]))
 
         for s in steps:
+            for out in s.tool["outputs"]:
+                self.state[idk(out["id"])] = None
             s.completed = False
 
         completed = 0
@@ -153,7 +172,7 @@ class Workflow(Process):
                         if newjob:
                             made_progress = True
                             yield newjob
-            if not made_progress:
+            if not made_progress and completed < len(steps):
                 yield None
 
         wo = {}
@@ -183,7 +202,7 @@ class External(Process):
                     i.update(a)
                     found = True
             if not found:
-                raise Exception("Did not find input '%s' in external process" % (i["def"]))
+                raise WorkflowException("Did not find input '%s' in external process" % (i["def"]))
 
             i["id"] = toolid
 
@@ -196,7 +215,7 @@ class External(Process):
                     i.update(a)
                     found = True
             if not found:
-                raise Exception("Did not find output '%s' in external process" % (i["def"]))
+                raise WorkflowException("Did not find output '%s' in external process" % (i["def"]))
 
             i["id"] = toolid
 
@@ -206,7 +225,7 @@ class External(Process):
         self.output  = {}
         for i in self.tool["outputs"]:
             if i["def"][:len(self.impl)] != self.impl:
-                raise Exception("'def' is '%s' but must refer to fragment of resource '%s' listed in 'impl'" % (i["def"], self.impl))
+                raise WorkflowException("'def' is '%s' but must refer to fragment of resource '%s' listed in 'impl'" % (i["def"], self.impl))
             d = idk(i["def"][len(self.impl):])
             self.output[idk(i["id"])] = jobout[d]
 
@@ -242,7 +261,7 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
         if l is None:
             l = len(joborder[idk(s)])
         elif l != len(joborder[idk(s)]):
-            raise Exception("Length of input arrays must be equal when performing dotproduct scatter.")
+            raise WorkflowException("Length of input arrays must be equal when performing dotproduct scatter.")
 
     output = {}
     for i in process.tool["outputs"]:
@@ -268,7 +287,7 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
     scatter_key = idk(scatter_keys[0])
     l = len(joborder[scatter_key])
     output = {}
-    for i in process["outputs"]:
+    for i in process.tool["outputs"]:
         output[idk(i["id"])] = [None] * l
 
     rc = ReceiveScatterOutput(output)
@@ -281,7 +300,7 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
             for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
                yield j
         else:
-            for j in nested_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, n)):
+            for j in nested_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, n), **kwargs):
                yield j
 
     while rc.completed < l:
@@ -295,7 +314,7 @@ def crossproduct_size(joborder, scatter_keys):
         sum = len(joborder[scatter_key])
     else:
         sum = 0
-        for n in range(0, l):
+        for n in range(0, len(joborder[scatter_key])):
             jo = copy.copy(joborder)
             jo[scatter_key] = joborder[scatter_key][n]
             sum += crossproduct_size(joborder, scatter_keys[1:])
@@ -305,9 +324,9 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
     scatter_key = idk(scatter_keys[0])
     l = len(joborder[scatter_key])
 
-    if startindex == 0:
+    if startindex == 0 and not isinstance(output_callback, ReceiveScatterOutput):
         output = {}
-        for i in process["outputs"]:
+        for i in process.tool["outputs"]:
             output[idk(i["id"])] = [None] * crossproduct_size(joborder, scatter_keys)
         rc = ReceiveScatterOutput(output)
     else:
@@ -323,11 +342,11 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
                 yield j
             put += 1
         else:
-            for j in flat_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, put)):
+            for j in flat_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], rc, put, **kwargs):
                 put += 1
                 yield j
 
-    if startindex == 0:
+    if startindex == 0 and not isinstance(output_callback, ReceiveScatterOutput):
         while rc.completed < put:
             yield None
 

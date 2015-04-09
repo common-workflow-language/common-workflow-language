@@ -359,6 +359,8 @@ class CommandLineTool(Tool):
                     r = r[0] if r else None
                 elif binding.get("loadContents"):
                     r = [v["contents"] for v in r]
+                    if len(r) == 1:
+                        r = r[0]
                 else:
                     r = None
 

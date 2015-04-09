@@ -14,9 +14,13 @@ INT_MAX_VALUE = (1 << 31) - 1
 LONG_MIN_VALUE = -(1 << 63)
 LONG_MAX_VALUE = (1 << 63) - 1
 
+def indent(v):
+    return "\n".join(["  " + l for l in v.splitlines()])
+
 def validate_ex(expected_schema, datum):
     """Determine if a python datum is an instance of a schema."""
     schema_type = expected_schema.type
+
     if schema_type == 'null':
         if datum is None:
             return True
@@ -74,7 +78,7 @@ def validate_ex(expected_schema, datum):
                     raise ValidationException("%s\n while validating item at position %i `%s`" % (v, i, d))
             return True
         else:
-            raise ValidationException("`%s`\n is not a list, expected list of\n %s" % (pprint.pformat(datum), expected_schema.items))
+            raise ValidationException("`%s` is not a list, expected list of %s" % (pprint.pformat(datum), expected_schema.items))
     elif schema_type == 'map':
         if (isinstance(datum, dict) and
             False not in [isinstance(k, basestring) for k in datum.keys()] and
@@ -98,8 +102,14 @@ def validate_ex(expected_schema, datum):
             raise ValidationException("`%s`\n is not a dict" % pprint.pformat(datum))
         try:
             for f in expected_schema.fields:
-                validate_ex(f.type, datum.get(f.name))
+                try:
+                    validate_ex(f.type, datum.get(f.name))
+                except ValidationException as v:
+                    if f.name not in datum:
+                        raise ValidationException("Missing required field `%s`" % f.name)
+                    else:
+                        raise
             return True
         except ValidationException as v:
-            raise ValidationException("%s\n while validating field `%s`" % (v, f.name))
+            raise ValidationException("Validating field `%s`:\n%s" % (f.name, indent(str(v))))
     raise ValidationException("Unrecognized schema_type %s" % schema_type)

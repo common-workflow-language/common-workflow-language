@@ -59,8 +59,15 @@ def main():
 
     try:
         t = workflow.makeTool(from_url(args.workflow), basedir)
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
-        _logger.exception("Tool definition failed validation")
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+        _logger.error("Tool definition failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
+    except RuntimeError as e:
+        _logger.error(e)
+        if args.debug:
+            _logger.exception()
         return 1
 
     try:
@@ -80,6 +87,7 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
+            last = None
             for r in jobiter:
                 if r:
                     if args.dry_run:
@@ -89,11 +97,22 @@ def main():
                     else:
                         outdir = tempfile.mkdtemp()
                     r.run(outdir, dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=(not args.leave_container))
+                else:
+                    print "Workflow deadlocked."
+                    return 1
+                last = r
 
             _logger.info("Output directory is %s", outdir)
             print json.dumps(final_output[0])
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
-        _logger.exception("Job order failed validation")
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+        _logger.error("Input object failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
+    except workflow.WorkflowException as e:
+        _logger.error("Workflow error:\n%s" % e)
+        if args.debug:
+            _logger.exception()
         return 1
 
     return 0
