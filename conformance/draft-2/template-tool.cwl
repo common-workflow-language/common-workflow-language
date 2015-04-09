@@ -5,7 +5,7 @@ documentDescription: Print the contents of a file to stdout using 'cat' running 
 class: CommandLineTool
 requirements:
   - class: DockerRequirement
-    dockerPull: "debian:wheezy"
+    dockerPull: "debian:8"
   - class: ExpressionEngineRequirement
     id: "#js"
     requirements:

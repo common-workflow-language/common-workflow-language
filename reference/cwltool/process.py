@@ -13,6 +13,9 @@ module_dir = os.path.dirname(os.path.abspath(__file__))
 
 _logger = logging.getLogger("cwltool")
 
+class WorkflowException(Exception):
+    pass
+
 def specialize(items, spec):
     if isinstance(items, dict):
         for n in ("type", "items", "values"):

@@ -14,6 +14,7 @@ import logging
 import hashlib
 import random
 from process import Process
+from process import WorkflowException
 import validate
 
 _logger = logging.getLogger("cwltool")
@@ -21,6 +22,8 @@ _logger = logging.getLogger("cwltool")
 CONTENT_LIMIT = 1024 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
+
+supportedProcessRequirements = ("DockerRequirement", "MemoryRequirement", "ExpressionEngineRequirement")
 
 class Builder(object):
     def jseval(self, expression, context):
@@ -283,28 +286,15 @@ class CommandLineTool(Tool):
         for t in self.tool.get("environmentDefs", []):
             j.environment[t["env"]] = builder.do_eval(t["value"])
 
-        for r in self.tool.get("requirements", []):
-            if r["class"] not in ("DockerRequirement", "MemoryRequirement"):
-                raise Exception("Unknown requirement %s" % (r["class"]))
+        j.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        j.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
 
-        reqsAndHints = self.tool.get("requirements", []) + self.tool.get("hints", [])
-        for r in reqsAndHints:
+        for r in j.requirements:
+            if r["class"] not in supportedProcessRequirements:
+                raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
+
+        for r in (j.requirements + j.hints):
             if r["class"] == "DockerRequirement" and use_container:
-                j.container = {}
-                j.container["type"] = "docker"
-                if "dockerPull" in r:
-                    j.container["pull"] = r["dockerPull"]
-                if "dockerFile" in r:
-                    j.container["file"] = r["dockerFile"]
-                if "dockerLoad" in r:
-                    if r["dockerLoad"].startswith("http"):
-                        j.container["load"] = r["dockerLoad"]
-                    else:
-                        j.container["load"] = os.path.join(basedir, r["dockerLoad"])
-                if "dockerImageId" in r:
-                    j.container["imageId"] = r["dockerImageId"]
-                else:
-                    j.container["imageId"] = r["dockerPull"]
                 builder.pathmapper = DockerPathMapper(reffiles, basedir)
 
         if builder.pathmapper is None:

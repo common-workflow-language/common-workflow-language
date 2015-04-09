@@ -3,6 +3,7 @@ import draft1tool
 import draft2tool
 from draft2tool import aslist
 from process import Process
+from process import WorkflowException
 import copy
 import logging
 import random
@@ -16,9 +17,6 @@ import validate
 _logger = logging.getLogger("cwltool")
 
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
-
-class WorkflowException(Exception):
-    pass
 
 def idk(key):
     if len(key) <= 1:
@@ -142,6 +140,9 @@ class Workflow(Process):
         # Validate job order
         validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
+        requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+
         steps = [makeTool(step, basedir) for step in self.tool.get("steps", [])]
         random.shuffle(steps)
 
@@ -168,7 +169,7 @@ class Workflow(Process):
                 if step.completed:
                     completed += 1
                 else:
-                    for newjob in self.try_make_job(step, basedir, **kwargs):
+                    for newjob in self.try_make_job(step, basedir, requirements=requirements, hints=hints, **kwargs):
                         if newjob:
                             made_progress = True
                             yield newjob
@@ -235,8 +236,11 @@ class External(Process):
             joborder[d] = joborder[idk(i["id"])]
             del joborder[idk(i["id"])]
 
+        requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+
         self.output = None
-        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, **kwargs):
+        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, requirements=requirements, hints=hints, **kwargs):
             yield t
 
         while self.output is None:
