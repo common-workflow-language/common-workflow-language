@@ -34,15 +34,14 @@ The current draft is draft 2.  This draft is not final.
 
 [Reference implementation](reference/)
 
-[Examples](examples/)
+[Example workflows](https://github.com/common-workflow-language/workflows)
 
 ## Implementations
 
-Current implementations of the common workflow language tool description:
+Current work-in-progress implementations of the common workflow language:
 
 * [Reference implementation (Python)](reference/)
 * [Rabix (Python)](https://github.com/rabix/rabix)
-* [Cliche (Javascript)](https://github.com/rabix/cliche)
 
 ## Contributing
 
