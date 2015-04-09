@@ -1,0 +1,37 @@
+- args: [bwa, mem, -t4, '-I1,2,3,4', -m, '3', draft-1/rabix/tests/test-files/chr20.fa,
+    draft-1/rabix/tests/test-files/example_human_Illumina.pe_1.fastq, draft-1/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+  job: draft-1/bwa-mem-job.json
+  stdout: output.sam
+  tool: draft-1/bwa-mem-tool.json
+- args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
+    '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
+    '16', map2, --max-seed-hits, '-1', --max-seq-length, '20', --min-seq-length, '10']
+  job: draft-1/tmap-job.json
+  stdin: draft-1/reads.fastq
+  stdout: output.sam
+  tool: draft-1/tmap-tool.json
+- args: [cat, draft-1/hello.txt]
+  job: draft-1/cat-job.json
+  tool: draft-1/cat1-tool.json
+- args: [cat, -n, draft-1/hello.txt]
+  job: draft-1/cat-n-job.json
+  tool: draft-1/cat1-tool.json
+- args: [cat]
+  job: draft-1/cat-job.json
+  stdin: draft-1/hello.txt
+  tool: draft-1/cat2-tool.json
+- args: [cat, draft-1/hello.txt]
+  job: draft-1/cat-job.json
+  stdout: output.txt
+  tool: draft-1/cat3-tool.json
+- args: [cat]
+  job: draft-1/cat-job.json
+  stdin: draft-1/hello.txt
+  stdout: output.txt
+  tool: draft-1/cat4-tool.json
+- args: [cat, foo.txt]
+  generatefiles: {foo.txt: 'The file is hello.txt
+
+      '}
+  job: draft-1/cat-job.json
+  tool: draft-1/template-tool.yaml

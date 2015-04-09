@@ -11,13 +11,7 @@ import requests
 _logger = logging.getLogger("cwltool")
 
 class CommandLineJob(object):
-    def run(self, dry_run=False, pull_image=True, outdir=None, rm_container=True):
-        if not outdir:
-            if not dry_run:
-                outdir = tempfile.mkdtemp()
-            else:
-                outdir = "/tmp"
-
+    def run(self, outdir, dry_run=False, pull_image=True, rm_container=True):
         with open(os.path.join(outdir, "cwl.input.json"), "w") as fp:
             json.dump(self.joborder, fp)
 
@@ -134,4 +128,4 @@ class CommandLineJob(object):
         if stdout != sys.stderr:
             stdout.close()
 
-        return (outdir, self.collect_outputs(outdir))
+        self.output_callback(self.collect_outputs(outdir))

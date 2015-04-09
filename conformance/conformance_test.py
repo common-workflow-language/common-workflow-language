@@ -7,6 +7,8 @@ import subprocess
 import sys
 import shutil
 import tempfile
+import yaml
+import pipes
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", type=str)
@@ -17,7 +19,7 @@ args = parser.parse_args()
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(module_dir, args.test)) as f:
-    tests = json.load(f)
+    tests = yaml.load(f)
 
 failures = 0
 
@@ -30,24 +32,32 @@ def run_test(i, t):
     try:
         if "output" in t:
             outdir = tempfile.mkdtemp()
-            outstr = subprocess.check_output([args.tool,
-                                              "--outdir=%s" % outdir,
-                                              t["tool"],
-                                              t["job"]])
+            test_command = [args.tool,
+                            "--outdir=%s" % outdir,
+                            t["tool"],
+                            t["job"]]
+            outstr = subprocess.check_output(test_command)
             out = {"output": json.loads(outstr)}
         else:
+            test_command = [args.tool,
+                            "--conformance-test",
+                            "--basedir=" + args.basedir,
+                            "--no-container",
+                            t["tool"],
+                            t["job"]]
+
             outstr = subprocess.check_output([args.tool,
                                               "--conformance-test",
                                               "--basedir=" + args.basedir,
                                               "--no-container",
                                               t["tool"],
                                               t["job"]])
-            out = json.loads(outstr)
+            out = yaml.load(outstr)
     except ValueError as v:
         print v
         print outstr
     except subprocess.CalledProcessError:
-        print """Test failed: %s""" % str([args.tool, "--conformance-test", t["tool"], t["job"]])
+        print """Test failed: %s""" % " ".join([pipes.quote(t) for t in test_command])
         print "Returned non-zero"
         failures += 1
         return

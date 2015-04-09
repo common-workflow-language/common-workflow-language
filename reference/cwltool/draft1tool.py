@@ -254,7 +254,7 @@ class Tool(object):
             raise Exception("Missing or invalid 'schema' field in tool description document, must be %s" % TOOL_SCHEMA_URL)
         tool_schema.validate(self.tool)
 
-    def job(self, joborder, basedir, use_container=True):
+    def job(self, joborder, basedir, output_callback, use_container=True):
         inputs = joborder['inputs']
         Draft4Validator(self.tool['inputs']).validate(inputs)
 
@@ -336,8 +336,9 @@ class Tool(object):
 
         j.pathmapper = d
         j.collect_outputs = functools.partial(self.collect_outputs, self.tool.get("outputs", {}), joborder)
+        j.output_callback = output_callback
 
-        return j
+        yield j
 
     def collect_outputs(self, schema, joborder, outdir):
         result_path = os.path.join(outdir, "result.cwl.json")

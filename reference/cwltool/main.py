@@ -11,6 +11,7 @@ import sys
 import logging
 import workflow
 import validate
+import tempfile
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
@@ -58,13 +59,25 @@ def main():
 
     try:
         t = workflow.makeTool(from_url(args.workflow), basedir)
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
-        _logger.exception("Tool definition failed validation")
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+        _logger.error("Tool definition failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
+    except RuntimeError as e:
+        _logger.error(e)
+        if args.debug:
+            _logger.exception()
         return 1
 
     try:
-        job = t.job(from_url(args.job_order), basedir, use_container=(not args.no_container))
+        final_output = []
+        def output_callback(out):
+            final_output.append(out)
+
+        jobiter = t.job(from_url(args.job_order), basedir, output_callback, use_container=(not args.no_container))
         if args.conformance_test:
+            job = jobiter.next()
             a = {"args": job.command_line}
             if job.stdin:
                 a["stdin"] = job.stdin
@@ -74,11 +87,32 @@ def main():
                 a["generatefiles"] = job.generatefiles
             print json.dumps(a)
         else:
-            (outdir, runjob) = job.run(dry_run=args.dry_run, pull_image=(not args.no_pull), outdir=args.outdir, rm_container=(not args.leave_container))
+            last = None
+            for r in jobiter:
+                if r:
+                    if args.dry_run:
+                        outdir = "/tmp"
+                    elif args.outdir:
+                        outdir = args.outdir
+                    else:
+                        outdir = tempfile.mkdtemp()
+                    r.run(outdir, dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=(not args.leave_container))
+                else:
+                    print "Workflow deadlocked."
+                    return 1
+                last = r
+
             _logger.info("Output directory is %s", outdir)
-            print json.dumps(runjob)
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException):
-        _logger.exception("Job order failed validation")
+            print json.dumps(final_output[0])
+    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+        _logger.error("Input object failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
+    except workflow.WorkflowException as e:
+        _logger.error("Workflow error:\n%s" % e)
+        if args.debug:
+            _logger.exception()
         return 1
 
     return 0
