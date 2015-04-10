@@ -14,6 +14,7 @@
     - array
     - map
     - File
+  jsonldPrefix: avro
   doc: |
    CWL data types are based on Avro schema declarations.  Refer to the [Avro
    schema declaration
@@ -40,7 +41,7 @@
    * **map**: An unordered collection of key/value pairs
 
 - type: record
-  name: File
+  name: FileRecord
   fields: [
             { name: "path", type: "string" },
             { name: "checksum", type: ["null", "string"] },
@@ -51,7 +52,7 @@
                     "null",
                     {
                         type: "array",
-                        items: "File"
+                        items: "FileRecord"
                     }
                 ]
             }
@@ -60,9 +61,10 @@
 
 - type: record
   name: "Ref"
-  fields: [
-    { name: "ref", type: "string" }
-  ]
+  fields:
+    - name: "ref"
+      type: "string"
+      jsonldPredicate: "@id"
   doc: >
     A URI reference to another object.  This may refer to an object within the
     current document, to an external file, or to a labeled object within an
@@ -79,6 +81,9 @@
     - name: "class"
       type: "string"
       doc: "The specific requirement type."
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
 
 - type: record
   name: ExpressionEngineRequirement
@@ -113,6 +118,7 @@
     - name: id
       type: string
       doc: "Used to identify the expression engine in the `engine` field of Expressions."
+      jsonldPredicate: "@id"
     - name: requirements
       type:
         - "null"
@@ -226,7 +232,7 @@
     { name: "valueFrom", type: ["null", "Expression", "Ref"] },
     { name: "glob", type: ["null", "string"] },
     { name: "loadContents", type: ["null", "boolean"] }
-    ]
+  ]
 
 - type: record
   name: "DataLink"
@@ -237,6 +243,9 @@
   fields:
     - name: "source"
       type: "string"
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
       doc: |
         An input parameter on the parent workflow as identified by the
         [`InputSchemaRoot.id`](#/schema/InputSchemaRoot), or an output
@@ -245,27 +254,35 @@
 
 - type: record
   name: ExternalInputParameter
-  fields: [
-    { name: "def", type: "string" },
-    {
-      name: "connect",
-      type: [
-        "DataLink",
-        {
-          type: "array",
-          items: "DataLink"
-        }
-      ]
-    },
-    { name: "id", type: ["null", "string"] }
-  ]
+  fields:
+    - name: def
+      type: string
+      jsonldPredicate:
+        "@id": "cwl:parameterDefinition"
+        "@type": "@id"
+    - name: connect
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
+      type:
+        - DataLink
+        - type: array
+          items: DataLink
+    - name: id
+      type: ["null", string]
+      jsonldPredicate: "@id"
 
 - type: record
   name: ExternalOutputParameter
-  fields: [
-    { name: "def", type: "string" },
-    { name: "id", type: "string" }
-  ]
+  fields:
+    - name: "def"
+      type: "string"
+      jsonldPredicate:
+        "@id": "cwl:parameterDefinition"
+        "@type": "@id"
+    - name: "id"
+      type: "string"
+      "jsonldPredicate": "@id"
 
 - type: record
   name: "Schema"
@@ -282,7 +299,11 @@
           type: "array",
           items: [ "Datatype", "Schema", "string" ]
         }
-      ]
+      ],
+      jsonldPredicate: {
+        "@id": "avro:type",
+        "@type": "@vocab"
+      }
     },
     {
       name: fields,
@@ -293,6 +314,10 @@
           items: "Schema"
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:fields",
+        "@container": "@list"
+      },
       doc: "When `type` is `record`, defines the fields of the record."
     },
     {
@@ -304,6 +329,10 @@
           items: "string"
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:symbols",
+        "@container": "@list"
+      },
       doc: "When `type` is `enum`, defines the set of valid symbols."
     },
     {
@@ -318,6 +347,10 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:items",
+        "@container": "@list"
+      },
       doc: "When `type` is `array`, defines the type of the array elements."
     },
     {
@@ -332,6 +365,10 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:values",
+        "@container": "@list"
+      },
       doc: "When `type` is `map`, defines the value type for the key/value pairs."
     }
   ]
@@ -368,6 +405,7 @@
   fields:
     - name: id
       type: string
+      jsonldPredicate: "@id"
     - name: type
       type:
         - Datatype
@@ -376,6 +414,9 @@
           items:
             - Datatype
             - Schema
+      jsonldPredicate:
+        "@id": "avro:type"
+        "@type": "@vocab"
     - name: connect
       type:
         - "null"
@@ -383,6 +424,9 @@
         - type: array
           items: DataLink
       doc: "Connect this parameter to upstream parameters, described above."
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
     # - name: "default"
     #   type:
     #     - "null"
@@ -445,6 +489,7 @@
       doc: "The name of the file to create in the output directory."
     - name: "value"
       type: ["string", "Expression", "Ref"]
+      jsonldPredicate: "rdf:value"
       doc: |
         The contents of the file.
 
@@ -465,7 +510,8 @@
     {name: "env", type: "string"},
     {
       name: "value",
-      type: ["string", "Expression", "Ref"]
+      type: ["string", "Expression", "Ref"],
+      jsonldPredicate: "rdf:value"
     }
   ]
 
@@ -487,8 +533,11 @@
 
   fields:
     - name: "class"
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
       type: ["null", "string"]
-      "doc": |
+      doc: |
         The type of process is defined by the `class` field.  Valid values for this
         field are [`CommandLineTool`](\#/schema/CommandLineTool),
         [`ExpressionTool`](\#/schema/ExpressionTool), [`Workflow`](\#/schema/Workflow) or
@@ -499,15 +548,16 @@
         type: "array",
         items: "InputParameter",
       }
+      jsonldPredicate: "wfdesc:hasInput"
       doc:
         "Defines the input parameters of the process.  This may be used to
         validate the input object or build a user interface for constructing
         the input object."
     - name: "outputs"
-      type: {
-        type: "array",
+      type:
+        type: "array"
         items: "OutputParameter"
-      }
+      jsonldPredicate: "wfdesc:hasOutput"
       doc: "Defines the input parameters of the process, and
         may be used to generate and/or validate the input object."
     - name: "schemaDefs"
@@ -565,6 +615,16 @@
       type:
         - "null"
         - ScatterMethod
+    - name: label
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "dct:title"
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "dct:description"
 
 - type: record
   name: "CommandLineTool"
@@ -699,6 +759,10 @@
             items: "string"
         }
       ]
+      jsonldPredicate: {
+        "@id": "cwl:baseCommand",
+        "@container": "@list"
+      }
     - name: "arguments"
       doc: |
         Command line bindings which are not directly associated with values
@@ -710,6 +774,10 @@
           items: ["string", "CommandLineBinding"]
         }
       ]
+      jsonldPredicate: {
+        "@id": "cwl:arguments",
+        "@container": "@list"
+      }
     - name: "stdin"
       type: ["null", "Ref"]
       doc: |
@@ -779,7 +847,11 @@
     {
       name: "impl",
       type: "string",
-      doc:  Specifies the resource that should be loaded to find the actual process definition.
+      jsonldPredicate: {
+        "@id": "cwl:impl",
+        "@type": "@id"
+      },
+      doc: "Specifies the resource that should be loaded to find the actual process definition."
     }
   ]
 
@@ -809,6 +881,7 @@
 
   fields:
     - name: "steps"
+      jsonldPredicate: "wfdesc:hasSubProcess"
       doc: |
         Subprocesses to execute as workflow steps.  Steps are executed when all
         input data links are fufilled.  Steps may execute concurrently.  The
