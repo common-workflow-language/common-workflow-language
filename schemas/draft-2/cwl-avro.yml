@@ -619,12 +619,12 @@
       type:
         - "null"
         - string
-      jsondldPredicate: "dct:title"
+      jsondldPredicate: "rdfs:label"
     - name: description
       type:
         - "null"
         - string
-      jsondldPredicate: "dct:description"
+      jsondldPredicate: "rdfs:comment"
 
 - type: record
   name: "CommandLineTool"
