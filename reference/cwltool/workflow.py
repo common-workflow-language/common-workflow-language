@@ -1,7 +1,7 @@
 import job
 import draft1tool
 import draft2tool
-from draft2tool import aslist
+from aslist import aslist
 from process import Process
 from process import WorkflowException
 import copy

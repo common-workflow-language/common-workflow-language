@@ -16,6 +16,7 @@ import random
 from process import Process
 from process import WorkflowException
 import validate
+from aslist import aslist
 
 _logger = logging.getLogger("cwltool")
 
@@ -206,12 +207,6 @@ class ExpressionTool(Tool):
         j.output_callback = output_callback
         yield j
 
-def aslist(l):
-    if isinstance(l, list):
-        return l
-    else:
-        return [l]
-
 class CommandLineTool(Tool):
     def __init__(self, toolpath_object):
         super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool")
@@ -252,7 +247,6 @@ class CommandLineTool(Tool):
 
         j = CommandLineJob()
         j.joborder = builder.job
-        j.container = None
         j.stdin = None
         j.stdout = None
         builder.pathmapper = None

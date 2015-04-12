@@ -158,6 +158,9 @@
     - name: engine
       type: string
       doc: "The engine to use, must be defined with ExpressionEngineRequirement"
+      jsonldPredicate:
+        "@id": "cwl:engine"
+        "@type": "@id"
     - name: script
       type: string
       doc: "The code to be executed by the expression engine."
