@@ -1,3 +1,16 @@
+# - name: HEADER
+#   doc: |
+#     abc
+#   jsonldPrefixes: {
+#     "cwl": "http://github.com/common-workflow-language#",
+#     "avro": "http://github.com/common-workflow-language#avro/",
+#     "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+#     "dct": "http://purl.org/dc/terms/",
+#     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+#   }
+#   jsonldVocab: cwl
+
+
 - type: enum
   name: Datatype
   symbols:
@@ -14,6 +27,7 @@
     - array
     - map
     - File
+  jsonldPrefix: avro
   doc: |
    CWL data types are based on Avro schema declarations.  Refer to the [Avro
    schema declaration
@@ -57,65 +71,114 @@
             }
         ]
 
-- type: record
-  name: Expression
-  doc: "An expression is a fragment of executable code that is evaluated by workflow
-  platform in order to affect the behavior of a process."
-  fields:
-    - name: "class"
-      type: "string"
-      doc: Currently only `JavascriptExpression`
-
-- type: record
-  name: JavascriptExpression
-  extends: Expression
-  doc: |
-    Execute [Javascript/ECMAScript
-    5.1](http://www.ecma-international.org/ecma-262/5.1/) code and return a JSON value.
-
-    Before executing the expression, the runtime must initialize a JavaScript
-    variable "$job" containing a copy of the validated contents of the input object
-    document.  This variable must be available in the expression's global
-    namespace when the expression is evaluated.
-
-    The runtime must also include any code defined in [`Process.expressionDefs`](#/schema/Process).
-
-    Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.  Expressions must be evaluated in
-    [Javascript strict
-    mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
-
-    The order in which expressions are evaluated is undefined.
-
-    Implementations may apply other limits, such as process isolation,
-    timeouts, and operating system containers/jails to minimize the security
-    risks associated with running untrusted code.
-
-  fields:
-    - name: "script"
-      type: ["null", "string"]
-      doc: |
-        A fragment of JavaScript code.  If `value` is enclosed in braces ("{"
-        and "}") then it will be interpreted as a [function
-        body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
-        anonymous, zero-argument function, and the value of the expression will
-        be the value returned when this function is executed.  Otherwise, the
-        code in `value` will be interpreted as a [Javascript
-        expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11),
-        and the value of the expression will be the result of evaluating that
-        expression.
 
 - type: record
   name: "Ref"
-  fields: [
-    { name: "ref", type: "string" }
-  ]
+  fields:
+    - name: "ref"
+      type: "string"
+      jsonldPredicate: "@id"
   doc: >
     A URI reference to another object.  This may refer to an object within the
     current document, to an external file, or to a labeled object within an
     external file.  To reference an object within the current document or
     an external document, the object must be labeled with an `id` field.
+
+- type: record
+  name: ProcessRequirement
+  doc: |
+    A process requirement declares a prerequisite that may or must be fufilled
+    before executing a process.  See [`Process.hints`](#/schema/Process) and
+    [`Process.requirements`](#/schema/Process).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "The specific requirement type."
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
+
+- type: record
+  name: ExpressionEngineRequirement
+  extends: ProcessRequirement
+  doc: |
+    Define an expression engine.  Expressions are fragments of code which
+    affect the control of the workflow engine.
+
+    An expression engine is a command line program following the following
+    protocol:
+
+      * On standard input, receive a JSON object with the following fields:
+
+        - expressionDefs: A list of strings from the `expressionDefs` field, or
+          `null` if `expressionDefs` is not specified.
+
+        - input: The input object of the current Process (context dependent).
+
+        - self: The specific value being transformed (context dependent).  May
+          be null.
+
+        - script: The code fragment to evaluate.
+
+      * On standard output, print a single JSON value (string, number, array, object,
+        boolean, or null) for the return value.
+
+    Implementations may apply limits, such as process isolation, timeouts, and
+    operating system containers/jails to minimize the security risks associated
+    with running untrusted code.
+
+  fields:
+    - name: id
+      type: string
+      doc: "Used to identify the expression engine in the `engine` field of Expressions."
+      jsonldPredicate: "@id"
+    - name: requirements
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: |
+        Requirements to run this expression engine, such as DockerRequirement
+        for specifying a container with the engine.
+    - name: engineCommand
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: "The command line to invoke the expression engine."
+    - name: expressionDefs
+      type:
+        - "null"
+        - type: array
+          items: ["string", "Ref"]
+      doc: |
+        Code fragments that should be evaluated before evaluating the script.
+        Can be used to provide function definitions used in multiple places.
+
+- type: record
+  name: Expression
+  doc: |
+    An expression is a fragment of executable code that is evaluated by
+    workflow the expression engine specified in `engine` in order to affect the
+    behavior of a process.
+
+    Expressions must be evaluated in an isolated context (a "sandbox") which
+    permits no side effects to leak outside the context, and permit no outside
+    data to leak into the context.
+
+    The order in which expressions are evaluated is undefined.
+  fields:
+    - name: engine
+      type: string
+      doc: "The engine to use, must be defined with ExpressionEngineRequirement"
+      jsonldPredicate:
+        "@id": "cwl:engine"
+        "@type": "@id"
+    - name: script
+      type: string
+      doc: "The code to be executed by the expression engine."
+
 
 - type: record
   name: "CommandLineBinding"
@@ -186,7 +249,7 @@
     { name: "valueFrom", type: ["null", "Expression", "Ref"] },
     { name: "glob", type: ["null", "string"] },
     { name: "loadContents", type: ["null", "boolean"] }
-    ]
+  ]
 
 - type: record
   name: "DataLink"
@@ -197,6 +260,9 @@
   fields:
     - name: "source"
       type: "string"
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
       doc: |
         An input parameter on the parent workflow as identified by the
         [`InputSchemaRoot.id`](#/schema/InputSchemaRoot), or an output
@@ -205,27 +271,35 @@
 
 - type: record
   name: ExternalInputParameter
-  fields: [
-    { name: "def", type: "string" },
-    {
-      name: "connect",
-      type: [
-        "DataLink",
-        {
-          type: "array",
-          items: "DataLink"
-        }
-      ]
-    },
-    { name: "id", type: ["null", "string"] }
-  ]
+  fields:
+    - name: def
+      type: string
+      jsonldPredicate:
+        "@id": "cwl:parameterDefinition"
+        "@type": "@id"
+    - name: connect
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
+      type:
+        - DataLink
+        - type: array
+          items: DataLink
+    - name: id
+      type: ["null", string]
+      jsonldPredicate: "@id"
 
 - type: record
   name: ExternalOutputParameter
-  fields: [
-    { name: "def", type: "string" },
-    { name: "id", type: "string" }
-  ]
+  fields:
+    - name: "def"
+      type: "string"
+      jsonldPredicate:
+        "@id": "cwl:parameterDefinition"
+        "@type": "@id"
+    - name: "id"
+      type: "string"
+      "jsonldPredicate": "@id"
 
 - type: record
   name: "Schema"
@@ -242,7 +316,11 @@
           type: "array",
           items: [ "Datatype", "Schema", "string" ]
         }
-      ]
+      ],
+      jsonldPredicate: {
+        "@id": "avro:type",
+        "@type": "@vocab"
+      }
     },
     {
       name: fields,
@@ -253,6 +331,10 @@
           items: "Schema"
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:fields",
+        "@container": "@list"
+      },
       doc: "When `type` is `record`, defines the fields of the record."
     },
     {
@@ -264,6 +346,10 @@
           items: "string"
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:symbols",
+        "@container": "@list"
+      },
       doc: "When `type` is `enum`, defines the set of valid symbols."
     },
     {
@@ -278,6 +364,10 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:items",
+        "@container": "@list"
+      },
       doc: "When `type` is `array`, defines the type of the array elements."
     },
     {
@@ -292,6 +382,10 @@
           items: [ "Datatype", "Schema", "string" ]
         }
       ],
+      jsonldPredicate: {
+        "@id": "avro:values",
+        "@container": "@list"
+      },
       doc: "When `type` is `map`, defines the value type for the key/value pairs."
     }
   ]
@@ -328,6 +422,7 @@
   fields:
     - name: id
       type: string
+      jsonldPredicate: "@id"
     - name: type
       type:
         - Datatype
@@ -336,6 +431,9 @@
           items:
             - Datatype
             - Schema
+      jsonldPredicate:
+        "@id": "avro:type"
+        "@type": "@vocab"
     - name: connect
       type:
         - "null"
@@ -343,6 +441,9 @@
         - type: array
           items: DataLink
       doc: "Connect this parameter to upstream parameters, described above."
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
     # - name: "default"
     #   type:
     #     - "null"
@@ -391,16 +492,6 @@
     - name: outputBinding
       type: [ "null", "OutputBinding" ]
 
-- type: record
-  name: ProcessRequirement
-  doc: |
-    A process requirement declares a prerequisite that may or must be fufilled
-    before executing a process.  See [`Process.hints`](#/schema/Process) and
-    [`Process.requirements`](#/schema/Process).
-  fields:
-    - name: "class"
-      type: "string"
-      doc: "The specific requirement type."
 
 - type: record
   name: "FileDef"
@@ -415,6 +506,7 @@
       doc: "The name of the file to create in the output directory."
     - name: "value"
       type: ["string", "Expression", "Ref"]
+      jsonldPredicate: "rdf:value"
       doc: |
         The contents of the file.
 
@@ -435,7 +527,8 @@
     {name: "env", type: "string"},
     {
       name: "value",
-      type: ["string", "Expression", "Ref"]
+      type: ["string", "Expression", "Ref"],
+      jsonldPredicate: "rdf:value"
     }
   ]
 
@@ -457,8 +550,11 @@
 
   fields:
     - name: "class"
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
       type: ["null", "string"]
-      "doc": |
+      doc: |
         The type of process is defined by the `class` field.  Valid values for this
         field are [`CommandLineTool`](\#/schema/CommandLineTool),
         [`ExpressionTool`](\#/schema/ExpressionTool), [`Workflow`](\#/schema/Workflow) or
@@ -469,15 +565,16 @@
         type: "array",
         items: "InputParameter",
       }
+      jsonldPredicate: "wfdesc:hasInput"
       doc:
         "Defines the input parameters of the process.  This may be used to
         validate the input object or build a user interface for constructing
         the input object."
     - name: "outputs"
-      type: {
-        type: "array",
+      type:
+        type: "array"
         items: "OutputParameter"
-      }
+      jsonldPredicate: "wfdesc:hasOutput"
       doc: "Defines the input parameters of the process, and
         may be used to generate and/or validate the input object."
     - name: "schemaDefs"
@@ -525,14 +622,6 @@
         workflow engine that may be helpful in executing this process.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
-    - name: "expressionDefs"
-      type: [
-        "null",
-        {
-          type: "array",
-          items: ["string", "Ref"]
-        }
-      ]
     - name: scatter
       type:
         - "null"
@@ -543,6 +632,16 @@
       type:
         - "null"
         - ScatterMethod
+    - name: label
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:label"
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
 
 - type: record
   name: "CommandLineTool"
@@ -677,6 +776,10 @@
             items: "string"
         }
       ]
+      jsonldPredicate: {
+        "@id": "cwl:baseCommand",
+        "@container": "@list"
+      }
     - name: "arguments"
       doc: |
         Command line bindings which are not directly associated with values
@@ -688,6 +791,10 @@
           items: ["string", "CommandLineBinding"]
         }
       ]
+      jsonldPredicate: {
+        "@id": "cwl:arguments",
+        "@container": "@list"
+      }
     - name: "stdin"
       type: ["null", "Ref"]
       doc: |
@@ -740,7 +847,7 @@
   extends: "Process"
   fields: [
     {
-      name: "script",
+      name: "expression",
       type: "Expression"
     }
   ]
@@ -757,7 +864,11 @@
     {
       name: "impl",
       type: "string",
-      doc:  Specifies the resource that should be loaded to find the actual process definition.
+      jsonldPredicate: {
+        "@id": "cwl:impl",
+        "@type": "@id"
+      },
+      doc: "Specifies the resource that should be loaded to find the actual process definition."
     }
   ]
 
@@ -787,6 +898,7 @@
 
   fields:
     - name: "steps"
+      jsonldPredicate: "wfdesc:hasSubProcess"
       doc: |
         Subprocesses to execute as workflow steps.  Steps are executed when all
         input data links are fufilled.  Steps may execute concurrently.  The
@@ -815,7 +927,26 @@
       type: ["null", "string"]
       doc: "Supply the contents of a Dockerfile which will be build using `docker build`."
     - name: "dockerImageId"
-      type: "string"
+      type: ["null", "string"]
       doc: |
         The image id that will be used for `docker run`.  May be a
-        human-readable image name or the image identifier hash.
+        human-readable image name or the image identifier hash.  May be skipped
+        if `dockerPull` is specified, in which case the `dockerPull` image id
+        will be used.
+
+- type: record
+  name: MemoryRequirement
+  extends: ProcessRequirement
+  doc: |
+    Indicates that a workflow process requires a certain minimum amount of RAM to run.
+  fields:
+    - name: "total_mem"
+      type:
+        - int
+        - Expression
+      doc: "Total memory required, in megabytes."
+
+- type: record
+  name: ScatterFeature
+  extends: ProcessRequirement
+  fields: []

@@ -2,6 +2,10 @@
 {
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
     "class": "ExpressionTool",
+    "requirements": [{
+      class: ExpressionEngineRequirement,
+      id: "node-engine.cwl"
+    }],
     "inputs": [{
         "id": "#file1",
         "type": "File",
@@ -11,8 +15,8 @@
         "id": "#output",
         "type": "int"
     }],
-    "script": {
-        "class": "JavascriptExpression",
+    "expression": {
+        "engine": "node-engine.cwl",
         "script": "{return {'output': parseInt($job.file1.contents)};}"
     }
 }

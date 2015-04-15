@@ -8,6 +8,9 @@ outputs:
     - id: "#count_output"
       type: int
       connect: {"source": "#step2_output"}
+requirements:
+  - class: ExpressionEngineRequirement
+    id: node-engine.cwl
 steps:
     - id: "#step1"
       class: CommandLineTool
@@ -33,6 +36,6 @@ steps:
       outputs:
         - id: "#step2_output"
           type: int
-      script:
-        class: JavascriptExpression
+      expression:
+        engine: node-engine.cwl
         script: "{return {'step2_output': parseInt($job.step2_file1.contents)};}"
