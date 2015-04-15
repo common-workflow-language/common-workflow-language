@@ -113,9 +113,9 @@
         - expressionDefs: A list of strings from the `expressionDefs` field, or
           `null` if `expressionDefs` is not specified.
 
-        - input: The input object of the current Process (context dependent).
+        - job: The input object of the current Process (context dependent).
 
-        - self: The specific value being transformed (context dependent).  May
+        - context: The specific value being transformed (context dependent).  May
           be null.
 
         - script: The code fragment to evaluate.
