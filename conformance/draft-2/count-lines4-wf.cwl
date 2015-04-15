@@ -12,6 +12,8 @@ outputs:
         type: array
         items: int
       connect: {"source": "#step1_output"}
+requirements:
+  - class: ScatterFeature
 steps:
   - id: "#step1"
     impl: wc2-tool.cwl

@@ -100,7 +100,7 @@ def validate_ex(expected_schema, datum):
                     raise ValidationException("At position %i\n%s" % (i, indent(str(v))))
             return True
         else:
-            raise ValidationException("the value `%s` is not a list, expected list of %s" % (pprint.pformat(datum), expected_schema.items))
+            raise ValidationException("the value `%s` is not a list, expected list of %s" % (pprint.pformat(datum), friendly(expected_schema.items)))
     elif schema_type == 'map':
         if (isinstance(datum, dict) and
             False not in [isinstance(k, basestring) for k in datum.keys()] and

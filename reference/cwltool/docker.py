@@ -1,7 +1,17 @@
 import subprocess
+import logging
+import sys
+import requests
+import os
 
-def get_image(dockerRequirement, pull_image):
+_logger = logging.getLogger("cwltool")
+
+def get_image(dockerRequirement, pull_image, dry_run=False):
     found = False
+
+    if "dockerImageId" not in dockerRequirement and "dockerPull" in dockerRequirement:
+        dockerRequirement["dockerImageId"] = dockerRequirement["dockerPull"]
+
     for ln in subprocess.check_output(["docker", "images", "--no-trunc", "--all"]).splitlines():
         try:
             ln.index(dockerRequirement["dockerImageId"])
@@ -50,18 +60,18 @@ def get_image(dockerRequirement, pull_image):
     return found
 
 
-def get_from_requirements(requirements, hints, pull_image):
+def get_from_requirements(requirements, hints, pull_image, dry_run=False):
     if requirements:
         for r in reversed(requirements):
             if r["class"] == "DockerRequirement":
-                if docker.get_image(r, pull_image):
+                if get_image(r, pull_image, dry_run):
                     return r["dockerImageId"]
                 else:
                     raise Exception("Docker image %s not found" % (self.container["imageId"]))
     if hints:
         for r in reversed(hints):
             if r["class"] == "DockerRequirement":
-                if docker.get_image(r, pull_image):
+                if get_image(r, pull_image, dry_run):
                     return r["dockerImageId"]
 
     return None

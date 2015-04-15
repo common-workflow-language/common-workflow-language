@@ -17,6 +17,7 @@ from process import Process
 from process import WorkflowException
 import validate
 from aslist import aslist
+import expression
 
 _logger = logging.getLogger("cwltool")
 
@@ -24,31 +25,20 @@ CONTENT_LIMIT = 1024 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
-supportedProcessRequirements = ("DockerRequirement", "MemoryRequirement", "ExpressionEngineRequirement")
+supportedProcessRequirements = ("DockerRequirement",
+                                "MemoryRequirement",
+                                "ExpressionEngineRequirement",
+                                "ScatterFeature")
 
 class Builder(object):
-    def jseval(self, expression, context):
-        if isinstance(expression, list):
-            exp = "{return %s(%s);}" % (expression[0], ",".join([json.dumps(self.do_eval(e)) for e in expression[1:]]))
-        elif expression.startswith('{'):
-            exp = '{return function()%s();}' % (expression)
-        else:
-            exp = '{return %s;}' % (expression)
-        return sandboxjs.execjs(exp, "var $job = %s; var $self = %s; %s" % (json.dumps(self.job), json.dumps(context), self.jslib))
-
-    def do_eval(self, ex, context=None):
-        if isinstance(ex, dict):
-            if ex.get("class") == "JavascriptExpression":
-                if "script" in ex:
-                    return self.jseval(ex["script"], context)
-            elif ex.get("ref"):
-                if ex["ref"].startswith("#"):
-                    return self.job[ex["ref"][1:]]
-                else:
-                    with open(os.path.join(self.basedir, ex["ref"]), "r") as f:
-                        return f.read()
-        else:
-            return ex
+    # def jseval(self, expression, context):
+    #     if isinstance(expression, list):
+    #         exp = "{return %s(%s);}" % (expression[0], ",".join([json.dumps(self.do_eval(e)) for e in expression[1:]]))
+    #     elif expression.startswith('{'):
+    #         exp = '{return function()%s();}' % (expression)
+    #     else:
+    #         exp = '{return %s;}' % (expression)
+    #     return sandboxjs.execjs(exp, "var $job = %s; var $self = %s; %s" % (json.dumps(self.job), json.dumps(context), self.jslib))
 
     def bind_input(self, schema, datum):
         bindings = []
@@ -128,7 +118,7 @@ class Builder(object):
     def generate_arg(self, binding):
         value = binding["valueFrom"]
         if "do_eval" in binding:
-            value = self.do_eval(binding["do_eval"], value)
+            value = expression.do_eval(binding["do_eval"], self.job, self.requirements, self.docpath, value)
 
         prefix = binding.get("prefix")
         sep = binding.get("separator")
@@ -165,13 +155,20 @@ class Builder(object):
 
 
 class Tool(Process):
-    def _init_job(self, joborder, basedir):
+    def _init_job(self, joborder, basedir, **kwargs):
         # Validate job order
         try:
             validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
         except validate.ValidationException as v:
             _logger.error("Failed to validate %s\n%s" % (pprint.pformat(joborder), v))
             raise
+
+        for r in self.tool.get("requirements", []):
+            if r["class"] not in supportedProcessRequirements:
+                raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
+
+        self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
 
         builder = Builder()
         builder.job = copy.deepcopy(joborder)
@@ -180,10 +177,7 @@ class Tool(Process):
         builder.files = []
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
-
-        if self.tool.get("expressionDefs"):
-            for ex in self.tool['expressionDefs']:
-                builder.jslib += builder.do_eval(ex) + "\n"
+        builder.docpath = self.docpath
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 
@@ -191,28 +185,31 @@ class Tool(Process):
 
 
 class ExpressionTool(Tool):
-    def __init__(self, toolpath_object):
-        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool")
+    def __init__(self, toolpath_object, docpath):
+        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", docpath)
 
     class ExpressionJob(object):
         def run(self, outdir=None, **kwargs):
-            self.output_callback(self.builder.do_eval(self.script))
+            self.output_callback(expression.do_eval(self.script, self.builder.job, self.requirements, self.builder.docpath))
 
     def job(self, joborder, basedir, output_callback, **kwargs):
-        builder = self._init_job(joborder, basedir)
+        builder = self._init_job(joborder, basedir, **kwargs)
 
         j = ExpressionTool.ExpressionJob()
         j.builder = builder
-        j.script = self.tool["script"]
+        j.script = self.tool["expression"]
         j.output_callback = output_callback
+        j.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        j.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+
         yield j
 
 class CommandLineTool(Tool):
-    def __init__(self, toolpath_object):
-        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool")
+    def __init__(self, toolpath_object, docpath):
+        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath)
 
     def job(self, joborder, basedir, output_callback, use_container=True, **kwargs):
-        builder = self._init_job(joborder, basedir)
+        builder = self._init_job(joborder, basedir, **kwargs)
 
         if self.tool["baseCommand"]:
             for n, b in enumerate(aslist(self.tool["baseCommand"])):
@@ -252,9 +249,9 @@ class CommandLineTool(Tool):
         builder.pathmapper = None
 
         if self.tool.get("stdin"):
-            j.stdin = builder.do_eval(self.tool["stdin"])
-            if isinstance(j.stdin, dict):
-                j.stdin = j.stdin["path"]
+            j.stdin = self.tool["stdin"]
+            if isinstance(j.stdin, dict) and "ref" in j.stdin:
+                j.stdin = builder.job[j.stdin["ref"][1:]]["path"]
             reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
@@ -268,24 +265,12 @@ class CommandLineTool(Tool):
                 if not j.stdout:
                     raise Exception("stdout refers to invalid output")
             else:
-                j.stdout = builder.do_eval(self.tool["stdout"])
+                j.stdout = self.tool["stdout"]
             if os.path.isabs(j.stdout):
                 raise Exception("stdout must be a relative path")
 
-        j.generatefiles = {}
-        for t in self.tool.get("fileDefs", []):
-            j.generatefiles[t["filename"]] = builder.do_eval(t["value"])
-
-        j.environment = {}
-        for t in self.tool.get("environmentDefs", []):
-            j.environment[t["env"]] = builder.do_eval(t["value"])
-
-        j.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        j.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
-
-        for r in j.requirements:
-            if r["class"] not in supportedProcessRequirements:
-                raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
+        j.requirements = self.requirements
+        j.hints = self.hints
 
         for r in (j.requirements + j.hints):
             if r["class"] == "DockerRequirement" and use_container:
@@ -296,6 +281,16 @@ class CommandLineTool(Tool):
 
         for f in builder.files:
             f["path"] = builder.pathmapper.mapper(f["path"])
+
+        builder.requirements = j.requirements
+
+        j.generatefiles = {}
+        for t in self.tool.get("fileDefs", []):
+            j.generatefiles[t["filename"]] = expression.do_eval(t["value"], builder.job, j.requirements, self.docpath)
+
+        j.environment = {}
+        for t in self.tool.get("environmentDefs", []):
+            j.environment[t["env"]] = expression.do_eval(t["value"], builder.job, j.requirements, self.docpath)
 
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
@@ -349,7 +344,7 @@ class CommandLineTool(Tool):
                     r = None
 
             if "valueFrom" in binding:
-                r = builder.do_eval(binding["valueFrom"], r)
+                r = expression.do_eval(binding["valueFrom"], builder.job, self.requirements, self.docpath, r)
 
         if not r and schema["type"] == "record":
             r = {}

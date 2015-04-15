@@ -37,7 +37,7 @@
   tool: draft-2/cat4-tool.cwl
 
 - args: [cat, foo.txt]
-  generatefiles: {foo.txt: 'The file is hello.txt
+  generatefiles: {foo.txt: 'The file is draft-2/hello.txt
 
       '}
   job: draft-2/cat-job.json

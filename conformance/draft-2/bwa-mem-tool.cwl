@@ -5,7 +5,11 @@
     "requirements": [
         {
             "class": "MemoryRequirement",
-            "value": 5000
+            "total_mem": 5000
+        },
+        {
+            class: ExpressionEngineRequirement,
+            id: "node-engine.cwl"
         }
     ],
     "hints": [
@@ -67,7 +71,7 @@
     "arguments": [
         {
             "valueFrom": {
-                "class": "JavascriptExpression",
+                "engine": "node-engine.cwl",
                 "script": "$job.allocatedResources.cpu"
             },
             "position": 1,

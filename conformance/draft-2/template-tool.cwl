@@ -9,11 +9,9 @@ requirements:
   - class: ExpressionEngineRequirement
     id: "#js"
     requirements:
-      class: DockerRequirement
-      dockerFile: |
-        FROM debian:8
-        RUN apt-get update && apt-get install -qq nodejs
-      dockerImageId: debian/nodejs
+      - class: DockerRequirement
+        dockerImageId: cwl-nodejs-engine
+    engineCommand: cwlNodeEngine.js
     expressionDefs:
       - { ref: underscore.js }
       - "var t = function(s) { return _.template(s)({'$job': $job}); };"

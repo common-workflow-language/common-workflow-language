@@ -10,6 +10,8 @@ inputs:
     type:
       type: array
       items: string
+requirements:
+  - class: ScatterFeature
 steps:
   - id: "#step1"
     class: CommandLineTool

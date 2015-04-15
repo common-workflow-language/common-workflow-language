@@ -1,3 +1,16 @@
+# - name: HEADER
+#   doc: |
+#     abc
+#   jsonldPrefixes: {
+#     "cwl": "http://github.com/common-workflow-language#",
+#     "avro": "http://github.com/common-workflow-language#avro/",
+#     "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+#     "dct": "http://purl.org/dc/terms/",
+#     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+#   }
+#   jsonldVocab: cwl
+
+
 - type: enum
   name: Datatype
   symbols:
@@ -41,7 +54,7 @@
    * **map**: An unordered collection of key/value pairs
 
 - type: record
-  name: FileRecord
+  name: File
   fields: [
             { name: "path", type: "string" },
             { name: "checksum", type: ["null", "string"] },
@@ -52,7 +65,7 @@
                     "null",
                     {
                         type: "array",
-                        items: "FileRecord"
+                        items: "File"
                     }
                 ]
             }
@@ -129,6 +142,7 @@
         for specifying a container with the engine.
     - name: engineCommand
       type:
+        - "null"
         - string
         - type: array
           items: string
@@ -833,7 +847,7 @@
   extends: "Process"
   fields: [
     {
-      name: "script",
+      name: "expression",
       type: "Expression"
     }
   ]
@@ -913,7 +927,26 @@
       type: ["null", "string"]
       doc: "Supply the contents of a Dockerfile which will be build using `docker build`."
     - name: "dockerImageId"
-      type: "string"
+      type: ["null", "string"]
       doc: |
         The image id that will be used for `docker run`.  May be a
-        human-readable image name or the image identifier hash.
+        human-readable image name or the image identifier hash.  May be skipped
+        if `dockerPull` is specified, in which case the `dockerPull` image id
+        will be used.
+
+- type: record
+  name: MemoryRequirement
+  extends: ProcessRequirement
+  doc: |
+    Indicates that a workflow process requires a certain minimum amount of RAM to run.
+  fields:
+    - name: "total_mem"
+      type:
+        - int
+        - Expression
+      doc: "Total memory required, in megabytes."
+
+- type: record
+  name: ScatterFeature
+  extends: ProcessRequirement
+  fields: []

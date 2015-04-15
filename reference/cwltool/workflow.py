@@ -25,25 +25,26 @@ def idk(key):
         raise WorkflowException("Must start with #")
     return key[1:]
 
-def makeTool(toolpath_object, basedir):
+def makeTool(toolpath_object, docpath):
+    """docpath is the directory the tool file is located."""
     if "schema" in toolpath_object:
         return draft1tool.Tool(toolpath_object)
     elif "impl" in toolpath_object and toolpath_object.get("class", "External") == "External":
-        return External(toolpath_object, basedir)
+        return External(toolpath_object, docpath)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
-            return draft2tool.CommandLineTool(toolpath_object)
+            return draft2tool.CommandLineTool(toolpath_object, docpath)
         elif toolpath_object["class"] == "ExpressionTool":
-            return draft2tool.ExpressionTool(toolpath_object)
+            return draft2tool.ExpressionTool(toolpath_object, docpath)
         elif toolpath_object["class"] == "Workflow":
-            return Workflow(toolpath_object)
+            return Workflow(toolpath_object, docpath)
     else:
         raise WorkflowException("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 
 class Workflow(Process):
-    def __init__(self, toolpath_object):
-        super(Workflow, self).__init__(toolpath_object, "Workflow")
+    def __init__(self, toolpath_object, docpath):
+        super(Workflow, self).__init__(toolpath_object, "Workflow", docpath)
 
     def receive_output(self, step, outputparms, jobout):
         _logger.info("Job got output: %s", jobout)
@@ -59,6 +60,8 @@ class Workflow(Process):
         inputobj = {}
 
         if "scatter" in step.tool:
+            if not self.check_feature("ScatterFeature", kwargs):
+                raise WorkflowException("Must include ScatterFeature in requirements.")
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])
             scatter = aslist(step.tool["scatter"])
@@ -90,7 +93,7 @@ class Workflow(Process):
                 is_array = isinstance(inp["type"], dict) and inp["type"]["type"] == "array"
                 for connection in aslist(connections):
                     src = idk(connection["source"])
-                    if src in self.state:
+                    if src in self.state and self.state[src] is not None:
                         if self.state[src].parameter["type"] == inp["type"]:
                             # source and input types are the same
                             if is_array and iid in inputobj:
@@ -108,8 +111,10 @@ class Workflow(Process):
                                 inputobj[iid] = [self.state[src].value]
                         else:
                             raise WorkflowException("Type mismatch between '%s' (%s) and '%s' (%s)" % (src, self.state[src].parameter["type"], idk(inp["id"]), inp["type"]))
+                    elif src not in self.state:
+                        raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
                     else:
-                        raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % ())
+                        return
             elif "default" in inp:
                 inputobj[iid] = inp["default"]
             else:
@@ -185,9 +190,12 @@ class Workflow(Process):
         output_callback(wo)
 
 class External(Process):
-    def __init__(self, toolpath_object, basedir):
+    def __init__(self, toolpath_object, docpath):
         self.impl = toolpath_object["impl"]
-        self.embedded_tool = makeTool(from_url(os.path.join(basedir, self.impl)), basedir)
+        try:
+            self.embedded_tool = makeTool(from_url(os.path.join(docpath, self.impl)), docpath)
+        except validate.ValidationException as v:
+            raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, self.impl), validate.indent(str(v))))
 
         if "id" in toolpath_object:
             self.id = toolpath_object["id"]
@@ -220,7 +228,7 @@ class External(Process):
 
             i["id"] = toolid
 
-        super(External, self).__init__(toolpath_object, "Process")
+        super(External, self).__init__(toolpath_object, "Process", docpath)
 
     def receive_output(self, jobout):
         self.output  = {}
@@ -236,11 +244,11 @@ class External(Process):
             joborder[d] = joborder[idk(i["id"])]
             del joborder[idk(i["id"])]
 
-        requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+        kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
 
         self.output = None
-        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, requirements=requirements, hints=hints, **kwargs):
+        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, **kwargs):
             yield t
 
         while self.output is None:
