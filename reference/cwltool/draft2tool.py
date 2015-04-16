@@ -25,10 +25,13 @@ CONTENT_LIMIT = 1024 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
-supportedProcessRequirements = ("DockerRequirement",
-                                "MemoryRequirement",
-                                "ExpressionEngineRequirement",
-                                "ScatterFeature")
+supportedProcessRequirements = (
+    "DebianRequirement",
+    "DockerRequirement",
+    "ExpressionEngineRequirement",
+    "MemoryRequirement",
+    "ScatterFeature"
+)
 
 class Builder(object):
     # def jseval(self, expression, context):
