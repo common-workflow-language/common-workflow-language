@@ -9,6 +9,7 @@ import apt.debfile
 
 _logger = logging.getLogger("cwltool")
 
+
 def install_package(package_name):
     cache = apt.cache.Cache()
     pkg = cache[package_name]
@@ -37,10 +38,10 @@ def check_depends_from_environment(requirements, hints, dry_run=False):
         for r in reversed(requirements):
             if r["class"] == "DebianRequirement":
                 if 'DebianDepends' in r:
-                    install_depends(r['DebianDepends'])
+                    install_depends(r['DebianDepends'], dry_run)
     if hints:
         for r in reversed(hints):
             if r["class"] == "DebianRequirement":
                 if 'DebianDepends' in r:
-                    install_depends(r['DebianDepends'])
+                    install_depends(r['DebianDepends'], dry_run)
     return None
