@@ -951,7 +951,7 @@
   extends: ProcessRequirement
   fields: []
 - type: record
-  name: DebianRepository
+  name: DebianExtraRepository
   doc: |
   fields:
     - name: "DebianRepository"
@@ -968,7 +968,7 @@
       type: "string"
       doc: |
         An optional ID of a GPG signing key for the specified
-        `DebianExtraRepository` if it wasn't a PPA.
+        `DebianRepository` if it wasn't a PPA.
     - name: "DebianKeyURL"
       type: "string"
       doc: |
@@ -995,7 +995,7 @@
         "null",
           {
             type: "array",
-            items: "DebianRepository"
+            items: "DebianExtraRepository"
           }
         ]
       doc: |
