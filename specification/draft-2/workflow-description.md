@@ -1,3 +1,4 @@
+# Common Workflow Language, Draft 2
 
 Author:
 
@@ -34,8 +35,6 @@ https://github.com/common-workflow-language/common-workflow-language
 
 The products of the CWL working group (including this document) are made available
 under the terms of the Apache License, version 2.
-
-# Table of Contents
 
 # Introduction
 
@@ -205,7 +204,7 @@ referenced `id` field.
 An implementation may choose to only honor references to objects for which the
 `id` field is explicitly listed in this specification.
 
-# Execution
+# Execution Model
 
 The generic execution sequence of a CWL document is as follows.  The root
 object defined in a CWL document must be a [`Process`](#/schema/Process)
