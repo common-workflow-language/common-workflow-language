@@ -10,7 +10,6 @@
 #   }
 #   jsonldVocab: cwl
 
-
 - type: enum
   name: Datatype
   symbols:
@@ -54,25 +53,6 @@
    * **map**: An unordered collection of key/value pairs
 
 - type: record
-  name: File
-  fields: [
-            { name: "path", type: "string" },
-            { name: "checksum", type: ["null", "string"] },
-            { name: "size", type: ["null", "long"] },
-            {
-                name: "secondaryFiles",
-                type: [
-                    "null",
-                    {
-                        type: "array",
-                        items: "File"
-                    }
-                ]
-            }
-        ]
-
-
-- type: record
   name: "Ref"
   fields:
     - name: "ref"
@@ -83,6 +63,23 @@
     current document, to an external file, or to a labeled object within an
     external file.  To reference an object within the current document or
     an external document, the object must be labeled with an `id` field.
+
+
+- type: record
+  name: File
+  fields:
+    - name: "path"
+      type: "string"
+    - name: "checksum"
+      type: ["null", "string"]
+    - name: "size"
+      type: ["null", "long"]
+    - name: "secondaryFiles"
+      type:
+        - "null"
+        - type: array
+          items: File
+
 
 - type: record
   name: ProcessRequirement
@@ -235,7 +232,13 @@
         Join the array elements into a single string with the elements
         separated by by `itemSeparator`.
     - name: "valueFrom"
-      type: ["null", "Expression", "Ref"]
+      type:
+        - "null"
+        - "string"
+        - "Expression"
+        - "Ref"
+        - type: array
+          items: ["string", "Expression", "Ref"]
       doc: |
         An expression or reference to a field in the input object which must be
         evaluted to yield the effective value to use to build the command line.
@@ -245,11 +248,26 @@
 
 - type: record
   name: "OutputBinding"
-  fields: [
-    { name: "valueFrom", type: ["null", "Expression", "Ref"] },
-    { name: "glob", type: ["null", "string"] },
-    { name: "loadContents", type: ["null", "boolean"] }
-  ]
+  doc: |
+    Binding operations are applied in the following order.
+      - glob
+      - loadContents
+      - valueFrom
+  fields:
+    - name: value
+      type: ["null", "string"]
+    - name: "valueFrom"
+      type:
+        - "null"
+        - "string"
+        - "Expression"
+        - "Ref"
+        - type: array
+          items: ["string", "Expression", "Ref"]
+    - name: "glob"
+      type: ["null", "string"]
+    - name: "loadContents"
+      type: ["null", "boolean"]
 
 - type: record
   name: "DataLink"
@@ -444,6 +462,29 @@
       jsonldPredicate:
         "@id": "wfdesc:hasSource"
         "@type": "@id"
+    - name: streamable
+      type: ["null", "boolean"]
+      doc: |
+        Only applies when `type` is `File`.  A value of `true` indicates that the file will
+        be read or written sequentially without seeking.  Default: `false`.
+    - name: secondaryFiles
+      type:
+        - "null"
+        - "string"
+        - Expression
+        - type: "array"
+          items: ["string", "Expression"]
+    - name: match
+      type: ["null", "string"]
+      doc: |
+        A regular expression for validating the input.  Parameter type must be
+        `string`, `File`, or an array of one of those.
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
+
     # - name: "default"
     #   type:
     #     - "null"

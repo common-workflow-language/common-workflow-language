@@ -31,93 +31,6 @@ def has_types(items):
     return []
 
 
-# with open(cwl_avsc) as f:
-#     j = yaml.load(f)
-#     subs = {}
-#     for t in j:
-#         if "extends" in t:
-#             if t["extends"] not in subs:
-#                 subs[t["extends"]] = []
-#             subs[t["extends"]].append(t["name"])
-
-#     out["fields"] = cwltool.process.extend_avro(j)
-
-#     uses = {}
-#     for t in out["fields"]:
-#         if t["type"] == "record":
-#             for f in t["fields"]:
-#                 p = has_types(f)
-#                 for tp in p:
-#                     if tp not in uses:
-#                         uses[tp] = []
-#                     if (t["name"], f["name"]) not in uses[tp]:
-#                         uses[tp].append((t["name"], f["name"]))
-
-#     for f in out["fields"]:
-#         if "doc" not in f:
-#             f["doc"] = ""
-
-#         f["type"] = copy.deepcopy(f)
-#         f["doc"] = ""
-#         f = f["type"]
-#         if "doc" not in f:
-#             f["doc"] = ""
-#         if f["type"] == "record":
-#             for field in f["fields"]:
-#                 if "doc" not in field:
-#                     field["doc"] = ""
-#         doc = ""
-#         if "extends" in f:
-#             doc += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
-#         if f["name"] in subs:
-#             doc += "\n\nExtended by"
-#             doc += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])
-#         if f["name"] in uses:
-#             doc += "\n\nReferenced by"
-#             doc += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
-#         f["doc"] = doc + "\n\n" + f["doc"]
-
-outdoc = open("index.html", "w")
-
-outdoc.write("""
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<style>
-body {
-  position: relative;
-  background-color: aliceblue;
-}
-
-#main {
- background-color: white;
-}
-
-.nav > li > a {
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-
-ol > li > ol {
-  list-style-type: none;
-}
-ol > li > ol > li {
-  padding-left: 1em;
-}
-
-</style>
-</head>
-<body data-spy="scroll" data-target="#toc">
-<div class="container-fluid">
-""")
-
-with open(sys.argv[2]) as md:
-    maindoc = md.read()
 
 n1 = 0
 n2 = 0
@@ -136,6 +49,9 @@ def to_id(text):
             pass
     textid = textid.lower().replace(" ", "_")
     return textid
+
+with open(sys.argv[2]) as md:
+    maindoc = md.read()
 
 start_numbering = False
 for line in maindoc.splitlines():
@@ -163,12 +79,109 @@ for line in maindoc.splitlines():
         toc += """<li><a href="#%s">%s</a></li>\n""" % (to_id(line[2:]), line[2:])
     line = re.sub(r'^(https?://\S+)', r'[\1](\1)', line)
     mdlines.append(line)
-toc += "</li>"
-
-print toc
 
 maindoc = '\n'.join(mdlines)
 
+with open(cwl_avsc) as f:
+    j = yaml.load(f)
+
+subs = {}
+for t in j:
+    if "extends" in t:
+        if t["extends"] not in subs:
+            subs[t["extends"]] = []
+        subs[t["extends"]].append(t["name"])
+
+alltypes = cwltool.process.extend_avro(j)
+
+uses = {}
+for t in alltypes:
+    if t["type"] == "record":
+        for f in t["fields"]:
+            p = has_types(f)
+            for tp in p:
+                if tp not in uses:
+                    uses[tp] = []
+                if (t["name"], f["name"]) not in uses[tp]:
+                    uses[tp].append((t["name"], f["name"]))
+
+toc += """<ol class="nav nav-pills nav-stacked">"""
+n2 = 0
+for f in alltypes:
+    if "doc" not in f:
+        f["doc"] = ""
+
+    f["type"] = copy.deepcopy(f)
+    f["doc"] = ""
+    f = f["type"]
+
+    if "doc" not in f:
+        f["doc"] = ""
+    if f["type"] == "record":
+        for field in f["fields"]:
+            if "doc" not in field:
+                field["doc"] = ""
+
+    lines = []
+    for l in f["doc"].splitlines():
+        if len(l) > 0 and l[0] == "#":
+            l = "#" + l
+        lines.append(l)
+    f["doc"] = "\n".join(lines)
+
+    n2 += 1
+    doc = "## %i.%i %s\n" % (n1, n2, f["name"])
+    toc += """<li><a href="#%s">%i.%i %s</a></li>\n""" % (to_id(f["name"]), n1, n2, f["name"])
+    if "extends" in f:
+        doc += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
+    if f["name"] in subs:
+        doc += "\n\nExtended by"
+        doc += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])
+    if f["name"] in uses:
+        doc += "\n\nReferenced by"
+        doc += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
+    f["doc"] = doc + "\n\n" + f["doc"]
+
+toc += "</ol></li>"
+
+outdoc = open("index.html", "w")
+
+outdoc.write("""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<style>
+body {
+  position: relative;
+  background-color: aliceblue;
+}
+
+#main {
+ background-color: white;
+}
+
+.nav > li > a {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+ol > li > ol {
+  list-style-type: none;
+}
+ol > li > ol > li {
+  padding-left: 1em;
+}
+
+</style>
+</head>
+<body data-spy="scroll" data-target="#toc">
+<div class="container-fluid">
+""")
 
 outdoc.write("""
 <div class="row">
@@ -190,6 +203,10 @@ class MyRenderer(mistune.Renderer):
 outdoc.write("""
 <div class="col-md-9 col-md-offset-3" role="main" id="main">""")
 outdoc.write(mistune.markdown(maindoc, renderer=MyRenderer()))
+
+for f in alltypes:
+    outdoc.write(mistune.markdown(f["type"]["doc"], renderer=MyRenderer()))
+
 outdoc.write("""</div>""")
 
 outdoc.write("""
