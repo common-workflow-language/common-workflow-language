@@ -30,15 +30,9 @@ def has_types(items):
         return [items]
     return []
 
-
-
-n1 = 0
-n2 = 0
-
-toc = ''
-
-mdlines = []
-n = []
+class MyRenderer(mistune.Renderer):
+    def header(self, text, level, raw=None):
+        return """<h1 id="%s">%s</h1>""" % (to_id(text), text)
 
 def to_id(text):
     textid = text
@@ -49,6 +43,23 @@ def to_id(text):
             pass
     textid = textid.lower().replace(" ", "_")
     return textid
+
+def typefmt(tp):
+    if isinstance(tp, list):
+        return " | ".join([typefmt(n) for n in tp])
+    if isinstance(tp, dict):
+        if tp["type"] == "array":
+            return "array&lt;%s&gt;" % (typefmt(tp["items"]))
+    else:
+        return str(tp)
+
+n1 = 0
+n2 = 0
+
+toc = ''
+
+mdlines = []
+n = []
 
 with open(sys.argv[2]) as md:
     maindoc = md.read()
@@ -62,7 +73,7 @@ for line in maindoc.splitlines():
         if m:
             if m.group(1):
                 if n2 == 0:
-                    toc += """<ol class="nav nav-pills nav-stacked">"""
+                    toc += """<ol class="nav nav-pills nav-stacked nav-secondary">"""
                 n2 += 1
                 toc += """<li><a href="#%s">%i.%i %s</a></li>\n""" % (to_id(m.group(2)), n1, n2, m.group(2))
                 line = "## %i.%i %s" % (n1, n2, m.group(2))
@@ -105,7 +116,7 @@ for t in alltypes:
                 if (t["name"], f["name"]) not in uses[tp]:
                     uses[tp].append((t["name"], f["name"]))
 
-toc += """<ol class="nav nav-pills nav-stacked">"""
+toc += """<ol class="nav nav-pills nav-stacked nav-secondary">"""
 n2 = 0
 for f in alltypes:
     if "doc" not in f:
@@ -133,14 +144,32 @@ for f in alltypes:
     doc = "## %i.%i %s\n" % (n1, n2, f["name"])
     toc += """<li><a href="#%s">%i.%i %s</a></li>\n""" % (to_id(f["name"]), n1, n2, f["name"])
     if "extends" in f:
-        doc += "\n\nExtends [%s](#/schema/%s)" % (f["extends"], f["extends"])
+        doc += "\n\nExtends [%s](#%s)" % (f["extends"], to_id(f["extends"]))
     if f["name"] in subs:
         doc += "\n\nExtended by"
-        doc += ", ".join([" [%s](#/schema/%s)" % (s, s) for s in subs[f["name"]]])
+        doc += ", ".join([" [%s](#%s)" % (s, to_id(s)) for s in subs[f["name"]]])
     if f["name"] in uses:
         doc += "\n\nReferenced by"
-        doc += ", ".join([" [%s.%s](#/schema/%s)" % (s[0], s[1], s[0]) for s in uses[f["name"]]])
-    f["doc"] = doc + "\n\n" + f["doc"]
+        doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in uses[f["name"]]])
+    doc = doc + "\n\n" + f["doc"]
+
+    doc = mistune.markdown(doc, renderer=MyRenderer())
+
+    if f["type"] == "record":
+        doc += """<table class="table table-striped">"""
+        doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
+        for i in f["fields"]:
+            doc += "<tr>"
+            tp = i["type"]
+            if isinstance(tp, list) and tp[0] == "null":
+                opt = False
+                tp = tp[1:]
+            else:
+                opt = True
+            doc += "<td>%s</td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(i["doc"]))
+            doc += "</tr>"
+        doc += """</table>"""
+    f["doc"] = doc
 
 toc += "</ol></li>"
 
@@ -156,7 +185,12 @@ outdoc.write("""
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <style>
+html {
+  height:100%;
+}
+
 body {
+  height:100%;
   position: relative;
   background-color: aliceblue;
 }
@@ -177,6 +211,21 @@ ol > li > ol > li {
   padding-left: 1em;
 }
 
+.nav-secondary > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+  text-decoration: underline;
+  color: #337AB7;
+  background-color: transparent;
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+.lefttoc {
+  height: 100%;
+  overflow-y: auto;
+}
+
 </style>
 </head>
 <body data-spy="scroll" data-target="#toc">
@@ -185,7 +234,7 @@ ol > li > ol > li {
 
 outdoc.write("""
 <div class="row">
-<div class="col-md-3 affix" role="complementary">
+<div class="col-md-3 affix lefttoc" role="complementary">
 <nav id="toc">
 <ol class="nav nav-pills nav-stacked">
 """)
@@ -196,16 +245,13 @@ outdoc.write("""</ol>
 </div>
 """)
 
-class MyRenderer(mistune.Renderer):
-    def header(self, text, level, raw=None):
-        return """<h1 id="%s">%s</h1>""" % (to_id(text), text)
 
 outdoc.write("""
 <div class="col-md-9 col-md-offset-3" role="main" id="main">""")
 outdoc.write(mistune.markdown(maindoc, renderer=MyRenderer()))
 
 for f in alltypes:
-    outdoc.write(mistune.markdown(f["type"]["doc"], renderer=MyRenderer()))
+    outdoc.write(f["type"]["doc"])
 
 outdoc.write("""</div>""")
 
