@@ -167,7 +167,7 @@ be handled by a specific workflow platform are:
 
 Conforming CWL documents must not assume anything about the runtime environment
 or workflow platform unless explicitly declared though the use of [process
-requirements](#/schema/ProcessRequirement).
+requirements](#processrequirement).
 
 # Syntax
 
@@ -197,7 +197,7 @@ entire document.  The format of the `id` field is that of a [relative fragment
 identifier](https://tools.ietf.org/html/rfc3986#section-3.5), and must start
 with a hash `#` character.
 
-Where an object field permits a [`Ref`](#/schema/Ref) value containing a
+Where an object field permits a [`Ref`](#ref) value containing a
 fragment identifier, the implementation must look up object using the
 referenced `id` field.
 
@@ -207,7 +207,7 @@ An implementation may choose to only honor references to objects for which the
 # Execution Model
 
 The generic execution sequence of a CWL document is as follows.  The root
-object defined in a CWL document must be a [`Process`](#/schema/Process)
+object defined in a CWL document must be a [`Process`](#process)
 object.
 
 1. Load and validate CWL document, yielding a process object.
@@ -227,4 +227,3 @@ platform to affect the inputs, outputs, or behavior of a process.  In the
 generic execution sequence, expressions may be evaluated during step 5 (process
 setup), step 6 (execute process), and/or step 7 (build output).
 
-# Objects

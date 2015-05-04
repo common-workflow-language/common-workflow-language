@@ -44,50 +44,80 @@ def to_id(text):
     textid = textid.lower().replace(" ", "_")
     return textid
 
-def typefmt(tp):
+class ToC(object):
+    def __init__(self):
+        self.first_toc_entry = True
+        self.numbering = [0]
+        self.toc = ""
+
+    def add_entry(self, thisdepth, title):
+        depth = len(self.numbering)
+        if thisdepth < depth:
+            self.toc += "</ol>"
+            for n in range(0, depth-thisdepth):
+                self.numbering.pop()
+                self.toc += "</li></ol>"
+            self.numbering[-1] += 1
+        elif thisdepth == depth:
+            if not self.first_toc_entry:
+                self.toc += "</ol>"
+            else:
+                self.first_toc_entry = False
+            self.numbering[-1] += 1
+        elif thisdepth > depth:
+            self.numbering.append(1)
+
+        if start_numbering:
+            num = "%i.%s" % (self.numbering[0], ".".join([str(n) for n in self.numbering[1:]]))
+        else:
+            num = ""
+        self.toc += """<li><a href="#%s">%s %s</a><ol class="nav nav-pills nav-stacked nav-secondary">\n""" %(to_id(title),
+            num, title)
+        return num
+
+    def contents(self, id):
+        c = """<nav id="%s"><ol class="nav nav-pills nav-stacked">%s""" % (id, self.toc)
+        c += "</ol>"
+        for i in range(0, len(self.numbering)):
+            c += "</li></ol>"
+        c += """</nav>"""
+        return c
+
+def typefmt(tp, nbsp=False):
     if isinstance(tp, list):
-        return " | ".join([typefmt(n) for n in tp])
+        if nbsp:
+            return "&nbsp;|&nbsp;".join([typefmt(n) for n in tp])
+        else:
+            return " | ".join([typefmt(n) for n in tp])
     if isinstance(tp, dict):
         if tp["type"] == "array":
-            return "array&lt;%s&gt;" % (typefmt(tp["items"]))
+            return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
     else:
-        return str(tp)
-
-n1 = 0
-n2 = 0
-
-toc = ''
+        if str(tp) in ("null", "boolean", "int", "long", "float", "double", "bytes", "string", "record", "enum", "array", "map"):
+            return """<a href="#datatype">%s</a>""" % str(tp)
+        else:
+            return """<a href="#%s">%s</a>""" % (to_id(str(tp)), str(tp))
 
 mdlines = []
-n = []
 
 with open(sys.argv[2]) as md:
     maindoc = md.read()
 
 start_numbering = False
+
+toc = ToC()
+
 for line in maindoc.splitlines():
     if line.strip() == "# Introduction":
         start_numbering = True
-    if start_numbering:
-        m = re.match(r'^#(#?) (.*)', line)
-        if m:
-            if m.group(1):
-                if n2 == 0:
-                    toc += """<ol class="nav nav-pills nav-stacked nav-secondary">"""
-                n2 += 1
-                toc += """<li><a href="#%s">%i.%i %s</a></li>\n""" % (to_id(m.group(2)), n1, n2, m.group(2))
-                line = "## %i.%i %s" % (n1, n2, m.group(2))
-            else:
-                if n2 > 0:
-                    toc += "</ol>"
-                if n1 > 0:
-                    toc += "</li>"
-                n1 += 1
-                n2 = 0
-                toc += """<li><a href="#%s">%i. %s</a>\n""" % (to_id(m.group(2)), n1, m.group(2))
-                line = "# %i. %s" % (n1, m.group(2))
-    elif len(line) > 0 and line[0] == "#":
-        toc += """<li><a href="#%s">%s</a></li>\n""" % (to_id(line[2:]), line[2:])
+        toc.numbering = [0]
+
+    m = re.match(r'^(#+) (.*)', line)
+    if m:
+        num = toc.add_entry(len(m.group(1)), m.group(2))
+        line = "%s %s %s" % (m.group(1), num, m.group(2))
+    #elif len(line) > 0 and line[0] == "#":
+    #    toc += """<li><a href="#%s">%s</a></li>\n""" % (to_id(line[2:]), line[2:])
     line = re.sub(r'^(https?://\S+)', r'[\1](\1)', line)
     mdlines.append(line)
 
@@ -97,16 +127,28 @@ with open(cwl_avsc) as f:
     j = yaml.load(f)
 
 subs = {}
+showUnder = {}
+
+def add_dictlist(di, key, val):
+    if key not in di:
+        di[key] = []
+    di[key].append(val)
+
 for t in j:
     if "extends" in t:
-        if t["extends"] not in subs:
-            subs[t["extends"]] = []
-        subs[t["extends"]].append(t["name"])
+        add_dictlist(subs, t["extends"], t["name"])
+        if "showUnder" not in t:
+            add_dictlist(showUnder, t["extends"], t["name"])
+
+    if t.get("showUnder"):
+        add_dictlist(showUnder, t["showUnder"], t["name"])
 
 alltypes = cwltool.process.extend_avro(j)
 
+typemap = {}
 uses = {}
 for t in alltypes:
+    typemap[t["name"]] = t
     if t["type"] == "record":
         for f in t["fields"]:
             p = has_types(f)
@@ -116,62 +158,73 @@ for t in alltypes:
                 if (t["name"], f["name"]) not in uses[tp]:
                     uses[tp].append((t["name"], f["name"]))
 
-toc += """<ol class="nav nav-pills nav-stacked nav-secondary">"""
-n2 = 0
+class RenderType(object):
+    def __init__(self):
+        self.typedoc = ""
+
+    def render_type(self, f, depth):
+        if "doc" not in f:
+            f["doc"] = ""
+
+        f["type"] = copy.deepcopy(f)
+        f["doc"] = ""
+        f = f["type"]
+
+        if "doc" not in f:
+            f["doc"] = ""
+        if f["type"] == "record":
+            for field in f["fields"]:
+                if "doc" not in field:
+                    field["doc"] = ""
+
+        lines = []
+        for l in f["doc"].splitlines():
+            if len(l) > 0 and l[0] == "#":
+                l = "#" + l
+            lines.append(l)
+        f["doc"] = "\n".join(lines)
+
+        num = toc.add_entry(depth, f["name"])
+        doc = "## %s %s\n" % (num, f["name"])
+
+        if "extends" in f:
+            doc += "\n\nExtends [%s](#%s)" % (f["extends"], to_id(f["extends"]))
+        if f["name"] in subs:
+            doc += "\n\nExtended by"
+            doc += ", ".join([" [%s](#%s)" % (s, to_id(s)) for s in subs[f["name"]]])
+        if f["name"] in uses:
+            doc += "\n\nReferenced by"
+            doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in uses[f["name"]]])
+        doc = doc + "\n\n" + f["doc"]
+
+        doc = mistune.markdown(doc, renderer=MyRenderer())
+
+        if f["type"] == "record": # and not f.get("abstract"):
+            doc += "<h3>Fields</h3>"
+            doc += """<table class="table table-striped">"""
+            doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
+            for i in f["fields"]:
+                doc += "<tr>"
+                tp = i["type"]
+                if isinstance(tp, list) and tp[0] == "null":
+                    opt = False
+                    tp = tp[1:]
+                else:
+                    opt = True
+                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(i["doc"]))
+                doc += "</tr>"
+            doc += """</table>"""
+        f["doc"] = doc
+
+        self.typedoc += f["doc"]
+
+        for s in showUnder.get(f["name"], []):
+            self.render_type(typemap[s], depth+1)
+
+rt = RenderType()
 for f in alltypes:
-    if "doc" not in f:
-        f["doc"] = ""
-
-    f["type"] = copy.deepcopy(f)
-    f["doc"] = ""
-    f = f["type"]
-
-    if "doc" not in f:
-        f["doc"] = ""
-    if f["type"] == "record":
-        for field in f["fields"]:
-            if "doc" not in field:
-                field["doc"] = ""
-
-    lines = []
-    for l in f["doc"].splitlines():
-        if len(l) > 0 and l[0] == "#":
-            l = "#" + l
-        lines.append(l)
-    f["doc"] = "\n".join(lines)
-
-    n2 += 1
-    doc = "## %i.%i %s\n" % (n1, n2, f["name"])
-    toc += """<li><a href="#%s">%i.%i %s</a></li>\n""" % (to_id(f["name"]), n1, n2, f["name"])
-    if "extends" in f:
-        doc += "\n\nExtends [%s](#%s)" % (f["extends"], to_id(f["extends"]))
-    if f["name"] in subs:
-        doc += "\n\nExtended by"
-        doc += ", ".join([" [%s](#%s)" % (s, to_id(s)) for s in subs[f["name"]]])
-    if f["name"] in uses:
-        doc += "\n\nReferenced by"
-        doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in uses[f["name"]]])
-    doc = doc + "\n\n" + f["doc"]
-
-    doc = mistune.markdown(doc, renderer=MyRenderer())
-
-    if f["type"] == "record":
-        doc += """<table class="table table-striped">"""
-        doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
-        for i in f["fields"]:
-            doc += "<tr>"
-            tp = i["type"]
-            if isinstance(tp, list) and tp[0] == "null":
-                opt = False
-                tp = tp[1:]
-            else:
-                opt = True
-            doc += "<td>%s</td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(i["doc"]))
-            doc += "</tr>"
-        doc += """</table>"""
-    f["doc"] = doc
-
-toc += "</ol></li>"
+    if "extends" not in f and not f.get("showUnder"):
+        rt.render_type(f, 1)
 
 outdoc = open("index.html", "w")
 
@@ -200,8 +253,7 @@ body {
 }
 
 .nav > li > a {
-  padding-top: 0px;
-  padding-bottom: 0px;
+  padding: 0px;
 }
 
 ol > li > ol {
@@ -235,12 +287,9 @@ ol > li > ol > li {
 outdoc.write("""
 <div class="row">
 <div class="col-md-3 affix lefttoc" role="complementary">
-<nav id="toc">
-<ol class="nav nav-pills nav-stacked">
 """)
-outdoc.write(toc)
-outdoc.write("""</ol>
-</nav>
+outdoc.write(toc.contents("toc"))
+outdoc.write("""
 </div>
 </div>
 """)
@@ -250,8 +299,7 @@ outdoc.write("""
 <div class="col-md-9 col-md-offset-3" role="main" id="main">""")
 outdoc.write(mistune.markdown(maindoc, renderer=MyRenderer()))
 
-for f in alltypes:
-    outdoc.write(f["type"]["doc"])
+outdoc.write(rt.typedoc)
 
 outdoc.write("""</div>""")
 

@@ -44,6 +44,7 @@ def extend_avro(items):
                 r["fields"] = specialize(r["fields"], t["specialize"])
             r["fields"].extend(t["fields"])
             r["extends"] = t["extends"]
+            r["abstract"] = t.get("abstract", False)
             r["doc"] = t.get("doc", "")
             types[t["name"]] = r
             t = r
@@ -57,7 +58,8 @@ def get_schema():
         j = yaml.load(f)
         j = extend_avro(j)
         for t in j:
-            avro.schema.make_avsc_object(t, names)
+            if not t.get("abstract"):
+                avro.schema.make_avsc_object(t, names)
     return names
 
 class Process(object):
