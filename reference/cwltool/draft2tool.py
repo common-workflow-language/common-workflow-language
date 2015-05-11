@@ -29,7 +29,7 @@ module_dir = os.path.dirname(os.path.abspath(__file__))
 supportedProcessRequirements = ("DockerRequirement",
                                 "MemoryRequirement",
                                 "ExpressionEngineRequirement",
-                                "ScatterFeature")
+                                "Scatter")
 
 def substitute(value, replace):
     if replace[0] == "^":

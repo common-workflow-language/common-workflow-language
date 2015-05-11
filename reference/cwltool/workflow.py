@@ -59,12 +59,11 @@ class Workflow(Process):
     def try_make_job(self, step, basedir, **kwargs):
         inputobj = {}
 
-        if "scatter" in step.tool:
-            if not self.check_feature("ScatterFeature", kwargs):
-                raise WorkflowException("Must include ScatterFeature in requirements.")
+        scatterSpec = self.get_feature("Scatter", requirements=self.tool["requirements"], hints=self.tool["hints"])
+        if scatterSpec:
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])
-            scatter = aslist(step.tool["scatter"])
+            scatter = aslist(scatterSpec["scatter"])
 
             inp_map = {i["id"]: i for i in inputparms}
             for s in aslist(step.tool["scatter"]):
@@ -73,7 +72,7 @@ class Workflow(Process):
 
                 inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
 
-            if step.tool.get("scatterMethod") == "nested_crossproduct":
+            if scatterSpec.get("scatterMethod") == "nested_crossproduct":
                 nesting = len(aslist(step.tool["scatter"]))
             else:
                 nesting = 1
@@ -124,9 +123,9 @@ class Workflow(Process):
 
         callback = functools.partial(self.receive_output, step, outputparms)
 
-        if step.tool.get("scatter"):
-            method = step.tool.get("scatterMethod")
-            if method is None and len(aslist(step.tool["scatter"])) != 1:
+        if scatterSpec:
+            method = scatterSpec.get("scatterMethod")
+            if method is None and len(aslist(scatterSpec["scatter"])) != 1:
                 raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
 
             if method == "dotproduct" or method is None:

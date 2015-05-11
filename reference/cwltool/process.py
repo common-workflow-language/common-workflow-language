@@ -61,14 +61,14 @@ def get_schema():
     return names
 
 class Process(object):
-    def check_feature(self, feature, kwargs):
+    def get_feature(self, feature, kwargs):
         for t in kwargs.get("requirements", []):
             if t["class"] == feature:
-                return True
+                return t
         for t in kwargs.get("hints", []):
             if t["class"] == feature:
-                return True
-        return False
+                return t
+        return None
 
     def __init__(self, toolpath_object, validateAs, docpath):
         self.names = get_schema()
