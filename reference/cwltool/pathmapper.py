@@ -12,8 +12,10 @@ class PathMapper(object):
     def mapper(self, src):
         return self._pathmap[src]
 
+    def files(self):
+        return self._pathmap.keys()
 
-class DockerPathMapper(object):
+class DockerPathMapper(PathMapper):
     def __init__(self, referenced_files, basedir):
         self._pathmap = {}
         self.dirs = {}
@@ -51,6 +53,3 @@ class DockerPathMapper(object):
             for d in self.dirs:
                 if abs.startswith(d):
                     self._pathmap[src] = os.path.join(self.dirs[d], abs[len(d)+1:])
-
-    def mapper(self, src):
-        return self._pathmap[src]

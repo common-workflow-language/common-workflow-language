@@ -44,6 +44,7 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
                     with open(dockerRequirement["dockerLoad"], "rb") as f:
                         loadproc = subprocess.Popen(cmd, stdin=f, stdout=sys.stderr)
                 else:
+                    loadproc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=sys.stderr)
                     _logger.info("Sending GET request to %s", dockerRequirement["dockerLoad"])
                     req = requests.get(dockerRequirement["dockerLoad"], stream=True)
                     n = 0

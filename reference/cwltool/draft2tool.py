@@ -18,6 +18,7 @@ from process import WorkflowException
 import validate
 from aslist import aslist
 import expression
+import re
 
 _logger = logging.getLogger("cwltool")
 
@@ -29,6 +30,12 @@ supportedProcessRequirements = ("DockerRequirement",
                                 "MemoryRequirement",
                                 "ExpressionEngineRequirement",
                                 "ScatterFeature")
+
+def substitute(value, replace):
+    if replace[0] == "^":
+        return substitute(value[0:value.rindex('.')], replace[1:])
+    else:
+        return value + replace
 
 class Builder(object):
     # def jseval(self, expression, context):
@@ -91,6 +98,19 @@ class Builder(object):
                     with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
                         datum["contents"] = f.read(CONTENT_LIMIT)
                 self.files.append(datum)
+                if "secondaryFiles" in schema:
+                    if "secondaryFiles" not in datum:
+                        datum["secondaryFiles"] = []
+                    for sf in aslist(schema["secondaryFiles"]):
+                        if isinstance(sf, dict):
+                            sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, datum["path"])
+                        else:
+                            sfpath = {"path": substitute(datum["path"], sf)}
+                        if isinstance(sfpath, list):
+                            datum["secondaryFiles"].extend(sfpath)
+                        else:
+                            datum["secondaryFiles"].append(sfpath)
+                        self.files.append(sfpath)
 
         b = None
         if "commandLineBinding" in schema and isinstance(schema["commandLineBinding"], dict):
@@ -157,11 +177,7 @@ class Builder(object):
 class Tool(Process):
     def _init_job(self, joborder, basedir, **kwargs):
         # Validate job order
-        try:
-            validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
-        except validate.ValidationException as v:
-            _logger.error("Failed to validate %s\n%s" % (pprint.pformat(joborder), v))
-            raise
+        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
         for r in self.tool.get("requirements", []):
             if r["class"] not in supportedProcessRequirements:
@@ -263,11 +279,11 @@ class CommandLineTool(Tool):
                         out["outputBinding"] = out.get("outputBinding", {})
                         out["outputBinding"]["glob"] = filename
                 if not j.stdout:
-                    raise Exception("stdout refers to invalid output")
+                    raise validate.ValidationException("stdout refers to invalid output")
             else:
                 j.stdout = self.tool["stdout"]
             if os.path.isabs(j.stdout):
-                raise Exception("stdout must be a relative path")
+                raise validate.ValidationException("stdout must be a relative path")
 
         j.requirements = self.requirements
         j.hints = self.hints
