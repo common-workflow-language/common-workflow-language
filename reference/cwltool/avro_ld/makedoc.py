@@ -237,7 +237,6 @@ def avrold_doc(j, outdoc):
     body {
       height:100%;
       position: relative;
-      background-color: aliceblue;
     }
 
     #main {
@@ -261,39 +260,45 @@ def avrold_doc(j, outdoc):
       background-color: transparent;
     }
 
-    .container-fluid {
-      height: 100%;
+    #main {
+      overflow-y: auto;
     }
 
-    .lefttoc {
-      height: 100%;
+    #lefttoc {
+      background-color: aliceblue;
       overflow-y: auto;
+    }
+
+    @media (min-width: 992px) {
+      .full-height {
+        height: 100%;
+      }
     }
 
     </style>
     </head>
-    <body data-spy="scroll" data-target="#toc">
-    <div class="container-fluid">
+    <body>
+    <div class="container-fluid full-height">
     """)
 
     outdoc.write("""
-    <div class="row">
-    <div class="col-md-3 affix lefttoc" role="complementary">
+    <div class="row full-height">
+    <div id="lefttoc" class="col-md-3 full-height" role="complementary">
     """)
     outdoc.write(toc.contents("toc"))
     outdoc.write("""
     </div>
-    </div>
     """)
 
     outdoc.write("""
-    <div class="col-md-9 col-md-offset-3" role="main" id="main">""")
+    <div class="col-md-9 full-height" role="main" id="main" data-spy="scroll" data-target="#toc">""")
 
     outdoc.write(rt.typedoc.getvalue().encode("utf-8"))
 
     outdoc.write("""</div>""")
 
     outdoc.write("""
+    </div>
     </div>
     </body>
     </html>""")
