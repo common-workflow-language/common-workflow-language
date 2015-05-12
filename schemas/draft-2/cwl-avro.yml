@@ -842,7 +842,7 @@
       jsonldPredicate:
         "@id": "@type"
         "@type": "@vocab"
-      type: ["null", "string"]
+      type: string
       doc: |
         The type of process is defined by the `class` field.  Valid values for this
         field are [`CommandLineTool`](\#commandlinetool),
