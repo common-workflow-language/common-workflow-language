@@ -228,7 +228,7 @@ class External(Process):
 
             i["id"] = toolid
 
-        super(External, self).__init__(toolpath_object, "Process", docpath)
+        super(External, self).__init__(toolpath_object, "External", docpath)
 
     def receive_output(self, jobout):
         self.output  = {}

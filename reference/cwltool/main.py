@@ -12,10 +12,13 @@ import logging
 import workflow
 import validate
 import tempfile
+import avro_ld.jsonld_context
+import yaml
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
 
+module_dir = os.path.dirname(os.path.abspath(__file__))
 
 def printrdf(workflow, sr):
     from rdflib import Graph, plugin
@@ -26,7 +29,7 @@ def printrdf(workflow, sr):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("workflow", type=str)
+    parser.add_argument("workflow", type=str, nargs="?", default=None)
     parser.add_argument("job_order", type=str, nargs="?", default=None)
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
@@ -35,10 +38,14 @@ def main():
     parser.add_argument("--leave-container", action="store_true", help="Do not delete Docker container after it exits")
     parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull the Docker image")
     parser.add_argument("--dry-run", action="store_true", help="Do not execute")
-    parser.add_argument("--verbose", action="store_true", help="Print more logging")
-    parser.add_argument("--debug", action="store_true", help="Print even more logging")
+
+    parser.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file")
     parser.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for workflow")
     parser.add_argument("--rdf-serializer", help="Output RDF serialization format (one of turtle (default), n3, nt, xml)", default="turtle")
+
+    parser.add_argument("--verbose", action="store_true", help="Print more logging")
+    parser.add_argument("--debug", action="store_true", help="Print even more logging")
+
 
     args = parser.parse_args()
 
@@ -47,12 +54,26 @@ def main():
     if args.debug:
         logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
+    if args.print_jsonld_context:
+        cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl-avro.yml')
+        with open(cwl_avsc) as f:
+            j = yaml.load(f)
+        (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
+        print json.dumps(ctx, indent=4, sort_keys=True)
+        return 0
+
+    if not args.workflow:
+        _logger.error("CWL document required")
+        parser.print_help()
+        return 1
+
     if args.print_rdf:
         printrdf(args.workflow, args.rdf_serializer)
         return 0
 
     if not args.job_order:
         _logger.error("Input object required")
+        parser.print_help()
         return 1
 
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))

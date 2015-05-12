@@ -16,6 +16,7 @@ requirements:
   - class: ScatterFeature
 steps:
   - id: "#step1"
+    class: External
     impl: wc2-tool.cwl
     inputs:
       - id: "#step1file1"
