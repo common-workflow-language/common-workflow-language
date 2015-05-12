@@ -273,6 +273,9 @@ def avrold_doc(j, outdoc):
       .full-height {
         height: 100%;
       }
+      #lefttoc {
+        border-right: thin solid #C0C0C0;
+      }
     }
 
     </style>
