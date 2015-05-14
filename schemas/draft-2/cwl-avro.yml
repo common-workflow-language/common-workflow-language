@@ -1,15 +1,242 @@
-# - name: HEADER
-#   doc: |
-#     abc
-#   jsonldPrefixes: {
-#     "cwl": "http://github.com/common-workflow-language#",
-#     "avro": "http://github.com/common-workflow-language#avro/",
-#     "wfdesc": "http://purl.org/wf4ever/wfdesc#",
-#     "dct": "http://purl.org/dc/terms/",
-#     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-#   }
-#   jsonldVocab: cwl
+- name: "Common Workflow Language, Draft 2"
+  type: doc
+  doc: |
+    Authors:
 
+    * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
+    * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
+
+    Contributers:
+
+    * Luka Stojanovic <luka.stojanovic@sbgenomics.com>, Seven Bridges Genomics
+    * John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
+    * Michael R. Crusoe <mcrusoe@msu.edu>, Michigan State University
+    * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
+    * Maxim Mikheev <mikhmv@biodatomics.com>, BioDatomics
+    * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>, University of Manchester
+
+    # Abstract
+
+    A Workflow is an analysis task which uses a directed graph to represent a
+    sequence of operations that transform an input data set to output.  This
+    specification defines the Common Workflow Language (CWL), a vendor-neutral
+    standard for representing Workflows intended to be portable across a variety of
+    computing platforms.  This specification defines two concrete workflow
+    operations, the Command Line Tool, for invoking a command line program
+    (optionally within an operating system container) and capturing the output, and
+    the Expression Tool, for applying ECMAScript functions to the data set.
+
+    # Status of This Document
+
+    This document is the product of the [Common Workflow Language working
+    group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
+    latest version of this document is available in the "specification" directory at
+
+    https://github.com/common-workflow-language/common-workflow-language
+
+    The products of the CWL working group (including this document) are made available
+    under the terms of the Apache License, version 2.
+
+    # Introduction
+
+    The Common Workflow Language (CWL) working group is an informal, multi-vendor
+    working group consisting of various organizations and individuals that have an
+    interest in portability of data analysis workflows.  The goal is to create
+    specifications like this one that enable data scientists to describe analysis
+    tools and workflows that are powerful, easy to use, portable, and support
+    reproducibility.
+
+    ## Introduction to draft 2
+
+    This specification represents the second milestone of the CWL group.  Since
+    draft-1, this draft introduces a number of major changes and additions:
+
+    * Use of Avro schema (instead of JSON-schema) and JSON-LD for data modeling
+    * Significant refactoring of the Command Line Tool description.
+    * Initial data and execution model for Workflows.
+
+    ## Purpose
+
+    CWL is designed to express workflows for data-intensive science, such as
+    Bioinformatics, Chemistry, Physics, and Astronomy.  This specification is
+    intended to define a data and execution model for Workflows and Command Line
+    Tools that can be implemented on top of a variety of computing platforms,
+    ranging from individual workstation to cluster, grid, cloud, and high
+    performance computing systems.
+
+    ## Dependencies on Other Specifications
+
+    * [JSON](http://json.org)
+    * [JSON-LD](http://json-ld.org)
+    * [YAML](http://yaml.org)
+    * [Avro](https://avro.apache.org)
+    * [ECMAScript 5.1 (Javascript)](http://www.ecma-international.org/ecma-262/5.1/)
+    * [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
+
+    ## Scope
+
+    This document describes the CWL syntax, execution, and object model.  It
+    is not intended to document a specific implementation of CWL, however it may
+    serve as a reference for the behavior of conforming implementations.
+
+    ## Terminology
+
+    The terminology used to describe CWL documents is defined in the
+    Concepts section of the specification. The terms defined in the
+    following list are used in building those definitions and in describing the
+    actions of an CWL implementation:
+
+    **may**: Conforming CWL documents and CWL implementations are permitted to but need
+    not behave as described.
+
+    **must**: Conforming CWL documents and CWL implementations are required to behave
+    as described; otherwise they are in error.
+
+    **error**: A violation of the rules of this specification; results are
+    undefined. Conforming implementations may detect and report a error and may
+    recover from it.
+
+    **fatal error**: A violation of the rules of this specification; results are
+    undefined. Conforming implementations must not continue to execute the current
+    process and may report an error.
+
+    **at user option**: Conforming software may or must (depending on the modal verb in
+    the sentence) behave as described; if it does, it must provide users a means to
+    enable or disable the behavior described.
+
+    # Concepts
+
+    ## Data
+
+    A **object** is a data structure equivalent to the "object" type in JSON,
+    consisting of a unordered set of name/value pairs (referred to here as
+    **fields**) and where the name is a string and the value is a string, number,
+    boolean, array, or object.
+
+    A **document** is a file containing a serialized object.
+
+    A **process** is a basic unit of computation.  It accepts some input data,
+    performs some computation, produces a some output data.
+
+    A **input object** is a object describing the inputs to a invocation of process.
+
+    A **output object** is a object describing the output of an invocation of a process.
+
+    A **input schema** describes the valid format (required fields, data types)
+    for an input object.
+
+    A **output schema** describes the valid format for a output object.
+
+    ## Execution
+
+    A **command line tool** is a process characterized by the
+    execution of a standalone, non-interactive program which is invoked on some
+    input, produces output, and then terminates.
+
+    A **workflow** is a process characterized by multiple subprocesses, where
+    subprocess outputs are connected to the inputs of other downstream
+    subprocesses, and independent subprocesses may run concurrently.
+
+    A **runtime environment** is the actual hardware and software environment when
+    executing a command line tool.  It includes, but is not limited to, the
+    hardware architecture, hardware resources, operating system, software runtime
+    (if applicable, such as the Python interpreter or the JVM), libraries, modules,
+    packages, utilities, and data files required to run the tool.
+
+    A **workflow platform** is a specific hardware and software and implementation
+    capable of interpreting a CWL document and executing the processes specified by
+    the document.  The responsibilities of the workflow infrastructure may include
+    scheduling process invocation, setting up the necessary runtime environment,
+    making input data available, invoking the tool process, and collecting output.
+
+    It is intended that the workflow platform has broad leeway outside of this
+    specification to optimize use of computing resources and enforce policies not
+    covered by this specifcation.  Some of areas are out of scope for CWL that may
+    be handled by a specific workflow platform are:
+
+    * Data security and permissions.
+    * Scheduling tool invocations on remote cluster or cloud compute nodes.
+    * Using virtual machines or operating system containers to manage the runtime
+    (except as described in [Executing tools in
+    Docker](#executing-tools-in-docker))
+    * Using remote or distributed file systems to manage input and output files.
+    * Translating or rewrite file paths.
+    * Determining if a process has already been executed and can be skipped and
+    re-use previous results.
+    * Pausing and resume processes or workflows.
+
+    Conforming CWL documents must not assume anything about the runtime environment
+    or workflow platform unless explicitly declared though the use of [process
+    requirements](#processrequirement).
+
+    # Syntax
+
+    Documents containing CWL objects are serialized and loaded using YAML syntax.
+    A conforming implementation must accept all valid YAML documents.
+
+    A CWL document may be formally validated using the Avro schema located at:
+
+    https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
+
+    An implementation may interpret a CWL document as [JSON-LD](http://json-ld.org)
+    and convert a CWL document to a [Resource Definition Framework
+    (RDF)](http://www.w3.org/RDF/) graph using the context located at:
+
+    https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-context.json
+
+    An implementation may reason about the resulting RDF graph using the RDF Schema
+    located at:
+
+    https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-rdfs.jsonld
+
+    ## Identifiers and references
+
+    If an object contains an `id` field, that is used to uniquely identify the
+    object in that document.  The value of the `id` field must be unique over the
+    entire document.  The format of the `id` field is that of a [relative fragment
+    identifier](https://tools.ietf.org/html/rfc3986#section-3.5), and must start
+    with a hash `#` character.
+
+    Where an object field permits a [`Ref`](#ref) value containing a
+    fragment identifier, the implementation must look up object using the
+    referenced `id` field.
+
+    An implementation may choose to only honor references to objects for which the
+    `id` field is explicitly listed in this specification.
+
+    # Execution Model
+
+    The generic execution sequence of a CWL document is as follows.  The root
+    object defined in a CWL document must be a [`Process`](#process)
+    object.
+
+    1. Load and validate CWL document, yielding a process object.
+    2. Load input object.
+    3. Validate input object against the `inputs` defined by the process.
+    4. Validate that process requirements are met.
+    5. Perform any further setup required by the specific process type.
+    6. Execute the process.
+    7. Build output object to capture results of process execution.
+    8. Validate output object against the `outputs` defined by the process.
+    9. Report output object to the caller.
+
+    ## Expressions
+
+    An expression is a fragment of executable code which is evaluated by workflow
+    platform to affect the inputs, outputs, or behavior of a process.  In the
+    generic execution sequence, expressions may be evaluated during step 5 (process
+    setup), step 6 (execute process), and/or step 7 (build output).
+
+  abstract: true
+  jsonldPrefixes: {
+    "cwl": "http://github.com/common-workflow-language#",
+    "avro": "http://github.com/common-workflow-language/avro#",
+    "wfdesc": "http://purl.org/wf4ever/wfdesc#",
+    "dct": "http://purl.org/dc/terms/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  }
+  jsonldVocab: cwl
 
 - type: enum
   name: Datatype
@@ -28,11 +255,14 @@
     - map
     - File
   jsonldPrefix: avro
+  jsonldPredicate:
+    - symbol: File
+      predicate: "cwl:File"
   doc: |
    CWL data types are based on Avro schema declarations.  Refer to the [Avro
    schema declaration
    documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
-   detailed information.  In addition, CWL defines [`File`](#/schema/File)
+   detailed information.  In addition, CWL defines [`File`](#file)
    as a special record type.
 
    ## Primitive types
@@ -54,25 +284,6 @@
    * **map**: An unordered collection of key/value pairs
 
 - type: record
-  name: File
-  fields: [
-            { name: "path", type: "string" },
-            { name: "checksum", type: ["null", "string"] },
-            { name: "size", type: ["null", "long"] },
-            {
-                name: "secondaryFiles",
-                type: [
-                    "null",
-                    {
-                        type: "array",
-                        items: "File"
-                    }
-                ]
-            }
-        ]
-
-
-- type: record
   name: "Ref"
   fields:
     - name: "ref"
@@ -84,12 +295,31 @@
     external file.  To reference an object within the current document or
     an external document, the object must be labeled with an `id` field.
 
+
+- type: record
+  name: File
+  docParent: Datatype
+  fields:
+    - name: "path"
+      type: "string"
+    - name: "checksum"
+      type: ["null", "string"]
+    - name: "size"
+      type: ["null", "long"]
+    - name: "secondaryFiles"
+      type:
+        - "null"
+        - type: array
+          items: File
+
+
 - type: record
   name: ProcessRequirement
+  docParent: null
   doc: |
     A process requirement declares a prerequisite that may or must be fufilled
-    before executing a process.  See [`Process.hints`](#/schema/Process) and
-    [`Process.requirements`](#/schema/Process).
+    before executing a process.  See [`Process.hints`](#process) and
+    [`Process.requirements`](#process).
   fields:
     - name: "class"
       type: "string"
@@ -182,6 +412,7 @@
 
 - type: record
   name: "CommandLineBinding"
+  docParent: CommandLineTool
   doc: |
 
     When listed under `commandLineBinding` in the input schema, the term
@@ -204,7 +435,7 @@
           nothing.
 
       - **File**: Add `prefix`, `separator`, and the value of
-        [`File.path`](#/schemas/File) to the command line.
+        [`File.path`](#file) to the command line.
 
       - **array**: If `itemSeparator` is specified, add `prefix`, `separator`,
           and the join the array as described below.  Otherwise add `prefix`
@@ -235,7 +466,13 @@
         Join the array elements into a single string with the elements
         separated by by `itemSeparator`.
     - name: "valueFrom"
-      type: ["null", "Expression", "Ref"]
+      type:
+        - "null"
+        - "string"
+        - "Expression"
+        - "Ref"
+        - type: array
+          items: ["string", "Expression", "Ref"]
       doc: |
         An expression or reference to a field in the input object which must be
         evaluted to yield the effective value to use to build the command line.
@@ -245,14 +482,29 @@
 
 - type: record
   name: "OutputBinding"
-  fields: [
-    { name: "valueFrom", type: ["null", "Expression", "Ref"] },
-    { name: "glob", type: ["null", "string"] },
-    { name: "loadContents", type: ["null", "boolean"] }
-  ]
+  docParent: CommandLineTool
+  doc: |
+    Binding operations are applied in the following order.
+      - glob
+      - loadContents
+      - valueFrom
+  fields:
+    - name: "valueFrom"
+      type:
+        - "null"
+        - "string"
+        - "Expression"
+        - "Ref"
+        - type: array
+          items: ["string", "Expression", "Ref"]
+    - name: "glob"
+      type: ["null", "string"]
+    - name: "loadContents"
+      type: ["null", "boolean"]
 
 - type: record
   name: "DataLink"
+  docParent: Workflow
   doc: |
     A data link connects the value of one parameter to another such that when a
     value becomes available for the parameter specified by `source`, that value
@@ -265,12 +517,13 @@
         "@type": "@id"
       doc: |
         An input parameter on the parent workflow as identified by the
-        [`InputSchemaRoot.id`](#/schema/InputSchemaRoot), or an output
+        [`InputSchemaRoot.id`](#inputschemaroot), or an output
         parameter of another step in the same workflow as identified by the
-        [`OutputSchemaRoot.id`](#/schema/OutputSchemaRoot) field.
+        [`OutputSchemaRoot.id`](#outputschemaRoot) field.
 
 - type: record
   name: ExternalInputParameter
+  docParent: External
   fields:
     - name: def
       type: string
@@ -291,6 +544,7 @@
 
 - type: record
   name: ExternalOutputParameter
+  docParent: External
   fields:
     - name: "def"
       type: "string"
@@ -304,6 +558,7 @@
 - type: record
   name: "Schema"
   doc: "A schema defines a parameter type."
+  docParent: Parameter
   fields: [
     {
       name: type,
@@ -393,6 +648,7 @@
 - type: record
   name: "SchemaDef"
   extends: "Schema"
+  docParent: Process
   fields:
     - name: name
       type: "string"
@@ -400,6 +656,8 @@
 
 - type: record
   name: "Parameter"
+  docParent: Process
+  abstract: true
   doc: |
 
     Define an input or output parameter to a process.
@@ -411,7 +669,7 @@
     There may be multiple inbound data links.  If so, the following rules apply
     to combine the inputs:
 
-      1. The parameter type must be an array, or named in a [workflow scatter](#/schema/Workflow)
+      1. The parameter type must be an array, or named in a [workflow scatter](#workflow)
          operation
       2. The source parameter must be the same type, or the type of array
          element type defined by `items`.
@@ -444,6 +702,29 @@
       jsonldPredicate:
         "@id": "wfdesc:hasSource"
         "@type": "@id"
+    - name: streamable
+      type: ["null", "boolean"]
+      doc: |
+        Only applies when `type` is `File`.  A value of `true` indicates that the file will
+        be read or written sequentially without seeking.  Default: `false`.
+    - name: secondaryFiles
+      type:
+        - "null"
+        - "string"
+        - Expression
+        - type: "array"
+          items: ["string", "Expression"]
+    - name: match
+      type: ["null", "string"]
+      doc: |
+        A regular expression for validating the input.  Parameter type must be
+        `string`, `File`, or an array of one of those.
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
+
     # - name: "default"
     #   type:
     #     - "null"
@@ -464,6 +745,7 @@
 - type: record
   name: CommandLineInputSchema
   extends: Schema
+  docParent: CommandLineTool
   specialize: {"Schema": "CommandLineInputSchema"}
   fields:
     - name: "commandLineBinding"
@@ -472,6 +754,7 @@
 - type: record
   name: CommandLineInputParameter
   extends: InputParameter
+  docParent: CommandLineTool
   specialize: {"Schema": "CommandLineInputSchema"}
   fields:
     - name: commandLineBinding
@@ -480,6 +763,7 @@
 - type: record
   name: CommandLineOutputSchema
   extends: Schema
+  docParent: CommandLineTool
   specialize: {"Schema": "CommandLineOutputSchema"}
   fields:
     - name: outputBinding
@@ -488,6 +772,7 @@
 - type: record
   name: CommandLineOutputParameter
   extends: OutputParameter
+  docParent: CommandLineTool
   fields:
     - name: outputBinding
       type: [ "null", "OutputBinding" ]
@@ -495,6 +780,7 @@
 
 - type: record
   name: "FileDef"
+  docParent: CommandLineTool
   doc: |
     Define a file that will be created by the workflow platform in the
     designated output directory prior to executing the command line tool.  May
@@ -510,7 +796,7 @@
       doc: |
         The contents of the file.
 
-        If the value is a [`Ref`](#/schema/Ref) to an input parameter of type
+        If the value is a [`Ref`](#ref) to an input parameter of type
         File, this indicates that the input file should be added to the
         designated output directory prior to executing the tool.  The input
         file entry in the designated output directory may read-only, and may be
@@ -519,6 +805,7 @@
 
 - type: record
   name: "EnvironmentDef"
+  docParent: CommandLineTool
   doc: |
     Define an environment variable that will be set in the runtime environment
     by the workflow platform when executing the command line tool.  May be the
@@ -534,6 +821,7 @@
 
 - type: enum
   name: ScatterMethod
+  docParent: Workflow
   symbols:
     - dotproduct
     - nested_crossproduct
@@ -541,25 +829,26 @@
 
 - type: record
   name: "Process"
+  abstract: true
   doc: |
 
     The base executable type in CWL is the `Process` object defined by the
     document.  Note that the `Process` object is abstract and cannot be
     directly executed.  If the `class` field is not specified, the
-    implementation must default to the class [`External`](\#/schema/External).
+    implementation must default to the class [`External`](\#external).
 
   fields:
     - name: "class"
       jsonldPredicate:
         "@id": "@type"
         "@type": "@vocab"
-      type: ["null", "string"]
+      type: string
       doc: |
         The type of process is defined by the `class` field.  Valid values for this
-        field are [`CommandLineTool`](\#/schema/CommandLineTool),
-        [`ExpressionTool`](\#/schema/ExpressionTool), [`Workflow`](\#/schema/Workflow) or
-        [`External`](\#/schema/External).  If the `class` field is not
-        specified, the implementation must default to the process class [`External`](\#/schema/External).
+        field are [`CommandLineTool`](\#commandlinetool),
+        [`ExpressionTool`](\#expressiontool), [`Workflow`](\#workflow) or
+        [`External`](\#external).  If the `class` field is not
+        specified, the implementation must default to the process class [`External`](\#external).
     - name: "inputs"
       type: {
         type: "array",
@@ -589,7 +878,7 @@
         This field consists of an
         array of type definitions which must be used when interpreting the `inputs` and
         `outputs` fields.  When a symbolic type is encountered that is not in
-        [`Datatype`](#/schema/Datatype), the implementation must check if
+        [`Datatype`](#datatype), the implementation must check if
         the type is defined in `schemaDefs` and use that definition.  If the type is not
         found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
         processed in the order listed such that later schema definitions may refer to
@@ -670,7 +959,7 @@
 
       1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
       key `[position, i]` where `position` is
-      [`CommandLineBinding.position`](#/schema/CommandLineBinding) and the `i`
+      [`CommandLineBinding.position`](#commandlinebinding) and the `i`
       is the index in the `arguments` list.
 
       2. Collect `CommandLineBinding` objects from the `inputs` schema and
@@ -684,7 +973,7 @@
       3. Sort elements on the assigned sorting keys.
 
       4. Apply the rules defined in
-      [`CommandLineBinding`](#/schema/CommandLineBinding) to convert bindings
+      [`CommandLineBinding`](#ommandlinebinding) to convert bindings
       to actual command line elements.
 
       5. Insert elements from `baseCommand` at the beginning of the command
@@ -730,11 +1019,11 @@
     ## Executing tools in Docker
 
     If the command line tool lists
-    [`DockerRequirement`](#/schemas/DockerRequirement) under `hints` or
+    [`DockerRequirement`](#dockerrequirement) under `hints` or
     `requirements`, it may (or must) be run in the specified Docker container.
 
     The platform must first acquire or install the correct Docker image, as
-    described by [`DockerRequirement`](#/schemas/DockerRequirement).
+    described by [`DockerRequirement`](#dockerrequirement).
 
     The platform must execute the tool in the container using `docker run` with
     the appropriate Docker image and the tool command line.
@@ -757,7 +1046,7 @@
     must be generated by walking the output schema and applying output bindings
     to the tool output.  Output bindings are listed directly in output
     parameters using the `outputBinding` field.  See
-    [`OutputBinding`](#/schema/OutputBinding) for details.
+    [`OutputBinding`](#outputbinding) for details.
 
   fields:
     - name: "baseCommand"
@@ -798,7 +1087,7 @@
     - name: "stdin"
       type: ["null", "Ref"]
       doc: |
-        A reference to an input [`File`](#/schema/File) parameter whose contents must be piped
+        A reference to an input [`File`](#file) parameter whose contents must be piped
         into the command's standard input stream.
     - name: "stdout"
       type: ["null", "string", "Expression", "Ref"]
@@ -814,7 +1103,7 @@
         characters (such as the path separator `/`) it is an error.
 
         If `stdout` is a reference, the corresponding output
-        [`File`](#/schema/File) parameter will be set to the file.  The output
+        [`File`](#file) parameter will be set to the file.  The output
         output file name is undefined, but may be based on the output parameter
         name.
 
@@ -888,7 +1177,7 @@
 
     A data link connects the value of one parameter to another such that when a
     value becomes available for the parameter specified by
-    [`DataLink.source`](#/schema/DataLink), that value of the parameter is
+    [`DataLink.source`](#dataLink), that value of the parameter is
     propagated to the destination parameter.  When all data links inbound to a
     given step are fufilled, the step is ready to execute.
 
