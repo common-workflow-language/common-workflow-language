@@ -781,6 +781,7 @@
 
 - type: record
   name: "FileDef"
+  docParent: CreateFilesRequirement
   doc: |
     Define a file that will be created by the workflow platform in the
     designated output directory prior to executing the command line tool.  May
@@ -805,6 +806,7 @@
 
 - type: record
   name: "EnvironmentDef"
+  docParent: EnvironmentVarRequirement
   doc: |
     Define an environment variable that will be set in the runtime environment
     by the workflow platform when executing the command line tool.  May be the
@@ -1224,6 +1226,7 @@
 - type: record
   name: SchemaDef
   extends: Schema
+  docParent: SchemaRequirement
   fields:
     - name: name
       type: string
@@ -1232,6 +1235,7 @@
 
 - name: SchemaRequirement
   type: record
+  extends: ProcessRequirement
   fields:
     - name: schemaDef
       type:
