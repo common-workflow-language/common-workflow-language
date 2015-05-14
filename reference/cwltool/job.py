@@ -8,6 +8,7 @@ import logging
 import sys
 import requests
 import docker
+import debian
 
 _logger = logging.getLogger("cwltool")
 
@@ -36,6 +37,9 @@ class CommandLineJob(object):
             runtime.append(img_id)
         else:
             env = self.environment
+            debian.check_depends_from_requirements(self.requirements,
+                                                   self.hints,
+                                                   self.dry_run)
 
         stdin = None
         stdout = None

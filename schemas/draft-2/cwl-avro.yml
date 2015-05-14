@@ -1239,3 +1239,55 @@
   name: ScatterFeature
   extends: ProcessRequirement
   fields: []
+- type: record
+  name: DebianExtraRepository
+  doc: |
+  fields:
+    - name: "DebianRepository"
+      type: "string"
+      doc: |
+        A single line in the APT configuration file [/etc/apt/sources.list]
+        (https://wiki.debian.org/SourcesList) or a string beginning with "ppa"
+        that specifies an Ubuntu Personal Package Archive. If a PPA is
+        specified then the corresponding GPG key should be automatically
+        downloaded and used to verify the repository the same way the
+        [apt-add-repository](http://bazaar.launchpad.net/~ubuntu-core-dev/software-properties/main/view/head:/add-apt-repository)
+        command does.
+    - name: "DebianKeyID"
+      type: "string"
+      doc: |
+        An optional ID of a GPG signing key for the specified
+        `DebianRepository` if it wasn't a PPA.
+    - name: "DebianKeyURL"
+      type: "string"
+      doc: |
+        An optional field. only protocol 'hpks' or 'https' is allowed. If the
+        protocol is 'hkps' then this URL specifies the key server to download
+        the GPG key specified by the DebianKeyID. If https this URL specifies
+        the exact file to download the GPG key specified by the `DebianKeyID`.
+
+- type: record
+  name: DebianRequirement
+  extends: ProcessRequirement
+  doc: |
+    Indicate that a workflow component should be run after installing the
+    specified Debian packages.
+  fields:
+    - name: "DebianDepends"
+      type: "string"
+      doc: |
+        The Debian package or packages that fulfill this prerequisite. The
+        format is as specified for the 'Depends' control field in [the Debian
+        Policy manual](https://www.debian.org/doc/debian-policy/ch-relationships.html#s-depsyntax)
+    - name: "DebianExtraRepositories"
+      type: [
+        "null",
+          {
+            type: "array",
+            items: "DebianExtraRepository"
+          }
+        ]
+      doc: |
+        An optional specification of one or more additional Debian package
+        repositories to use to fulfill the specified `DebianDepends`
+        requirement or requirements.
