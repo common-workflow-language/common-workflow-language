@@ -1069,7 +1069,7 @@
   name: "ExpressionTool"
   extends: "Process"
   fields:
-    - name: "expression",
+    - name: "expression"
       type: "Expression"
 
 
@@ -1121,7 +1121,7 @@
         order in which steps are listed does not affect the actual execution
         order of steps.
       type:
-        type: "array",
+        type: "array"
         items: ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
 
 
@@ -1179,7 +1179,7 @@
   fields:
     - name: fileDefs
       type:
-        type: "array",
+        type: "array"
         items: "FileDef"
 
 
@@ -1192,7 +1192,7 @@
   fields:
     - name: envDefs
       type:
-        type: "array",
+        type: "array"
         items: "EnvironmentDef"
 
 
