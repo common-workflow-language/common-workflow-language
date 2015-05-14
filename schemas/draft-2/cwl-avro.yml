@@ -289,11 +289,12 @@
     - name: "ref"
       type: "string"
       jsonldPredicate: "@id"
-  doc: >
-    A URI reference to another object.  This may refer to an object within the
-    current document, to an external file, or to a labeled object within an
-    external file.  To reference an object within the current document or
-    an external document, the object must be labeled with an `id` field.
+  doc: |
+    A URI reference to external document or document fragment.  This may refer
+    to an object within the current document, to an external file, or to a
+    labeled object within an external file.  To reference an object within the
+    current document or an external document, the object must be labeled with
+    an `id` field.
 
 
 - type: record
@@ -386,6 +387,7 @@
         Code fragments that should be evaluated before evaluating the script.
         Can be used to provide function definitions used in multiple places.
 
+
 - type: record
   name: Expression
   doc: |
@@ -470,15 +472,15 @@
         - "null"
         - "string"
         - "Expression"
-        - "Ref"
         - type: array
-          items: ["string", "Expression", "Ref"]
+          items: ["string", "Expression"]
       doc: |
         An expression or reference to a field in the input object which must be
         evaluted to yield the effective value to use to build the command line.
         Required when evaluating the binding as part of the `CommandLineTool.arguments` field.
     - name: "loadContents"
       type: ["null", "boolean"]
+
 
 - type: record
   name: "OutputBinding"
@@ -487,20 +489,24 @@
     Binding operations are applied in the following order.
       - glob
       - loadContents
-      - valueFrom
+      - outputEval
   fields:
-    - name: "valueFrom"
+    - name: glob
       type:
         - "null"
-        - "string"
-        - "Expression"
-        - "Ref"
+        - string
+        - Expression
         - type: array
-          items: ["string", "Expression", "Ref"]
-    - name: "glob"
-      type: ["null", "string"]
-    - name: "loadContents"
-      type: ["null", "boolean"]
+          items: string
+    - name: loadContents
+      type:
+        - "null"
+        - boolean
+    - name: outputEval
+      type:
+        - "null"
+        - Expression
+
 
 - type: record
   name: "DataLink"
@@ -520,6 +526,7 @@
         [`InputSchemaRoot.id`](#inputschemaroot), or an output
         parameter of another step in the same workflow as identified by the
         [`OutputSchemaRoot.id`](#outputschemaRoot) field.
+
 
 - type: record
   name: ExternalInputParameter
@@ -542,6 +549,7 @@
       type: ["null", string]
       jsonldPredicate: "@id"
 
+
 - type: record
   name: ExternalOutputParameter
   docParent: External
@@ -554,6 +562,7 @@
     - name: "id"
       type: "string"
       "jsonldPredicate": "@id"
+
 
 - type: record
   name: "Schema"
@@ -645,14 +654,6 @@
     }
   ]
 
-- type: record
-  name: "SchemaDef"
-  extends: "Schema"
-  docParent: Process
-  fields:
-    - name: name
-      type: "string"
-      doc: "The type name being defined."
 
 - type: record
   name: "Parameter"
@@ -780,7 +781,6 @@
 
 - type: record
   name: "FileDef"
-  docParent: CommandLineTool
   doc: |
     Define a file that will be created by the workflow platform in the
     designated output directory prior to executing the command line tool.  May
@@ -805,7 +805,6 @@
 
 - type: record
   name: "EnvironmentDef"
-  docParent: CommandLineTool
   doc: |
     Define an environment variable that will be set in the runtime environment
     by the workflow platform when executing the command line tool.  May be the
@@ -814,18 +813,11 @@
     {name: "env", type: "string"},
     {
       name: "value",
-      type: ["string", "Expression", "Ref"],
+      type: ["string", "Expression"],
       jsonldPredicate: "rdf:value"
     }
   ]
 
-- type: enum
-  name: ScatterMethod
-  docParent: Workflow
-  symbols:
-    - dotproduct
-    - nested_crossproduct
-    - flat_crossproduct
 
 - type: record
   name: "Process"
@@ -866,23 +858,6 @@
       jsonldPredicate: "wfdesc:hasOutput"
       doc: "Defines the input parameters of the process, and
         may be used to generate and/or validate the input object."
-    - name: "schemaDefs"
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "SchemaDef"
-        }
-      ]
-      doc: |
-        This field consists of an
-        array of type definitions which must be used when interpreting the `inputs` and
-        `outputs` fields.  When a symbolic type is encountered that is not in
-        [`Datatype`](#datatype), the implementation must check if
-        the type is defined in `schemaDefs` and use that definition.  If the type is not
-        found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
-        processed in the order listed such that later schema definitions may refer to
-        earlier schema definitions.
     - name: "requirements"
       type: [
         "null",
@@ -911,16 +886,6 @@
         workflow engine that may be helpful in executing this process.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
-    - name: scatter
-      type:
-        - "null"
-        - string
-        - type: array
-          items: string
-    - name: scatterMethod
-      type:
-        - "null"
-        - ScatterMethod
     - name: label
       type:
         - "null"
@@ -982,9 +947,6 @@
     ## Execution
 
     Once the command line is built, the tool is almost ready to execute.
-
-    The workflow platform must set up `fileDefs` and set `environmentDefs` as
-    describe below.
 
     The `TMPDIR` environment variable must be set in the runtime environment to
     the **designated temporary directory**.  Any files written to the
@@ -1085,12 +1047,12 @@
         "@container": "@list"
       }
     - name: "stdin"
-      type: ["null", "Ref"]
+      type: ["null", string, Expression]
       doc: |
-        A reference to an input [`File`](#file) parameter whose contents must be piped
-        into the command's standard input stream.
+        A path to a file whose contents must be piped into the command's
+        standard input stream.
     - name: "stdout"
-      type: ["null", "string", "Expression", "Ref"]
+      type: ["null", string, Expression]
       doc: |
         Capture the command's standard output stream to a file written to
         the designated output directory.
@@ -1102,44 +1064,14 @@
         return value is not a string, or the resulting path contains illegal
         characters (such as the path separator `/`) it is an error.
 
-        If `stdout` is a reference, the corresponding output
-        [`File`](#file) parameter will be set to the file.  The output
-        output file name is undefined, but may be based on the output parameter
-        name.
-
-    - name: "fileDefs"
-      doc: |
-        Define a list of files that will be created by the workflow platform in
-        the designated output directory prior to executing the command line
-        tool.  See `FileDef` for details.
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "FileDef"
-        }
-      ]
-    - name: "environmentDefs"
-      doc: |
-        Define a list of environment variables which will be set in the
-        execution environment of the tool.  See `EnvironmentDef` for details.
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "EnvironmentDef"
-        }
-      ]
 
 - type: record
   name: "ExpressionTool"
   extends: "Process"
-  fields: [
-    {
-      name: "expression",
+  fields:
+    - name: "expression",
       type: "Expression"
-    }
-  ]
+
 
 - type: record
   name: "External"
@@ -1166,7 +1098,6 @@
   name: "Workflow"
   extends: "Process"
   doc: |
-
     A workflow is a process consisting of one or more process `steps`.  Each
     step has input and output parameters defined by the `inputs` and `outputs`
     fields.
@@ -1181,10 +1112,6 @@
     propagated to the destination parameter.  When all data links inbound to a
     given step are fufilled, the step is ready to execute.
 
-    ## Scatter/gather
-
-
-
   fields:
     - name: "steps"
       jsonldPredicate: "wfdesc:hasSubProcess"
@@ -1193,10 +1120,10 @@
         input data links are fufilled.  Steps may execute concurrently.  The
         order in which steps are listed does not affect the actual execution
         order of steps.
-      type: {
+      type:
         type: "array",
         items: ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
-      }
+
 
 - type: record
   name: DockerRequirement
@@ -1206,22 +1133,28 @@
     [Docker](http://docker.com) container, and specifies how to fetch or build
     the image.
   fields:
-    - name: "dockerPull"
+    - name: dockerPull
       type: ["null", "string"]
       doc: "Get a Docker image using `docker pull`."
     - name: "dockerLoad"
       type: ["null", "string"]
       doc: "Specify a HTTP URL from which to download a Docker image using `docker load`."
-    - name: "dockerFile"
+    - name: dockerFile
       type: ["null", "string"]
       doc: "Supply the contents of a Dockerfile which will be build using `docker build`."
-    - name: "dockerImageId"
+    - name: dockerImageId
       type: ["null", "string"]
       doc: |
         The image id that will be used for `docker run`.  May be a
         human-readable image name or the image identifier hash.  May be skipped
         if `dockerPull` is specified, in which case the `dockerPull` image id
         will be used.
+    - name: dockerOutputDirectory
+      type: ["null", "string"]
+      doc: |
+        Set the designated output directory to a specific location inside the
+        Docker container.
+
 
 - type: record
   name: MemoryRequirement
@@ -1235,7 +1168,81 @@
         - Expression
       doc: "Total memory required, in megabytes."
 
-- type: record
-  name: ScatterFeature
+
+- name: CreateFilesRequirement
+  type: record
   extends: ProcessRequirement
-  fields: []
+  doc: |
+    Define a list of files that will be created by the workflow platform in
+    the designated output directory prior to executing the command line
+    tool.  See `FileDef` for details.
+  fields:
+    - name: fileDefs
+      type:
+        type: "array",
+        items: "FileDef"
+
+
+- name: EnvironmentVarRequirement
+  type: record
+  extends: ProcessRequirement
+  doc: |
+    Define a list of environment variables which will be set in the
+    execution environment of the tool.  See `EnvironmentDef` for details.
+  fields:
+    - name: envDefs
+      type:
+        type: "array",
+        items: "EnvironmentDef"
+
+
+- name: ScatterMethod
+  type: enum
+  docParent: Workflow
+  symbols:
+    - dotproduct
+    - nested_crossproduct
+    - flat_crossproduct
+
+- name: ScatterRequirement
+  type: record
+  extends: ProcessRequirement
+  fields:
+    - name: scatter
+      type:
+        - string
+        - type: array
+          items: string
+    - name: scatterMethod
+      doc: |
+        Required if `scatter` is an array of more than one element.
+      type:
+        - "null"
+        - ScatterMethod
+
+
+- type: record
+  name: SchemaDef
+  extends: Schema
+  fields:
+    - name: name
+      type: string
+      doc: "The type name being defined."
+
+
+- name: SchemaRequirement
+  type: record
+  fields:
+    - name: schemaDef
+      type:
+        type: array
+        items: SchemaDef
+  doc: |
+        This field consists of an
+        array of type definitions which must be used when interpreting the `inputs` and
+        `outputs` fields.  When a symbolic type is encountered that is not in
+        [`Datatype`](#datatype), the implementation must check if
+        the type is defined in `schemaDefs` and use that definition.  If the type is not
+        found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
+        processed in the order listed such that later schema definitions may refer to
+        earlier schema definitions.
