@@ -10,7 +10,6 @@ import pprint
 from aslist import aslist
 import avro_ld.schema
 
-TOOL_CONTEXT_URL = "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
 _logger = logging.getLogger("cwltool")
@@ -24,24 +23,23 @@ def get_schema():
         j = yaml.load(f)
         return avro_ld.schema.schema(j)
 
-class Process(object):
-    def get_feature(self, feature, kwargs):
-        for t in kwargs.get("requirements", []):
+def get_feature(feature, **kwargs):
+    if kwargs.get("requirements"):
+        for t in reversed(kwargs["requirements"]):
             if t["class"] == feature:
-                return t
-        for t in kwargs.get("hints", []):
+                return (t, True)
+    if kwargs.get("hints"):
+        for t in reversed(kwargs.get("hints", [])):
             if t["class"] == feature:
-                return t
-        return None
+                return (t, False)
+    return (None, None)
 
+class Process(object):
     def __init__(self, toolpath_object, validateAs, docpath):
         self.names = get_schema()
         self.docpath = docpath
 
         self.tool = toolpath_object
-
-        #if self.tool.get("@context") != TOOL_CONTEXT_URL:
-        #    raise Exception("Missing or invalid '@context' field in tool description document, must be %s" % TOOL_CONTEXT_URL)
 
         # Validate tool documument
         validate.validate_ex(self.names.get_name(validateAs, ""), self.tool)
@@ -71,8 +69,9 @@ class Process(object):
                 {"type": "map", "values": "Any"}
             ]}
 
-        if self.tool.get("schemaDefs"):
-            for i in self.tool["schemaDefs"]:
+        sd, _ = get_feature("SchemaDefRequirement", requirements=self.tool.get("requirements"), hints=self.tool.get("hints"))
+        if sd:
+            for i in sd["types"]:
                 avro.schema.make_avsc_object(i, self.names)
                 self.schemaDefs[i["name"]] = i
 

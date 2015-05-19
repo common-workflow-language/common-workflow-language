@@ -59,7 +59,7 @@ class Workflow(Process):
     def try_make_job(self, step, basedir, **kwargs):
         inputobj = {}
 
-        scatterSpec = self.get_feature("Scatter", requirements=self.tool["requirements"], hints=self.tool["hints"])
+        (scatterSpec, _) = self.get_feature("Scatter", requirements=self.tool["requirements"], hints=self.tool["hints"])
         if scatterSpec:
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])

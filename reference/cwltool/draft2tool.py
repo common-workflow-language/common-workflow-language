@@ -15,6 +15,7 @@ import hashlib
 import random
 from process import Process
 from process import WorkflowException
+from process import get_feature
 import validate
 from aslist import aslist
 import expression
@@ -22,14 +23,17 @@ import re
 
 _logger = logging.getLogger("cwltool")
 
-CONTENT_LIMIT = 1024 * 1024
+CONTENT_LIMIT = 64 * 1024
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
 supportedProcessRequirements = ("DockerRequirement",
                                 "MemoryRequirement",
                                 "ExpressionEngineRequirement",
-                                "Scatter")
+                                "Scatter",
+                                "SchemaDefRequirement",
+                                "EnvVarRequirement",
+                                "CreateFileRequirement")
 
 def substitute(value, replace):
     if replace[0] == "^":
@@ -38,14 +42,6 @@ def substitute(value, replace):
         return value + replace
 
 class Builder(object):
-    # def jseval(self, expression, context):
-    #     if isinstance(expression, list):
-    #         exp = "{return %s(%s);}" % (expression[0], ",".join([json.dumps(self.do_eval(e)) for e in expression[1:]]))
-    #     elif expression.startswith('{'):
-    #         exp = '{return function()%s();}' % (expression)
-    #     else:
-    #         exp = '{return %s;}' % (expression)
-    #     return sandboxjs.execjs(exp, "var $job = %s; var $self = %s; %s" % (json.dumps(self.job), json.dumps(context), self.jslib))
 
     def bind_input(self, schema, datum):
         bindings = []
@@ -141,7 +137,7 @@ class Builder(object):
             value = expression.do_eval(binding["do_eval"], self.job, self.requirements, self.docpath, value)
 
         prefix = binding.get("prefix")
-        sep = binding.get("separator")
+        sep = binding.get("separate", True)
 
         l = []
         if isinstance(value, list):
@@ -166,10 +162,10 @@ class Builder(object):
 
         args = []
         for j in l:
-            if sep is None or sep == " ":
+            if sep:
                 args.extend([prefix, str(j)])
             else:
-                args.extend([prefix + sep + str(j)])
+                args.extend([prefix + str(j)])
 
         return [a for a in args if a is not None]
 
@@ -265,7 +261,7 @@ class CommandLineTool(Tool):
         builder.pathmapper = None
 
         if self.tool.get("stdin"):
-            j.stdin = self.tool["stdin"]
+            j.stdin = expression.do_eval(self.tool["stdin"], builder.job, self.requirements, self.docpath, j.stdin)
             if isinstance(j.stdin, dict) and "ref" in j.stdin:
                 j.stdin = builder.job[j.stdin["ref"][1:]]["path"]
             reffiles.append(j.stdin)
@@ -288,8 +284,8 @@ class CommandLineTool(Tool):
         j.requirements = self.requirements
         j.hints = self.hints
 
-        for r in (j.requirements + j.hints):
-            if r["class"] == "DockerRequirement" and use_container:
+        dockerReq, _ = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
+        if dockerReq and use_container:
                 builder.pathmapper = DockerPathMapper(reffiles, basedir)
 
         if builder.pathmapper is None:
@@ -301,12 +297,16 @@ class CommandLineTool(Tool):
         builder.requirements = j.requirements
 
         j.generatefiles = {}
-        for t in self.tool.get("fileDefs", []):
-            j.generatefiles[t["filename"]] = expression.do_eval(t["value"], builder.job, j.requirements, self.docpath)
+        createFiles, _ = get_feature("CreateFileRequirement", requirements=self.requirements, hints=self.hints)
+        if createFiles:
+            for t in createFiles["fileDef"]:
+                j.generatefiles[t["filename"]] = expression.do_eval(t["fileContent"], builder.job, j.requirements, self.docpath)
 
         j.environment = {}
-        for t in self.tool.get("environmentDefs", []):
-            j.environment[t["env"]] = expression.do_eval(t["value"], builder.job, j.requirements, self.docpath)
+        evr, _ = get_feature("EnvVarRequirement", requirements=self.requirements, hints=self.hints)
+        if evr:
+            for t in evr["envDef"]:
+                j.environment[t["envName"]] = expression.do_eval(t["envValue"], builder.job, j.requirements, self.docpath)
 
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
@@ -333,7 +333,10 @@ class CommandLineTool(Tool):
         if "outputBinding" in schema:
             binding = schema["outputBinding"]
             if "glob" in binding:
-                r = [{"path": g} for g in glob.glob(os.path.join(outdir, binding["glob"]))]
+                r = []
+                bg = expression.do_eval(binding["glob"], builder.job, self.requirements, self.docpath)
+                for gb in aslist(bg):
+                    r.extend([{"path": g} for g in glob.glob(os.path.join(outdir, gb))])
                 for files in r:
                     checksum = hashlib.sha1()
                     with open(files["path"], "rb") as f:
@@ -351,16 +354,29 @@ class CommandLineTool(Tool):
                 if schema["type"] == "array" and schema["items"] == "File":
                     pass
                 elif schema["type"] == "File":
-                    r = r[0] if r else None
-                elif binding.get("loadContents"):
-                    r = [v["contents"] for v in r]
-                    if len(r) == 1:
-                        r = r[0]
+                    if len(r) != 1:
+                        raise WorkflowException("Multiple matches for output item that is a single file.")
+                    r = r[0]
                 else:
                     r = None
 
-            if "valueFrom" in binding:
-                r = expression.do_eval(binding["valueFrom"], builder.job, self.requirements, self.docpath, r)
+            if "outputEval" in binding:
+                r = expression.do_eval(binding["outputEval"], builder.job, self.requirements, self.docpath, r)
+                if schema["type"] == "File" and (not isinstance(r, dict) or "path" not in r):
+                    raise WorkflowException("Expression must return a file object.")
+
+            if schema["type"] == "File" and "secondaryFiles" in binding:
+                r["secondaryFiles"] = []
+                for sf in aslist(binding["secondaryFiles"]):
+                    if isinstance(sf, dict):
+                        sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, r["path"])
+                    else:
+                        sfpath = {"path": substitute(r["path"], sf)}
+                    if isinstance(sfpath, list):
+                        r["secondaryFiles"].extend(sfpath)
+                    else:
+                        r["secondaryFiles"].append(sfpath)
+
 
         if not r and schema["type"] == "record":
             r = {}

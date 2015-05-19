@@ -454,14 +454,12 @@
     - name: "prefix"
       type: [ "null", "string"]
       doc: "Command line prefix to add before the value."
-    - name: "separator"
-      type: ["null", "string"]
+    - name: "separate"
+      type: ["null", boolean]
       doc: |
-        Separator to insert between `prefix` and the actual value.  If not
-        specified, null, or a single space " ", then the prefix and value must be
-        added as separate command line arguments; for any other value
-        (including the empty string ""), the prefix, separator and value must
-        be concatenated into a single command line argument.
+        If true (default) then the prefix and value must be added as separate
+        command line arguments; if false, prefix value must be concatenated
+        into a single command line argument.
     - name: "itemSeparator"
       type: ["null", "string"]
       doc: |
@@ -498,14 +496,28 @@
         - Expression
         - type: array
           items: string
+      doc: |
+        Find files relative to the output directory, following POSIX glob(3)
+        pathname matching.  If provided an array, match all patterns in the
+        array.  If provided an expression, the expression must return a string
+        or an array of strings, which will then be evaluated as a glob pattern.
+        Only files which actually exist will be matched and returned.
     - name: loadContents
       type:
         - "null"
         - boolean
+      doc: |
+        Read up to the first 64 KiB of text from the file and place it in the
+        "contents" field of the file object for manipulation by scripts.
     - name: outputEval
       type:
         - "null"
         - Expression
+      doc: |
+        Evaluate an expression to generate the output value.  If `glob` was
+        specified, the script "context" will be be the file or files that were
+        matched.  Additionally, if `loadContents` is `true`, the file objects
+        will include up to the first 64 KiB of file contents.
 
 
 - type: record
@@ -781,7 +793,7 @@
 
 - type: record
   name: "FileDef"
-  docParent: CreateFilesRequirement
+  docParent: CreateFileRequirement
   doc: |
     Define a file that will be created by the workflow platform in the
     designated output directory prior to executing the command line tool.  May
@@ -791,9 +803,8 @@
     - name: "filename"
       type: ["string", "Expression"]
       doc: "The name of the file to create in the output directory."
-    - name: "value"
+    - name: "fileContent"
       type: ["string", "Expression", "Ref"]
-      jsonldPredicate: "rdf:value"
       doc: |
         The contents of the file.
 
@@ -804,21 +815,19 @@
         implemented through bind mounts or file system links in such a way as
         to avoid copying the input file.
 
+
 - type: record
   name: "EnvironmentDef"
-  docParent: EnvironmentVarRequirement
+  docParent: EnvVarRequirement
   doc: |
     Define an environment variable that will be set in the runtime environment
     by the workflow platform when executing the command line tool.  May be the
     result of executing an expression, such as getting a parameter from input.
-  fields: [
-    {name: "env", type: "string"},
-    {
-      name: "value",
-      type: ["string", "Expression"],
-      jsonldPredicate: "rdf:value"
-    }
-  ]
+  fields:
+    - name: "envName"
+      type: "string"
+    - name: "envValue"
+      type: ["string", "Expression"]
 
 
 - type: record
@@ -1171,7 +1180,7 @@
       doc: "Total memory required, in megabytes."
 
 
-- name: CreateFilesRequirement
+- name: CreateFileRequirement
   type: record
   extends: ProcessRequirement
   doc: |
@@ -1179,20 +1188,20 @@
     the designated output directory prior to executing the command line
     tool.  See `FileDef` for details.
   fields:
-    - name: fileDefs
+    - name: fileDef
       type:
         type: "array"
         items: "FileDef"
 
 
-- name: EnvironmentVarRequirement
+- name: EnvVarRequirement
   type: record
   extends: ProcessRequirement
   doc: |
     Define a list of environment variables which will be set in the
     execution environment of the tool.  See `EnvironmentDef` for details.
   fields:
-    - name: envDefs
+    - name: envDef
       type:
         type: "array"
         items: "EnvironmentDef"
@@ -1233,11 +1242,11 @@
       doc: "The type name being defined."
 
 
-- name: SchemaRequirement
+- name: SchemaDefRequirement
   type: record
   extends: ProcessRequirement
   fields:
-    - name: schemaDef
+    - name: types
       type:
         type: array
         items: SchemaDef
