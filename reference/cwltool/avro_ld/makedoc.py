@@ -151,7 +151,7 @@ class RenderType(object):
                             self.uses[tp].append((t["name"], f["name"]))
 
         for f in alltypes:
-            if "extends" not in f and not f.get("docParent"):
+            if "extends" not in f and "docParent" not in f and "docAfter" not in f:
                 self.render_type(f, 1)
 
 
