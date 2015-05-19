@@ -68,7 +68,7 @@ def get_from_requirements(requirements, hints, pull_image, dry_run=False):
                 if get_image(r, pull_image, dry_run):
                     return r["dockerImageId"]
                 else:
-                    raise Exception("Docker image %s not found" % (self.container["imageId"]))
+                    raise Exception("Docker image %s not found" % r["dockerImageId"])
     if hints:
         for r in reversed(hints):
             if r["class"] == "DockerRequirement":
