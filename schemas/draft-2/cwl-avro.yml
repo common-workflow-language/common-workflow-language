@@ -316,7 +316,7 @@
 
 - type: record
   name: ProcessRequirement
-  docParent: null
+  docAfter: Process
   doc: |
     A process requirement declares a prerequisite that may or must be fufilled
     before executing a process.  See [`Process.hints`](#process) and

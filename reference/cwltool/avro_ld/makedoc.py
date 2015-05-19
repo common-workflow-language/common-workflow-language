@@ -122,6 +122,7 @@ class RenderType(object):
         self.toc = toc
         self.subs = {}
         self.docParent = {}
+        self.docAfter = {}
         for t in j:
             if "extends" in t:
                 add_dictlist(self.subs, t["extends"], t["name"])
@@ -130,6 +131,9 @@ class RenderType(object):
 
             if t.get("docParent"):
                 add_dictlist(self.docParent, t["docParent"], t["name"])
+
+            if t.get("docAfter"):
+                add_dictlist(self.docAfter, t["docAfter"], t["name"])
 
         alltypes = schema.extend_avro(j)
 
@@ -213,6 +217,9 @@ class RenderType(object):
 
         for s in self.docParent.get(f["name"], []):
             self.render_type(self.typemap[s], depth+1)
+
+        for s in self.docAfter.get(f["name"], []):
+            self.render_type(self.typemap[s], depth)
 
 def avrold_doc(j, outdoc):
     toc = ToC()
