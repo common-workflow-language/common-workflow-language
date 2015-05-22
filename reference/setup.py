@@ -43,7 +43,8 @@ setup(name='cwltool',
           'PyYAML',
           'avro',
           'rdflib >= 4.2.0',
-          'rdflib-jsonld >= 0.3.0'
+          'rdflib-jsonld >= 0.3.0',
+          'mistune'
         ],
       test_suite='tests',
       tests_require=[],
