@@ -6,12 +6,12 @@ inputs:
     type:
       type: array
       items: string
-requirements:
-  - class: ScatterFeature
 steps:
   - id: "#step1"
     class: CommandLineTool
-    scatter: "#step1_in"
+    requirements:
+      - class: Scatter
+        scatter: "#step1_in"
     inputs:
       - id: "#step1_in"
         type: string
@@ -21,12 +21,17 @@ steps:
       - id: "#step1_out"
         type: string
         outputBinding:
+          glob: "step1_out"
           loadContents: true
+          outputEval:
+            class: Expression
+            engine: JsonPointer
+            script: "context/0/contents"
     baseCommand: "echo"
     arguments:
       - "-n"
       - "foo"
-    stdout: {ref: "#step1_out"}
+    stdout: "step1_out"
 outputs:
   - id: "#out"
     type:

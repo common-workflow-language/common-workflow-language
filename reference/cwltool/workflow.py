@@ -2,8 +2,7 @@ import job
 import draft1tool
 import draft2tool
 from aslist import aslist
-from process import Process
-from process import WorkflowException
+from process import Process, WorkflowException, get_feature
 import copy
 import logging
 import random
@@ -59,21 +58,21 @@ class Workflow(Process):
     def try_make_job(self, step, basedir, **kwargs):
         inputobj = {}
 
-        (scatterSpec, _) = self.get_feature("Scatter", requirements=self.tool["requirements"], hints=self.tool["hints"])
+        (scatterSpec, _) = get_feature("Scatter", requirements=step.tool.get("requirements"), hints=step.tool.get("hints"))
         if scatterSpec:
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])
             scatter = aslist(scatterSpec["scatter"])
 
             inp_map = {i["id"]: i for i in inputparms}
-            for s in aslist(step.tool["scatter"]):
+            for s in scatter:
                 if s not in inp_map:
                     raise WorkflowException("Invalid Scatter parameter '%s'" % s)
 
                 inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
 
             if scatterSpec.get("scatterMethod") == "nested_crossproduct":
-                nesting = len(aslist(step.tool["scatter"]))
+                nesting = len(scatter)
             else:
                 nesting = 1
 
@@ -109,7 +108,7 @@ class Workflow(Process):
                             else:
                                 inputobj[iid] = [self.state[src].value]
                         else:
-                            raise WorkflowException("Type mismatch between '%s' (%s) and '%s' (%s)" % (src, self.state[src].parameter["type"], idk(inp["id"]), inp["type"]))
+                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], idk(inp["id"]), inp["type"]))
                     elif src not in self.state:
                         raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
                     else:
@@ -125,15 +124,15 @@ class Workflow(Process):
 
         if scatterSpec:
             method = scatterSpec.get("scatterMethod")
-            if method is None and len(aslist(scatterSpec["scatter"])) != 1:
+            if method is None and len(scatter) != 1:
                 raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
 
             if method == "dotproduct" or method is None:
-                jobs = dotproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
+                jobs = dotproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
             elif method == "nested_crossproduct":
-                jobs = nested_crossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, **kwargs)
+                jobs = nested_crossproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
             elif method == "flat_crossproduct":
-                jobs = flat_crossproduct_scatter(step, inputobj, basedir, aslist(step.tool["scatter"]), callback, 0, **kwargs)
+                jobs = flat_crossproduct_scatter(step, inputobj, basedir, scatter, callback, 0, **kwargs)
         else:
             jobs = step.job(inputobj, basedir, callback, **kwargs)
 

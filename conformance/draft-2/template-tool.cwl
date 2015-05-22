@@ -15,11 +15,12 @@ requirements:
     expressionDefs:
       - { ref: underscore.js }
       - "var t = function(s) { return _.template(s)({'$job': $job}); };"
-fileDefs:
-  - filename: foo.txt
-    value:
-      engine: "#js"
-      script: 't("The file is <%= $job.file1.path %>\n")'
+  - class: CreateFileRequirement
+    fileDef:
+      - filename: foo.txt
+        fileContent:
+          engine: "#js"
+          script: 't("The file is <%= $job.file1.path %>\n")'
 inputs:
   - id: "#file1"
     type: File

@@ -79,7 +79,7 @@ def run_test(i, t):
     for key in checkkeys:
         if t.get(key) != out.get(key):
             if not failed:
-                print """Test failed: %s""" % str([args.tool, "--conformance-test", t["tool"], t["job"]])
+                print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
                 failed = True
             print "%s expected %s\n%s      got %s" % (key, t.get(key), " " * len(key), out.get(key))
     if failed:

@@ -173,7 +173,10 @@ class Builder(object):
 class Tool(Process):
     def _init_job(self, joborder, basedir, **kwargs):
         # Validate job order
-        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        try:
+            validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        except validate.ValidationException as e:
+            raise WorkflowException("Error validating input record, " + str(e))
 
         for r in self.tool.get("requirements", []):
             if r["class"] not in supportedProcessRequirements:
@@ -292,7 +295,7 @@ class CommandLineTool(Tool):
             builder.pathmapper = PathMapper(reffiles, basedir)
 
         for f in builder.files:
-            f["path"] = builder.pathmapper.mapper(f["path"])
+            f["path"] = builder.pathmapper.mapper(f["path"])[1]
 
         builder.requirements = j.requirements
 
@@ -320,13 +323,17 @@ class CommandLineTool(Tool):
         yield j
 
     def collect_output_ports(self, ports, builder, outdir):
-        custom_output = os.path.join(outdir, "cwl.output.json")
-        if os.path.exists(custom_output):
-            outputdoc = yaml.load(custom_output)
-            validate.validate_ex(self.names.get_name("output_record_schema", ""), outputdoc)
-            return outputdoc
-        ret = {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
-        return ret if ret is not None else {}
+        try:
+            custom_output = os.path.join(outdir, "cwl.output.json")
+            if os.path.exists(custom_output):
+                outputdoc = yaml.load(custom_output)
+                validate.validate_ex(self.names.get_name("outputs_record_schema", ""), outputdoc)
+                return outputdoc
+            ret = {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
+            validate.validate_ex(self.names.get_name("outputs_record_schema", ""), ret)
+            return ret if ret is not None else {}
+        except validate.ValidationException as e:
+            raise WorkflowException("Error validating output record, " + str(e))
 
     def collect_output(self, schema, builder, outdir):
         r = None
@@ -351,19 +358,15 @@ class CommandLineTool(Tool):
                     files["checksum"] = "sha1$%s" % checksum.hexdigest()
                     files["size"] = filesize
 
-                if schema["type"] == "array" and schema["items"] == "File":
-                    pass
-                elif schema["type"] == "File":
-                    if len(r) != 1:
-                        raise WorkflowException("Multiple matches for output item that is a single file.")
-                    r = r[0]
-                else:
-                    r = None
-
             if "outputEval" in binding:
                 r = expression.do_eval(binding["outputEval"], builder.job, self.requirements, self.docpath, r)
                 if schema["type"] == "File" and (not isinstance(r, dict) or "path" not in r):
                     raise WorkflowException("Expression must return a file object.")
+
+            if schema["type"] == "File":
+                if len(r) != 1:
+                    raise WorkflowException("Multiple matches for output item that is a single file.")
+                r = r[0]
 
             if schema["type"] == "File" and "secondaryFiles" in binding:
                 r["secondaryFiles"] = []

@@ -1215,7 +1215,7 @@
     - nested_crossproduct
     - flat_crossproduct
 
-- name: ScatterRequirement
+- name: Scatter
   type: record
   extends: ProcessRequirement
   fields:

@@ -14,8 +14,8 @@ outputs:
       outputBinding:
         glob: output.txt
         loadContents: true
-        valueFrom:
+        outputEval:
             engine: node-engine.cwl
-            script: "parseInt($self)"
+            script: "parseInt($self[0].contents)"
 stdout: output.txt
 baseCommand: wc

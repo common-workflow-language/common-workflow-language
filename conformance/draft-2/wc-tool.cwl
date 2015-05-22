@@ -8,9 +8,16 @@
     }],
     "outputs": [{
         "id": "#output",
-        "type": "File"
+        "type": "File",
+        "outputBinding": {
+          "glob": "output"
+        }
     }],
-    "stdin": {"ref": "#file1"},
-    "stdout": {"ref": "#output"},
+    "stdin": {
+      "class": "Expression",
+      "engine": "JsonPointer",
+      "script": "job/file1/path"
+    },
+    "stdout": "output",
     "baseCommand": ["wc"]
 }

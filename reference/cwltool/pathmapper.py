@@ -2,12 +2,14 @@ import os
 import random
 
 class PathMapper(object):
-    # Maps files to their absolute path
+    """Mapping of files from relative path provided in the file to a tuple of
+    (absolute local path, absolute container path)"""
+
     def __init__(self, referenced_files, basedir):
         self._pathmap = {}
         for src in referenced_files:
             ab = src if os.path.isabs(src) else os.path.join(basedir, src)
-            self._pathmap[src] = ab
+            self._pathmap[src] = (ab, ab)
 
     def mapper(self, src):
         return self._pathmap[src]
@@ -49,7 +51,7 @@ class DockerPathMapper(PathMapper):
             self.dirs[d] = name
 
         for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
+            ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
             for d in self.dirs:
-                if abs.startswith(d):
-                    self._pathmap[src] = os.path.join(self.dirs[d], abs[len(d)+1:])
+                if ab.startswith(d):
+                    self._pathmap[src] = (ab, os.path.join(self.dirs[d], abs[len(d)+1:]))

@@ -12,12 +12,13 @@ outputs:
         type: array
         items: int
       connect: {"source": "#step1_output"}
-requirements:
-  - class: ScatterFeature
 steps:
   - id: "#step1"
     class: External
     impl: wc2-tool.cwl
+    requirements:
+      - class: Scatter
+        scatter: "#step1file1"
     inputs:
       - id: "#step1file1"
         def: "wc2-tool.cwl#file1"
@@ -27,4 +28,3 @@ steps:
     outputs:
       - def: "wc2-tool.cwl#output"
         id: "#step1_output"
-    scatter: "#step1file1"
