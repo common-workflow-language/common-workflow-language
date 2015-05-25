@@ -343,7 +343,7 @@ class CommandLineTool(Tool):
                 r = []
                 bg = expression.do_eval(binding["glob"], builder.job, self.requirements, self.docpath)
                 for gb in aslist(bg):
-                    r.extend([{"path": g} for g in glob.glob(os.path.join(outdir, gb))])
+                    r.extend([{"path": g, "class": "File"} for g in glob.glob(os.path.join(outdir, gb))])
                 for files in r:
                     checksum = hashlib.sha1()
                     with open(files["path"], "rb") as f:

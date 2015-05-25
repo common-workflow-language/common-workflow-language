@@ -4,7 +4,7 @@ class: Workflow
 inputs:
     - id: "#file1"
       type: File
-      default: {path: hello.txt}
+      default: {class: File, path: hello.txt}
 outputs:
     - id: "#count_output"
       type: int

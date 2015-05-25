@@ -301,6 +301,12 @@
   name: File
   docParent: Datatype
   fields:
+    - name: "class"
+      type:
+        type: enum
+        name: "File_class"
+        symbols:
+          - File
     - name: "path"
       type: "string"
     - name: "checksum"

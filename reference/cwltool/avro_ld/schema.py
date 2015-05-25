@@ -27,6 +27,11 @@ def extend_avro(items):
             if "specialize" in t:
                 r["fields"] = specialize(r["fields"], t["specialize"])
             r["fields"].extend(t["fields"])
+
+            for y in [x for x in r["fields"] if x["name"] == "class"]:
+                y["type"] = {"type": "enum", "symbols": [r["name"]], "name": r["name"]+"_class"}
+
+
             r["extends"] = t["extends"]
             r["abstract"] = t.get("abstract", False)
             r["doc"] = t.get("doc", "")
