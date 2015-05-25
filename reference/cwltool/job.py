@@ -8,6 +8,7 @@ import logging
 import sys
 import requests
 import docker
+from process import WorkflowException
 
 _logger = logging.getLogger("cwltool")
 
@@ -21,6 +22,10 @@ class CommandLineJob(object):
         env = {}
 
         img_id = docker.get_from_requirements(self.requirements, self.hints, pull_image)
+
+        for f in self.pathmapper.files():
+            if not os.path.exists(self.pathmapper.mapper(f)[0]):
+                raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
         if img_id:
             runtime = ["docker", "run", "-i"]

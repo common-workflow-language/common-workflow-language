@@ -28,7 +28,9 @@
             "type": "File"
         }
     ],
-    "schemaDefs": [
+    "requirements": [
+    {"class": "SchemaDefRequirement",
+    "types": [
         {
             "fields": [
                 {
@@ -47,7 +49,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--max-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -56,7 +57,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--min-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -90,7 +90,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--max-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -99,7 +98,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--min-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -133,7 +131,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--max-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -142,7 +139,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--min-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -176,7 +172,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--max-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -185,7 +180,6 @@
                     "type": ["null", "int"],
                     "commandLineBinding": {
                         "prefix": "--min-seq-length",
-                        "separator": " ",
                         "position": 2
                     }
                 },
@@ -209,7 +203,7 @@
                     "commandLineBinding": {
                         "position": 0,
                         "prefix": "stage",
-                        "separator": ""
+                        "separate": false
                     },
                     "name": "stageId",
                     "type": ["null", "int"]
@@ -239,8 +233,12 @@
                 }
             ]
         }
-    ],
+    ]}],
     "baseCommand": ["tmap", "mapall"],
-    "stdin": {"ref": "#reads"},
+    "stdin": {
+      "class": "Expression",
+      "engine": "JsonPointer",
+      "script": "job/reads/path"
+      },
     "stdout": "output.sam"
 }

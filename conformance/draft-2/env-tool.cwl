@@ -5,13 +5,17 @@ inputs:
 outputs:
   - id: "#out"
     type: "File"
+    outputBinding:
+      glob: "out"
 requirements:
   - class: ExpressionEngineRequirement
     id: "node-engine.cwl"
-environmentDefs:
-  - env: "TEST_ENV"
-    value:
-      engine: node-engine.cwl
-      script: "$job.in"
+  - class: EnvVarRequirement
+    envDef:
+      - envName: "TEST_ENV"
+        envValue:
+          class: Expression
+          engine: node-engine.cwl
+          script: "$job.in"
 baseCommand: ["/bin/bash", "-c", "echo $TEST_ENV"]
-stdout: {ref: "#out"}
+stdout: "out"

@@ -19,10 +19,17 @@
     "outputs": [
         {
             "id": "#output.txt",
-            "type": "File"
+            "type": "File",
+            "outputBinding": {
+              "glob": "output.txt"
+              }
         }
     ],
     "baseCommand": "cat",
-    "stdout": { "ref": "#output.txt" },
-    "stdin": { "ref": "#file1" }
+    "stdout": "output.txt",
+    "stdin": {
+      "class": "Expression",
+      "engine": "JsonPointer",
+      "script": "job/file1/path"
+      }
 }

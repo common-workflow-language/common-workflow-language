@@ -17,5 +17,9 @@
     ],
     "outputs": [],
     "baseCommand": "cat",
-    "stdin": {"ref": "#file1"}
+    "stdin": {
+      "class": "Expression",
+      "engine": "JsonPointer",
+      "script": "job/file1/path"
+      }
 }

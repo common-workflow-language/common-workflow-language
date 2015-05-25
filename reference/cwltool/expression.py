@@ -8,10 +8,14 @@ from process import WorkflowException
 import process
 import yaml
 import validate
+import ref_resolver
 
 _logger = logging.getLogger("cwltool")
 
 def exeval(ex, jobinput, requirements, docpath, context, pull_image):
+    if ex["engine"] == "JsonPointer":
+        return ref_resolver.resolve_pointer({"job": jobinput, "context": context}, ex["script"])
+
     for r in reversed(requirements):
         if r["class"] == "ExpressionEngineRequirement" and r["id"] == ex["engine"]:
             if r["id"][0] != "#":

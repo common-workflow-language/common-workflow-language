@@ -10,13 +10,13 @@ inputs:
     type:
       type: array
       items: string
-requirements:
-  - class: ScatterFeature
 steps:
   - id: "#step1"
     class: CommandLineTool
-    scatter: ["#step1_in1", "#step1_in2"]
-    scatterMethod: flat_crossproduct
+    requirements:
+      - class: Scatter
+        scatter: ["#step1_in1", "#step1_in2"]
+        scatterMethod: flat_crossproduct
     inputs:
       - id: "#step1_in1"
         type: string
@@ -30,12 +30,17 @@ steps:
       - id: "#step1_out"
         type: string
         outputBinding:
+          glob: "step1_out"
           loadContents: true
+          outputEval:
+            class: Expression
+            engine: JsonPointer
+            script: "context/0/contents"
     baseCommand: "echo"
     arguments:
       - "-n"
       - "foo"
-    stdout: {ref: "#step1_out"}
+    stdout: step1_out
 outputs:
   - id: "#out"
     connect: {source: "#step1_out"}

@@ -4,13 +4,14 @@ class: Workflow
 inputs:
     - id: "#file1"
       type: File
-      default: {path: hello.txt}
+      default: {class: File, path: hello.txt}
 outputs:
     - id: "#count_output"
       type: int
       connect: {"source": "#step1_output"}
 steps:
   - id: "#step1"
+    class: External
     impl: wc2-tool.cwl
     inputs:
       - def: "wc2-tool.cwl#file1"

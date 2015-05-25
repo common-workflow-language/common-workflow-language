@@ -10,6 +10,7 @@ outputs:
     connect: {"source": "#step2_output"}
 steps:
   - id: "#step1"
+    class: External
     impl: wc-tool.cwl
     inputs:
       - def: "wc-tool.cwl#file1"
@@ -18,6 +19,7 @@ steps:
       - def: "wc-tool.cwl#output"
         id: "#step1_output"
   - id: "#step2"
+    class: External
     impl: parseInt-tool.cwl
     inputs:
       - def: "parseInt-tool.cwl#file1"

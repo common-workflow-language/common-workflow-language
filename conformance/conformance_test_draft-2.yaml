@@ -45,20 +45,29 @@
 
 - job: draft-2/cat-job.json
   output:
-    output_file: {checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b, path: output.txt,
-      size: 13}
+    output_file:
+      class: File
+      checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
+      path: output.txt
+      size: 13
   tool: draft-2/cat3-tool.cwl
 
 - job: draft-2/cat-job.json
   output:
-    output.txt: {checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b, path: output.txt,
-      size: 13}
+    output.txt:
+      class: File
+      checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
+      path: output.txt
+      size: 13
   tool: draft-2/cat4-tool.cwl
 
 - job: draft-2/wc-job.json
   output:
-    output: {checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae, path: output,
-      size: 15}
+    output:
+      class: File
+      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
+      path: output
+      size: 15
   tool: draft-2/wc-tool.cwl
 
 - job: draft-2/parseInt-job.json
@@ -97,7 +106,11 @@
 
 - job: draft-2/env-job.json
   output:
-    out: {checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519, path: out, size: 15}
+    out:
+      class: File
+      checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
+      path: out
+      size: 15
   tool: draft-2/env-tool.cwl
 
 - job: draft-2/scatter-job1.json

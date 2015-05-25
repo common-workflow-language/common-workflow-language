@@ -3,6 +3,7 @@ import logging
 import sys
 import requests
 import os
+import process
 
 _logger = logging.getLogger("cwltool")
 
@@ -44,6 +45,7 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
                     with open(dockerRequirement["dockerLoad"], "rb") as f:
                         loadproc = subprocess.Popen(cmd, stdin=f, stdout=sys.stderr)
                 else:
+                    loadproc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=sys.stderr)
                     _logger.info("Sending GET request to %s", dockerRequirement["dockerLoad"])
                     req = requests.get(dockerRequirement["dockerLoad"], stream=True)
                     n = 0
@@ -61,17 +63,13 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
 
 
 def get_from_requirements(requirements, hints, pull_image, dry_run=False):
-    if requirements:
-        for r in reversed(requirements):
-            if r["class"] == "DockerRequirement":
-                if get_image(r, pull_image, dry_run):
-                    return r["dockerImageId"]
-                else:
-                    raise Exception("Docker image %s not found" % (self.container["imageId"]))
-    if hints:
-        for r in reversed(hints):
-            if r["class"] == "DockerRequirement":
-                if get_image(r, pull_image, dry_run):
-                    return r["dockerImageId"]
+    (r, req) = process.get_feature("DockerRequirement", requirements=requirements, hints=hints)
+
+    if r:
+        if get_image(r, pull_image, dry_run):
+            return r["dockerImageId"]
+        else:
+            if req:
+                raise Exception("Docker image %s not found" % r["dockerImage"])
 
     return None
