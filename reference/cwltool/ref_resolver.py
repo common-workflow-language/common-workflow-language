@@ -8,8 +8,7 @@ import requests
 import urlparse
 import yaml
 
-log = logging.getLogger(__name__)
-
+log = logging.getLogger("cwltool")
 
 class NormDict(dict):
     def __init__(self, normalize=unicode):
@@ -33,41 +32,48 @@ class Loader(object):
         self.resolved = NormDict(normalize)
         self.resolving = NormDict(normalize)
 
-    def load(self, url, base_url=None):
+    def load(self, url, base_url=None, url_fields=[]):
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
-        return self.resolve_ref({'id': url}, base_url)
+        return self.resolve_ref({'id': url}, base_url, url_fields=url_fields)
 
-    def resolve_ref(self, obj, base_url):
-        ref, mixin = obj.pop('id', None)
-        if ref[0] == "#":
-            return obj
+    def resolve_ref(self, obj, base_url, url_fields=[]):
+        ref = obj['id']
         url = urlparse.urljoin(base_url, ref)
+        if ref[0] == "#":
+            obj = copy.deepcopy(obj)
+            obj['id'] = url
+            return obj
+        if len(obj) != 1:
+            raise RuntimeError("External references cannot have other fields.")
         if url in self.resolved:
             return self.resolved[url]
         if url in self.resolving:
             raise RuntimeError('Circular reference for url %s' % url)
         self.resolving[url] = True
-        doc_url, pointer = urlparse.urldefrag(url)
+        doc_url, fragment = urlparse.urldefrag(url)
         document = self.fetch(doc_url)
-        fragment = copy.deepcopy(resolve_fragment(document, pointer))
+        fragment = copy.deepcopy(resolve_fragment(document, fragment))
         try:
-            fragment = dict(obj, **fragment)
-            result = self.resolve_all(fragment, doc_url)
+            result = self.resolve_all(fragment, doc_url, url_fields)
         finally:
             del self.resolving[url]
+        result["id"] = url
         return result
 
-    def resolve_all(self, document, base_url):
+    def resolve_all(self, document, base_url, url_fields):
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
             if 'id' in document:
-                return self.resolve_ref(document, base_url)
+                document = self.resolve_ref(document, base_url, url_fields)
+            for d in url_fields:
+                if d in document and isinstance(document[d], basestring):
+                    document[d] = urlparse.urljoin(base_url, document[d])
             iterator = document.iteritems()
         else:
             return document
         for key, val in iterator:
-            document[key] = self.resolve_all(val, base_url)
+            document[key] = self.resolve_all(val, base_url, url_fields)
         return document
 
     def fetch(self, url):
@@ -97,6 +103,8 @@ class Loader(object):
 POINTER_DEFAULT = object()
 
 def resolve_fragment(document, frag):
+    if not frag:
+        return document
     if isinstance(document, dict):
         if document.get("id") == frag:
             return document
@@ -131,5 +139,5 @@ def resolve_json_pointer(document, pointer, default=POINTER_DEFAULT):
 
 loader = Loader()
 
-def from_url(url, base_url=None):
-    return loader.load(url, base_url)
+def from_url(url, base_url=None, url_fields=[]):
+    return loader.load(url, base_url, url_fields=url_fields)

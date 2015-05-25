@@ -8,7 +8,6 @@
             "total_mem": 5000
         },
         {
-            class: ExpressionEngineRequirement,
             id: "node-engine.cwl"
         }
     ],

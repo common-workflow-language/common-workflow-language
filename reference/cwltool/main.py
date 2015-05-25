@@ -46,10 +46,11 @@ def main():
     parser.add_argument("--print-spec", action="store_true", help="Print HTML specification document")
     parser.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file")
     parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file")
+    parser.add_argument("--print-avro", action="store_true", help="Print Avro schema")
+    parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing")
 
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
-
 
     args = parser.parse_args()
 
@@ -60,24 +61,32 @@ def main():
 
     cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl-avro.yml')
 
+    with open(cwl_avsc) as f:
+        j = yaml.load(f)
+    (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
+
+    url_fields = []
+    for c in ctx:
+        if c != "id" and (ctx[c] == "@id") or (isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id"):
+            url_fields.append(c)
+
     if args.print_jsonld_context:
-        with open(cwl_avsc) as f:
-            j = yaml.load(f)
-        (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
         print json.dumps(ctx, indent=4, sort_keys=True)
         return 0
 
     if args.print_rdfs:
-        with open(cwl_avsc) as f:
-            j = yaml.load(f)
-        (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
         print(g.serialize(format=args.rdf_serializer))
         return 0
 
     if args.print_spec:
-        with open(cwl_avsc) as f:
-            j = yaml.load(f)
         avro_ld.makedoc.avrold_doc(j, sys.stdout)
+        return 0
+
+    if args.print_avro:
+        names = avro_ld.schema.schema(j)
+        print "["
+        print ", ".join([json.dumps(names.names[n].to_json(), indent=4, sort_keys=True) for n in names.names])
+        print "]"
         return 0
 
     if not args.workflow:
@@ -85,8 +94,14 @@ def main():
         parser.print_help()
         return 1
 
+    processobj = from_url(args.workflow, url_fields=url_fields)
+
     if args.print_rdf:
         printrdf(args.workflow, args.rdf_serializer)
+        return 0
+
+    if args.print_pre:
+        print json.dumps(processobj, indent=4)
         return 0
 
     if not args.job_order:
@@ -97,7 +112,7 @@ def main():
     basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
 
     try:
-        t = workflow.makeTool(from_url(args.workflow), basedir)
+        t = workflow.makeTool(processobj, basedir)
     except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:

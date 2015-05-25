@@ -1,6 +1,5 @@
 {
     class: ExpressionEngineRequirement,
-    id: "#js",
     requirements: [
       {
         class: DockerRequirement,

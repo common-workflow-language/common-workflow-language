@@ -13,18 +13,11 @@ import ref_resolver
 _logger = logging.getLogger("cwltool")
 
 def exeval(ex, jobinput, requirements, docpath, context, pull_image):
-    if ex["engine"] == "JsonPointer":
-        return ref_resolver.resolve_pointer({"job": jobinput, "context": context}, ex["script"])
+    if ex["engine"].endswith("/JsonPointer"):
+        return ref_resolver.resolve_json_pointer({"job": jobinput, "context": context}, ex["script"])
 
     for r in reversed(requirements):
         if r["class"] == "ExpressionEngineRequirement" and r["id"] == ex["engine"]:
-            if r["id"][0] != "#":
-                with open(os.path.join(docpath, r["id"])) as f:
-                    ex_obj = yaml.load(f)
-                sch = process.get_schema()
-                validate.validate_ex(sch.get_name("ExpressionEngineRequirement", ""), ex_obj)
-                r = ex_obj
-
             runtime = []
             img_id = docker.get_from_requirements(r.get("requirements"), r.get("hints"), pull_image)
             if img_id:
@@ -33,7 +26,7 @@ def exeval(ex, jobinput, requirements, docpath, context, pull_image):
             exdefs = []
             for exdef in r.get("expressionDefs", []):
                 if isinstance(exdef, dict) and "ref" in exdef:
-                    with open(os.path.join(r["_docpath"], exdef["ref"])) as f:
+                    with open(exdef["ref"][7:]) as f:
                         exdefs.append(f.read())
                 elif isinstance(exdef, basestring):
                     exdefs.append(exdef)

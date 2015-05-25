@@ -9,6 +9,7 @@ import logging
 import pprint
 from aslist import aslist
 import avro_ld.schema
+import urlparse
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -79,7 +80,8 @@ class Process(object):
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
         for i in self.tool["inputs"]:
             c = copy.copy(i)
-            c["name"] = c["id"][1:]
+            doc_url, fragment = urlparse.urldefrag(c['id'])
+            c["name"] = fragment
             del c["id"]
             if "default" in c:
                 c["type"] = ["null"] + aslist(c["type"])
@@ -89,7 +91,8 @@ class Process(object):
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
         for i in self.tool["outputs"]:
             c = copy.copy(i)
-            c["name"] = c["id"][1:]
+            doc_url, fragment = urlparse.urldefrag(c['id'])
+            c["name"] = fragment
             del c["id"]
             if "default" in c:
                 c["type"] = ["null"] + aslist(c["type"])

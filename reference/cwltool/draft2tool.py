@@ -20,6 +20,7 @@ import validate
 from aslist import aslist
 import expression
 import re
+import urlparse
 
 _logger = logging.getLogger("cwltool")
 
@@ -271,14 +272,15 @@ class CommandLineTool(Tool):
 
         if self.tool.get("stdout"):
             if isinstance(self.tool["stdout"], dict) and "ref" in self.tool["stdout"]:
-                for out in self.tool.get("outputs", []):
-                    if out["id"] == self.tool["stdout"]["ref"]:
-                        filename = self.tool["stdout"]["ref"][1:]
-                        j.stdout = filename
-                        out["outputBinding"] = out.get("outputBinding", {})
-                        out["outputBinding"]["glob"] = filename
-                if not j.stdout:
-                    raise validate.ValidationException("stdout refers to invalid output")
+                pass
+                # for out in self.tool.get("outputs", []):
+                #     if out["id"] == self.tool["stdout"]["ref"]:
+                #         filename = self.tool["stdout"]["ref"][1:]
+                #         j.stdout = filename
+                #         out["outputBinding"] = out.get("outputBinding", {})
+                #         out["outputBinding"]["glob"] = filename
+                # if not j.stdout:
+                #     raise validate.ValidationException("stdout refers to invalid output")
             else:
                 j.stdout = self.tool["stdout"]
             if os.path.isabs(j.stdout):
@@ -329,11 +331,15 @@ class CommandLineTool(Tool):
                 outputdoc = yaml.load(custom_output)
                 validate.validate_ex(self.names.get_name("outputs_record_schema", ""), outputdoc)
                 return outputdoc
-            ret = {port["id"][1:]: self.collect_output(port, builder, outdir) for port in ports}
+
+            ret = {}
+            for port in ports:
+                doc_url, fragment = urlparse.urldefrag(port['id'])
+                ret[fragment] = self.collect_output(port, builder, outdir)
             validate.validate_ex(self.names.get_name("outputs_record_schema", ""), ret)
             return ret if ret is not None else {}
         except validate.ValidationException as e:
-            raise WorkflowException("Error validating output record, " + str(e))
+            raise WorkflowException("Error validating output record, " + str(e) + "\n in " + json.dumps(ret, indent=4))
 
     def collect_output(self, schema, builder, outdir):
         r = None

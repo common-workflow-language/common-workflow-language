@@ -15,7 +15,7 @@ from flatten import flatten
 
 from jsonschema.validators import Draft4Validator
 import ref_resolver
-from ref_resolver import from_url, resolve_pointer
+from ref_resolver import from_url, resolve_json_pointer
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -89,7 +89,7 @@ class Builder(object):
                 ex += ")"
                 return self.jseval(job, ex)
             elif "$job" in v:
-                return resolve_pointer(job, v["$job"])
+                return resolve_json_pointer(job, v["$job"])
             elif "$import" in v:
                 # TODO: check checksum
                 url = urlparse.urljoin(self.base_url, v["$import"])

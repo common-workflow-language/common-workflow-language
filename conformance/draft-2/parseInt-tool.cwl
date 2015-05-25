@@ -3,7 +3,6 @@
     "@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json",
     "class": "ExpressionTool",
     "requirements": [{
-      class: ExpressionEngineRequirement,
       id: "node-engine.cwl"
     }],
     "inputs": [{

@@ -74,7 +74,7 @@ def avrold_to_jsonld_context(j):
                 if isinstance(v, basestring):
                     v = v if v[0] != "@" else None
                 else:
-                    v = v["@id"] if v["@id"][0] != "@" else None
+                    v = v["@id"] if v.get("@id", "@")[0] != "@" else None
 
                 if v:
                     (ns, ln) = rdflib.namespace.split_uri(unicode(v))
@@ -97,4 +97,3 @@ if __name__ == "__main__":
         j = yaml.load(f)
         (ctx, g) = avrold_to_jsonld_context(j)
         print json.dumps(ctx, indent=4, sort_keys=True)
-

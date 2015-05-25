@@ -307,6 +307,9 @@
         name: "File_class"
         symbols:
           - File
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
     - name: "path"
       type: "string"
     - name: "checksum"
@@ -366,7 +369,7 @@
 
   fields:
     - name: id
-      type: string
+      type: ["null", string]
       doc: "Used to identify the expression engine in the `engine` field of Expressions."
       jsonldPredicate: "@id"
     - name: requirements
@@ -534,8 +537,8 @@
     value becomes available for the parameter specified by `source`, that value
     of the parameter is propagated to the destination parameter.
   fields:
-    - name: "source"
-      type: "string"
+    - name: source
+      type: string
       jsonldPredicate:
         "@id": "wfdesc:hasSource"
         "@type": "@id"
@@ -557,7 +560,7 @@
         "@type": "@id"
     - name: connect
       jsonldPredicate:
-        "@id": "wfdesc:hasSource"
+        "@reverse": "wfdesc:hasSink"
         "@type": "@id"
       type:
         - DataLink
@@ -719,7 +722,7 @@
           items: DataLink
       doc: "Connect this parameter to upstream parameters, described above."
       jsonldPredicate:
-        "@id": "wfdesc:hasSource"
+        "@reverse": "wfdesc:hasSink"
         "@type": "@id"
     - name: streamable
       type: ["null", "boolean"]
