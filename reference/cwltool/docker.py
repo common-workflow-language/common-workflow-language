@@ -70,6 +70,6 @@ def get_from_requirements(requirements, hints, pull_image, dry_run=False):
             return r["dockerImageId"]
         else:
             if req:
-                raise Exception("Docker image %s not found" % r["dockerImage"])
+                raise Exception("Docker image %s not found" % r["dockerImageId"])
 
     return None
