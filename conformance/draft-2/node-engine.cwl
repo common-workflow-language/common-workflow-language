@@ -3,7 +3,7 @@
     requirements: [
       {
         class: DockerRequirement,
-        dockerImageId: cwl-nodejs-engine
+        dockerImageId: commonworkflowlanguage/nodejs-engine
       }
     ],
     engineCommand: cwlNodeEngine.js

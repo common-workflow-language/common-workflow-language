@@ -10,7 +10,7 @@ requirements:
     id: "#js"
     requirements:
       - class: DockerRequirement
-        dockerImageId: cwl-nodejs-engine
+        dockerImageId: commonworkflowlanguage/nodejs-engine
     engineCommand: cwlNodeEngine.js
     expressionDefs:
       - { ref: underscore.js }
