@@ -6,10 +6,10 @@ requirements:
   - id: node-engine.cwl
 
 inputs:
-  - { id: "#file1", datatype: File, inputBinding: { loadContents: true } }
+  - { id: "#file1", type: File, inputBinding: { loadContents: true } }
 
 outputs:
-  - { id: "#output", datatype: int }
+  - { id: "#output", type: int }
 
 expression:
   engine: node-engine.cwl

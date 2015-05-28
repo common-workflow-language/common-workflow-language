@@ -6,7 +6,7 @@ requirements:
 inputs:
     - id: "#file1"
       type: File
-      commandLineBinding: {}
+      inputBinding: {}
 outputs:
     - id: "#output"
       type: int

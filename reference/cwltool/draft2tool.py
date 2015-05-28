@@ -84,17 +84,18 @@ class Builder(object):
 
             if schema["type"] == "array":
                 for n, item in enumerate(datum):
-                    b = self.bind_input({"type": schema["items"], "commandLineBinding": schema.get("commandLineBinding")}, item)
+                    b = self.bind_input({"type": schema["items"], "inputBinding": schema.get("inputBinding")}, item)
                     for bi in b:
                         bi["position"].insert(0, n)
                     bindings.extend(b)
 
-            if schema["type"] == "File":
-                if schema.get("loadContents"):
+            if schema["type"] == "File" and "inputBinding" in schema:
+                binding = schema["inputBinding"]
+                if binding.get("loadContents"):
                     with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
                         datum["contents"] = f.read(CONTENT_LIMIT)
                 self.files.append(datum)
-                if "secondaryFiles" in schema:
+                if "secondaryFiles" in binding:
                     if "secondaryFiles" not in datum:
                         datum["secondaryFiles"] = []
                     for sf in aslist(schema["secondaryFiles"]):
@@ -109,8 +110,8 @@ class Builder(object):
                         self.files.append(sfpath)
 
         b = None
-        if "commandLineBinding" in schema and isinstance(schema["commandLineBinding"], dict):
-            b = copy.copy(schema["commandLineBinding"])
+        if "inputBinding" in schema and isinstance(schema["inputBinding"], dict):
+            b = copy.copy(schema["inputBinding"])
 
             if b.get("position"):
                 b["position"] = [b["position"]]

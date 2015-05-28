@@ -86,10 +86,14 @@ class Process(object):
             doc_url, fragment = urlparse.urldefrag(c['id'])
             c["name"] = fragment
             del c["id"]
+
+            if "type" not in c:
+                raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
+
             if "default" in c:
-                c["type"] = ["null"] + aslist(c["datatype"])
+                c["type"] = ["null"] + aslist(c["type"])
             else:
-                c["type"] = c["datatype"]
+                c["type"] = c["type"]
             self.inputs_record_schema["fields"].append(c)
 
         avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
@@ -100,13 +104,16 @@ class Process(object):
             doc_url, fragment = urlparse.urldefrag(c['id'])
             c["name"] = fragment
             del c["id"]
+
+            if "type" not in c:
+                raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
+
             if "default" in c:
-                c["type"] = ["null"] + aslist(c["datatype"])
+                c["type"] = ["null"] + aslist(c["type"])
             else:
-                c["type"] = c["datatype"]
+                c["type"] = c["type"]
             self.outputs_record_schema["fields"].append(c)
 
-        print self.names.get_name("File", "")
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
     def validate_requirements(self, tool, field):

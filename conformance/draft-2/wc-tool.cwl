@@ -3,10 +3,10 @@
 class: CommandLineTool
 
 inputs:
-  - { id: "#file1", datatype: File }
+  - { id: "#file1", type: File }
 
 "outputs":
-  - { id: "#output", datatype: File,  outputBinding: { glob: output } }
+  - { id: "#output", type: File,  outputBinding: { glob: output } }
 
 baseCommand: ["wc"]
 

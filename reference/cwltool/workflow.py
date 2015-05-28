@@ -12,23 +12,17 @@ from collections import namedtuple
 import pprint
 import functools
 import avro_ld.validate as validate
+import urlparse
 
 _logger = logging.getLogger("cwltool")
 
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
-def idk(key):
-    if len(key) <= 1:
-        raise WorkflowException("Identifier is too short")
-    if key[0] != '#':
-        raise WorkflowException("Must start with #")
-    return key[1:]
-
 def makeTool(toolpath_object, docpath, **kwargs):
     """docpath is the directory the tool file is located."""
     if "schema" in toolpath_object:
         return draft1tool.Tool(toolpath_object)
-    elif "impl" in toolpath_object and toolpath_object.get("class", "External") == "External":
+    elif "run" in toolpath_object and toolpath_object.get("class", "External") == "External":
         return External(toolpath_object, docpath)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
@@ -38,7 +32,7 @@ def makeTool(toolpath_object, docpath, **kwargs):
         elif toolpath_object["class"] == "Workflow":
             return Workflow(toolpath_object, docpath, **kwargs)
     else:
-        raise WorkflowException("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
+        raise WorkflowException("Missing 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
 
 
 class Workflow(Process):
@@ -46,17 +40,19 @@ class Workflow(Process):
         super(Workflow, self).__init__(toolpath_object, "Workflow", docpath, **kwargs)
 
     def receive_output(self, step, outputparms, jobout):
-        _logger.info("Job got output: %s", jobout)
+        _logger.debug("WorkflowStep completed with %s", jobout)
         for i in outputparms:
             if "id" in i:
-                if idk(i["id"]) in jobout:
-                    self.state[idk(i["id"])] = WorkflowStateItem(i, jobout[idk(i["id"])])
+                if i["id"] in jobout:
+                    self.state[i["id"]] = WorkflowStateItem(i, jobout[i["id"]])
                 else:
-                    raise WorkflowException("Output is missing expected field %s" % idk(i["id"]))
+                    raise WorkflowException("Output is missing expected field %s" % d)
         step.completed = True
 
     def try_make_job(self, step, basedir, **kwargs):
         inputobj = {}
+
+        _logger.debug("Try to make job %s", step.id)
 
         (scatterSpec, _) = get_feature("Scatter", requirements=step.tool.get("requirements"), hints=step.tool.get("hints"))
         if scatterSpec:
@@ -84,13 +80,13 @@ class Workflow(Process):
             outputparms = step.tool["outputs"]
 
         for inp in inputparms:
-            _logger.debug(inp)
-            iid = idk(inp["id"])
+            _logger.debug("Trying input %s", inp)
+            iid = inp["id"]
             if "connect" in inp:
                 connections = inp["connect"]
                 is_array = isinstance(inp["type"], dict) and inp["type"]["type"] == "array"
                 for connection in aslist(connections):
-                    src = idk(connection["source"])
+                    src = connection["source"]
                     if src in self.state and self.state[src] is not None:
                         if self.state[src].parameter["type"] == inp["type"]:
                             # source and input types are the same
@@ -108,7 +104,7 @@ class Workflow(Process):
                             else:
                                 inputobj[iid] = [self.state[src].value]
                         else:
-                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], idk(inp["id"]), inp["type"]))
+                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"]), inp["type"])
                     elif src not in self.state:
                         raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
                     else:
@@ -151,17 +147,17 @@ class Workflow(Process):
 
         self.state = {}
         for i in self.tool["inputs"]:
-            iid = idk(i["id"])
+            (_, iid) = urlparse.urldefrag(i["id"])
             if iid in joborder:
-                self.state[iid] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
+                self.state[i["id"]] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
             elif "default" in i:
-                self.state[iid] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
+                self.state[i["id"]] = WorkflowStateItem(i, copy.deepcopy(i["default"]))
             else:
                 raise WorkflowException("Input '%s' not in input object and does not have a default value." % (i["id"]))
 
         for s in steps:
             for out in s.tool["outputs"]:
-                self.state[idk(out["id"])] = None
+                self.state[out["id"]] = None
             s.completed = False
 
         completed = 0
@@ -182,18 +178,17 @@ class Workflow(Process):
         wo = {}
         for i in self.tool["outputs"]:
             if "connect" in i:
-                src = idk(i["connect"]["source"])
-                wo[idk(i["id"])] = self.state[src].value
+                (_, src) = urlparse.urldefrag(i['id'])
+                wo[src] = self.state[i["connect"]["source"]].value
 
         output_callback(wo)
 
 class External(Process):
     def __init__(self, toolpath_object, docpath):
-        self.impl = toolpath_object["impl"]
         try:
-            self.embedded_tool = makeTool(from_url(self.impl), docpath)
+            self.embedded_tool = makeTool(toolpath_object["run"], docpath)
         except validate.ValidationException as v:
-            raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, self.impl), validate.indent(str(v))))
+            raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, toolpath_object["run"]["id"]), validate.indent(str(v))))
 
         if "id" in toolpath_object:
             self.id = toolpath_object["id"]
@@ -201,46 +196,45 @@ class External(Process):
             self.id = "#step_" + str(random.randint(1, 1000000000))
 
         for i in toolpath_object["inputs"]:
-            d = i["def"][len(self.impl):]
-            toolid = i.get("id", self.id + "." + idk(d))
+            (_, d) = urlparse.urldefrag(i["param"])
+            toolid = i.get("id", self.id + "." + d)
             found = False
             for a in self.embedded_tool.tool["inputs"]:
-                if a["id"] == d:
+                if a["id"] == i["param"]:
                     i.update(a)
                     found = True
             if not found:
-                raise WorkflowException("Did not find input '%s' in external process" % (i["def"]))
+                raise WorkflowException("Did not find input '%s' in external process" % (i["param"]))
 
             i["id"] = toolid
 
         for i in toolpath_object["outputs"]:
-            d = i["def"][len(self.impl):]
-            toolid = i["id"]
+            (_, d) = urlparse.urldefrag(i["param"])
+            toolid = i["id"] if 'id' in i else i['param']
             found = False
             for a in self.embedded_tool.tool["outputs"]:
-                if a["id"] == d:
+                if a["id"] == i["param"]:
                     i.update(a)
                     found = True
             if not found:
-                raise WorkflowException("Did not find output '%s' in external process" % (i["def"]))
+                raise WorkflowException("Did not find output '%s' in external process" % (i["param"]))
 
             i["id"] = toolid
 
-        super(External, self).__init__(toolpath_object, "External", docpath)
+        super(External, self).__init__(toolpath_object, "WorkflowStep", docpath)
 
     def receive_output(self, jobout):
         self.output  = {}
+        _logger.debug("WorkflowStep output from run is %s", jobout)
         for i in self.tool["outputs"]:
-            if i["def"][:len(self.impl)] != self.impl:
-                raise WorkflowException("'def' is '%s' but must refer to fragment of resource '%s' listed in 'impl'" % (i["def"], self.impl))
-            d = idk(i["def"][len(self.impl):])
-            self.output[idk(i["id"])] = jobout[d]
+            (_, d) = urlparse.urldefrag(i["param"] if "param" in i else i["id"])
+            self.output[i["id"]] = jobout[d]
 
     def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
-            d = i["def"][len(self.impl)+1:]
-            joborder[d] = joborder[idk(i["id"])]
-            del joborder[idk(i["id"])]
+            (_, d) = urlparse.urldefrag(i["param"])
+            joborder[d] = joborder[i["id"]]
+            del joborder[i["id"]]
 
         kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
@@ -269,20 +263,20 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
     l = None
     for s in scatter_keys:
         if l is None:
-            l = len(joborder[idk(s)])
-        elif l != len(joborder[idk(s)]):
+            l = len(joborder[s])
+        elif l != len(joborder[s]):
             raise WorkflowException("Length of input arrays must be equal when performing dotproduct scatter.")
 
     output = {}
     for i in process.tool["outputs"]:
-        output[idk(i["id"])] = [None] * l
+        output[i["id"]] = [None] * l
 
     rc = ReceiveScatterOutput(output)
 
     for n in range(0, l):
         jo = copy.copy(joborder)
         for s in scatter_keys:
-            jo[idk(s)] = joborder[idk(s)][n]
+            jo[s] = joborder[s][n]
 
         for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
             yield j
@@ -294,11 +288,11 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
 
 
 def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
-    scatter_key = idk(scatter_keys[0])
+    scatter_key = scatter_keys[0]
     l = len(joborder[scatter_key])
     output = {}
     for i in process.tool["outputs"]:
-        output[idk(i["id"])] = [None] * l
+        output[i["id"]] = [None] * l
 
     rc = ReceiveScatterOutput(output)
 
@@ -319,7 +313,7 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
     output_callback(output)
 
 def crossproduct_size(joborder, scatter_keys):
-    scatter_key = idk(scatter_keys[0])
+    scatter_key = scatter_keys[0]
     if len(scatter_keys) == 1:
         sum = len(joborder[scatter_key])
     else:
@@ -331,13 +325,13 @@ def crossproduct_size(joborder, scatter_keys):
     return sum
 
 def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, startindex, **kwargs):
-    scatter_key = idk(scatter_keys[0])
+    scatter_key = scatter_keys[0]
     l = len(joborder[scatter_key])
 
     if startindex == 0 and not isinstance(output_callback, ReceiveScatterOutput):
         output = {}
         for i in process.tool["outputs"]:
-            output[idk(i["id"])] = [None] * crossproduct_size(joborder, scatter_keys)
+            output[i["id"]] = [None] * crossproduct_size(joborder, scatter_keys)
         rc = ReceiveScatterOutput(output)
     else:
         rc = output_callback

@@ -18,8 +18,7 @@
     "outputs": [],
     "baseCommand": "cat",
     "stdin": {
-      "class": "Expression",
-      "engine": "JsonPointer",
+      "engine": "cwl:JsonPointer",
       "script": "job/file1/path"
       }
 }

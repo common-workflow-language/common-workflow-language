@@ -17,36 +17,36 @@
     "inputs": [
         {
             "id": "#reference",
-            "datatype": "File",
-            "commandLineBinding": {
+            "type": "File",
+            "inputBinding": {
                 "position": 2
             }
         },
         {
             "id": "#reads",
-            "datatype": {
+            "type": {
                 "type": "array",
                 "items": "File",
-                "commandLineBinding": {
+                "inputBinding": {
                     "position": 3
                 }
             }
         },
         {
             "id": "#minimum_seed_length",
-            "datatype": "int",
-            "commandLineBinding": {
+            "type": "int",
+            "inputBinding": {
                 "position": 1,
                 "prefix": "-m"
             }
         },
         {
             "id": "#min_std_max_min",
-            "datatype": {
+            "type": {
                 "type": "array",
                 "items": "int"
             },
-            "commandLineBinding": {
+            "inputBinding": {
                 "itemSeparator": ",",
                 "position": 1,
                 "prefix": "-I"
@@ -56,7 +56,7 @@
     "outputs": [
         {
             "id": "#sam",
-            "datatype": "File",
+            "type": "File",
             "outputBinding": {
                 "glob": "output.sam"
             }

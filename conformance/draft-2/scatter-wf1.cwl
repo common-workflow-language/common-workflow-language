@@ -16,7 +16,7 @@ steps:
       - id: "#step1_in"
         type: string
         connect: {source: "#inp"}
-        commandLineBinding: {}
+        inputBinding: {}
     outputs:
       - id: "#step1_out"
         type: string

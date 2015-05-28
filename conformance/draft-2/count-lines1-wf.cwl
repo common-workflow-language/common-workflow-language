@@ -2,10 +2,10 @@
 class: Workflow
 
 inputs:
-  - { id: "#file1", datatype: File }
+  - { id: "#file1", type: File }
 
 outputs:
-  - { id: "#count_output", datatype: int, connect: {"source": "#step2_output"} }
+  - { id: "#count_output", type: int, connect: {"source": "#step2_output"} }
 
 steps:
   - run: {id: wc-tool.cwl}

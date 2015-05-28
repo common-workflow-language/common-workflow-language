@@ -13,12 +13,12 @@
         {
             "id": "#file1",
             "type": "File",
-            "commandLineBinding": {"position": 1}
+            "inputBinding": {"position": 1}
         },
         {
             "id": "#numbering",
             "type": ["null", "boolean"],
-            "commandLineBinding": {
+            "inputBinding": {
                 "position": 0,
                 "prefix": "-n"
             }

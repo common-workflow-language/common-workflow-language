@@ -12,15 +12,13 @@ outputs:
       connect: {"source": "#step2_output"}
 steps:
   - id: "#step1"
-    impl: count-lines4-wf.cwl
+    run: count-lines4-wf.cwl
     inputs:
-      - def: "count-lines4-wf.cwl#file1"
-        connect: {"source": "#file1"}
-      - def: "count-lines4-wf.cwl#file2"
-        connect: {"source": "#file2"}
+      - { param: "count-lines4-wf.cwl#file1", connect: {"source": "#file1"} }
+      - { param: "count-lines4-wf.cwl#file2", connect: {"source": "#file2"} }
     outputs:
-      - def: "count-lines4-wf.cwl#count_output"
-        id: "#step1_output"
+      - { id: "#step1_output", param: "count-lines4-wf.cwl#count_output" }
+
   - id: "#step2"
     class: ExpressionTool
     inputs:

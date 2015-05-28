@@ -21,11 +21,11 @@ steps:
       - id: "#step1_in1"
         type: string
         connect: {source: "#inp1"}
-        commandLineBinding: {}
+        inputBinding: {}
       - id: "#step1_in2"
         type: string
         connect: {source: "#inp2"}
-        commandLineBinding: {}
+        inputBinding: {}
     outputs:
       - id: "#step1_out"
         type: string

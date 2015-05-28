@@ -428,7 +428,7 @@
     - name: id
       type: ["null", string]
       jsonldPredicate: "@id"
-    - name: datatype
+    - name: type
       type:
         - "null"
         - Datatype
@@ -438,7 +438,7 @@
             - Datatype
             - Schema
       jsonldPredicate:
-        "@id": "wfdesc:hasArtifact"
+        "@id": "avro:type"
         "@type": "@vocab"
     - name: connect
       doc: "Connect this parameter to upstream parameters"
@@ -515,7 +515,7 @@
     - name: streamable
       type: ["null", "boolean"]
       doc: |
-        Only applies when `datatype` is `File`.  A value of `true` indicates that the file will
+        Only applies when `type` is `File`.  A value of `true` indicates that the file will
         be read or written sequentially without seeking.  Default: `false`.
     - name: secondaryFiles
       type:
@@ -525,7 +525,7 @@
         - type: "array"
           items: ["string", "Expression"]
       doc: |
-        Applies when `datatype` is `File`.  Describes files that must be
+        Applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
 
 
