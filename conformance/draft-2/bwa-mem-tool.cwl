@@ -4,10 +4,6 @@
     "class": "CommandLineTool",
     "requirements": [
         {
-            "class": "MemoryRequirement",
-            "total_mem": 5000
-        },
-        {
             id: "node-engine.cwl"
         }
     ],
@@ -21,14 +17,14 @@
     "inputs": [
         {
             "id": "#reference",
-            "type": "File",
+            "datatype": "File",
             "commandLineBinding": {
                 "position": 2
             }
         },
         {
             "id": "#reads",
-            "type": {
+            "datatype": {
                 "type": "array",
                 "items": "File",
                 "commandLineBinding": {
@@ -38,7 +34,7 @@
         },
         {
             "id": "#minimum_seed_length",
-            "type": "int",
+            "datatype": "int",
             "commandLineBinding": {
                 "position": 1,
                 "prefix": "-m"
@@ -46,7 +42,7 @@
         },
         {
             "id": "#min_std_max_min",
-            "type": {
+            "datatype": {
                 "type": "array",
                 "items": "int"
             },
@@ -60,7 +56,7 @@
     "outputs": [
         {
             "id": "#sam",
-            "type": "File",
+            "datatype": "File",
             "outputBinding": {
                 "glob": "output.sam"
             }

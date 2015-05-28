@@ -69,7 +69,7 @@ def avrold_to_jsonld_context(j):
 
             context[t["name"]] = predicate
 
-            for i in t["fields"]:
+            for i in t.get("fields", []):
                 v = pred(t, i, i["name"], context, defaultPrefix)
 
                 if isinstance(v, basestring):

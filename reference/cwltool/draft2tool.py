@@ -200,8 +200,8 @@ class Tool(Process):
 
 
 class ExpressionTool(Tool):
-    def __init__(self, toolpath_object, docpath):
-        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", docpath)
+    def __init__(self, toolpath_object, docpath, **kwargs):
+        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", docpath, **kwargs)
 
     class ExpressionJob(object):
         def run(self, outdir=None, **kwargs):
@@ -220,8 +220,8 @@ class ExpressionTool(Tool):
         yield j
 
 class CommandLineTool(Tool):
-    def __init__(self, toolpath_object, docpath):
-        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath)
+    def __init__(self, toolpath_object, docpath, **kwargs):
+        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath, **kwargs)
 
     def job(self, joborder, basedir, output_callback, use_container=True, **kwargs):
         builder = self._init_job(joborder, basedir, **kwargs)

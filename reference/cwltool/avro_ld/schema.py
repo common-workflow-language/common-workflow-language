@@ -1,36 +1,44 @@
 import avro
 import copy
+from  makedoc import add_dictlist
 
-def specialize(items, spec):
+def specialize(items, spec, extended_by):
     if isinstance(items, dict):
         for n in ("type", "items", "values"):
             if n in items:
-                items[n] = specialize(items[n], spec)
+                items[n] = specialize(items[n], spec, extended_by)
         return items
     if isinstance(items, list):
         n = []
         for i in items:
-            n.append(specialize(i, spec))
+            n.append(specialize(i, spec, extended_by))
         return n
     if isinstance(items, basestring):
         if items in spec:
             return spec[items]
+        if items in extended_by:
+            return extended_by[items]
     return items
 
 def extend_avro(items):
     types = {t["name"]: t for t in items}
     n = []
+
+    extended_by = {}
+    for t in items:
+        if "extends" in t and types[t["extends"]].get("abstract"):
+            add_dictlist(extended_by, t["extends"], t["name"])
+
     for t in items:
         if "extends" in t:
             r = copy.deepcopy(types[t["extends"]])
             r["name"] = t["name"]
             if "specialize" in t:
-                r["fields"] = specialize(r["fields"], t["specialize"])
-            r["fields"].extend(t["fields"])
+                r["fields"] = specialize(r["fields"], t["specialize"], {})
+            r["fields"].extend(t.get("fields", []))
 
             for y in [x for x in r["fields"] if x["name"] == "class"]:
                 y["type"] = {"type": "enum", "symbols": [r["name"]], "name": r["name"]+"_class"}
-
 
             r["extends"] = t["extends"]
             r["abstract"] = t.get("abstract", False)
@@ -38,6 +46,11 @@ def extend_avro(items):
             types[t["name"]] = r
             t = r
         n.append(t)
+
+    # for t in n:
+    #     if "fields" in t:
+    #         t["fields"] = specialize(t["fields"], "", extended_by)
+
     return n
 
 def schema(j):
@@ -46,4 +59,5 @@ def schema(j):
     for t in j:
         if not t.get("abstract"):
             avro.schema.make_avsc_object(t, names)
+
     return names

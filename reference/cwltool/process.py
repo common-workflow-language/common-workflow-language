@@ -105,6 +105,8 @@ class Process(object):
             else:
                 c["type"] = c["datatype"]
             self.outputs_record_schema["fields"].append(c)
+
+        print self.names.get_name("File", "")
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
     def validate_requirements(self, tool, field):
