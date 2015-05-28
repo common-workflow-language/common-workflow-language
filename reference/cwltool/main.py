@@ -10,7 +10,7 @@ import os
 import sys
 import logging
 import workflow
-import validate
+import avro_ld.validate as validate
 import tempfile
 import avro_ld.jsonld_context
 import avro_ld.makedoc
@@ -21,10 +21,10 @@ _logger.addHandler(logging.StreamHandler())
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
-def printrdf(workflow, sr):
+def printrdf(workflow, wf, ctx, sr):
     from rdflib import Graph, plugin
     from rdflib.serializer import Serializer
-    wf = from_url(workflow)
+    wf["@context"] = ctx
     g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
     print(g.serialize(format=sr))
 
@@ -48,6 +48,7 @@ def main():
     parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file")
     parser.add_argument("--print-avro", action="store_true", help="Print Avro schema")
     parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing")
+    parser.add_argument("--strict", action="store_true", help="Strict validation (unrecognized fields are an error) (default false)")
 
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
@@ -96,24 +97,18 @@ def main():
 
     processobj = from_url(args.workflow, url_fields=url_fields)
 
-    if args.print_rdf:
-        printrdf(args.workflow, args.rdf_serializer)
-        return 0
-
     if args.print_pre:
         print json.dumps(processobj, indent=4)
         return 0
 
-    if not args.job_order:
-        _logger.error("Input object required")
-        parser.print_help()
-        return 1
-
-    basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
+    if args.job_order:
+        basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
+    else:
+        basedir = args.basedir
 
     try:
-        t = workflow.makeTool(processobj, basedir)
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+        t = workflow.makeTool(processobj, basedir, strict=args.strict)
+    except (jsonschema.exceptions.ValidationError, avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
             _logger.exception()
@@ -122,6 +117,15 @@ def main():
         _logger.error(e)
         if args.debug:
             _logger.exception()
+        return 1
+
+    if args.print_rdf:
+        printrdf(args.workflow, processobj, ctx, args.rdf_serializer)
+        return 0
+
+    if not args.job_order:
+        _logger.error("Input object required")
+        parser.print_help()
         return 1
 
     try:

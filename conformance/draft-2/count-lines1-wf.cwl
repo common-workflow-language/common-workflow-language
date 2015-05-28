@@ -1,29 +1,21 @@
 #!/usr/bin/env cwl-runner
-"@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 class: Workflow
+
 inputs:
-  - id: "#file1"
-    type: File
+  - { id: "#file1", datatype: File }
+
 outputs:
-  - id: "#count_output"
-    type: int
-    connect: {"source": "#step2_output"}
+  - { id: "#count_output", datatype: int, connect: {"source": "#step2_output"} }
+
 steps:
-  - id: "#step1"
-    class: External
-    impl: wc-tool.cwl
+  - run: {id: wc-tool.cwl}
     inputs:
-      - def: "wc-tool.cwl#file1"
-        connect: {"source": "#file1"}
+      - {param: "wc-tool.cwl#file1", connect: {source: "#file1"}}
     outputs:
-      - def: "wc-tool.cwl#output"
-        id: "#step1_output"
-  - id: "#step2"
-    class: External
-    impl: parseInt-tool.cwl
+      - {id: "#step1_output", param: "wc-tool.cwl#output"}
+
+  - run: {id: parseInt-tool.cwl}
     inputs:
-      - def: "parseInt-tool.cwl#file1"
-        connect: {"source": "#step1_output"}
+      - {param: "parseInt-tool.cwl#file1", connect: {source: "#step1_output"}}
     outputs:
-      - def: "parseInt-tool.cwl#output"
-        id: "#step2_output"
+      - {id: "#step2_output", param: "parseInt-tool.cwl#output"}

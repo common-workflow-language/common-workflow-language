@@ -7,7 +7,7 @@ import os
 from process import WorkflowException
 import process
 import yaml
-import validate
+import avro_ld.validate as validate
 import ref_resolver
 
 _logger = logging.getLogger("cwltool")

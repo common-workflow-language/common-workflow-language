@@ -6,7 +6,6 @@ from flatten import flatten
 import functools
 import os
 from pathmapper import PathMapper, DockerPathMapper
-import sandboxjs
 from job import CommandLineJob
 import yaml
 import glob
@@ -16,7 +15,7 @@ import random
 from process import Process
 from process import WorkflowException
 from process import get_feature
-import validate
+import avro_ld.validate as validate
 from aslist import aslist
 import expression
 import re

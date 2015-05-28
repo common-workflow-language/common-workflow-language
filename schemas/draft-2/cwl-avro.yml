@@ -283,19 +283,6 @@
    * **array**: An ordered sequence of values
    * **map**: An unordered collection of key/value pairs
 
-- type: record
-  name: "Ref"
-  fields:
-    - name: "ref"
-      type: "string"
-      jsonldPredicate: "@id"
-  doc: |
-    A URI reference to external document or document fragment.  This may refer
-    to an object within the current document, to an external file, or to a
-    labeled object within an external file.  To reference an object within the
-    current document or an external document, the object must be labeled with
-    an `id` field.
-
 
 - type: record
   name: File
@@ -324,77 +311,104 @@
 
 
 - type: record
-  name: ProcessRequirement
-  docAfter: Process
-  doc: |
-    A process requirement declares a prerequisite that may or must be fufilled
-    before executing a process.  See [`Process.hints`](#process) and
-    [`Process.requirements`](#process).
+  name: "Ref"
   fields:
-    - name: "class"
+    - name: "ref"
       type: "string"
-      doc: "The specific requirement type."
-      jsonldPredicate:
-        "@id": "@type"
-        "@type": "@vocab"
+      jsonldPredicate: "@id"
+  doc: |
+    A URI reference to external document or document fragment.  This may refer
+    to an object within the current document, to an external file, or to a
+    labeled object within an external file.  To reference an object within the
+    current document or an external document, the object must be labeled with
+    an `id` field.
+
 
 - type: record
-  name: ExpressionEngineRequirement
-  extends: ProcessRequirement
+  name: "DataLink"
+  docParent: Workflow
   doc: |
-    Define an expression engine.  Expressions are fragments of code which
-    affect the control of the workflow engine.
-
-    An expression engine is a command line program following the following
-    protocol:
-
-      * On standard input, receive a JSON object with the following fields:
-
-        - expressionDefs: A list of strings from the `expressionDefs` field, or
-          `null` if `expressionDefs` is not specified.
-
-        - job: The input object of the current Process (context dependent).
-
-        - context: The specific value being transformed (context dependent).  May
-          be null.
-
-        - script: The code fragment to evaluate.
-
-      * On standard output, print a single JSON value (string, number, array, object,
-        boolean, or null) for the return value.
-
-    Implementations may apply limits, such as process isolation, timeouts, and
-    operating system containers/jails to minimize the security risks associated
-    with running untrusted code.
-
+    A data link connects the value of one parameter to another such that when a
+    value becomes available for the parameter specified by `source`, that value
+    of the parameter is propagated to the destination parameter.
   fields:
-    - name: id
-      type: ["null", string]
-      doc: "Used to identify the expression engine in the `engine` field of Expressions."
-      jsonldPredicate: "@id"
-    - name: requirements
-      type:
-        - "null"
-        - type: array
-          items: ProcessRequirement
+    - name: source
+      type: string
+      jsonldPredicate:
+        "@id": "wfdesc:hasSource"
+        "@type": "@id"
       doc: |
-        Requirements to run this expression engine, such as DockerRequirement
-        for specifying a container with the engine.
-    - name: engineCommand
+        An input parameter on the parent workflow as identified by the
+        [`InputSchemaRoot.id`](#inputschemaroot), or an output
+        parameter of another step in the same workflow as identified by the
+        [`OutputSchemaRoot.id`](#outputschemaRoot) field.
+
+
+- type: record
+  name: "Schema"
+  doc: "A schema defines a parameter type."
+  docParent: Parameter
+  fields:
+    - name: type
+      doc: "The data type of this parameter."
+      type:
+        - "Datatype"
+        - "Schema"
+        - "string"
+        - type: "array"
+          items: [ "Datatype", "Schema", "string" ]
+      jsonldPredicate:
+        "@id": "avro:type"
+        "@type": "@vocab"
+    - name: fields,
       type:
         - "null"
-        - string
-        - type: array
-          items: string
-      doc: "The command line to invoke the expression engine."
-    - name: expressionDefs
+        - type: "array"
+          items: "Schema"
+      jsonldPredicate:
+        "@id": "avro:fields"
+        "@container": "@list"
+      doc: "When `type` is `record`, defines the fields of the record."
+    - name: "symbols"
       type:
         - "null"
-        - type: array
-          items: ["string", "Ref"]
-      doc: |
-        Code fragments that should be evaluated before evaluating the script.
-        Can be used to provide function definitions used in multiple places.
+        - type: "array"
+          items: "string"
+      jsonldPredicate:
+        "@id": "avro:symbols"
+        "@container": "@list"
+      doc: "When `type` is `enum`, defines the set of valid symbols."
+    - name: items
+      type:
+        - "null"
+        - "Datatype"
+        - "Schema"
+        - "string"
+        - type: "array"
+          items: [ "Datatype", "Schema", "string" ]
+      jsonldPredicate:
+        "@id": "avro:items"
+        "@container": "@list"
+      doc: "When `type` is `array`, defines the type of the array elements."
+    - name: "values"
+      type:
+        - "null"
+        - "Datatype"
+        - "Schema"
+        - "string"
+        - type: "array"
+          items: [ "Datatype", "Schema", "string" ]
+      jsonldPredicate:
+        "@id": "avro:values"
+        "@container": "@list"
+      doc: "When `type` is `map`, defines the value type for the key/value pairs."
+
+
+- type: enum
+  name: JsonPointer_enum
+  symbols:
+    - JsonPointer
+  jsonldPrefix: "cwl"
 
 
 - type: record
@@ -411,14 +425,215 @@
     The order in which expressions are evaluated is undefined.
   fields:
     - name: engine
-      type: string
+      type:
+        - JsonPointer_enum
+        - string
       doc: "The engine to use, must be defined with ExpressionEngineRequirement"
       jsonldPredicate:
         "@id": "cwl:engine"
-        "@type": "@id"
+        "@type": "@vocab"
     - name: script
       type: string
       doc: "The code to be executed by the expression engine."
+
+
+- type: record
+  name: Port
+  abstract: true
+  fields:
+    - name: connect
+      doc: "Connect this parameter to upstream parameters"
+      jsonldPredicate:
+        "@reverse": "wfdesc:hasSink"
+        "@type": "@id"
+      type:
+        - "null"
+        - DataLink
+        - type: array
+          items: DataLink
+
+
+- type: record
+  name: Parameter
+  extends: Port
+  abstract: true
+  doc: |
+
+    Define an input or output parameter to a process.
+
+    If the process is part of a workflow, the `connect` field must define
+    either a connection to an input parameter on the parent workflow, or to the
+    output parameter of another step in the same workflow.
+
+    There may be multiple inbound data links.  If so, the following rules apply
+    to combine the inputs:
+
+      1. The parameter type must be an array, or named in a [workflow scatter](#workflow)
+         operation
+      2. The source parameter must be the same type, or the type of array
+         element type defined by `items`.
+      3. Source parameters which are array of the same type are concatenated;
+         source parameters which are single element types are appended added as
+         single elements.
+  fields:
+    - name: id
+      type: string
+      jsonldPredicate: "@id"
+    - name: datatype
+      type:
+        - Datatype
+        - Schema
+        - type: array
+          items:
+            - Datatype
+            - Schema
+      jsonldPredicate:
+        "@id": "wfdesc:hasArtifact"
+        "@type": "@vocab"
+    - name: streamable
+      type: ["null", "boolean"]
+      doc: |
+        Only applies when `datatype` is `File`.  A value of `true` indicates that the file will
+        be read or written sequentially without seeking.  Default: `false`.
+    - name: secondaryFiles
+      type:
+        - "null"
+        - "string"
+        - Expression
+        - type: "array"
+          items: ["string", "Expression"]
+      doc: |
+
+        Only applies when `datatype` is `File`.  Describes files that must be
+        included alongside the primary file.
+
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
+
+    # - name: "default"
+    #   type:
+    #     - "null"
+    #   doc: |
+    #     The default value for this parameter if there is no `connect`
+    #     field.
+
+
+- type: record
+  name: InputParameter
+  extends: Parameter
+  fields: []
+
+
+- type: record
+  name: OutputParameter
+  extends: Parameter
+  fields: []
+
+
+- type: record
+  name: ProcessRequirement
+  docAfter: Process
+  doc: |
+    A process requirement declares a prerequisite that may or must be fufilled
+    before executing a process.  See [`Process.hints`](#process) and
+    [`Process.requirements`](#process).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "The specific requirement type."
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
+
+
+- type: record
+  name: Process
+  abstract: true
+  doc: |
+
+    The base executable type in CWL is the `Process` object defined by the
+    document.  Note that the `Process` object is abstract and cannot be
+    directly executed.  If the `class` field is not specified, the
+    implementation must default to the class [`External`](\#external).
+
+  fields:
+    - name: id
+      type: ["null", string]
+      jsonldPredicate: "@id"
+    - name: "inputs"
+      type: {
+        type: "array",
+        items: "InputParameter",
+      }
+      jsonldPredicate: "wfdesc:hasInput"
+      doc:
+        "Defines the input parameters of the process.  This may be used to
+        validate the input object or build a user interface for constructing
+        the input object."
+    - name: "outputs"
+      type:
+        type: "array"
+        items: "OutputParameter"
+      jsonldPredicate: "wfdesc:hasOutput"
+      doc: "Defines the input parameters of the process, and
+        may be used to generate and/or validate the input object."
+    - name: "requirements"
+      type: [
+        "null",
+        {
+          type: "array",
+          items: "ProcessRequirement"
+        }
+      ]
+      doc: >
+        Declares requirements applying to either the runtime environment or the
+        workflow engine that must be met in order to execute this process.  If
+        an implementation cannot satisfy all requirements, or a requirement is
+        listed which is not recognized by the implementation, it is a fatal
+        error and the implementation must not attempt to run the process,
+        unless overridden at user option.
+    - name: "hints"
+      type: [
+        "null",
+        {
+          type: "array",
+          items: "ProcessRequirement"
+        }
+      ]
+      doc: >
+        Declares hints applying to either the runtime environment or the
+        workflow engine that may be helpful in executing this process.  It is
+        not an error if an implementation cannot satisfy all hints, however
+        the implementation may report a warning.
+    - name: label
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:label"
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
+
+
+- type: record
+  name: ProcessImplementation
+  abstract: true
+  extends: Process
+  fields:
+    - name: "class"
+      jsonldPredicate:
+        "@id": "@type"
+        "@type": "@vocab"
+      type: string
+      doc: |
+        The type of process is defined by the `class` field.  Valid values for this
+        field are [`CommandLineTool`](\#commandlinetool),
+        [`ExpressionTool`](\#expressiontool), [`Workflow`](\#workflow).
 
 
 - type: record
@@ -530,241 +745,6 @@
 
 
 - type: record
-  name: "DataLink"
-  docParent: Workflow
-  doc: |
-    A data link connects the value of one parameter to another such that when a
-    value becomes available for the parameter specified by `source`, that value
-    of the parameter is propagated to the destination parameter.
-  fields:
-    - name: source
-      type: string
-      jsonldPredicate:
-        "@id": "wfdesc:hasSource"
-        "@type": "@id"
-      doc: |
-        An input parameter on the parent workflow as identified by the
-        [`InputSchemaRoot.id`](#inputschemaroot), or an output
-        parameter of another step in the same workflow as identified by the
-        [`OutputSchemaRoot.id`](#outputschemaRoot) field.
-
-
-- type: record
-  name: ExternalInputParameter
-  docParent: External
-  fields:
-    - name: def
-      type: string
-      jsonldPredicate:
-        "@id": "cwl:parameterDefinition"
-        "@type": "@id"
-    - name: connect
-      jsonldPredicate:
-        "@reverse": "wfdesc:hasSink"
-        "@type": "@id"
-      type:
-        - DataLink
-        - type: array
-          items: DataLink
-    - name: id
-      type: ["null", string]
-      jsonldPredicate: "@id"
-
-
-- type: record
-  name: ExternalOutputParameter
-  docParent: External
-  fields:
-    - name: "def"
-      type: "string"
-      jsonldPredicate:
-        "@id": "cwl:parameterDefinition"
-        "@type": "@id"
-    - name: "id"
-      type: "string"
-      "jsonldPredicate": "@id"
-
-
-- type: record
-  name: "Schema"
-  doc: "A schema defines a parameter type."
-  docParent: Parameter
-  fields: [
-    {
-      name: type,
-      doc: "The data type of this parameter.",
-      type: [
-        "Datatype",
-        "Schema",
-        "string",
-        {
-          type: "array",
-          items: [ "Datatype", "Schema", "string" ]
-        }
-      ],
-      jsonldPredicate: {
-        "@id": "avro:type",
-        "@type": "@vocab"
-      }
-    },
-    {
-      name: fields,
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "Schema"
-        }
-      ],
-      jsonldPredicate: {
-        "@id": "avro:fields",
-        "@container": "@list"
-      },
-      doc: "When `type` is `record`, defines the fields of the record."
-    },
-    {
-      name: "symbols",
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "string"
-        }
-      ],
-      jsonldPredicate: {
-        "@id": "avro:symbols",
-        "@container": "@list"
-      },
-      doc: "When `type` is `enum`, defines the set of valid symbols."
-    },
-    {
-      name: items,
-      type: [
-        "null",
-        "Datatype",
-        "Schema",
-        "string",
-        {
-          type: "array",
-          items: [ "Datatype", "Schema", "string" ]
-        }
-      ],
-      jsonldPredicate: {
-        "@id": "avro:items",
-        "@container": "@list"
-      },
-      doc: "When `type` is `array`, defines the type of the array elements."
-    },
-    {
-      name: "values",
-      type: [
-        "null",
-        "Datatype",
-        "Schema",
-        "string",
-        {
-          type: "array",
-          items: [ "Datatype", "Schema", "string" ]
-        }
-      ],
-      jsonldPredicate: {
-        "@id": "avro:values",
-        "@container": "@list"
-      },
-      doc: "When `type` is `map`, defines the value type for the key/value pairs."
-    }
-  ]
-
-
-- type: record
-  name: "Parameter"
-  docParent: Process
-  abstract: true
-  doc: |
-
-    Define an input or output parameter to a process.
-
-    If the process is part of a workflow, the `connect` field must define
-    either a connection to an input parameter on the parent workflow, or to the
-    output parameter of another step in the same workflow.
-
-    There may be multiple inbound data links.  If so, the following rules apply
-    to combine the inputs:
-
-      1. The parameter type must be an array, or named in a [workflow scatter](#workflow)
-         operation
-      2. The source parameter must be the same type, or the type of array
-         element type defined by `items`.
-      3. Source parameters which are array of the same type are concatenated;
-         source parameters which are single element types are appended added as
-         single elements.
-
-  fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-    - name: type
-      type:
-        - Datatype
-        - Schema
-        - type: array
-          items:
-            - Datatype
-            - Schema
-      jsonldPredicate:
-        "@id": "avro:type"
-        "@type": "@vocab"
-    - name: connect
-      type:
-        - "null"
-        - DataLink
-        - type: array
-          items: DataLink
-      doc: "Connect this parameter to upstream parameters, described above."
-      jsonldPredicate:
-        "@reverse": "wfdesc:hasSink"
-        "@type": "@id"
-    - name: streamable
-      type: ["null", "boolean"]
-      doc: |
-        Only applies when `type` is `File`.  A value of `true` indicates that the file will
-        be read or written sequentially without seeking.  Default: `false`.
-    - name: secondaryFiles
-      type:
-        - "null"
-        - "string"
-        - Expression
-        - type: "array"
-          items: ["string", "Expression"]
-    - name: match
-      type: ["null", "string"]
-      doc: |
-        A regular expression for validating the input.  Parameter type must be
-        `string`, `File`, or an array of one of those.
-    - name: description
-      type:
-        - "null"
-        - string
-      jsondldPredicate: "rdfs:comment"
-
-    # - name: "default"
-    #   type:
-    #     - "null"
-    #   doc: |
-    #     The default value for this parameter if there is no `connect`
-    #     field.
-
-- type: record
-  name: InputParameter
-  extends: Parameter
-  fields: []
-
-- type: record
-  name: OutputParameter
-  extends: Parameter
-  fields: []
-
-- type: record
   name: CommandLineInputSchema
   extends: Schema
   docParent: CommandLineTool
@@ -801,125 +781,8 @@
 
 
 - type: record
-  name: "FileDef"
-  docParent: CreateFileRequirement
-  doc: |
-    Define a file that will be created by the workflow platform in the
-    designated output directory prior to executing the command line tool.  May
-    be the result of executing an expression, such as building a configuration
-    file from a template.
-  fields:
-    - name: "filename"
-      type: ["string", "Expression"]
-      doc: "The name of the file to create in the output directory."
-    - name: "fileContent"
-      type: ["string", "Expression", "Ref"]
-      doc: |
-        The contents of the file.
-
-        If the value is a [`Ref`](#ref) to an input parameter of type
-        File, this indicates that the input file should be added to the
-        designated output directory prior to executing the tool.  The input
-        file entry in the designated output directory may read-only, and may be
-        implemented through bind mounts or file system links in such a way as
-        to avoid copying the input file.
-
-
-- type: record
-  name: "EnvironmentDef"
-  docParent: EnvVarRequirement
-  doc: |
-    Define an environment variable that will be set in the runtime environment
-    by the workflow platform when executing the command line tool.  May be the
-    result of executing an expression, such as getting a parameter from input.
-  fields:
-    - name: "envName"
-      type: "string"
-    - name: "envValue"
-      type: ["string", "Expression"]
-
-
-- type: record
-  name: "Process"
-  abstract: true
-  doc: |
-
-    The base executable type in CWL is the `Process` object defined by the
-    document.  Note that the `Process` object is abstract and cannot be
-    directly executed.  If the `class` field is not specified, the
-    implementation must default to the class [`External`](\#external).
-
-  fields:
-    - name: "class"
-      jsonldPredicate:
-        "@id": "@type"
-        "@type": "@vocab"
-      type: string
-      doc: |
-        The type of process is defined by the `class` field.  Valid values for this
-        field are [`CommandLineTool`](\#commandlinetool),
-        [`ExpressionTool`](\#expressiontool), [`Workflow`](\#workflow) or
-        [`External`](\#external).  If the `class` field is not
-        specified, the implementation must default to the process class [`External`](\#external).
-    - name: "inputs"
-      type: {
-        type: "array",
-        items: "InputParameter",
-      }
-      jsonldPredicate: "wfdesc:hasInput"
-      doc:
-        "Defines the input parameters of the process.  This may be used to
-        validate the input object or build a user interface for constructing
-        the input object."
-    - name: "outputs"
-      type:
-        type: "array"
-        items: "OutputParameter"
-      jsonldPredicate: "wfdesc:hasOutput"
-      doc: "Defines the input parameters of the process, and
-        may be used to generate and/or validate the input object."
-    - name: "requirements"
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "ProcessRequirement"
-        }
-      ]
-      doc: >
-        Declares requirements applying to either the runtime environment or the
-        workflow engine that must be met in order to execute this process.  If
-        an implementation cannot satisfy all requirements, or a requirement is
-        listed which is not recognized by the implementation, it is a fatal
-        error and the implementation must not attempt to run the process,
-        unless overridden at user option.
-    - name: "hints"
-      type: [
-        "null",
-        {
-          type: "array",
-          items: "ProcessRequirement"
-        }
-      ]
-      doc: >
-        Declares hints applying to either the runtime environment or the
-        workflow engine that may be helpful in executing this process.  It is
-        not an error if an implementation cannot satisfy all hints, however
-        the implementation may report a warning.
-    - name: label
-      type:
-        - "null"
-        - string
-      jsondldPredicate: "rdfs:label"
-    - name: description
-      type:
-        - "null"
-        - string
-      jsondldPredicate: "rdfs:comment"
-
-- type: record
-  name: "CommandLineTool"
-  extends: "Process"
+  name: CommandLineTool
+  extends: ProcessImplementation
   specialize:
     InputParameter: CommandLineInputParameter
     OutputParameter: CommandLineOutputParameter
@@ -1087,38 +950,53 @@
 
 - type: record
   name: "ExpressionTool"
-  extends: "Process"
+  extends: ProcessImplementation
   fields:
     - name: "expression"
       type: "Expression"
 
 
 - type: record
-  name: "External"
-  extends: "Process"
-  specialize:
-    InputParameter: ExternalInputParameter
-    OutputParameter: ExternalOutputParameter
-  doc: "An external process provides a level of indirection to instantiate a process
-    defined by an external resource (another CWL document)."
-  fields: [
-    {
-      name: "impl",
-      type: "string",
-      jsonldPredicate: {
-        "@id": "cwl:impl",
+  name: WorkflowStepInput
+  extends: Port
+  fields:
+    - name: param
+      type: string
+      jsonldPredicate:
+        "@id": "wfdesc:hasArtifact"
         "@type": "@id"
-      },
-      doc: "Specifies the resource that should be loaded to find the actual process definition."
-    }
-  ]
 
 
 - type: record
-  name: "Workflow"
-  extends: "Process"
+  name: WorkflowStepOutput
+  fields:
+    - name: param
+      type: string
+      jsonldPredicate:
+        "@id": "wfdesc:hasArtifact"
+        "@type": "@id"
+    - name: id
+      type: string
+      jsonldPredicate: "@id"
+
+
+- name: WorkflowStep
+  type: record
+  extends: Process
+  specialize:
+    InputParameter: WorkflowStepInput
+    OutputParameter: WorkflowStepOutput
+  fields:
+    - name: run
+      type: [CommandLineTool, ExpressionTool]
+      doc: "Specify the process that should be run"
+
+
+- name: Workflow
+  type: record
+  extends: ProcessImplementation
   doc: |
-    A workflow is a process consisting of one or more process `steps`.  Each
+    A workflow is a process consisting of one or more `subprocesses` or `subworkflows`.  Each
     step has input and output parameters defined by the `inputs` and `outputs`
     fields.
 
@@ -1133,7 +1011,7 @@
     given step are fufilled, the step is ready to execute.
 
   fields:
-    - name: "steps"
+    - name: steps
       jsonldPredicate: "wfdesc:hasSubProcess"
       doc: |
         Subprocesses to execute as workflow steps.  Steps are executed when all
@@ -1141,8 +1019,68 @@
         order in which steps are listed does not affect the actual execution
         order of steps.
       type:
-        type: "array"
-        items: ["Workflow", "CommandLineTool", "ExpressionTool", "External"]
+        - "null"
+        - type: array
+          items: WorkflowStep
+
+
+- type: record
+  name: ExpressionEngineRequirement
+  extends: ProcessRequirement
+  doc: |
+    Define an expression engine.  Expressions are fragments of code which
+    affect the control of the workflow engine.
+
+    An expression engine is a command line program following the following
+    protocol:
+
+      * On standard input, receive a JSON object with the following fields:
+
+        - expressionDefs: A list of strings from the `expressionDefs` field, or
+          `null` if `expressionDefs` is not specified.
+
+        - job: The input object of the current Process (context dependent).
+
+        - context: The specific value being transformed (context dependent).  May
+          be null.
+
+        - script: The code fragment to evaluate.
+
+      * On standard output, print a single JSON value (string, number, array, object,
+        boolean, or null) for the return value.
+
+    Implementations may apply limits, such as process isolation, timeouts, and
+    operating system containers/jails to minimize the security risks associated
+    with running untrusted code.
+
+  fields:
+    - name: id
+      type: string
+      doc: "Used to identify the expression engine in the `engine` field of Expressions."
+      jsonldPredicate: "@id"
+    - name: requirements
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: |
+        Requirements to run this expression engine, such as DockerRequirement
+        for specifying a container with the engine.
+    - name: engineCommand
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: "The command line to invoke the expression engine."
+    - name: expressionDefs
+      type:
+        - "null"
+        - type: array
+          items: ["string", "Ref"]
+      doc: |
+        Code fragments that should be evaluated before evaluating the script.
+        Can be used to provide function definitions used in multiple places.
 
 
 - type: record
@@ -1176,17 +1114,50 @@
         Docker container.
 
 
-- type: record
-  name: MemoryRequirement
-  extends: ProcessRequirement
-  doc: |
-    Indicates that a workflow process requires a certain minimum amount of RAM to run.
+- name: Subworkflow
+  type: record
+  extends: Process
+  specialize:
+    InputParameter: WorkflowStepInput
+    OutputParameter: WorkflowStepOutput
   fields:
-    - name: "total_mem"
+    - name: run
+      type: Workflow
+
+
+- type: record
+  name: Subworkflows
+  extends: ProcessRequirement
+  fields:
+    - name: subworkflows
       type:
-        - int
-        - Expression
-      doc: "Total memory required, in megabytes."
+        type: array
+        items: Subworkflow
+
+
+- type: record
+  name: "FileDef"
+  docParent: CreateFileRequirement
+  doc: |
+    Define a file that will be created by the workflow platform in the
+    designated output directory prior to executing the command line tool.  May
+    be the result of executing an expression, such as building a configuration
+    file from a template.
+  fields:
+    - name: "filename"
+      type: ["string", "Expression"]
+      doc: "The name of the file to create in the output directory."
+    - name: "fileContent"
+      type: ["string", "Expression", "Ref"]
+      doc: |
+        The contents of the file.
+
+        If the value is a [`Ref`](#ref) to an input parameter of type
+        File, this indicates that the input file should be added to the
+        designated output directory prior to executing the tool.  The input
+        file entry in the designated output directory may read-only, and may be
+        implemented through bind mounts or file system links in such a way as
+        to avoid copying the input file.
 
 
 - name: CreateFileRequirement
@@ -1201,6 +1172,20 @@
       type:
         type: "array"
         items: "FileDef"
+
+
+- type: record
+  name: "EnvironmentDef"
+  docParent: EnvVarRequirement
+  doc: |
+    Define an environment variable that will be set in the runtime environment
+    by the workflow platform when executing the command line tool.  May be the
+    result of executing an expression, such as getting a parameter from input.
+  fields:
+    - name: "envName"
+      type: "string"
+    - name: "envValue"
+      type: ["string", "Expression"]
 
 
 - name: EnvVarRequirement

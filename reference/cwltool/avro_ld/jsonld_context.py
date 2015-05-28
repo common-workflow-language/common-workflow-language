@@ -20,10 +20,11 @@ def pred(datatype, field, name, context, defaultPrefix):
         for d in datatype["jsonldPredicate"]:
             if d["symbol"] == name:
                 v = d["predicate"]
-    elif field and "jsonldPrefix" in field:
-        defaultPrefix = field["jsonldPrefix"]
-    elif "jsonldPrefix" in datatype:
-        defaultPrefix = datatype["jsonldPrefix"]
+    if not v:
+        if field and "jsonldPrefix" in field:
+            defaultPrefix = field["jsonldPrefix"]
+        elif "jsonldPrefix" in datatype:
+            defaultPrefix = datatype["jsonldPrefix"]
 
     if not v:
         v = "%s:%s" % (defaultPrefix, name)

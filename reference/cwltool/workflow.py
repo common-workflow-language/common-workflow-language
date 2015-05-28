@@ -11,7 +11,7 @@ import os
 from collections import namedtuple
 import pprint
 import functools
-import validate
+import avro_ld.validate as validate
 
 _logger = logging.getLogger("cwltool")
 
@@ -24,7 +24,7 @@ def idk(key):
         raise WorkflowException("Must start with #")
     return key[1:]
 
-def makeTool(toolpath_object, docpath):
+def makeTool(toolpath_object, docpath, **kwargs):
     """docpath is the directory the tool file is located."""
     if "schema" in toolpath_object:
         return draft1tool.Tool(toolpath_object)
@@ -32,18 +32,18 @@ def makeTool(toolpath_object, docpath):
         return External(toolpath_object, docpath)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
-            return draft2tool.CommandLineTool(toolpath_object, docpath)
+            return draft2tool.CommandLineTool(toolpath_object, docpath, **kwargs)
         elif toolpath_object["class"] == "ExpressionTool":
-            return draft2tool.ExpressionTool(toolpath_object, docpath)
+            return draft2tool.ExpressionTool(toolpath_object, docpath, **kwargs)
         elif toolpath_object["class"] == "Workflow":
-            return Workflow(toolpath_object, docpath)
+            return Workflow(toolpath_object, docpath, **kwargs)
     else:
         raise WorkflowException("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
 
 class Workflow(Process):
-    def __init__(self, toolpath_object, docpath):
-        super(Workflow, self).__init__(toolpath_object, "Workflow", docpath)
+    def __init__(self, toolpath_object, docpath, **kwargs):
+        super(Workflow, self).__init__(toolpath_object, "Workflow", docpath, **kwargs)
 
     def receive_output(self, step, outputparms, jobout):
         _logger.info("Job got output: %s", jobout)
@@ -191,7 +191,7 @@ class External(Process):
     def __init__(self, toolpath_object, docpath):
         self.impl = toolpath_object["impl"]
         try:
-            self.embedded_tool = makeTool(from_url(os.path.join(docpath, self.impl)), docpath)
+            self.embedded_tool = makeTool(from_url(self.impl), docpath)
         except validate.ValidationException as v:
             raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, self.impl), validate.indent(str(v))))
 

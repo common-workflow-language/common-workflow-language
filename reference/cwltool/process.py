@@ -1,7 +1,7 @@
 import avro.schema
 import os
 import json
-import validate
+import avro_ld.validate as validate
 import copy
 import yaml
 import copy
@@ -36,14 +36,17 @@ def get_feature(feature, **kwargs):
     return (None, None)
 
 class Process(object):
-    def __init__(self, toolpath_object, validateAs, docpath):
+    def __init__(self, toolpath_object, validateAs, docpath, **kwargs):
         self.names = get_schema()
         self.docpath = docpath
 
         self.tool = toolpath_object
 
-        # Validate tool documument
-        validate.validate_ex(self.names.get_name(validateAs, ""), self.tool)
+        try:
+            # Validate tool documument
+            validate.validate_ex(self.names.get_name(validateAs, ""), self.tool, **kwargs)
+        except validate.ValidationException as v:
+            raise validate.ValidationException("Could not validate %s:\n%s" % (self.tool.get("id"), validate.indent(str(v))))
 
         self.validate_requirements(self.tool, "requirements")
         self.validate_requirements(self.tool, "hints")
@@ -84,8 +87,11 @@ class Process(object):
             c["name"] = fragment
             del c["id"]
             if "default" in c:
-                c["type"] = ["null"] + aslist(c["type"])
+                c["type"] = ["null"] + aslist(c["datatype"])
+            else:
+                c["type"] = c["datatype"]
             self.inputs_record_schema["fields"].append(c)
+
         avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
 
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
@@ -95,7 +101,9 @@ class Process(object):
             c["name"] = fragment
             del c["id"]
             if "default" in c:
-                c["type"] = ["null"] + aslist(c["type"])
+                c["type"] = ["null"] + aslist(c["datatype"])
+            else:
+                c["type"] = c["datatype"]
             self.outputs_record_schema["fields"].append(c)
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 

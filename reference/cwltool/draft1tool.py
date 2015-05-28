@@ -1,7 +1,6 @@
 import os
 import pprint
 import json
-import sandboxjs
 import copy
 import sys
 import jsonschema.exceptions

@@ -38,13 +38,15 @@ class Loader(object):
 
     def resolve_ref(self, obj, base_url, url_fields=[]):
         ref = obj['id']
-        url = urlparse.urljoin(base_url, ref)
-        if ref[0] == "#":
-            obj = copy.deepcopy(obj)
-            obj['id'] = url
+        split = urlparse.urlparse(ref)
+        if split.scheme:
+            url = ref
+        else:
+            url = urlparse.urljoin(base_url, ref)
+        obj = copy.deepcopy(obj)
+        obj['id'] = url
+        if ref[0] == "#" or len(obj) != 1:
             return obj
-        if len(obj) != 1:
-            raise RuntimeError("External references cannot have other fields.")
         if url in self.resolved:
             return self.resolved[url]
         if url in self.resolving:
@@ -68,7 +70,11 @@ class Loader(object):
                 document = self.resolve_ref(document, base_url, url_fields)
             for d in url_fields:
                 if d in document and isinstance(document[d], basestring):
-                    document[d] = urlparse.urljoin(base_url, document[d])
+                    url = document[d]
+                    split = urlparse.urlparse(url)
+                    if not split.scheme:
+                        url = urlparse.urljoin(base_url, url)
+                    document[d] = url
             iterator = document.iteritems()
         else:
             return document

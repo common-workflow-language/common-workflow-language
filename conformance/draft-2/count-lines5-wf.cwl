@@ -12,7 +12,7 @@ outputs:
 steps:
   - id: "#step1"
     class: External
-    impl: wc2-tool.cwl
+    impl: {id: wc2-tool.cwl}
     inputs:
       - def: "wc2-tool.cwl#file1"
         connect: {"source": "#file1"}
