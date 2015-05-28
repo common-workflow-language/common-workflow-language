@@ -37,6 +37,8 @@ def makeTool(toolpath_object, docpath):
             return draft2tool.ExpressionTool(toolpath_object, docpath)
         elif toolpath_object["class"] == "Workflow":
             return Workflow(toolpath_object, docpath)
+        else:
+            raise RuntimeError("class {} not recognized".format(toolpath_object["class"]))
     else:
         raise WorkflowException("Missing 'class' field, expecting one of: Workflow, CommandLineTool, ExpressionTool, External")
 
