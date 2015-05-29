@@ -24,6 +24,12 @@ class NormDict(dict):
     def __delitem__(self, key):
         return super(NormDict, self).__delitem__(self.normalize(key))
 
+def expand_url(url, base_url):
+    split = urlparse.urlparse(url)
+    if not split.scheme:
+        return urlparse.urljoin(base_url, url)
+    else:
+        return url
 
 class Loader(object):
     def __init__(self):
@@ -69,12 +75,11 @@ class Loader(object):
             if 'id' in document:
                 document = self.resolve_ref(document, base_url, url_fields)
             for d in url_fields:
-                if d in document and isinstance(document[d], basestring):
-                    url = document[d]
-                    split = urlparse.urlparse(url)
-                    if not split.scheme:
-                        url = urlparse.urljoin(base_url, url)
-                    document[d] = url
+                if d in document:
+                    if isinstance(document[d], basestring):
+                        document[d] = expand_url(document[d], base_url)
+                    elif isinstance(document[d], list):
+                        document[d] = [expand_url(url, base_url) if isinstance(document[d], basestring) else url for url in document[d] ]
             iterator = document.iteritems()
         else:
             return document

@@ -43,8 +43,23 @@ def substitute(value, replace):
 
 class Builder(object):
 
-    def bind_input(self, schema, datum):
+    def bind_input(self, schema, datum, lead_pos=[], tail_pos=[]):
         bindings = []
+        binding = None
+        if "inputBinding" in schema and isinstance(schema["inputBinding"], dict):
+            binding = copy.copy(schema["inputBinding"])
+
+            if "position" in binding:
+                binding["position"] = aslist(lead_pos) + aslist(binding["position"]) + aslist(tail_pos)
+            else:
+                binding["position"] = aslist(lead_pos) + [0] + aslist(tail_pos)
+
+            if "valueFrom" in binding:
+                binding["do_eval"] = binding["valueFrom"]
+            binding["valueFrom"] = datum
+
+            if schema["type"] == "File":
+                binding["is_file"] = True
 
         # Handle union types
         if isinstance(schema["type"], list):
@@ -56,13 +71,16 @@ class Builder(object):
                 if validate.validate(avsc, datum):
                     if isinstance(t, basestring):
                         t = {"type": t}
-                    bindings.extend(self.bind_input(t, datum))
+                    bindings.extend(self.bind_input(t, datum, lead_pos=lead_pos, tail_pos=tail_pos))
                     success = True
                     break
             if not success:
                 raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
         elif isinstance(schema["type"], dict):
-            bindings.extend(self.bind_input(schema["type"], datum))
+            st = copy.deepcopy(schema["type"])
+            if binding and "inputBinding" not in st and "itemSeparator" not in binding and st["type"] in ("array", "map"):
+                st["inputBinding"] = {}
+            bindings.extend(self.bind_input(st, datum, lead_pos=lead_pos, tail_pos=tail_pos))
         else:
             if schema["type"] in self.schemaDefs:
                 schema = self.schemaDefs[schema["type"]]
@@ -70,27 +88,29 @@ class Builder(object):
             if schema["type"] == "record":
                 for f in schema["fields"]:
                     if f["name"] in datum:
-                        b = self.bind_input(f, datum[f["name"]])
-                        for bi in b:
-                            bi["position"].append(f["name"])
-                        bindings.extend(b)
+                        bindings.extend(self.bind_input(f, datum[f["name"]], lead_pos=lead_pos, tail_pos=f["name"]))
 
             if schema["type"] == "map":
-                for v in datum:
-                    b = self.bind_input(schema["values"], datum[v])
-                    for bi in b:
-                        bi["position"].insert(0, v)
-                    bindings.extend(b)
+                for n, item in datum.items():
+                    b2 = None
+                    if binding:
+                        b2 = copy.deepcopy(binding)
+                        b2["valueFrom"] = [n, item]
+                    bindings.extend(self.bind_input({"type": schema["values"], "inputBinding": b2},
+                                                    item, lead_pos=n, tail_pos=tail_pos))
+                binding = None
 
             if schema["type"] == "array":
                 for n, item in enumerate(datum):
-                    b = self.bind_input({"type": schema["items"], "inputBinding": schema.get("inputBinding")}, item)
-                    for bi in b:
-                        bi["position"].insert(0, n)
-                    bindings.extend(b)
+                    b2 = None
+                    if binding:
+                        b2 = copy.deepcopy(binding)
+                        b2["valueFrom"] = item
+                    bindings.extend(self.bind_input({"type": schema["items"], "inputBinding": b2},
+                                                    item, lead_pos=n, tail_pos=tail_pos))
+                binding = None
 
-            if schema["type"] == "File" and "inputBinding" in schema:
-                binding = schema["inputBinding"]
+            if schema["type"] == "File" and binding:
                 if binding.get("loadContents"):
                     with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
                         datum["contents"] = f.read(CONTENT_LIMIT)
@@ -109,26 +129,11 @@ class Builder(object):
                             datum["secondaryFiles"].append(sfpath)
                         self.files.append(sfpath)
 
-        b = None
-        if "inputBinding" in schema and isinstance(schema["inputBinding"], dict):
-            b = copy.copy(schema["inputBinding"])
-
-            if b.get("position"):
-                b["position"] = [b["position"]]
-            else:
-                b["position"] = [0]
-
-            # Position to front of the sort key
+        # Position to front of the sort key
+        if binding:
             for bi in bindings:
-                bi["position"] = b["position"] + bi["position"]
-
-            if "valueFrom" in b:
-                b["do_eval"] = b["valueFrom"]
-            b["valueFrom"] = datum
-
-            if schema["type"] == "File":
-                b["is_file"] = True
-            bindings.append(b)
+                bi["position"] = binding["position"] + bi["position"]
+            bindings.append(binding)
 
         return bindings
 
@@ -166,7 +171,7 @@ class Builder(object):
             if sep:
                 args.extend([prefix, str(j)])
             else:
-                args.extend([prefix + str(j)])
+                args.append(prefix + str(j))
 
         return [a for a in args if a is not None]
 
@@ -271,18 +276,7 @@ class CommandLineTool(Tool):
             reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
-            if isinstance(self.tool["stdout"], dict) and "ref" in self.tool["stdout"]:
-                pass
-                # for out in self.tool.get("outputs", []):
-                #     if out["id"] == self.tool["stdout"]["ref"]:
-                #         filename = self.tool["stdout"]["ref"][1:]
-                #         j.stdout = filename
-                #         out["outputBinding"] = out.get("outputBinding", {})
-                #         out["outputBinding"]["glob"] = filename
-                # if not j.stdout:
-                #     raise validate.ValidationException("stdout refers to invalid output")
-            else:
-                j.stdout = self.tool["stdout"]
+            j.stdout = self.tool["stdout"]
             if os.path.isabs(j.stdout):
                 raise validate.ValidationException("stdout must be a relative path")
 

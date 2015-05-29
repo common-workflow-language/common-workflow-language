@@ -4,6 +4,13 @@
   stdout: output.sam
   tool: draft-2/bwa-mem-tool.cwl
 
+- args: [bwa, mem, draft-2/rabix/tests/test-files/chr20.fa,
+    "-XXX",
+    "-YYY", draft-2/rabix/tests/test-files/example_human_Illumina.pe_1.fastq,
+    "-YYY", draft-2/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+  job: draft-2/bwa-mem-job.json
+  tool: draft-2/binding-test.cwl
+
 - args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
     '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
     '16', map2, --max-seed-hits, '-1', --max-seq-length, '20', --min-seq-length, '10']

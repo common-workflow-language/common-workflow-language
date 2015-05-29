@@ -179,6 +179,8 @@ class Workflow(Process):
         for i in self.tool["outputs"]:
             if "connect" in i:
                 (_, src) = urlparse.urldefrag(i['id'])
+                if i["connect"]["source"] not in self.state:
+                    raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (i["connect"]["source"], inp["id"]))
                 wo[src] = self.state[i["connect"]["source"]].value
 
         output_callback(wo)

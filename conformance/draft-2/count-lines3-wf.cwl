@@ -11,18 +11,16 @@ outputs:
       type:
         type: array
         items: int
-      connect: {"source": "#step1_output"}
+      connect: {"source": "wc2-tool.cwl#output"}
 steps:
   - id: "#step1"
-    class: External
+    run: {id: wc2-tool.cwl}
     requirements:
       - class: Scatter
         scatter: "#step1file"
-    impl: wc2-tool.cwl
     inputs:
       - id: "#step1file"
-        def: "wc2-tool.cwl#file1"
+        param: "wc2-tool.cwl#file1"
         connect: {"source": "#file1"}
     outputs:
-      - def: "wc2-tool.cwl#output"
-        id: "#step1_output"
+      - param: "wc2-tool.cwl#output"

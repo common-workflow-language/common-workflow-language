@@ -238,6 +238,7 @@
   }
   jsonldVocab: cwl
 
+
 - name: Datatype
   type: enum
   symbols:
@@ -310,10 +311,24 @@
           items: File
 
 
+- name: Import
+  type: record
+  fields:
+    - name: "import"
+      type: "string"
+      jsonldPredicate: "@id"
+  doc: |
+    A URI reference to external document or document fragment.  This may refer
+    to an object within the current document, to an external file, or to a
+    labeled object within an external file.  To reference an object within the
+    current document or an external document, the object must be labeled with
+    an `id` field.
+
+
 - name: Ref
   type: record
   fields:
-    - name: "ref"
+    - name: "id"
       type: "string"
       jsonldPredicate: "@id"
   doc: |
@@ -360,7 +375,7 @@
       jsonldPredicate:
         "@id": "avro:type"
         "@type": "@vocab"
-    - name: fields,
+    - name: fields
       type:
         - "null"
         - type: "array"
@@ -1168,12 +1183,19 @@
         - string
         - type: array
           items: string
+      jsonldPredicate:
+        "@id": "cwl:scatter"
+        "@type": "@id"
+        "@container": "@list"
     - name: scatterMethod
       doc: |
         Required if `scatter` is an array of more than one element.
       type:
         - "null"
         - ScatterMethod
+      jsonldPredicate:
+        "@id": "cwl:scatterMethod"
+        "@type": "@vocab"
 
 
 - type: record
