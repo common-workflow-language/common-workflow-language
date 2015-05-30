@@ -11,11 +11,10 @@ outputs:
       connect: {"source": "#step1_output"}
 steps:
   - id: "#step1"
-    class: External
-    impl: {id: wc2-tool.cwl}
+    run: {import: wc2-tool.cwl}
     inputs:
-      - def: "wc2-tool.cwl#file1"
+      - param: "wc2-tool.cwl#file1"
         connect: {"source": "#file1"}
     outputs:
-      - def: "wc2-tool.cwl#output"
+      - param: "wc2-tool.cwl#output"
         id: "#step1_output"

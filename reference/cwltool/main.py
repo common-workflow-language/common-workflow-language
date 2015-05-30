@@ -3,7 +3,7 @@
 import draft1tool
 import draft2tool
 import argparse
-from ref_resolver import from_url
+from ref_resolver import from_url, validate_links
 import jsonschema
 import json
 import os
@@ -95,11 +95,17 @@ def main():
         parser.print_help()
         return 1
 
-    processobj = from_url(args.workflow, url_fields=url_fields)
+    idx = {}
+    processobj = from_url(args.workflow, url_fields=url_fields, idx=idx)
+
+    _logger.warn(url_fields)
+    #_logger.warn(json.dumps(idx, indent=4))
 
     if args.print_pre:
         print json.dumps(processobj, indent=4)
         return 0
+
+    validate_links(processobj, url_fields, idx)
 
     if args.job_order:
         basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))

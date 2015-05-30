@@ -3,7 +3,7 @@
 class: ExpressionTool
 
 requirements:
-  - id: node-engine.cwl
+  - import: node-engine.cwl
 
 inputs:
   - { id: "#file1", type: File, inputBinding: { loadContents: true } }

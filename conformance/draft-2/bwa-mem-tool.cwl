@@ -2,7 +2,7 @@
 
 class: CommandLineTool
 requirements:
-  - id: node-engine.cwl
+  - import: node-engine.cwl
 
 hints:
   - class: DockerRequirement

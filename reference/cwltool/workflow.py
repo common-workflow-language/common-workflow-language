@@ -104,7 +104,7 @@ class Workflow(Process):
                             else:
                                 inputobj[iid] = [self.state[src].value]
                         else:
-                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"]), inp["type"])
+                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"], inp["type"]))
                     elif src not in self.state:
                         raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
                     else:
@@ -198,28 +198,29 @@ class External(Process):
             self.id = "#step_" + str(random.randint(1, 1000000000))
 
         for i in toolpath_object["inputs"]:
-            (_, d) = urlparse.urldefrag(i["param"])
+            p = i["param"] if 'param' in i else self.id
+            (_, d) = urlparse.urldefrag(p)
             toolid = i.get("id", self.id + "." + d)
             found = False
             for a in self.embedded_tool.tool["inputs"]:
-                if a["id"] == i["param"]:
+                if a["id"] == p:
                     i.update(a)
                     found = True
             if not found:
-                raise WorkflowException("Did not find input '%s' in external process" % (i["param"]))
+                raise WorkflowException("Did not find input parameter '%s' in workflow step" % (p))
 
             i["id"] = toolid
 
         for i in toolpath_object["outputs"]:
-            (_, d) = urlparse.urldefrag(i["param"])
-            toolid = i["id"] if 'id' in i else i['param']
+            p = i["param"] if 'param' in i else i['id']
+            toolid = i["id"]
             found = False
             for a in self.embedded_tool.tool["outputs"]:
-                if a["id"] == i["param"]:
+                if a["id"] == p:
                     i.update(a)
                     found = True
             if not found:
-                raise WorkflowException("Did not find output '%s' in external process" % (i["param"]))
+                raise WorkflowException("Did not find output parameter '%s' in workflow step" % (p))
 
             i["id"] = toolid
 

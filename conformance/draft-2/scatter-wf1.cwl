@@ -6,32 +6,38 @@ inputs:
     type:
       type: array
       items: string
+
 steps:
   - id: "#step1"
-    class: CommandLineTool
+    inputs:
+      - id: "#step1_in"
+        connect: {source: "#inp"}
+    outputs:
+      - id: "#step1_out"
     requirements:
       - class: Scatter
         scatter: "#step1_in"
-    inputs:
-      - id: "#step1_in"
-        type: string
-        connect: {source: "#inp"}
-        inputBinding: {}
-    outputs:
-      - id: "#step1_out"
-        type: string
-        outputBinding:
-          glob: "step1_out"
-          loadContents: true
-          outputEval:
-            class: Expression
-            engine: JsonPointer
-            script: "context/0/contents"
-    baseCommand: "echo"
-    arguments:
-      - "-n"
-      - "foo"
-    stdout: "step1_out"
+    run:
+      class: CommandLineTool
+      inputs:
+        - id: "#step1_in"
+          type: string
+          inputBinding: {}
+      outputs:
+        - id: "#step1_out"
+          type: string
+          outputBinding:
+            glob: "step1_out"
+            loadContents: true
+            outputEval:
+              engine: "cwl:JsonPointer"
+              script: "context/0/contents"
+      baseCommand: "echo"
+      arguments:
+        - "-n"
+        - "foo"
+      stdout: "step1_out"
+
 outputs:
   - id: "#out"
     type:

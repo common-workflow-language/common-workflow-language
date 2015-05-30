@@ -15,16 +15,15 @@ outputs:
 
 steps:
   - id: "#step1"
-    run: {id: wc2-tool.cwl}
+    run: {import: wc2-tool.cwl}
     requirements:
       - class: Scatter
         scatter: "#step1file1"
     inputs:
       - id: "#step1file1"
-        def: "wc2-tool.cwl#file1"
+        param: "wc2-tool.cwl#file1"
         connect:
           - "source": "#file1"
           - "source": "#file2"
     outputs:
-      - def: "wc2-tool.cwl#output"
-        id: "#step1_output"
+      - { id: "#step1_output", param: "wc2-tool.cwl#output" }

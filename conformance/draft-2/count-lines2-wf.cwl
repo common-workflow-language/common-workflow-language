@@ -8,14 +8,14 @@ outputs:
     - { id: "#count_output", type: int, connect: {"source": "#step2_output"} }
 
 requirements:
-  - id: node-engine.cwl
+  - import: node-engine.cwl
 
 steps:
   - id: "#step1"
     inputs:
       - { param: "#step1_file1", connect: {"source": "#file1"} }
     outputs:
-      - { param: "#step1_output" }
+      - { id: "#step1_output" }
     run:
       class: CommandLineTool
       inputs:
@@ -29,7 +29,7 @@ steps:
     inputs:
       - { "param": "#step2_file1", connect: {"source": "#step1_output"} }
     outputs:
-      - { "param": "#step2_output" }
+      - { "id": "#step2_output" }
     run:
       class: ExpressionTool
       inputs:

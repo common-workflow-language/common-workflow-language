@@ -3,18 +3,16 @@
 class: Workflow
 inputs:
     - id: "#file1"
-      type:
-        type: array
-        items: File
+      type: { type: array, items: File }
+
 outputs:
     - id: "#count_output"
-      type:
-        type: array
-        items: int
+      type: { type: array, items: int }
       connect: {"source": "wc2-tool.cwl#output"}
+
 steps:
   - id: "#step1"
-    run: {id: wc2-tool.cwl}
+    run: {import: wc2-tool.cwl}
     requirements:
       - class: Scatter
         scatter: "#step1file"
@@ -23,4 +21,4 @@ steps:
         param: "wc2-tool.cwl#file1"
         connect: {"source": "#file1"}
     outputs:
-      - param: "wc2-tool.cwl#output"
+      - id: "wc2-tool.cwl#output"

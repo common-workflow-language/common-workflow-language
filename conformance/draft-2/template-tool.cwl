@@ -13,7 +13,7 @@ requirements:
         dockerImageId: commonworkflowlanguage/nodejs-engine
     engineCommand: cwlNodeEngine.js
     expressionDefs:
-      - { ref: underscore.js }
+      - { include: underscore.js }
       - "var t = function(s) { return _.template(s)({'$job': $job}); };"
   - class: CreateFileRequirement
     fileDef:

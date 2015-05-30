@@ -325,20 +325,6 @@
     an `id` field.
 
 
-- name: Ref
-  type: record
-  fields:
-    - name: "id"
-      type: "string"
-      jsonldPredicate: "@id"
-  doc: |
-    A URI reference to external document or document fragment.  This may refer
-    to an object within the current document, to an external file, or to a
-    labeled object within an external file.  To reference an object within the
-    current document or an external document, the object must be labeled with
-    an `id` field.
-
-
 - name: DataLink
   type: record
   docParent: Workflow
@@ -440,9 +426,6 @@
          source parameters which are single element types are appended added as
          single elements.
   fields:
-    - name: id
-      type: ["null", string]
-      jsonldPredicate: "@id"
     - name: type
       type:
         - "null"
@@ -567,6 +550,9 @@
   extends: Parameter
   specialize: {Schema: InputSchema}
   fields:
+    - name: id
+      type: string
+      jsonldPredicate: "@id"
     - name: "inputBinding"
       type: [ "null", "Binding" ]
 
@@ -576,6 +562,9 @@
   extends: Parameter
   specialize: {Schema: OutputSchema}
   fields:
+    - name: id
+      type: string
+      jsonldPredicate: "@id"
     - name: "outputBinding"
       type: [ "null", "Binding" ]
 
@@ -993,9 +982,26 @@
 
 
 - type: record
-  name: WorkflowStepParameter
+  name: WorkflowStepInput
   extends: Parameter
   fields:
+    - name: id
+      type: ["null", string]
+      jsonldPredicate: "@id"
+    - name: param
+      type: ["null", string]
+      jsonldPredicate:
+        "@id": "wfdesc:hasArtifact"
+        "@type": "@id"
+
+
+- type: record
+  name: WorkflowStepOutput
+  extends: Parameter
+  fields:
+    - name: id
+      type: string
+      jsonldPredicate: "@id"
     - name: param
       type: string
       jsonldPredicate:
@@ -1007,8 +1013,8 @@
   type: record
   extends: Process
   specialize:
-    InputParameter: WorkflowStepParameter
-    OutputParameter: WorkflowStepParameter
+    InputParameter: WorkflowStepInput
+    OutputParameter: WorkflowStepOutput
   fields:
     - name: run
       type: [CommandLineTool, ExpressionTool]
@@ -1083,8 +1089,8 @@
   type: record
   extends: Process
   specialize:
-    InputParameter: WorkflowStepParameter
-    OutputParameter: WorkflowStepParameter
+    InputParameter: WorkflowStepInput
+    OutputParameter: WorkflowStepOutput
   fields:
     - name: run
       type: Workflow
@@ -1113,7 +1119,7 @@
       type: ["string", "Expression"]
       doc: "The name of the file to create in the output directory."
     - name: "fileContent"
-      type: ["string", "Expression", "Ref"]
+      type: ["string", "Expression"]
       doc: |
         The contents of the file.
 
@@ -1279,7 +1285,7 @@
       type:
         - "null"
         - type: array
-          items: ["string", "Ref"]
+          items: string
       doc: |
         Code fragments that should be evaluated before evaluating the script.
         Can be used to provide function definitions used in multiple places.
