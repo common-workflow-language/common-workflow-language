@@ -110,24 +110,26 @@ class Builder(object):
                                                     item, lead_pos=n, tail_pos=tail_pos))
                 binding = None
 
-            if schema["type"] == "File" and binding:
-                if binding.get("loadContents"):
-                    with open(os.path.join(self.basedir, datum["path"]), "rb") as f:
-                        datum["contents"] = f.read(CONTENT_LIMIT)
+            if schema["type"] == "File":
                 self.files.append(datum)
-                if "secondaryFiles" in binding:
-                    if "secondaryFiles" not in datum:
-                        datum["secondaryFiles"] = []
-                    for sf in aslist(schema["secondaryFiles"]):
-                        if isinstance(sf, dict):
-                            sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, datum["path"])
-                        else:
-                            sfpath = {"path": substitute(datum["path"], sf)}
-                        if isinstance(sfpath, list):
-                            datum["secondaryFiles"].extend(sfpath)
-                        else:
-                            datum["secondaryFiles"].append(sfpath)
-                        self.files.append(sfpath)
+                if binding:
+                    if binding.get("loadContents"):
+                        with open(os.path.join(self.input_basedir, datum["path"]), "rb") as f:
+                            datum["contents"] = f.read(CONTENT_LIMIT)
+
+                    if "secondaryFiles" in binding:
+                        if "secondaryFiles" not in datum:
+                            datum["secondaryFiles"] = []
+                        for sf in aslist(schema["secondaryFiles"]):
+                            if isinstance(sf, dict):
+                                sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, datum["path"])
+                            else:
+                                sfpath = {"path": substitute(datum["path"], sf)}
+                            if isinstance(sfpath, list):
+                                datum["secondaryFiles"].extend(sfpath)
+                            else:
+                                datum["secondaryFiles"].append(sfpath)
+                            self.files.append(sfpath)
 
         # Position to front of the sort key
         if binding:
@@ -177,7 +179,7 @@ class Builder(object):
 
 
 class Tool(Process):
-    def _init_job(self, joborder, basedir, **kwargs):
+    def _init_job(self, joborder, input_basedir, **kwargs):
         # Validate job order
         try:
             validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
@@ -194,7 +196,7 @@ class Tool(Process):
         builder = Builder()
         builder.job = copy.deepcopy(joborder)
         builder.jslib = ''
-        builder.basedir = basedir
+        builder.input_basedir = input_basedir
         builder.files = []
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
@@ -213,8 +215,8 @@ class ExpressionTool(Tool):
         def run(self, outdir=None, **kwargs):
             self.output_callback(expression.do_eval(self.script, self.builder.job, self.requirements, self.builder.docpath))
 
-    def job(self, joborder, basedir, output_callback, **kwargs):
-        builder = self._init_job(joborder, basedir, **kwargs)
+    def job(self, joborder, input_basedir, output_callback, **kwargs):
+        builder = self._init_job(joborder, input_basedir, **kwargs)
 
         j = ExpressionTool.ExpressionJob()
         j.builder = builder
@@ -229,8 +231,8 @@ class CommandLineTool(Tool):
     def __init__(self, toolpath_object, docpath, **kwargs):
         super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath, **kwargs)
 
-    def job(self, joborder, basedir, output_callback, use_container=True, **kwargs):
-        builder = self._init_job(joborder, basedir, **kwargs)
+    def job(self, joborder, input_basedir, output_callback, use_container=True, **kwargs):
+        builder = self._init_job(joborder, input_basedir, **kwargs)
 
         if self.tool["baseCommand"]:
             for n, b in enumerate(aslist(self.tool["baseCommand"])):
@@ -285,10 +287,10 @@ class CommandLineTool(Tool):
 
         dockerReq, _ = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
         if dockerReq and use_container:
-                builder.pathmapper = DockerPathMapper(reffiles, basedir)
+                builder.pathmapper = DockerPathMapper(reffiles, input_basedir)
 
         if builder.pathmapper is None:
-            builder.pathmapper = PathMapper(reffiles, basedir)
+            builder.pathmapper = PathMapper(reffiles, input_basedir)
 
         for f in builder.files:
             f["path"] = builder.pathmapper.mapper(f["path"])[1]
@@ -310,7 +312,7 @@ class CommandLineTool(Tool):
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
         if j.stdin:
-            j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(basedir, j.stdin)
+            j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(input_basedir, j.stdin)
 
         j.pathmapper = builder.pathmapper
         j.collect_outputs = functools.partial(self.collect_output_ports, self.tool["outputs"], builder)
