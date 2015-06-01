@@ -4,6 +4,7 @@ import sys
 import requests
 import os
 import process
+import re
 
 _logger = logging.getLogger("cwltool")
 
@@ -15,8 +16,14 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
 
     for ln in subprocess.check_output(["docker", "images", "--no-trunc", "--all"]).splitlines():
         try:
-            ln.index(dockerRequirement["dockerImageId"])
-            found = True
+            m = re.match(r"^([^ ]+)\s+([^ ]+)\s+([^ ]+)", ln)
+            sp = dockerRequirement["dockerImageId"].split(":")
+            if len(sp) == 1:
+                sp.append("latest")
+            # check for repository:tag match or image id match
+            if ((sp[0] == m.group(1) and sp[1] == m.group(2)) or dockerRequirement["dockerImageId"] == m.group(3)):
+                found = True
+                break
         except ValueError:
             pass
 

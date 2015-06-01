@@ -213,7 +213,10 @@ class ExpressionTool(Tool):
 
     class ExpressionJob(object):
         def run(self, outdir=None, **kwargs):
-            self.output_callback(expression.do_eval(self.script, self.builder.job, self.requirements, self.builder.docpath))
+            try:
+                self.output_callback(expression.do_eval(self.script, self.builder.job, self.requirements, self.builder.docpath), "success")
+            except Exception:
+                self.output_callback({}, "permanentFail")
 
     def job(self, joborder, input_basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, input_basedir, **kwargs)
@@ -269,6 +272,9 @@ class CommandLineTool(Tool):
         j.joborder = builder.job
         j.stdin = None
         j.stdout = None
+        j.successCodes = self.tool.get("successCodes")
+        j.temporaryFailCodes = self.tool.get("temporaryFailCodes")
+        j.permanentFailCodes = self.tool.get("permanentFailCodes")
         builder.pathmapper = None
 
         if self.tool.get("stdin"):

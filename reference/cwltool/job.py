@@ -53,21 +53,21 @@ class CommandLineJob(object):
         if dry_run:
             return (outdir, {})
 
+        os.chdir(outdir)
+
+        for t in self.generatefiles:
+            with open(os.path.join(outdir, t), "w") as f:
+                f.write(self.generatefiles[t])
+
         if self.stdin:
             stdin = open(self.stdin, "rb")
         else:
             stdin = subprocess.PIPE
 
-        os.chdir(outdir)
-
         if self.stdout:
             stdout = open(self.stdout, "wb")
         else:
             stdout = sys.stderr
-
-        for t in self.generatefiles:
-            with open(os.path.join(outdir, t), "w") as f:
-                f.write(self.generatefiles[t])
 
         sp = subprocess.Popen(runtime + self.command_line,
                               shell=False,
@@ -80,12 +80,25 @@ class CommandLineJob(object):
         if stdin == subprocess.PIPE:
             sp.stdin.close()
 
-        sp.wait()
+        rcode = sp.wait()
 
         if stdin != subprocess.PIPE:
             stdin.close()
 
-        if stdout != sys.stderr:
+        if stdout is not sys.stderr:
             stdout.close()
 
-        self.output_callback(self.collect_outputs(outdir))
+        outputs = self.collect_outputs(outdir)
+
+        if self.successCodes and rcode in self.successCodes:
+            processStatus = "success"
+        elif self.temporaryFailCodes and rcode in self.temporaryFailCodes:
+            processStatus = "temporaryFail"
+        elif self.permanentFailCodes and rcode in self.permanentFailCodes:
+            processStatus = "permanentFail"
+        elif rcode == 0:
+            processStatus = "success"
+        else:
+            processStatus = "permanentFail"
+
+        self.output_callback(outputs, processStatus)

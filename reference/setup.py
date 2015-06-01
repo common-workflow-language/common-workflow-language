@@ -38,7 +38,6 @@ setup(name='cwltool',
       packages=["cwltool", "cwltool.avro_ld"],
       package_data={'cwltool': ['schemas/draft-1/*', 'schemas/draft-2/*']},
       install_requires=[
-          'jsonschema >= 2.4.0',
           'requests',
           'PyYAML',
           'avro',

@@ -919,7 +919,7 @@
     [`OutputBinding`](#outputbinding) for details.
 
   fields:
-    - name: "baseCommand"
+    - name: baseCommand
       doc: |
         Specifies the program to execute.  If the value is an array, the first
         element is the program to execute, and subsequent elements are placed
@@ -928,38 +928,30 @@
         be an absolute path, otherwise it is an error.  If the program does not
         include a path separator, search the `$PATH` variable in the runtime
         environment find the absolute path of the executable.
-      type: [
-        "string",
-        {
-          type: "array",
-            items: "string"
-        }
-      ]
-      jsonldPredicate: {
-        "@id": "cwl:baseCommand",
+      type:
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        "@id": "cwl:baseCommand"
         "@container": "@list"
-      }
-    - name: "arguments"
+    - name: arguments
       doc: |
         Command line bindings which are not directly associated with values
         from the input object.
-      type: [
-        "null",
-        {
-          type: "array",
-          items: ["string", "CommandLineBinding"]
-        }
-      ]
-      jsonldPredicate: {
-        "@id": "cwl:arguments",
+      type:
+        - "null"
+        - type: array
+          items: [string, CommandLineBinding]
+      jsonldPredicate:
+        "@id": "cwl:arguments"
         "@container": "@list"
-      }
-    - name: "stdin"
+    - name: stdin
       type: ["null", string, Expression]
       doc: |
         A path to a file whose contents must be piped into the command's
         standard input stream.
-    - name: "stdout"
+    - name: stdout
       type: ["null", string, Expression]
       doc: |
         Capture the command's standard output stream to a file written to
@@ -971,7 +963,21 @@
         return a string with the file name to use to capture stdout.  If the
         return value is not a string, or the resulting path contains illegal
         characters (such as the path separator `/`) it is an error.
-
+    - name: successCodes
+      type:
+        - "null"
+        - type: array
+          items: int
+    - name: temporaryFailCodes
+      type:
+        - "null"
+        - type: array
+          items: int
+    - name: permanentFailCodes
+      type:
+        - "null"
+        - type: array
+          items: int
 
 - type: record
   name: "ExpressionTool"

@@ -142,7 +142,8 @@ def main():
 
     try:
         final_output = []
-        def output_callback(out):
+        def output_callback(out, processStatus):
+            _logger.info("Process completion status is %s", processStatus)
             final_output.append(out)
 
         jobiter = t.job(loader.resolve_ref(args.job_order), input_basedir, output_callback, use_container=(not args.no_container))

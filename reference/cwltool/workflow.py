@@ -35,7 +35,7 @@ class Workflow(Process):
     def __init__(self, toolpath_object, docpath, **kwargs):
         super(Workflow, self).__init__(toolpath_object, "Workflow", docpath, **kwargs)
 
-    def receive_output(self, step, outputparms, jobout):
+    def receive_output(self, step, outputparms, jobout, processStatus):
         _logger.debug("WorkflowStep completed with %s", jobout)
         for i in outputparms:
             if "id" in i:
@@ -43,6 +43,9 @@ class Workflow(Process):
                     self.state[i["id"]] = WorkflowStateItem(i, jobout[i["id"]])
                 else:
                     raise WorkflowException("Output is missing expected field %s" % d)
+        if processStatus != "success":
+            if self.processStatus != "permanentFail":
+                self.processStatus = processStatus
         step.completed = True
 
     def try_make_job(self, step, basedir, **kwargs):
@@ -142,6 +145,7 @@ class Workflow(Process):
         random.shuffle(steps)
 
         self.state = {}
+        self.processStatus = "success"
         for i in self.tool["inputs"]:
             (_, iid) = urlparse.urldefrag(i["id"])
             if iid in joborder:
@@ -179,7 +183,7 @@ class Workflow(Process):
                     raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (i["connect"]["source"], inp["id"]))
                 wo[src] = self.state[i["connect"]["source"]].value
 
-        output_callback(wo)
+        output_callback(wo, self.processStatus)
 
 class External(Process):
     def __init__(self, toolpath_object, docpath):
@@ -222,12 +226,13 @@ class External(Process):
 
         super(External, self).__init__(toolpath_object, "WorkflowStep", docpath)
 
-    def receive_output(self, jobout):
-        self.output  = {}
+    def receive_output(self, jobout, processStatus):
         _logger.debug("WorkflowStep output from run is %s", jobout)
+        self.output = {}
         for i in self.tool["outputs"]:
             (_, d) = urlparse.urldefrag(i["param"] if "param" in i else i["id"])
             self.output[i["id"]] = jobout[d]
+        self.processStatus = processStatus
 
     def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
@@ -245,17 +250,23 @@ class External(Process):
         while self.output is None:
             yield None
 
-        output_callback(self.output)
+        output_callback(self.output, self.processStatus)
 
 
 class ReceiveScatterOutput(object):
     def __init__(self, dest):
         self.dest = dest
         self.completed = 0
+        self.processStatus = "success"
 
-    def receive_scatter_output(self, index, jobout):
+    def receive_scatter_output(self, index, jobout, processStatus):
         for k,v in jobout.items():
             self.dest[k][index] = v
+
+        if processStatus != "success":
+            if self.processStatus != "permanentFail":
+                self.processStatus = jobout["processStatus"]
+
         self.completed += 1
 
 def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
@@ -283,7 +294,7 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
     while rc.completed < l:
         yield None
 
-    output_callback(output)
+    output_callback(output, rc.processStatus)
 
 
 def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
@@ -309,7 +320,7 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
     while rc.completed < l:
         yield None
 
-    output_callback(output)
+    output_callback(output, rc.processStatus)
 
 def crossproduct_size(joborder, scatter_keys):
     scatter_key = scatter_keys[0]
@@ -353,4 +364,4 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
         while rc.completed < put:
             yield None
 
-        output_callback(output)
+        output_callback(output, rc.processStatus)
