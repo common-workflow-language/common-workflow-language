@@ -1,5 +1,4 @@
 #!/usr/bin/env cwl-runner
-"@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 class: Workflow
 inputs:
     - { id: "#file1", type: File }
@@ -13,30 +12,30 @@ requirements:
 steps:
   - id: "#step1"
     inputs:
-      - { param: "#step1_file1", connect: {"source": "#file1"} }
+      - { param: "#wc_file1", connect: {"source": "#file1"} }
     outputs:
-      - { id: "#step1_output" }
+      - { id: "#step1_output", param: "#wc_output" }
     run:
       class: CommandLineTool
       inputs:
-        - { id: "#step1_file1", type: File, inputBinding: {} }
+        - { id: "#wc_file1", type: File, inputBinding: {} }
       outputs:
-        - { id: "#step1_output", type: File, outputBinding: { glob: output.txt } }
+        - { id: "#wc_output", type: File, outputBinding: { glob: output.txt } }
       stdout: output.txt
       baseCommand: ["wc"]
 
   - id: "#step2"
     inputs:
-      - { "param": "#step2_file1", connect: {"source": "#step1_output"} }
+      - { "param": "#parseInt_file1", connect: {"source": "#step1_output"} }
     outputs:
-      - { "id": "#step2_output" }
+      - { "id": "#step2_output", param: "#parseInt_output" }
     run:
       class: ExpressionTool
       inputs:
-        - { id: "#step2_file1", type: File, inputBinding: { loadContents: true } }
+        - { id: "#parseInt_file1", type: File, inputBinding: { loadContents: true } }
       outputs:
-        - { id: "#step2_output", type: int }
+        - { id: "#parseInt_output", type: int }
       expression:
         engine: node-engine.cwl
         script: >
-          {return {'step2_output': parseInt($job.step2_file1.contents)};}
+          {return {'parseInt_output': parseInt($job.parseInt_file1.contents)};}

@@ -1,5 +1,4 @@
 #!/usr/bin/env cwl-runner
-"@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 class: Workflow
 
 inputs:
@@ -8,9 +7,7 @@ inputs:
 
 outputs:
     - id: "#count_output"
-      type:
-        type: array
-        items: int
+      type: {type: array, items: int}
       connect: {"source": "#step1_output"}
 
 steps:

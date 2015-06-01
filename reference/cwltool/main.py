@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-import draft1tool
 import draft2tool
 import argparse
-from ref_resolver import from_url, validate_links
+from avro_ld.ref_resolver import loader
 import jsonschema
 import json
 import os
@@ -15,6 +14,7 @@ import tempfile
 import avro_ld.jsonld_context
 import avro_ld.makedoc
 import yaml
+import urlparse
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
@@ -71,6 +71,9 @@ def main():
         if c != "id" and (ctx[c] == "@id") or (isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id"):
             url_fields.append(c)
 
+    loader.url_fields = url_fields
+    loader.idx["cwl:JsonPointer"] = {}
+
     if args.print_jsonld_context:
         print json.dumps(ctx, indent=4, sort_keys=True)
         return 0
@@ -96,21 +99,24 @@ def main():
         return 1
 
     idx = {}
-    processobj = from_url(args.workflow, url_fields=url_fields, idx=idx)
+    processobj = loader.resolve_ref(args.workflow)
 
-    _logger.warn(url_fields)
-    #_logger.warn(json.dumps(idx, indent=4))
+    #_logger.warn(url_fields)
+    #_logger.warn(json.dumps(loader.idx, indent=4))
 
     if args.print_pre:
         print json.dumps(processobj, indent=4)
         return 0
 
-    validate_links(processobj, url_fields, idx)
+    loader.validate_links(processobj)
 
     if args.job_order:
         basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
     else:
         basedir = args.basedir
+
+    if isinstance(processobj, list):
+        processobj = loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
     try:
         t = workflow.makeTool(processobj, basedir, strict=args.strict)
@@ -139,7 +145,7 @@ def main():
         def output_callback(out):
             final_output.append(out)
 
-        jobiter = t.job(from_url(args.job_order), basedir, output_callback, use_container=(not args.no_container))
+        jobiter = t.job(loader.resolve_ref(args.job_order), basedir, output_callback, use_container=(not args.no_container))
         if args.conformance_test:
             job = jobiter.next()
             a = {"args": job.command_line}

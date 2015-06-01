@@ -989,7 +989,7 @@
       type: ["null", string]
       jsonldPredicate: "@id"
     - name: param
-      type: ["null", string]
+      type: string
       jsonldPredicate:
         "@id": "wfdesc:hasArtifact"
         "@type": "@id"

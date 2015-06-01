@@ -1,12 +1,10 @@
 import job
-import draft1tool
 import draft2tool
 from aslist import aslist
 from process import Process, WorkflowException, get_feature
 import copy
 import logging
 import random
-from ref_resolver import from_url
 import os
 from collections import namedtuple
 import pprint
@@ -20,9 +18,7 @@ WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
 def makeTool(toolpath_object, docpath, **kwargs):
     """docpath is the directory the tool file is located."""
-    if "schema" in toolpath_object:
-        return draft1tool.Tool(toolpath_object)
-    elif "run" in toolpath_object and toolpath_object.get("class", "External") == "External":
+    if "run" in toolpath_object: # and toolpath_object.get("class", "External") == "External":
         return External(toolpath_object, docpath)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":

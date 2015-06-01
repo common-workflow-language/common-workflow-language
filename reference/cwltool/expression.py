@@ -8,13 +8,13 @@ from process import WorkflowException
 import process
 import yaml
 import avro_ld.validate as validate
-import ref_resolver
+import avro_ld.ref_resolver
 
 _logger = logging.getLogger("cwltool")
 
 def exeval(ex, jobinput, requirements, docpath, context, pull_image):
     if ex["engine"] == "cwl:JsonPointer":
-        return ref_resolver.resolve_json_pointer({"job": jobinput, "context": context}, ex["script"])
+        return avro_ld.ref_resolver.resolve_json_pointer({"job": jobinput, "context": context}, ex["script"])
 
     for r in reversed(requirements):
         if r["class"] == "ExpressionEngineRequirement" and r["id"] == ex["engine"]:

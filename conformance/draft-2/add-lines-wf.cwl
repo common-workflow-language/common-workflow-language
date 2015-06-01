@@ -1,5 +1,4 @@
 #!/usr/bin/env cwl-runner
-"@context": "https://raw.githubusercontent.com/common-workflow-language/common-workflow-language/master/schemas/draft-2/cwl-context.json"
 class: Workflow
 inputs:
     - id: "#file1"

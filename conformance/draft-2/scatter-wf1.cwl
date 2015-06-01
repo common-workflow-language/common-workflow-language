@@ -10,21 +10,20 @@ inputs:
 steps:
   - id: "#step1"
     inputs:
-      - id: "#step1_in"
-        connect: {source: "#inp"}
+      - {id: "#step1_in", param: "#echo_in", connect: {source: "#inp"}}
     outputs:
-      - id: "#step1_out"
+      - {id: "#step1_out", param: "#echo_out"}
     requirements:
       - class: Scatter
         scatter: "#step1_in"
     run:
       class: CommandLineTool
       inputs:
-        - id: "#step1_in"
+        - id: "#echo_in"
           type: string
           inputBinding: {}
       outputs:
-        - id: "#step1_out"
+        - id: "#echo_out"
           type: string
           outputBinding:
             glob: "step1_out"

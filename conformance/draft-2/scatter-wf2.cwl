@@ -11,10 +11,10 @@ inputs:
 steps:
   - id: "#step1"
     inputs:
-      - { id: "#step1_in1", connect: {source: "#inp1"} }
-      - { id: "#step1_in2", connect: {source: "#inp2"} }
+      - { id: "#step1_in1", param: "#echo_in1", connect: {source: "#inp1"} }
+      - { id: "#step1_in2", param: "#echo_in2", connect: {source: "#inp2"} }
     outputs:
-      - id: "#step1_out"
+      - { id: "#step1_out", param: "#echo_out" }
     requirements:
       - class: Scatter
         scatter: ["#step1_in1", "#step1_in2"]
@@ -22,20 +22,20 @@ steps:
     run:
       class: CommandLineTool
       inputs:
-        - id: "#step1_in1"
+        - id: "#echo_in1"
           type: string
           inputBinding: {}
-        - id: "#step1_in2"
+        - id: "#echo_in2"
           type: string
           inputBinding: {}
       outputs:
-        - id: "#step1_out"
+        - id: "#echo_out"
           type: string
           outputBinding:
             glob: "step1_out"
             loadContents: true
             outputEval:
-              engine: JsonPointer
+              engine: cwl:JsonPointer
               script: "context/0/contents"
       baseCommand: "echo"
       arguments:
