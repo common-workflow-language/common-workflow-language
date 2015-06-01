@@ -6,7 +6,7 @@ import collections
 import requests
 import urlparse
 import yaml
-import avro_ld.validate
+import validate
 
 log = logging.getLogger("cwltool")
 
