@@ -311,18 +311,18 @@
           items: File
 
 
-- name: Import
-  type: record
-  fields:
-    - name: "import"
-      type: "string"
-      jsonldPredicate: "@id"
-  doc: |
-    A URI reference to external document or document fragment.  This may refer
-    to an object within the current document, to an external file, or to a
-    labeled object within an external file.  To reference an object within the
-    current document or an external document, the object must be labeled with
-    an `id` field.
+# - name: Import
+#   type: record
+#   fields:
+#     - name: "import"
+#       type: "string"
+#       jsonldPredicate: "@id"
+#   doc: |
+#     A URI reference to external document or document fragment.  This may refer
+#     to an object within the current document, to an external file, or to a
+#     labeled object within an external file.  To reference an object within the
+#     current document or an external document, the object must be labeled with
+#     an `id` field.
 
 
 - name: DataLink
@@ -407,6 +407,7 @@
 
 - name: Parameter
   type: record
+  docParent: Process
   abstract: true
   doc: |
     Define an input or output parameter to a process.
@@ -469,6 +470,7 @@
 
 - name: JsonPointer_enum
   type: enum
+  docParent: Expression
   symbols:
     - JsonPointer
   jsonldPrefix: "cwl"
@@ -502,6 +504,7 @@
 
 - name: Binding
   type: record
+  docParent: Parameter
   fields:
     - name: loadContents
       type:
@@ -571,7 +574,7 @@
 
 - type: record
   name: ProcessRequirement
-  docAfter: Process
+  docAfter: ProcessImplementation
   doc: |
     A process requirement declares a prerequisite that may or must be fufilled
     before executing a process.  See [`Process.hints`](#process) and
@@ -656,6 +659,7 @@
   name: ProcessImplementation
   abstract: true
   extends: Process
+  docAfter: Workflow
   fields:
     - name: "class"
       jsonldPredicate:
@@ -736,7 +740,7 @@
 
 
 - type: record
-  name: "CommandOutputBinding"
+  name: CommandOutputBinding
   extends: Binding
   docParent: CommandLineTool
   doc: |
@@ -980,7 +984,7 @@
           items: int
 
 - type: record
-  name: "ExpressionTool"
+  name: ExpressionTool
   extends: ProcessImplementation
   fields:
     - name: "expression"
@@ -990,6 +994,7 @@
 - type: record
   name: WorkflowStepInput
   extends: Parameter
+  docParent: Workflow
   fields:
     - name: id
       type: ["null", string]
@@ -1003,6 +1008,7 @@
 
 - type: record
   name: WorkflowStepOutput
+  docParent: Workflow
   extends: Parameter
   fields:
     - name: id
@@ -1018,6 +1024,7 @@
 - name: WorkflowStep
   type: record
   extends: Process
+  docParent: Workflow
   specialize:
     InputParameter: WorkflowStepInput
     OutputParameter: WorkflowStepOutput
@@ -1029,6 +1036,7 @@
 
 - name: Workflow
   type: record
+  docAfter: Process
   extends: ProcessImplementation
   doc: |
     A workflow is a process consisting of one or more `subprocesses` or `subworkflows`.  Each
@@ -1094,6 +1102,7 @@
 - name: Subworkflow
   type: record
   extends: Process
+  docParent: Subworkflows
   specialize:
     InputParameter: WorkflowStepInput
     OutputParameter: WorkflowStepOutput
@@ -1180,7 +1189,7 @@
 
 - name: ScatterMethod
   type: enum
-  docParent: Workflow
+  docParent: Scatter
   symbols:
     - dotproduct
     - nested_crossproduct
@@ -1213,7 +1222,7 @@
 - type: record
   name: SchemaDef
   extends: Schema
-  docParent: SchemaRequirement
+  docParent: SchemaDefRequirement
   fields:
     - name: name
       type: string

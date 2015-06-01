@@ -126,7 +126,7 @@ class RenderType(object):
         for t in j:
             if "extends" in t:
                 add_dictlist(self.subs, t["extends"], t["name"])
-                if "docParent" not in t:
+                if "docParent" not in t and "docAfter" not in t:
                     add_dictlist(self.docParent, t["extends"], t["name"])
 
             if t.get("docParent"):
@@ -274,6 +274,10 @@ def avrold_doc(j, outdoc):
     #lefttoc {
       background-color: aliceblue;
       overflow-y: auto;
+    }
+
+    #toc {
+      margin-bottom: 2em;
     }
 
     @media (min-width: 992px) {
