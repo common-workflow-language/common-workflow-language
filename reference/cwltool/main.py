@@ -3,7 +3,6 @@
 import draft2tool
 import argparse
 from avro_ld.ref_resolver import loader
-import jsonschema
 import json
 import os
 import sys
@@ -120,7 +119,7 @@ def main():
 
     try:
         t = workflow.makeTool(processobj, input_basedir, strict=args.strict)
-    except (jsonschema.exceptions.ValidationError, avro_ld.validate.ValidationException) as e:
+    except (avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
             _logger.exception()
@@ -175,7 +174,7 @@ def main():
 
             _logger.info("Output directory is %s", outdir)
             print json.dumps(final_output[0])
-    except (jsonschema.exceptions.ValidationError, validate.ValidationException) as e:
+    except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:
             _logger.exception()
