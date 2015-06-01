@@ -43,6 +43,14 @@ Current work-in-progress implementations of the common workflow language:
 * [Reference implementation (Python)](reference/)
 * [Rabix (Python)](https://github.com/rabix/rabix)
 
+## Testing
+
+There is a Jenkins server maintained by Curoverse that runs tests for the
+reference implementation, builds and uploads packages, and builds and uploads
+Docker images:
+
+* https://ci.curoverse.com/job/common-workflow-language/
+
 ## Contributing
 
 If you are interested in contributing ideas or code, please join the
