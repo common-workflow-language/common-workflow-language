@@ -41,6 +41,7 @@ def multi(v, q=""):
 
 def validate_ex(expected_schema, datum, strict=False):
     """Determine if a python datum is an instance of a schema."""
+
     schema_type = expected_schema.type
 
     if schema_type == 'null':
@@ -87,6 +88,11 @@ def validate_ex(expected_schema, datum, strict=False):
         else:
             raise ValidationException("the value `%s` is not fixed" % pprint.pformat(datum))
     elif schema_type == 'enum':
+        if expected_schema.name == "Any":
+            if datum is not None:
+                return True
+            else:
+                raise ValidationException("Any type must be non-null")
         if datum in expected_schema.symbols:
             return True
         else:

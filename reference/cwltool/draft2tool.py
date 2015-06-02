@@ -65,9 +65,9 @@ class Builder(object):
         if isinstance(schema["type"], list):
             success = False
             for t in schema["type"]:
-                if t in self.schemaDefs:
+                if isinstance(t, basestring) and t in self.schemaDefs:
                     t = self.schemaDefs[t]
-                avsc = avro.schema.make_avsc_object(t, None)
+                avsc = avro.schema.make_avsc_object(t, self.names)
                 if validate.validate(avsc, datum):
                     if isinstance(t, basestring):
                         t = {"type": t}
@@ -201,6 +201,7 @@ class Tool(Process):
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
         builder.docpath = self.docpath
+        builder.names = self.names
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 

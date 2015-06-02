@@ -255,6 +255,7 @@
     - array
     - map
     - File
+    - Any
   jsonldPrefix: avro
   jsonldPredicate:
     - symbol: File

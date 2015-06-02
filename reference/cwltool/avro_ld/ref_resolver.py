@@ -93,7 +93,7 @@ class Loader(object):
         if url in self.idx:
             return self.idx[url]
         else:
-            raise RuntimeError("Reference `%s` is not valid" % url)
+            raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
     def resolve_all(self, document, base_url):
         if isinstance(document, list):
@@ -147,7 +147,7 @@ class Loader(object):
         if isinstance(result, dict):
             if "id" not in result:
                 result["id"] = url
-            self.idx[result["id"]] = result
+            self.idx[expand_url(result["id"], url)] = result
         else:
             self.idx[url] = result
         return result
@@ -160,11 +160,11 @@ class Loader(object):
                 if d in document:
                     if isinstance(document[d], basestring):
                         if document[d] not in self.idx:
-                            raise ValueError("Invalid link `%s` in field `%s`" % (document[d], d))
+                            raise validate.ValidationException("Invalid link `%s` in field `%s`" % (document[d], d))
                     elif isinstance(document[d], list):
                         for i in document[d]:
                             if isinstance(i, basestring) and i not in self.idx:
-                                raise ValueError("Invalid link `%s` in field `%s`" % (i, d))
+                                raise validate.ValidationException("Invalid link `%s` in field `%s`" % (i, d))
             iterator = document.iteritems()
         else:
             return
@@ -172,11 +172,11 @@ class Loader(object):
         try:
             for key, val in iterator:
                 self.validate_links(val)
-        except ValueError as v:
+        except validate.ValidationException as v:
             if isinstance(key, basestring):
-                raise ValueError("At field `%s`\n%s" % (key, avro_ld.validate.indent(str(v))))
+                raise validate.ValidationException("At field `%s`\n%s" % (key, validate.indent(str(v))))
             else:
-                raise ValueError("At position %s\n%s" % (key, avro_ld.validate.indent(str(v))))
+                raise validate.ValidationException("At position %s\n%s" % (key, validate.indent(str(v))))
 
         return
 

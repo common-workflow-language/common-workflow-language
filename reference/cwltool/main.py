@@ -98,7 +98,13 @@ def main():
         return 1
 
     idx = {}
-    processobj = loader.resolve_ref(args.workflow)
+    try:
+        processobj = loader.resolve_ref(args.workflow)
+    except (avro_ld.validate.ValidationException) as e:
+        _logger.error("Tool definition failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
 
     #_logger.warn(url_fields)
     #_logger.warn(json.dumps(loader.idx, indent=4))
@@ -107,7 +113,13 @@ def main():
         print json.dumps(processobj, indent=4)
         return 0
 
-    loader.validate_links(processobj)
+    try:
+        loader.validate_links(processobj)
+    except (avro_ld.validate.ValidationException) as e:
+        _logger.error("Tool definition failed validation:\n%s" % e)
+        if args.debug:
+            _logger.exception()
+        return 1
 
     if args.job_order:
         input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
@@ -136,7 +148,7 @@ def main():
 
     if not args.job_order:
         _logger.error("Input object required")
-        parser.print_help()
+        _logger.error("Use --help for command line options")
         return 1
 
     try:

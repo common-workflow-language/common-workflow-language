@@ -134,3 +134,8 @@
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
   tool: draft-2/scatter-wf3.cwl
+
+- tool: draft-2/echo-tool.cwl
+  job: draft-2/env-job.json
+  output:
+    {"out": "hello test env\n"}

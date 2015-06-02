@@ -14,7 +14,11 @@ _logger = logging.getLogger("cwltool")
 
 def exeval(ex, jobinput, requirements, docpath, context, pull_image):
     if ex["engine"] == "cwl:JsonPointer":
-        return avro_ld.ref_resolver.resolve_json_pointer({"job": jobinput, "context": context}, ex["script"])
+        try:
+            obj = {"job": jobinput, "context": context}
+            return avro_ld.ref_resolver.resolve_json_pointer(obj, ex["script"])
+        except ValueError as v:
+            raise WorkflowException("%s in %s" % (v,  obj))
 
     for r in reversed(requirements):
         if r["class"] == "ExpressionEngineRequirement" and r["id"] == ex["engine"]:
