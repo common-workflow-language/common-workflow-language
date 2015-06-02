@@ -65,9 +65,10 @@ class Builder(object):
         if isinstance(schema["type"], list):
             success = False
             for t in schema["type"]:
-                if isinstance(t, basestring) and t in self.schemaDefs:
-                    t = self.schemaDefs[t]
-                avsc = avro.schema.make_avsc_object(t, self.names)
+                if isinstance(t, basestring) and self.names.has_name(t, ""):
+                    avsc = self.names.get_name(t, "")
+                else:
+                    avsc = avro.schema.make_avsc_object(t, self.names)
                 if validate.validate(avsc, datum):
                     if isinstance(t, basestring):
                         t = {"type": t}
