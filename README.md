@@ -1,9 +1,6 @@
 Common Workflow Language
 ========================
 
-This repo holds in-development draft description of the specification being developed on the
-[Common Workflow Language mailing list](https://groups.google.com/forum/#!forum/common-workflow-language).
-
 The Common Workflow Language (CWL) is an informal, multi-vendor working group
 consisting of various organizations and individuals that have an interest in
 portability of data analysis workflows.  Our goal is to create specifications
@@ -19,29 +16,21 @@ Bioinformatics, Chemistry, Physics, and Astronomy.
 
 ## Current specification
 
-http://common-workflow-language.github.io/
+http://common-workflow-language.github.io/draft-2/
 
 Please be aware that Common Workflow Language is still under heavy development.
 The current draft is draft 2.  This draft is not final.
-
-## Repository contents
-
-[Draft specifications](specification/)
-
-[Schemas](schemas/)
-
-[Conformance test suite](conformance/)
-
-[Reference implementation](reference/)
-
-[Example workflows](https://github.com/common-workflow-language/workflows)
 
 ## Implementations
 
 Current work-in-progress implementations of the common workflow language:
 
-* [Reference implementation (Python)](reference/)
+* [Reference implementation (Python)](https://github.com/common-workflow-language/common-workflow-language/tree/master/reference/)
 * [Rabix (Python)](https://github.com/rabix/rabix)
+
+## Examples
+
+[Github repository of example workflows.](https://github.com/common-workflow-language/workflows)
 
 ## Testing
 
@@ -53,9 +42,10 @@ Docker images:
 
 ## Contributing
 
-If you are interested in contributing ideas or code, please join the
-[mailing list](https://groups.google.com/forum/#!forum/common-workflow-language) or fork
-the repository and send a pull request!
+If you are interested in contributing ideas or code, please join the [mailing
+list](https://groups.google.com/forum/#!forum/common-workflow-language) or
+[fork the repository](https://github.com/common-workflow-language/common-workflow-language)
+and send a pull request!
 
 ## Participating Organizations
 

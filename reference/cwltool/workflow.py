@@ -46,6 +46,12 @@ class Workflow(Process):
         if processStatus != "success":
             if self.processStatus != "permanentFail":
                 self.processStatus = processStatus
+
+            if processStatus == "success":
+                _logger.info("Workflow step %s completion status is %s", step.id, processStatus)
+            else:
+                _logger.warn("Workflow step %s completion status is %s", step.id, processStatus)
+
         step.completed = True
 
     def try_make_job(self, step, basedir, **kwargs):

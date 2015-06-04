@@ -14,11 +14,10 @@ import avro_ld.jsonld_context
 import avro_ld.makedoc
 import yaml
 import urlparse
+import process
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
-
-module_dir = os.path.dirname(os.path.abspath(__file__))
 
 def printrdf(workflow, wf, ctx, sr):
     from rdflib import Graph, plugin
@@ -59,10 +58,7 @@ def main():
     if args.debug:
         logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
-    cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl-avro.yml')
-
-    with open(cwl_avsc) as f:
-        j = yaml.load(f)
+    (j, names) = process.get_schema()
     (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
 
     url_fields = []
@@ -86,7 +82,6 @@ def main():
         return 0
 
     if args.print_avro:
-        names = avro_ld.schema.schema(j)
         print "["
         print ", ".join([json.dumps(names.names[n].to_json(), indent=4, sort_keys=True) for n in names.names])
         print "]"
@@ -154,7 +149,10 @@ def main():
     try:
         final_output = []
         def output_callback(out, processStatus):
-            _logger.info("Process completion status is %s", processStatus)
+            if processStatus == "success":
+                _logger.info("Overall job status is %s", processStatus)
+            else:
+                _logger.warn("Overall job status is %s", processStatus)
             final_output.append(out)
 
         jobiter = t.job(loader.resolve_ref(args.job_order), input_basedir, output_callback, use_container=(not args.no_container))
@@ -185,7 +183,7 @@ def main():
                 last = r
 
             _logger.info("Output directory is %s", outdir)
-            print json.dumps(final_output[0])
+            print json.dumps(final_output[0], indent=4)
     except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:

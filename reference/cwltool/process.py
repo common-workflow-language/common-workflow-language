@@ -22,7 +22,7 @@ def get_schema():
     cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl-avro.yml')
     with open(cwl_avsc) as f:
         j = yaml.load(f)
-        return avro_ld.schema.schema(j)
+        return (j, avro_ld.schema.schema(j))
 
 def get_feature(feature, **kwargs):
     if kwargs.get("requirements"):
@@ -37,7 +37,7 @@ def get_feature(feature, **kwargs):
 
 class Process(object):
     def __init__(self, toolpath_object, validateAs, docpath, **kwargs):
-        self.names = get_schema()
+        (_, self.names) = get_schema()
         self.docpath = docpath
 
         self.tool = toolpath_object

@@ -5,6 +5,7 @@ import requests
 import os
 import process
 import re
+import tempfile
 
 _logger = logging.getLogger("cwltool")
 
@@ -69,9 +70,7 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
     return found
 
 
-def get_from_requirements(requirements, hints, pull_image, dry_run=False):
-    (r, req) = process.get_feature("DockerRequirement", requirements=requirements, hints=hints)
-
+def get_from_requirements(r, req, pull_image, dry_run=False):
     if r:
         if get_image(r, pull_image, dry_run):
             return r["dockerImageId"]

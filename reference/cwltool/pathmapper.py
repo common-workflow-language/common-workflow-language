@@ -1,5 +1,8 @@
 import os
 import random
+import logging
+
+_logger = logging.getLogger("cwltool")
 
 class PathMapper(object):
     """Mapping of files from relative path provided in the file to a tuple of
@@ -22,8 +25,8 @@ class DockerPathMapper(PathMapper):
         self._pathmap = {}
         self.dirs = {}
         for src in referenced_files:
-            abs = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
-            dir, fn = os.path.split(abs)
+            ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
+            dir, fn = os.path.split(ab)
 
             subdir = False
             for d in self.dirs:
@@ -54,4 +57,4 @@ class DockerPathMapper(PathMapper):
             ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
             for d in self.dirs:
                 if ab.startswith(d):
-                    self._pathmap[src] = (ab, os.path.join(self.dirs[d], abs[len(d)+1:]))
+                    self._pathmap[src] = (ab, os.path.join(self.dirs[d], ab[len(d)+1:]))

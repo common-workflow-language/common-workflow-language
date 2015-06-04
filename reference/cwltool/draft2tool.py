@@ -63,20 +63,16 @@ class Builder(object):
 
         # Handle union types
         if isinstance(schema["type"], list):
-            success = False
             for t in schema["type"]:
                 if isinstance(t, basestring) and self.names.has_name(t, ""):
                     avsc = self.names.get_name(t, "")
                 else:
                     avsc = avro.schema.make_avsc_object(t, self.names)
                 if validate.validate(avsc, datum):
-                    if isinstance(t, basestring):
-                        t = {"type": t}
-                    bindings.extend(self.bind_input(t, datum, lead_pos=lead_pos, tail_pos=tail_pos))
-                    success = True
-                    break
-            if not success:
-                raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
+                    schema = copy.deepcopy(schema)
+                    schema["type"] = t
+                    return self.bind_input(schema, datum, lead_pos=lead_pos, tail_pos=tail_pos)
+            raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
         elif isinstance(schema["type"], dict):
             st = copy.deepcopy(schema["type"])
             if binding and "inputBinding" not in st and "itemSeparator" not in binding and st["type"] in ("array", "map"):
@@ -181,9 +177,17 @@ class Builder(object):
 
 class Tool(Process):
     def _init_job(self, joborder, input_basedir, **kwargs):
+        builder = Builder()
+        builder.job = copy.deepcopy(joborder)
+
+        for i in self.tool["inputs"]:
+            (_, d) = urlparse.urldefrag(i["id"])
+            if d not in builder.job and "default" in i:
+                builder.job[d] = i["default"]
+
         # Validate job order
         try:
-            validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+            validate.validate_ex(self.names.get_name("input_record_schema", ""), builder.job)
         except validate.ValidationException as e:
             raise WorkflowException("Error validating input record, " + str(e))
 
@@ -194,9 +198,6 @@ class Tool(Process):
         self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
 
-        builder = Builder()
-        builder.job = copy.deepcopy(joborder)
-        builder.jslib = ''
         builder.input_basedir = input_basedir
         builder.files = []
         builder.bindings = []
@@ -265,9 +266,6 @@ class CommandLineTool(Tool):
 
         builder.bindings.sort(key=lambda a: a["position"])
 
-        _logger.debug(pprint.pformat(builder.bindings))
-        _logger.debug(pprint.pformat(builder.files))
-
         reffiles = [f["path"] for f in builder.files]
 
         j = CommandLineJob()
@@ -302,6 +300,9 @@ class CommandLineTool(Tool):
 
         for f in builder.files:
             f["path"] = builder.pathmapper.mapper(f["path"])[1]
+
+        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
+        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
 
         builder.requirements = j.requirements
 

@@ -8,7 +8,7 @@ import logging
 import sys
 import requests
 import docker
-from process import WorkflowException
+from process import WorkflowException, get_feature
 
 _logger = logging.getLogger("cwltool")
 
@@ -21,13 +21,14 @@ class CommandLineJob(object):
         runtime = []
         env = {}
 
-        img_id = docker.get_from_requirements(self.requirements, self.hints, pull_image)
+        (docker_req, docker_is_req) = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
 
         for f in self.pathmapper.files():
             if not os.path.exists(self.pathmapper.mapper(f)[0]):
                 raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
-        if img_id:
+        if docker_req:
+            img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
                 runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
@@ -65,6 +66,9 @@ class CommandLineJob(object):
             stdin = subprocess.PIPE
 
         if self.stdout:
+            dn = os.path.dirname(self.stdout)
+            if dn and not os.path.exists(dn):
+                os.makedirs(dn)
             stdout = open(self.stdout, "wb")
         else:
             stdout = sys.stderr
