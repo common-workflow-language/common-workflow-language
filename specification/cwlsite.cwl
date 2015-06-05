@@ -66,7 +66,7 @@
 
   hints:
     - class: DockerRequirement
-      dockerImageId: commonworkflowlanguage/cwltool_module
+      dockerPull: commonworkflowlanguage/cwltool_module
   steps:
   - id: "#spec"
     inputs:

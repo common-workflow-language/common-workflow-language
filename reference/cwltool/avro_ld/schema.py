@@ -35,6 +35,11 @@ def extend_avro(items):
             r["name"] = t["name"]
             if "specialize" in t:
                 r["fields"] = specialize(r["fields"], t["specialize"], {})
+
+            for f in r["fields"]:
+                if "inherited_from" not in f:
+                    f["inherited_from"] = t["extends"]
+
             r["fields"].extend(t.get("fields", []))
 
             for y in [x for x in r["fields"] if x["name"] == "class"]:
