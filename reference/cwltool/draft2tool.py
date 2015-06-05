@@ -275,6 +275,9 @@ class CommandLineTool(Tool):
         j.successCodes = self.tool.get("successCodes")
         j.temporaryFailCodes = self.tool.get("temporaryFailCodes")
         j.permanentFailCodes = self.tool.get("permanentFailCodes")
+        j.requirements = self.requirements
+        j.hints = self.hints
+
         builder.pathmapper = None
 
         if self.tool.get("stdin"):
@@ -284,12 +287,9 @@ class CommandLineTool(Tool):
             reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
-            j.stdout = self.tool["stdout"]
+            j.stdout = expression.do_eval(self.tool["stdout"], builder.job, j.requirements, self.docpath)
             if os.path.isabs(j.stdout):
                 raise validate.ValidationException("stdout must be a relative path")
-
-        j.requirements = self.requirements
-        j.hints = self.hints
 
         dockerReq, _ = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
         if dockerReq and use_container:

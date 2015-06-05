@@ -4,7 +4,7 @@ import json
 from aslist import aslist
 import logging
 import os
-from process import WorkflowException
+from process import WorkflowException, get_feature
 import process
 import yaml
 import avro_ld.validate as validate
@@ -23,7 +23,10 @@ def exeval(ex, jobinput, requirements, docpath, context, pull_image):
     for r in reversed(requirements):
         if r["class"] == "ExpressionEngineRequirement" and r["id"] == ex["engine"]:
             runtime = []
-            img_id = docker.get_from_requirements(r.get("requirements"), r.get("hints"), pull_image)
+
+            (docker_req, docker_is_req) = process.get_feature("DockerRequirement", requirements=r.get("requirements"), hints=r.get("hints"))
+            if docker_req:
+                img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             if img_id:
                 runtime = ["docker", "run", "-i", "--rm", img_id]
 

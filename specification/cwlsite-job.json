@@ -2,5 +2,13 @@
     "main_index_in": {
         "class": "File",
         "path": "../README.md"
-    }
+    },
+    "main_index_target": "index.html",
+    "main_title": "Common Workflow Language",
+
+    "cwl_schema_in": {
+        "class": "File",
+        "path": "../schemas/draft-2/cwl-avro.yml"
+    },
+    "cwl_schema_target": "draft-2/index.html"
 }

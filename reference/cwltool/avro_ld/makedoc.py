@@ -277,6 +277,7 @@ def avrold_doc(j, outdoc):
     }
 
     #toc {
+      margin-top: 1em;
       margin-bottom: 2em;
     }
 
@@ -319,6 +320,11 @@ def avrold_doc(j, outdoc):
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
-        with open("index.html", "w") as i:
+        if sys.argv[1].endswith("yml") or sys.argv[1].endswith("yaml"):
             j = yaml.load(f)
-            avrold_doc(j, i)
+        else:
+            j = [{"name": sys.argv[2],
+                  "type": "doc",
+                  "doc": f.read().decode("utf-8")
+              }]
+        avrold_doc(j, sys.stdout)

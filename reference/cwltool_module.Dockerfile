@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER jerome.petazzoni@docker.com
+MAINTAINER peter.amstutz@curoverse.com
 
 # Based on https://github.com/jpetazzo/dind
 
@@ -11,7 +11,7 @@ RUN apt-get update -qq && apt-get install -qqy \
     lxc \
     iptables \
     python-setuptools
-    
+
 # Install Docker from Docker Inc. repositories.
 RUN curl -sSL https://get.docker.com/ubuntu/ | sh
 
@@ -24,8 +24,3 @@ ADD setup.py README.rst cwltool/ /root/cwltool/
 ADD cwltool/ /root/cwltool/cwltool
 ADD cwltool/schemas/ /root/cwltool/cwltool/schemas
 RUN cd /root/cwltool && easy_install .
-
-# Define additional metadata for our image.
-VOLUME /var/lib/docker
-ENTRYPOINT ["wrapdocker", "cwltool"]
-

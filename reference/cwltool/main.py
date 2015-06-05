@@ -98,7 +98,7 @@ def main():
     except (avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
-            _logger.exception()
+            _logger.exception("")
         return 1
 
     #_logger.warn(url_fields)

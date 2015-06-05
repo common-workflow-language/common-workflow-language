@@ -1,2 +1,2 @@
 #!/bin/sh
-docker run --privileged -ti --volume=$PWD:/tmp/workdir -w=/tmp/workdir cwltool $*
+docker run --privileged -ti --volume=$PWD:/tmp/workdir -w=/tmp/workdir commonworkflowlanguage/cwltool $*

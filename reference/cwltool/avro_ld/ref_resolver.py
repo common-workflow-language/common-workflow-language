@@ -83,14 +83,16 @@ class Loader(object):
             self.idx[url] = obj
         else:
             # Load structured document
-            doc_url, _ = urlparse.urldefrag(url)
+            doc_url, frg = urlparse.urldefrag(url)
+            if doc_url in self.idx:
+                raise validate.ValidationException("Reference `#%s` not found in file `%s`." % (frg, doc_url))
             obj = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
         self.resolve_all(obj, url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
-        if url in self.idx:
+        if self.idx.get(url) is not None:
             return self.idx[url]
         else:
             raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
@@ -116,7 +118,13 @@ class Loader(object):
             return document
 
         for key, val in iterator:
-            document[key] = self.resolve_all(val, base_url)
+            try:
+                document[key] = self.resolve_all(val, base_url)
+            except validate.ValidationException as v:
+                if isinstance(key, basestring):
+                    raise validate.ValidationException("Validation error in field %s:\n%s" % (key, validate.indent(str(v))))
+                else:
+                    raise validate.ValidationException("Validation error in position %i:\n%s" % (key, validate.indent(str(v))))
 
         return document
 

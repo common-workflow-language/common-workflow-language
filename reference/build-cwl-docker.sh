@@ -6,7 +6,8 @@ if test -L cwltool/schemas ; then
   cp -r ../schemas cwltool/schemas
   restore=1
 fi
-docker build --tag=commonworkflowlanguage/cwltool .
+docker build --file=cwltool_module.Dockerfile --tag=commonworkflowlanguage/cwltool_module .
+docker build --file=cwltool.Dockerfile --tag=commonworkflowlanguage/cwltool .
 if test $restore = 1 ; then
   rm -r cwltool/schemas
   ln -s ../../schemas cwltool/schemas
