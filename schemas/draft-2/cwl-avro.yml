@@ -222,6 +222,17 @@
     In the generic execution sequence, expressions may be evaluated during step
     5 (process setup), step 6 (execute process), and/or step 7 (build output).
 
+    The inputs to an expression are the .  See
+    [ExpressionEngineRequirement](#expressionenginerequirement) for more
+    details.
+
+    Expressions must be evaluated in an isolated context (a "sandbox") which
+    permits no side effects to leak outside the context, and permit no outside
+    data to leak into the context.
+
+    The order in which expressions are evaluated within a process or workflow
+    is undefined.
+
     ## Workflow graph
 
     A workflow describes a set of **subprocesses** and the **dependencies**
@@ -245,7 +256,7 @@
     class: CommandLineTool
     description: "Reverse each line using the `rev` command"
 
-    # The inputs array defines the structure of the input object that describes
+    # The "inputs" array defines the structure of the input object that describes
     # the inputs to the underlying program.  Here, there is one input field
     # defined that will be called "input" and will contain a "File" object.
     #
@@ -258,7 +269,7 @@
         type: File
         inputBinding: {}
 
-    # The outputs array defines the structure of the output object that
+    # The "outputs" array defines the structure of the output object that
     # describes the outputs of the underlying program.  Here, there is one
     # output field defined that will be called "output", must be a "File" type,
     # and after the program executes, the output value will be the file
@@ -321,7 +332,14 @@
     # This is a two-step workflow which uses "revtool" and "sorttool" defined above.
     #
     class: Workflow
-    description: "Reverse the lines in a document, then sort those lines."
+    description: "Reverse the lines in a document, then sort lines."
+
+    # Requirements specify prerequisites and extensions to the workflow.
+    # In this example, DockerRequirement specifies a default Docker container
+    # in which the command line tools will execute.
+    requirements:
+      - class: DockerRequirement
+        dockerPull: debian:8
 
     # The inputs array defines the structure of the input object that describes
     # the inputs to the workflow.
@@ -338,17 +356,28 @@
         default: true
         description: "If true, reverse (decending) sort"
 
-    # The outputs array defines the structure of the output object that describes
+    # The "outputs" array defines the structure of the output object that describes
     # the outputs of the workflow.
     #
-    # Each output field must be connected to the output of one of the workflow steps using
-    # the "connect" field.
+    # Each output field must be connected to the output of one of the workflow
+    # steps using the "connect" field.  Here, the parameter "#output" of the
+    # workflow comes from the "#sorted" output of the "sort" step.
     outputs:
       - id: "#output"
         type: File
         connect: { source: "#sorted" }
         description: "The output with the lines reversed and sorted."
 
+    # The "steps" array lists the subprocesses that make up the workflow.
+    # The tool to execute each step is listed in the "run" field.
+    #
+    # In the first step, the "inputs" field of the step connects the upstream
+    # parameter "#input" of the workflow to the input parameter of the tool
+    # "revtool.cwl#input"
+    #
+    # In the second step, the "inputs" field of the step connects the output
+    # parameter "#reversed" from the first step to the input parameter of the
+    # tool "sorttool.cwl#input".
     steps:
       - inputs:
           - { param: "revtool.cwl#input", connect: { source: "#input" } }
@@ -364,7 +393,7 @@
         run: { import: sorttool.cwl }
     ```
 
-    revsort-job.json:
+    Sample input object:
     ```
     {
       "input": {
@@ -374,8 +403,18 @@
     }
     ```
 
+    Sample output object:
+    ```
+    {
+        "output": {
+            "path": "/tmp/tmpdeI_p_/output.txt",
+            "size": 1111,
+            "class": "File",
+            "checksum": "sha1$b9214658cc453331b62c2282b772a5c063dbd284"
+        }
+    }
+    ```
 
-  abstract: true
   jsonldPrefixes: {
     "cwl": "http://github.com/common-workflow-language#",
     "avro": "http://github.com/common-workflow-language/avro#",
@@ -386,13 +425,15 @@
   }
   jsonldVocab: cwl
 
+
 - name: Reference
   type: doc
-  doc: writeme
+  doc: This section specifies the core object types that make up a CWL document.
+
 
 - name: Datatype
   type: enum
-  docParent: Parameter
+  docParent: Schema
   symbols:
     - "null"
     - boolean
@@ -437,6 +478,9 @@
    * **array**: An ordered sequence of values
    * **map**: An unordered collection of key/value pairs
 
+   ## Any type
+
+   The `Any` type validates for any non-null value.
 
 - name: File
   type: record
@@ -565,20 +609,6 @@
   doc: |
     Define an input or output parameter to a process.
 
-    If the process is part of a workflow, the `connect` field must define
-    either a connection to an input parameter on the parent workflow, or to the
-    output parameter of another step in the same workflow.
-
-    There may be multiple inbound data links.  If so, the following rules apply
-    to combine the inputs:
-
-      1. The parameter type must be an array, or named in a [workflow scatter](#workflow)
-         operation
-      2. The source parameter must be the same type, or the type of array
-         element type defined by `items`.
-      3. Source parameters which are array of the same type are concatenated;
-         source parameters which are single element types are appended added as
-         single elements.
   fields:
     - name: type
       type:
@@ -592,26 +622,20 @@
       jsonldPredicate:
         "@id": "avro:type"
         "@type": "@vocab"
-    - name: connect
-      doc: "Connect this parameter to upstream parameters"
-      jsonldPredicate:
-        "@reverse": "wfdesc:hasSink"
-        "@type": "@id"
-      type:
-        - "null"
-        - DataLink
-        - type: array
-          items: DataLink
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
     - name: label
       type:
         - "null"
         - string
       jsondldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this parameter object."
     - name: description
       type:
         - "null"
         - string
       jsondldPredicate: "rdfs:comment"
+      doc: "A long, human-readable description of this parameter object."
 
     # - name: "default"
     #   type:
@@ -621,7 +645,7 @@
     #     field.
 
 
-- name: JsonPointer_enum
+- name: JsonPointer
   type: enum
   docParent: Expression
   symbols:
@@ -631,22 +655,15 @@
 
 - type: record
   name: Expression
-  docParent: Reference
+  docAfter: ExpressionTool
   doc: |
-    An expression is a fragment of executable code that is evaluated by
-    workflow the expression engine specified in `engine` in order to affect the
-    behavior of a process.  See [ExpressionEngineRequirement](#expressionenginerequirement)
-    for more details on expression engines.
 
-    Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.
-
-    The order in which expressions are evaluated within a process or workflow is undefined.
+    See [ExpressionEngineRequirement](#expressionenginerequirement)
+    for information on how to define a expression engine.
   fields:
     - name: engine
       type:
-        - JsonPointer_enum
+        - JsonPointer
         - string
       doc: |
         A reference to the ExpressionEngineRequirement defining which
@@ -751,19 +768,19 @@
 
 - type: record
   name: Process
-  docParent: Reference
   abstract: true
+  docAfter: ProcessRequirement
   doc: |
 
     The base executable type in CWL is the `Process` object defined by the
     document.  Note that the `Process` object is abstract and cannot be
-    directly executed.  If the `class` field is not specified, the
-    implementation must default to the class [`External`](\#external).
+    directly executed.
 
   fields:
     - name: id
       type: ["null", string]
       jsonldPredicate: "@id"
+      doc: "The unique identifier for this process object."
     - name: "inputs"
       type:
         type: "array"
@@ -810,12 +827,13 @@
         - "null"
         - string
       jsondldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this process object."
     - name: description
       type:
         - "null"
         - string
       jsondldPredicate: "rdfs:comment"
-
+      doc: "A long, human-readable description of this process object."
 
 - type: record
   name: CommandLineBinding
@@ -1134,6 +1152,7 @@
         - type: array
           items: int
 
+
 - type: record
   name: ExpressionTool
   extends: Process
@@ -1148,6 +1167,25 @@
       type: "Expression"
 
 
+- name: WorkflowOutputParameter
+  type: record
+  extends: OutputParameter
+  docParent: Workflow
+  fields:
+    - name: connect
+      doc: |
+        Connect this parameter to one or parameters in the workflow
+        which will provide the workflow output.
+      jsonldPredicate:
+        "@reverse": "wfdesc:hasSink"
+        "@type": "@id"
+      type:
+        - "null"
+        - DataLink
+        - type: array
+          items: DataLink
+
+
 - type: record
   name: WorkflowStepInput
   extends: Parameter
@@ -1156,11 +1194,22 @@
     - name: id
       type: ["null", string]
       jsonldPredicate: "@id"
+      doc: "The unique identifier for this parameter object."
     - name: param
       type: string
       jsonldPredicate:
         "@id": "wfdesc:hasArtifact"
         "@type": "@id"
+    - name: connect
+      doc: "Connect this parameter to upstream parameters"
+      jsonldPredicate:
+        "@reverse": "wfdesc:hasSink"
+        "@type": "@id"
+      type:
+        - "null"
+        - DataLink
+        - type: array
+          items: DataLink
 
 
 - type: record
@@ -1193,22 +1242,38 @@
 
 - name: Workflow
   type: record
-  docAfter: Process
+  docParent: Reference
   extends: Process
+  specialize:
+    OutputParameter: WorkflowOutputParameter
   doc: |
-    A workflow is a process consisting of one or more `subprocesses` or `subworkflows`.  Each
+    A workflow is a process consisting of one or more `subprocesses`.  Each
     step has input and output parameters defined by the `inputs` and `outputs`
-    fields.
+    fields.  A workflow executes as described in [execution model](#workflow_graph).
 
-    Steps are connected to other steps by data links.  Data links also connect
-    the input and output of steps to the input and output parameters of the
-    workflow.
+    # Data links
+
+    Dependencies between parameters are expressed by [data links](#datalink) on [workflow step input parameters](#workflowstepinput) and [workflow output parameters](#workflowoutputparameter).
 
     A data link connects the value of one parameter to another such that when a
     value becomes available for the parameter specified by
-    [`DataLink.source`](#dataLink), that value of the parameter is
+    [`DataLink.source`](#datalink), that value of the parameter is
     propagated to the destination parameter.  When all data links inbound to a
     given step are fufilled, the step is ready to execute.
+
+    ## Multiple inbound data links
+
+    There may be multiple inbound data links sending data to a parameter (the
+    "sink").  If so, the following rules apply to combine the inputs:
+
+      1. The sink parameter type must be an array, or named in a [workflow scatter](#scatter)
+         operation.
+      2. The source and sink parameters must be compatible types, or the source
+         type must be compatible with single element type "items" type of the
+         "sink" array type.
+      3. Source parameters which are array of the same type are concatenated;
+         source parameters which are single element types are appended added as
+         single elements.
 
   fields:
     - name: "class"

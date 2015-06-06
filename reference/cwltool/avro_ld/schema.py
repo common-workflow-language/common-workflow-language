@@ -43,7 +43,11 @@ def extend_avro(items):
             r["fields"].extend(t.get("fields", []))
 
             for y in [x for x in r["fields"] if x["name"] == "class"]:
-                y["type"] = {"type": "enum", "symbols": [r["name"]], "name": r["name"]+"_class"}
+                y["type"] = {"type": "enum",
+                             "symbols": [r["name"]],
+                             "name": r["name"]+"_class",
+                }
+                y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
             r["extends"] = t["extends"]
             r["abstract"] = t.get("abstract", False)
@@ -62,7 +66,7 @@ def schema(j):
     names = avro.schema.Names()
     j = extend_avro(j)
     for t in j:
-        if not t.get("abstract"):
+        if not t.get("abstract") and t.get("type") != "doc":
             avro.schema.make_avsc_object(t, names)
 
     return names

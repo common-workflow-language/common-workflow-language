@@ -86,6 +86,8 @@ def typefmt(tp, nbsp=False):
     if isinstance(tp, dict):
         if tp["type"] == "array":
             return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
+        if tp["type"] == "enum":
+            return tp["name"]
     else:
         if str(tp) in ("null", "boolean", "int", "long", "float", "double", "bytes", "string", "record", "enum", "array", "map"):
             return """<a href="#datatype">%s</a>""" % str(tp)
@@ -99,18 +101,21 @@ def add_dictlist(di, key, val):
 
 def number_headings(toc, maindoc):
     mdlines = []
+    skip = False
     for line in maindoc.splitlines():
         if line.strip() == "# Introduction":
             toc.start_numbering = True
             toc.numbering = [0]
 
-        m = re.match(r'^(#+) (.*)', line)
-        if m:
-            num = toc.add_entry(len(m.group(1)), m.group(2))
-            line = "%s %s %s" % (m.group(1), num, m.group(2))
-        #elif len(line) > 0 and line[0] == "#":
-        #    toc += """<li><a href="#%s">%s</a></li>\n""" % (to_id(line[2:]), line[2:])
-        line = re.sub(r'^(https?://\S+)', r'[\1](\1)', line)
+        if line == "```":
+            skip = not skip
+
+        if not skip:
+            m = re.match(r'^(#+) (.*)', line)
+            if m:
+                num = toc.add_entry(len(m.group(1)), m.group(2))
+                line = "%s %s %s" % (m.group(1), num, m.group(2))
+            line = re.sub(r'^(https?://\S+)', r'[\1](\1)', line)
         mdlines.append(line)
 
     maindoc = '\n'.join(mdlines)
@@ -151,7 +156,7 @@ class RenderType(object):
                             self.uses[tp].append((t["name"], f["name"]))
 
         for f in alltypes:
-            if "extends" not in f and "docParent" not in f and "docAfter" not in f:
+            if ("extends" not in f) and ("docParent" not in f) and ("docAfter" not in f):
                 self.render_type(f, 1)
 
 
@@ -189,6 +194,7 @@ class RenderType(object):
         if f["name"] in self.subs:
             doc += "\n\nExtended by"
             doc += ", ".join([" [%s](#%s)" % (s, to_id(s)) for s in self.subs[f["name"]]])
+
         if f["name"] in self.uses:
             doc += "\n\nReferenced by"
             doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in self.uses[f["name"]]])
@@ -196,7 +202,7 @@ class RenderType(object):
 
         doc = mistune.markdown(doc, renderer=MyRenderer())
 
-        if f["type"] == "record": # and not f.get("abstract"):
+        if f["type"] == "record":
             doc += "<h3>Fields</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
