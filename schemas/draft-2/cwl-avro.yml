@@ -164,9 +164,9 @@
     execution of a standalone, non-interactive program which is invoked on some
     input, produces output, and then terminates.
 
-    A **workflow** is a process characterized by multiple subprocesses, where
-    subprocess outputs are connected to the inputs of other downstream
-    subprocesses to form a directed graph, and independent subprocesses may run
+    A **workflow** is a process characterized by multiple steps, where
+    step outputs are connected to the inputs of other downstream
+    steps to form a directed graph, and independent steps may run
     concurrently.
 
     A **runtime environment** is the actual hardware and software environment when
@@ -215,12 +215,45 @@
     8. Validate output object against the `outputs` schema for the process.
     9. Report output object to the process caller.
 
+    ## Workflow graph
+
+    A workflow describes a set of **steps** and the **dependencies**
+    between those processes.  When a process produces output that will be
+    consumed by a second process, the second process is a dependency of the
+    first process.  When there is a dependency, the workflow engine must must
+    execute the producer process first and wait for it to successfully complete
+    and produce output before the executing the dependent second process that
+    will consume the output.  If two processes are defined in the workflow
+    graph that are not directly or indirectly dependent, these processes are
+    **independent**, and may execute in any order or execute concurrently.  A
+    workflow is complete when all steps have been executed.
+
+    ## Success and failure
+
+    A completed process must result in one of `success`, `temporaryFailure` or
+    `permanentFailure` states.  An implementation may choose to retry a process
+    execution which resulted in `temporaryFailure`.  An implementation may
+    choose to either continue running other steps of a workflow, or terminate
+    immediately upon permanentFailure.
+
+    * If any step of a workflow execution results in `permanentFailure`, the
+    workflow status is `permanentFailure`.
+
+    * If one or more steps result in `temporaryFailure` and all other steps
+    complete `success` or are not executed, then the workflow status is
+    `temporaryFailure`.
+
+    * If all workflow steps are executed and complete with `success` then the workflow
+    status is `success`.
+
     ## Expressions
 
     An expression is a fragment of executable code which is evaluated by
     workflow platform to affect the inputs, outputs, or behavior of a process.
     In the generic execution sequence, expressions may be evaluated during step
     5 (process setup), step 6 (execute process), and/or step 7 (build output).
+    Expressions are distinct from regular processes in that they are intended
+    to modify the workflow
 
     The inputs to an expression are the .  See
     [ExpressionEngineRequirement](#expressionenginerequirement) for more
@@ -233,18 +266,6 @@
     The order in which expressions are evaluated within a process or workflow
     is undefined.
 
-    ## Workflow graph
-
-    A workflow describes a set of **subprocesses** and the **dependencies**
-    between those processes.  When a process produces output that will be
-    consumed by a second process, the second process is a dependency of the
-    first process.  When there is a dependency, the workflow engine must must
-    execute the producer process first and wait for it to successfully complete
-    and produce output before the executing the dependent second process that
-    will consume the output.  If two processes are defined in the workflow
-    graph that are not directly or indirectly dependent, these processes are
-    **independent**, and may execute in any order or execute concurrently.  A
-    workflow is complete when all subprocesses have been executed.
 
     # Sample CWL workflow
 
@@ -368,7 +389,7 @@
         connect: { source: "#sorted" }
         description: "The output with the lines reversed and sorted."
 
-    # The "steps" array lists the subprocesses that make up the workflow.
+    # The "steps" array lists the executable steps that make up the workflow.
     # The tool to execute each step is listed in the "run" field.
     #
     # In the first step, the "inputs" field of the step connects the upstream
@@ -536,10 +557,8 @@
         "@id": "wfdesc:hasSource"
         "@type": "@id"
       doc: |
-        An input parameter on the parent workflow as identified by the
-        [`InputSchemaRoot.id`](#inputschemaroot), or an output
-        parameter of another step in the same workflow as identified by the
-        [`OutputSchemaRoot.id`](#outputschemaRoot) field.
+        A workflow parameter, either an input parameter of the workflow or an
+        output parameter of another workflow step.
 
 
 - name: Schema
@@ -644,7 +663,6 @@
     #     The default value for this parameter if there is no `connect`
     #     field.
 
-
 - name: JsonPointer
   type: enum
   docParent: Expression
@@ -652,12 +670,10 @@
     - JsonPointer
   jsonldPrefix: "cwl"
 
-
 - type: record
   name: Expression
   docAfter: ExpressionTool
   doc: |
-
     See [ExpressionEngineRequirement](#expressionenginerequirement)
     for information on how to define a expression engine.
   fields:
@@ -686,7 +702,7 @@
         - boolean
       doc: |
         Read up to the first 64 KiB of text from the file and place it in the
-        "contents" field of the file object for manipulation by scripts.
+        "contents" field of the file object for manipulation by expressions.
     - name: streamable
       type: ["null", "boolean"]
       doc: |
@@ -712,6 +728,9 @@
   fields:
     - name: inputBinding
       type: [ "null", "Binding" ]
+      doc: |
+        Describes how to handle a value in the input object convert it
+        into a concrete form for execution, such as command line parameters.
 
 
 - name: OutputSchema
@@ -733,9 +752,12 @@
     - name: id
       type: string
       jsonldPredicate: "@id"
+      doc: "The unique identifier for this parameter object."
     - name: "inputBinding"
       type: [ "null", "Binding" ]
-
+      doc: |
+        Describes how to handle the inputs of a process and convert them
+        into a concrete form for execution, such as command line parameters.
 
 - name: OutputParameter
   type: record
@@ -746,9 +768,13 @@
     - name: id
       type: string
       jsonldPredicate: "@id"
+      doc: "The unique identifier for this parameter object."
     - name: "outputBinding"
       type: [ "null", "Binding" ]
-
+      doc: |
+        Describes how to handle the concrete outputs of a process step (such as
+        files created by a programs) and describe them in the process output
+        parameter.
 
 - type: record
   name: ProcessRequirement
@@ -781,42 +807,42 @@
       type: ["null", string]
       jsonldPredicate: "@id"
       doc: "The unique identifier for this process object."
-    - name: "inputs"
+    - name: inputs
       type:
-        type: "array"
-        items: "InputParameter"
+        type: array
+        items: InputParameter
       jsonldPredicate: "wfdesc:hasInput"
-      doc:
-        "Defines the input parameters of the process.  This may be used to
-        validate the input object or build a user interface for constructing
-        the input object."
-    - name: "outputs"
+      doc: |
+        Defines the input parameters of the process.  The process is ready to
+        run when all required input parameters are associated with concrete
+        values.  Input parameters include a schema for each parameter and is
+        used to validate the input object, it may also be used build a user
+        interface for constructing the input object.
+    - name: outputs
       type:
-        type: "array"
-        items: "OutputParameter"
+        type: array
+        items: OutputParameter
       jsonldPredicate: "wfdesc:hasOutput"
-      doc: "Defines the input parameters of the process, and
-        may be used to generate and/or validate the input object."
+      doc: |
+        Defines the parameters representing the output of the process.  May be
+        used to generate and/or validate the output object.
     - name: "requirements"
       type:
         - "null"
         - type: "array"
           items: "ProcessRequirement"
       doc: >
-        Declares requirements applying to either the runtime environment or the
+        Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this process.  If
         an implementation cannot satisfy all requirements, or a requirement is
         listed which is not recognized by the implementation, it is a fatal
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
     - name: "hints"
-      type: [
-        "null",
-        {
-          type: "array",
+      type:
+        - "null"
+        - type: "array"
           items: "ProcessRequirement"
-        }
-      ]
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
@@ -852,29 +878,30 @@
     expression evaluation, an implementation must use the data type of the
     effective value.
 
-      - **string**: Add `prefix`, `separator` and string to the command line.
+      - **string**: Add `prefix` and the string to the command line.
 
-      - **number**: Add `prefix`, `separator` and decimal string representation
-        and add to command line.
+      - **number**: Add `prefix` and decimal representation to command line.
 
       - **boolean**: If true, add `prefix` to the command line.  If false, add
           nothing.
 
-      - **File**: Add `prefix`, `separator`, and the value of
+      - **File**: Add `prefix` and the value of
         [`File.path`](#file) to the command line.
 
-      - **array**: If `itemSeparator` is specified, add `prefix`, `separator`,
-          and the join the array as described below.  Otherwise add `prefix`
-          only.
+      - **array**: If `itemSeparator` is specified, add `prefix` and the join
+          the array into a single string with `itemSeparator` separating the
+          items.  Otherwise add `prefix` and recursively add individual
+          elements.
 
-      - **object**: Add `prefix` only.
+      - **object**: Add `prefix` only, and recursively add object fields for
+          which `inputBinding` is specified.
 
       - **null**: Add nothing.
 
   fields:
     - name: "position"
       type: ["null", "int"]
-      doc: "The sorting key"
+      doc: "The sorting key.  Default position is 0."
     - name: "prefix"
       type: [ "null", "string"]
       doc: "Command line prefix to add before the value."
@@ -882,7 +909,7 @@
       type: ["null", boolean]
       doc: |
         If true (default) then the prefix and value must be added as separate
-        command line arguments; if false, prefix value must be concatenated
+        command line arguments; if false, prefix and value must be concatenated
         into a single command line argument.
     - name: "itemSeparator"
       type: ["null", "string"]
@@ -894,12 +921,18 @@
         - "null"
         - "string"
         - "Expression"
-        - type: array
-          items: ["string", "Expression"]
       doc: |
-        An expression or reference to a field in the input object which must be
-        evaluted to yield the effective value to use to build the command line.
-        Required when evaluating the binding as part of the `CommandLineTool.arguments` field.
+        If `valueFrom` is a constant string value, use this as the value and
+        apply the binding rules above.
+
+        If `valueFrom` is an expression, evaluate the expression to yield the
+        actual value to use to build the command line and apply the binding
+        rules above.  If the inputBinding is associated with an input
+        parameter, the "context" of the expression will be the value of the
+        input parameter.
+
+        When a binding is part of the `CommandLineTool.arguments` field,
+        the `valueFrom` field is required.
 
 
 - type: record
@@ -907,7 +940,12 @@
   extends: Binding
   docParent: CommandOutputParameter
   doc: |
-    Binding operations are applied in the following order.
+    Describes how to generate an output parameter based on the files produced
+    by a CommandLineTool.
+
+    The output parameter is generated by applying these operations in
+    the following order:
+
       - glob
       - loadContents
       - outputEval
@@ -959,6 +997,7 @@
   name: CommandInputParameter
   extends: InputParameter
   docParent: CommandLineTool
+  doc: An input parameter for a CommandLineTool.
   specialize:
     InputSchema: CommandInputSchema
     Binding: CommandLineBinding
@@ -968,6 +1007,7 @@
   name: CommandOutputParameter
   extends: OutputParameter
   docParent: CommandLineTool
+  doc: An output parameter for a CommandLineTool.
   specialize:
     OutputSchema: CommandOutputSchema
     Binding: CommandOutputBinding
@@ -981,22 +1021,23 @@
     OutputParameter: CommandOutputParameter
   doc: |
 
-    A *tool* is a standalone, non-interactive command line application which is
-    invoked on some input to perform computation, produce output, and then
-    terminate.  In order to use a tool in a workflow, it is necessary to
-    connect the inputs and outputs of the tool to upstream and downstream
-    steps.  However, because of the enormous variety in syntax for input,
-    invocation, and output, it is necessary to provide describe the invocation
-    in detail.  The CommandLineTool process describes how to translate inputs
-    to an actual program invocation and collect the resulting output.
+    A CommandLineTool process is a process implementation for executing a
+    standalone, non-interactive command line applications.  To help accomodate
+    of the enormous variety in syntax and semantics for input, runtime
+    environment, invocation, and output of arbitrary programs, CommandLineTool
+    provides the concept of "input binding" to describe how to translate input
+    parameters to an actual program invocation, and "output binding" to
+    describe how generate output parameters from program output.
 
-    ## Command line binding
+    # Input binding
 
     The tool command line is built by applying command line bindings to the
-    input object.  Bindings can be listed directly under input parameters using
-    the `inputBinding` field, or separately using the `arguments` field.
+    input object.  Bindings are listed either as part of an [input
+    parameter](#commandlineinputparameter) using the `inputBinding` field, or
+    separately using the `arguments` field of the CommandLineTool.
 
-    The algorithm to build the command line is as follows:
+    The algorithm to build the command line is as follows.  In this algorithm,
+    the sort key is a list consisting of one or more numeric and string elements.
 
       1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
       key `[position, i]` where `position` is
@@ -1007,43 +1048,68 @@
       associate them with values from the input object.  Where the input type
       is a record, array, or map, recursively walk the schema and input object,
       collecting nested `CommandLineBinding` objects and associating them with
-      values from the input object.  Assign a sorting key for each leaf binding
-      object by appending nested `position` fields together with the record
-      name, array index, or map key of the data at each nesting level.
+      values from the input object.
 
-      3. Sort elements on the assigned sorting keys.
+      3. Assign a sorting key for each leaf binding object by appending nested
+      `position` fields together with the array index, or map key of the data
+      at each nesting level.  If two bindings have the same position, the tie
+      must be broken using the lexographic ordering of the field or parameter
+      name immediately containing the binding.
 
-      4. Apply the rules defined in
-      [`CommandLineBinding`](#ommandlinebinding) to convert bindings
-      to actual command line elements.
+      4. Sort elements lexicographically using the assigned sorting keys.
+      Numeric entries sort before strings.  Strings are sorted based on UTF-8
+      encoding.
 
-      5. Insert elements from `baseCommand` at the beginning of the command
+      5. In the sorted order, apply the rules defined in
+      [`CommandLineBinding`](#commandlinebinding) to convert bindings to actual
+      command line elements.
+
+      6. Insert elements from `baseCommand` at the beginning of the command
       line.
 
-    ## Execution
+    # Runtime environment
 
-    Once the command line is built, the tool is almost ready to execute.
+    All files listed in the input object must be made available in the runtime
+    environment.  The implementation may use a shared or distributed file
+    system or transfer files via explicit download.  Implementations may choose
+    not to provide access to files not explicitly specified by the input object
+    or process requirements.
+
+    Output files produced by tool execution must be written to the **designated
+    output directory**.
+
+    The initial current working directory when executing the tool must be the
+    designated output directory.
 
     The `TMPDIR` environment variable must be set in the runtime environment to
     the **designated temporary directory**.  Any files written to the
     designated temporary directory may be deleted by the workflow
     infrastructure when the tool invocation is complete.
 
-    When the tool is initially executed, the designated designated temporary
-    directory must contain a single file "cwl.input.json", which contains the
-    input object encoded in JSON.
-
-    Output files produced by tool execution must be written to the **designated
-    output directory**.  The designated output directory must be the initial
-    current working in when executing the tool.
-
-    The standard input stream and standard output stream may be redirected as
-    described below.
-
     An implementation may forbid the tool from writing to any location in the
     runtime environment file system other than the designated temporary
     directory and designated output directory.  An implementation may provide
     read-only input files, and disallow in-place update of input files.
+
+    The standard input stream and standard output stream may be redirected as
+    described in the `stdin` and `stdout` fields.
+
+    ## Extensions
+
+    [DockerRequirement](#dockerrequirement),
+    [CreateFileRequirement](#createfilerequirement), and
+    [EnvVarRequirement](#envvarrequirement), are available as standard
+    extensions to core command line tool semantics for defining the runtime
+    environment.
+
+    # Execution
+
+    Once the command line is built and the runtime environment is created, the
+    actual tool is executed.
+
+    The standard error stream and standard output stream (unless redirected by
+    setting `stdout`) may be captured by platform logging facilities for
+    storage and reporting.
 
     Tools may be multithreaded or spawn child processes; however, when the
     parent process exits, the tool is considered finished regardless of whether
@@ -1051,40 +1117,21 @@
     kind of console, GUI, or web based user interaction in order to start and
     run to completion.
 
-    The standard error stream and standard output stream (unless redirected)
-    may be captured by platform logging facilities for storage and reporting.
+    The exit code of the process indicates if the process completed
+    successfully.  By convention, an exit code of zero is treated as success
+    and non-zero exit codes are treated as failure.  This may be customized by
+    providing the fields `successCodes`, `temporaryFailCodes`, and
+    `permanentFailCodes`.  An implementation may choose to default unspecified
+    non-zero exit codes to either `temporaryFailure` or `permanentFailure`.
 
-    ## Executing tools in Docker
-
-    If the command line tool lists
-    [`DockerRequirement`](#dockerrequirement) under `hints` or
-    `requirements`, it may (or must) be run in the specified Docker container.
-
-    The platform must first acquire or install the correct Docker image, as
-    described by [`DockerRequirement`](#dockerrequirement).
-
-    The platform must execute the tool in the container using `docker run` with
-    the appropriate Docker image and the tool command line.
-
-    The workflow platform may provide input files and the designated output
-    directory through the use of volume bind mounts.  The platform may rewrite
-    file paths in the input object to correspond to the Docker bind mounted
-    locations.
-
-    When running a tool contained in Docker, the workflow platform must not
-    assume anything about the contents of the Docker container, such as the
-    presence or absence of specific software, except to assume that the
-    generated command line represents a valid command within the runtime
-    environment of the container.
-
-    ## Output binding
+    # Output binding
 
     If the output directory contains a file called "cwl.output.json", that file
     must be loaded and used as the output object.  Otherwise, the output object
-    must be generated by walking the output schema and applying output bindings
-    to the tool output.  Output bindings are listed directly in output
-    parameters using the `outputBinding` field.  See
-    [`OutputBinding`](#outputbinding) for details.
+    must be generated by walking the parameters listed in `outputs` and
+    applying output bindings to the tool output.  Output bindings are
+    associated with output parameters using the `outputBinding` field.  See
+    [`CommandOutputBinding`](#commandoutputbinding) for details.
 
   fields:
     - name: "class"
@@ -1110,8 +1157,7 @@
         "@container": "@list"
     - name: arguments
       doc: |
-        Command line bindings which are not directly associated with values
-        from the input object.
+        Command line bindings which are not directly associated with input parameters.
       type:
         - "null"
         - type: array
@@ -1141,17 +1187,28 @@
         - "null"
         - type: array
           items: int
+      doc: |
+        Exit codes that indicate the process completed successfully.
+
     - name: temporaryFailCodes
       type:
         - "null"
         - type: array
           items: int
+      doc: |
+        Exit codes that indicate the process failed due to a possibly
+        temporary condition, where excuting the process with the same
+        runtime environment and inputs may produce different results.
+
     - name: permanentFailCodes
       type:
         - "null"
         - type: array
           items: int
-
+      doc:
+        Exit codes that indicate the process failed due to a permanent logic
+        error, where excuting the process with the same runtime environment and
+        same inputs is expected to always fail.
 
 - type: record
   name: ExpressionTool
@@ -1171,6 +1228,10 @@
   type: record
   extends: OutputParameter
   docParent: Workflow
+  doc: |
+    Describe an output parameter of a workflow.  The parameter must be
+    connected to one or more parameters defined in the workflow that will
+    provide the value of the output parameter.
   fields:
     - name: connect
       doc: |
@@ -1190,18 +1251,26 @@
   name: WorkflowStepInput
   extends: Parameter
   docParent: WorkflowStep
+  doc: |
+    The input of a workflow step connects an upstream parameter (from the
+    workflow inputs, or the outputs of other workflows steps) with the input
+    parameters of the underlying process.
   fields:
     - name: id
       type: ["null", string]
       jsonldPredicate: "@id"
-      doc: "The unique identifier for this parameter object."
+      doc: "A unique identifier for this workflow input parameter."
     - name: param
       type: string
       jsonldPredicate:
         "@id": "wfdesc:hasArtifact"
         "@type": "@id"
+      doc: |
+        The input parameter of the underlying process (specified in the `run` field
+        of `WorkflowStep`) that will get the value from `connect`.
     - name: connect
-      doc: "Connect this parameter to upstream parameters"
+      doc: |
+        Specifies one or more workflow parameters that will provide input to the underlying process parameter specified in `param`.
       jsonldPredicate:
         "@reverse": "wfdesc:hasSink"
         "@type": "@id"
@@ -1216,16 +1285,27 @@
   name: WorkflowStepOutput
   docParent: WorkflowStep
   extends: Parameter
+  doc: |
+    Associate an output parameter of the underlying process with a workflow
+    parameter.  The workflow parameter (given in the `id` field) be may be used
+    as a `source` to connect with input parameters of other workflow steps, or
+    with an output parameter of the process.
   fields:
     - name: id
       type: string
       jsonldPredicate: "@id"
+      doc: |
+        A unique identifier for this workflow output parameter.  This is the
+        identifier to use in the `source` field of `DataLink` to connect the
+        output value to downstream parameters.
     - name: param
       type: string
       jsonldPredicate:
         "@id": "wfdesc:hasArtifact"
         "@type": "@id"
-
+      doc: |
+        The output parameter of the underlying process (specified in the `run` field
+        of `WorkflowStep`) that will provide the value for this this parameter.
 
 - name: WorkflowStep
   type: record
@@ -1234,6 +1314,11 @@
   specialize:
     InputParameter: WorkflowStepInput
     OutputParameter: WorkflowStepOutput
+  doc: |
+    A workflow step is the basic executable element of a workflow.  It specifies the
+    underlying process implementation (such as `CommandLineTool`) in the `run`
+    field and connects the input and output parameters of the underlying
+    process to workflow parameters.
   fields:
     - name: run
       type: [CommandLineTool, ExpressionTool]
@@ -1247,19 +1332,19 @@
   specialize:
     OutputParameter: WorkflowOutputParameter
   doc: |
-    A workflow is a process consisting of one or more `subprocesses`.  Each
+    A workflow is a process consisting of one or more `steps`.  Each
     step has input and output parameters defined by the `inputs` and `outputs`
     fields.  A workflow executes as described in [execution model](#workflow_graph).
 
-    # Data links
+    # Dependencies
 
     Dependencies between parameters are expressed by [data links](#datalink) on [workflow step input parameters](#workflowstepinput) and [workflow output parameters](#workflowoutputparameter).
 
-    A data link connects the value of one parameter to another such that when a
-    value becomes available for the parameter specified by
-    [`DataLink.source`](#datalink), that value of the parameter is
-    propagated to the destination parameter.  When all data links inbound to a
-    given step are fufilled, the step is ready to execute.
+    A data link expresses the dependency of one parameter on another such that
+    when a value is associated with the parameter specified by
+    [`DataLink.source`](#datalink), that value is propagated to the destination
+    parameter.  When all data links inbound to a given step are fufilled, the
+    step is ready to execute.
 
     ## Multiple inbound data links
 
@@ -1275,6 +1360,11 @@
          source parameters which are single element types are appended added as
          single elements.
 
+    # Extensions
+
+    [Scatter](#scatter) and [Subworkflows](#Subworkflows) are available
+    as standard extensions to core workflow semantics.
+
   fields:
     - name: "class"
       jsonldPredicate:
@@ -1284,12 +1374,11 @@
     - name: steps
       jsonldPredicate: "wfdesc:hasSubProcess"
       doc: |
-        Subprocesses to execute as workflow steps.  Steps are executed when all
-        input data links are fufilled.  Steps may execute concurrently.  The
-        order in which steps are listed does not affect the actual execution
-        order of steps.
+        The individual steps that make up the workflow.  Steps are executed when all
+        input data links are fufilled.  An implementation may choose to execute
+        the steps in a different order than listed and/or execute steps
+        concurrently, provided that dependencies between steps are met.
       type:
-        - "null"
         - type: array
           items: WorkflowStep
 
@@ -1301,6 +1390,28 @@
     Indicates that a workflow component should be run in a
     [Docker](http://docker.com) container, and specifies how to fetch or build
     the image.
+
+    If a CommandLineTool lists [`DockerRequirement`](#dockerrequirement) under
+    `hints` or `requirements`, it may (or must) be run in the specified Docker
+    container.
+
+    The platform must first acquire or install the correct Docker image, as
+    described by [`DockerRequirement`](#dockerrequirement).
+
+    The platform must execute the tool in the container using `docker run` with
+    the appropriate Docker image and the tool command line.
+
+    The workflow platform may provide input files and the designated output
+    directory through the use of volume bind mounts.  The platform may rewrite
+    file paths in the input object to correspond to the Docker bind mounted
+    locations.
+
+    When running a tool contained in Docker, the workflow platform must not
+    assume anything about the contents of the Docker container, such as the
+    presence or absence of specific software, except to assume that the
+    generated command line represents a valid command within the runtime
+    environment of the container.
+
   fields:
     - name: dockerPull
       type: ["null", "string"]
