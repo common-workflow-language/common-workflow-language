@@ -21,14 +21,6 @@ http://common-workflow-language.github.io/draft-2/
 Please be aware that Common Workflow Language is still under development.  The
 current draft is draft 2.  This draft is not final.
 
-## Development
-
-[![Build Status](https://ci.curoverse.com/buildStatus/icon?job=common-workflow-language)](https://ci.curoverse.com/job/common-workflow-language/)
-
-The CWL effort is on Github:
-
-https://github.com/common-workflow-language/common-workflow-language
-
 ## Implementations
 
 Current work-in-progress implementations of the common workflow language:
@@ -40,13 +32,19 @@ Current work-in-progress implementations of the common workflow language:
 
 [Github repository of example workflows.](https://github.com/common-workflow-language/workflows)
 
-## Testing
+## Development and testing
+
+[![Build Status](https://ci.curoverse.com/buildStatus/icon?job=common-workflow-language)](https://ci.curoverse.com/job/common-workflow-language/)
+
+The CWL effort is on Github:
+
+https://github.com/common-workflow-language/common-workflow-language
 
 There is a Jenkins server maintained by Curoverse that runs tests for the
 reference implementation, builds and uploads packages, and builds and uploads
 Docker images:
 
-* https://ci.curoverse.com/job/common-workflow-language/
+https://ci.curoverse.com/job/common-workflow-language/
 
 ## Contributing
 
