@@ -68,8 +68,7 @@
     * [JSON-LD](http://json-ld.org)
     * [JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
     * [YAML](http://yaml.org)
-    * [Avro](https://avro.apache.org)
-    * [ECMAScript 5.1 (Javascript)](http://www.ecma-international.org/ecma-262/5.1/)
+    * [Avro](https://avro.apache.org/docs/current/spec.html)
     * [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
 
     ## Scope
@@ -146,7 +145,7 @@
     The latest draft-2 schema is defined here:
     https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
 
-    ## Identifiers and references
+    ## Identifiers
 
     If an object contains an `id` field, that is used to uniquely identify the
     object in that document.  The value of the `id` field must be unique over the
@@ -157,18 +156,46 @@
     An implementation may choose to only honor references to object types for
     which the `id` field is explicitly listed in this specification.
 
+    When loading a CWL document, an implementation may resolve relative
+    identifiers to absolute URI references.  For example, "my_tool.cwl" located
+    in the directory "/home/example/work/" may be transformed to
+    "file:///home/example/work/my_tool.cwl" and a relative fragment reference
+    "#input" in this file may be transformed to
+    "file:///home/example/work/my_tool.cwl#input".
+
+    ## Document preprocessing
+
+    An implementation must resolve `import` directives.  An `import` directive
+    is an object consisting of the field `import` specifying a URI.  The URI
+    referenced by `import` must be loaded as a CWL document (including
+    recursive preprocessing) and then the `import` object is implicitly
+    replaced by the external resource.  URIs may include document fragments
+    referring to objects identified by `id` field, in which case the `import`
+    directive is replaced by only the fragment object.
+
+    An implementation must resolve `include` directives.  An `include`
+    directive is an object consisting of the field `include` specifying a URI.
+    The URI referenced by `include` must be loaded as UTF-8 encoded text
+    document and the `include` directive implicitly replaced by a string with
+    the contents of the document.  Because the loaded resource is unparsed,
+    URIs used with `include` must not include fragments.
+
     # Execution model
 
     ## Execution concepts
 
-    A **command line tool** is a process characterized by the
-    execution of a standalone, non-interactive program which is invoked on some
-    input, produces output, and then terminates.
+    A **parameter** is a named symbolic input or output of process, with an
+    associated datatype or schema.  During execution, values are assigned to
+    parameters to make the input object or output object used for concrete
+    process invocation.
 
-    A **workflow** is a process characterized by multiple steps, where
-    step outputs are connected to the inputs of other downstream
-    steps to form a directed graph, and independent steps may run
-    concurrently.
+    A **command line tool** is a process characterized by the execution of a
+    standalone, non-interactive program which is invoked on some input,
+    produces output, and then terminates.
+
+    A **workflow** is a process characterized by multiple subprocess steps,
+    where step outputs are connected to the inputs of other downstream steps to
+    form a directed graph, and independent steps may run concurrently.
 
     A **runtime environment** is the actual hardware and software environment when
     executing a command line tool.  It includes, but is not limited to, the
@@ -190,21 +217,21 @@
     * Data security and permissions.
     * Scheduling tool invocations on remote cluster or cloud compute nodes.
     * Using virtual machines or operating system containers to manage the runtime
-    (except as described in [Executing tools in
-    Docker](#executing-tools-in-docker))
+    (except as described in [DockerRequirement](#dockerrequirement)).
     * Using remote or distributed file systems to manage input and output files.
-    * Translating or rewrite file paths.
-    * Determining if a process has already been executed and can be skipped and
-    re-use previous results.
-    * Pause and resume of processes or workflows.
+    * Translating or rewriting file paths.
+    * Determining if a process has previously been executed and can be skipped and
+    previous results re-used.
+    * Pausing and resuming of processes or workflows.
 
-    Conforming CWL documents must not assume anything about the runtime environment
-    or workflow platform unless explicitly declared though the use of [process
-    requirements](#processrequirement).
+    Conforming CWL processes must not assume anything about the runtime
+    environment or workflow platform unless explicitly declared though the use
+    of [process requirements](#processrequirement).
 
     ## Generic execution process
 
-    The generic execution sequence of a CWL process is as follows.
+    The generic execution sequence of a CWL process (including both workflows
+    and concrete process implementations) is as follows.
 
     1. Load and validate CWL document, yielding a process object.
     2. Load input object.
@@ -238,37 +265,6 @@
 
     Process requirements are the primary mechanism for specifying extensions to
     the CWL core specification.
-
-    ## Workflow graph
-
-    A workflow describes a set of **steps** and the **dependencies**
-    between those processes.  When a process produces output that will be
-    consumed by a second process, the second process is a dependency of the
-    first process.  When there is a dependency, the workflow engine must must
-    execute the producer process first and wait for it to successfully complete
-    and produce output before the executing the dependent second process that
-    will consume the output.  If two processes are defined in the workflow
-    graph that are not directly or indirectly dependent, these processes are
-    **independent**, and may execute in any order or execute concurrently.  A
-    workflow is complete when all steps have been executed.
-
-    ## Success and failure
-
-    A completed process must result in one of `success`, `temporaryFailure` or
-    `permanentFailure` states.  An implementation may choose to retry a process
-    execution which resulted in `temporaryFailure`.  An implementation may
-    choose to either continue running other steps of a workflow, or terminate
-    immediately upon permanentFailure.
-
-    * If any step of a workflow execution results in `permanentFailure`, the
-    workflow status is `permanentFailure`.
-
-    * If one or more steps result in `temporaryFailure` and all other steps
-    complete `success` or are not executed, then the workflow status is
-    `temporaryFailure`.
-
-    * If all workflow steps are executed and complete with `success` then the workflow
-    status is `success`.
 
     ## Expressions
 
@@ -314,6 +310,37 @@
 
     The order in which expressions are evaluated within a process or workflow
     is undefined.
+
+    ## Workflow graph
+
+    A workflow describes a set of **steps** and the **dependencies**
+    between those processes.  When a process produces output that will be
+    consumed by a second process, the second process is a dependency of the
+    first process.  When there is a dependency, the workflow engine must must
+    execute the producer process first and wait for it to successfully complete
+    and produce output before the executing the dependent second process that
+    will consume the output.  If two processes are defined in the workflow
+    graph that are not directly or indirectly dependent, these processes are
+    **independent**, and may execute in any order or execute concurrently.  A
+    workflow is complete when all steps have been executed.
+
+    ## Success and failure
+
+    A completed process must result in one of `success`, `temporaryFailure` or
+    `permanentFailure` states.  An implementation may choose to retry a process
+    execution which resulted in `temporaryFailure`.  An implementation may
+    choose to either continue running other steps of a workflow, or terminate
+    immediately upon permanentFailure.
+
+    * If any step of a workflow execution results in `permanentFailure`, the
+    workflow status is `permanentFailure`.
+
+    * If one or more steps result in `temporaryFailure` and all other steps
+    complete `success` or are not executed, then the workflow status is
+    `temporaryFailure`.
+
+    * If all workflow steps are executed and complete with `success` then the workflow
+    status is `success`.
 
 
     # Sample CWL workflow
@@ -538,7 +565,7 @@
    * **long**: 64-bit signed integer
    * **float**: single precision (32-bit) IEEE 754 floating-point number
    * **double**: double precision (64-bit) IEEE 754 floating-point number
-   * **bytes**: sequence of 8-bit unsigned bytes
+   * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
    * **string**: unicode character sequence
 
    ## Complex types
@@ -548,9 +575,14 @@
    * **array**: An ordered sequence of values
    * **map**: An unordered collection of key/value pairs
 
+   ## File type
+
+   See [File](#file) below.
+
    ## Any type
 
-   The `Any` type validates for any non-null value.
+   The **Any** type validates for any non-null value.
+
 
 - name: File
   type: record
@@ -565,31 +597,30 @@
       jsonldPredicate:
         "@id": "@type"
         "@type": "@vocab"
+      doc: Must be `File` to indicate this object describes a file.
     - name: "path"
       type: "string"
+      doc: The path to the file.
     - name: "checksum"
       type: ["null", "string"]
+      doc: |
+        Optional hash code for validating file integrity.  Currently must be in the form
+        "sha1$ + hexidecimal string" using the SHA-1 algorithm.
     - name: "size"
       type: ["null", "long"]
+      doc: Optional file size.
     - name: "secondaryFiles"
       type:
         - "null"
         - type: array
           items: File
-
-
-# - name: Import
-#   type: record
-#   fields:
-#     - name: "import"
-#       type: "string"
-#       jsonldPredicate: "@id"
-#   doc: |
-#     A URI reference to external document or document fragment.  This may refer
-#     to an object within the current document, to an external file, or to a
-#     labeled object within an external file.  To reference an object within the
-#     current document or an external document, the object must be labeled with
-#     an `id` field.
+      doc: |
+        A list of additional files that are associated with the primary file
+        and must be transferred alongside the primary file.  Examples include
+        indexes of the primary file, or external references which must be
+        included when loading primary document.  A file object listed in
+        `secondaryFiles` may itself include `secondaryFiles` for which the same
+        rules apply.
 
 
 - name: DataLink
@@ -767,6 +798,18 @@
       doc: |
         Applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
+
+        If the value is Expression, the context of the expression is the input
+        or output File parameter to which this binding applies.
+
+        Where the value is a string, it specifies that the following pattern
+        should be applied to the primary file:
+
+          # If string begins with one or more caret `^` characters, for each
+            caret, remove the last file extension from the path (the last
+            period `.` and all following characters).  If there are no file
+            extensions, the path is unchanged.
+          # Append the remainder of the string to the end of the file path.
 
 
 - name: InputSchema
