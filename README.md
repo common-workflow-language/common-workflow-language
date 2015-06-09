@@ -18,8 +18,16 @@ Bioinformatics, Chemistry, Physics, and Astronomy.
 
 http://common-workflow-language.github.io/draft-2/
 
-Please be aware that Common Workflow Language is still under heavy development.
-The current draft is draft 2.  This draft is not final.
+Please be aware that Common Workflow Language is still under development.  The
+current draft is draft 2.  This draft is not final.
+
+## Development
+
+[![Build Status](https://ci.curoverse.com/buildStatus/icon?job=common-workflow-language)](https://ci.curoverse.com/job/common-workflow-language/)
+
+The CWL effort is on Github:
+
+https://github.com/common-workflow-language/common-workflow-language
 
 ## Implementations
 
