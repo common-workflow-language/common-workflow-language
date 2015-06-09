@@ -66,6 +66,7 @@
 
     * [JSON](http://json.org)
     * [JSON-LD](http://json-ld.org)
+    * [JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
     * [YAML](http://yaml.org)
     * [Avro](https://avro.apache.org)
     * [ECMAScript 5.1 (Javascript)](http://www.ecma-international.org/ecma-262/5.1/)
@@ -113,8 +114,8 @@
 
     A **document** is a file containing a serialized object, or an array of objects.
 
-    A **process** is a basic unit of computation.  It accepts some input data,
-    performs some computation, produces a some output data.
+    A **process** is a basic unit of computation which accepts input data,
+    performs some computation, and produces output data.
 
     A **input object** is a object describing the inputs to a invocation of process.
 
@@ -215,6 +216,29 @@
     8. Validate output object against the `outputs` schema for the process.
     9. Report output object to the process caller.
 
+    ## Requirements and hints
+
+    [Process requirements](#processrequirement) modify the semantics or runtime
+    environment of a process.  If an implementation cannot satisfy all
+    requirements, or a requirement is listed which is not recognized by the
+    implementation, it is a fatal error and the implementation must not attempt
+    to run the process, unless overridden at user option.
+
+    A `hint` is similar to a requirement, however it is not an error if an
+    implementation cannot satisfy all hints.  The implementation may report a
+    warning if a hint cannot be satisfied.
+
+    Requirements are inherited.  A requirement specified in a Workflow applies
+    to all workflow steps; a requirement specified on a workflow step will
+    apply to the process implementation.  However, when determining how to
+    apply a requirement, the closest instance of the requirement is used, that
+    is, the requirement on a CommandLineTool will take precendence over the
+    workflow step, and a requirement on a workflow step takes precedence over
+    the workflow.
+
+    Process requirements are the primary mechanism for specifying extensions to
+    the CWL core specification.
+
     ## Workflow graph
 
     A workflow describes a set of **steps** and the **dependencies**
@@ -255,13 +279,38 @@
     Expressions are distinct from regular processes in that they are intended
     to modify the workflow
 
-    The inputs to an expression are the .  See
-    [ExpressionEngineRequirement](#expressionenginerequirement) for more
-    details.
+    An implementation must provide the predefined `cwl:JsonPointer` expression
+    engine.  This expression engine specifies a [JSON
+    Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
+    into an expression input object consisting of the **job** and **context**
+    fields described below.
+
+    An expression engine defined with
+    [ExpressionEngineRequirement](#expressionenginerequirement) is a command
+    line program following the following protocol:
+
+      * On standard input, receive a JSON object with the following fields:
+
+        - **expressionDefs**: A list of strings from the `expressionDefs` field, or
+          `null` if `expressionDefs` is not specified.
+
+        - **job**: The input object of the current Process (context dependent).
+
+        - **context**: The specific value being transformed (context dependent).  May
+          be null.
+
+        - **script**: The code fragment to evaluate.
+
+      * On standard output, print a single JSON value (string, number, array, object,
+        boolean, or null) for the return value.
 
     Expressions must be evaluated in an isolated context (a "sandbox") which
     permits no side effects to leak outside the context, and permit no outside
     data to leak into the context.
+
+    Implementations may apply limits, such as process isolation, timeouts, and
+    operating system containers/jails to minimize the security risks associated
+    with running untrusted code.
 
     The order in which expressions are evaluated within a process or workflow
     is undefined.
@@ -667,7 +716,7 @@
   type: enum
   docParent: Expression
   symbols:
-    - JsonPointer
+    - "JsonPointer"
   jsonldPrefix: "cwl"
 
 - type: record
@@ -682,8 +731,8 @@
         - JsonPointer
         - string
       doc: |
-        A reference to the ExpressionEngineRequirement defining which
-        engine to use.  One expression engine is predefined, `cwl:JsonPointer`"
+        Either `cwl:JsonPointer` or a reference to an
+        ExpressionEngineRequirement defining which engine to use.
       jsonldPredicate:
         "@id": "cwl:engine"
         "@type": "@id"
@@ -741,6 +790,10 @@
   fields:
     - name: "outputBinding"
       type: [ "null", "Binding" ]
+      doc: |
+        Describes how to handle the concrete outputs of a process (such as
+        files created by a programs) and describe them in the process output
+        parameter.
 
 
 - name: InputParameter
@@ -773,7 +826,7 @@
       type: [ "null", "Binding" ]
       doc: |
         Describes how to handle the concrete outputs of a process step (such as
-        files created by a programs) and describe them in the process output
+        files created by a program) and describe them in the process output
         parameter.
 
 - type: record
@@ -783,6 +836,10 @@
     A process requirement declares a prerequisite that may or must be fufilled
     before executing a process.  See [`Process.hints`](#process) and
     [`Process.requirements`](#process).
+
+    Process requirements are the primary mechanism for specifying extensions to
+    the CWL core specification.
+
   fields:
     - name: "class"
       type: "string"
@@ -826,11 +883,11 @@
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
-    - name: "requirements"
+    - name: requirements
       type:
         - "null"
-        - type: "array"
-          items: "ProcessRequirement"
+        - type: array
+          items: ProcessRequirement
       doc: >
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this process.  If
@@ -838,11 +895,11 @@
         listed which is not recognized by the implementation, it is a fatal
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
-    - name: "hints"
+    - name: hints
       type:
         - "null"
-        - type: "array"
-          items: "ProcessRequirement"
+        - type: array
+          items: ProcessRequirement
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
@@ -958,7 +1015,7 @@
         - type: array
           items: string
       doc: |
-        Find files relative to the output directory, following POSIX glob(3)
+        Find files relative to the output directory, using POSIX glob(3)
         pathname matching.  If provided an array, match all patterns in the
         array.  If provided an expression, the expression must return a string
         or an array of strings, which will then be evaluated as a glob pattern.
@@ -970,9 +1027,9 @@
         - Expression
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
-        specified, the script "context" will be be the file or files that were
+        specified, the script `context` will be an array containing any files that were
         matched.  Additionally, if `loadContents` is `true`, the file objects
-        will include up to the first 64 KiB of file contents.
+        will include up to the first 64 KiB of file contents in the `contents` field.
 
 
 - type: record
@@ -1214,14 +1271,19 @@
   name: ExpressionTool
   extends: Process
   docAfter: CommandLineTool
+  doc: |
+    Execute an expression as a process step.
   fields:
     - name: "class"
       jsonldPredicate:
         "@id": "@type"
         "@type": "@vocab"
       type: string
-    - name: "expression"
-      type: "Expression"
+    - name: expression
+      type: Expression
+      doc: |
+        The expression to execute.  The expression must return a JSON object which
+        matches the output parameters of the ExpressionTool.
 
 
 - name: WorkflowOutputParameter
@@ -1322,7 +1384,7 @@
   fields:
     - name: run
       type: [CommandLineTool, ExpressionTool]
-      doc: "Specify the process that should be run"
+      doc: "Specifies the process to run."
 
 
 - name: Workflow
@@ -1338,7 +1400,9 @@
 
     # Dependencies
 
-    Dependencies between parameters are expressed by [data links](#datalink) on [workflow step input parameters](#workflowstepinput) and [workflow output parameters](#workflowoutputparameter).
+    Dependencies between parameters are expressed by [data links](#datalink)
+    on [workflow step input parameters](#workflowstepinput)
+    and [workflow output parameters](#workflowoutputparameter).
 
     A data link expresses the dependency of one parameter on another such that
     when a value is associated with the parameter specified by
@@ -1436,7 +1500,6 @@
         Docker container.
 
 
-
 - name: Subworkflow
   type: record
   extends: Process
@@ -1444,29 +1507,37 @@
   specialize:
     InputParameter: WorkflowStepInput
     OutputParameter: WorkflowStepOutput
+  doc: |
+    A nested workflow to run as part of a larger workflow.  The workflow is
+    specified in the `run` field and connects the input and output parameters
+    of the nested workflow to workflow parameters.
   fields:
     - name: run
       type: Workflow
+      doc: "Specifies the nested workflow to run."
 
 
 - type: record
   name: Subworkflows
   extends: ProcessRequirement
+  doc: |
+    Specify one or more subworkflows to execute alongside the process steps.
+    Only valid when in the requirements list of a [Workflow](#workflow).
   fields:
     - name: subworkflows
       type:
         type: array
         items: Subworkflow
+      doc: "A list of subworkflows to execute as part of the overall parent workflow."
 
 
 - type: record
   name: "FileDef"
   docParent: CreateFileRequirement
   doc: |
-    Define a file that will be created by the workflow platform in the
-    designated output directory prior to executing the command line tool.  May
-    be the result of executing an expression, such as building a configuration
-    file from a template.
+    Define a file that must be placed by in the designated output directory
+    prior to executing the command line tool.  May be the result of executing
+    an expression, such as building a configuration file from a template.
   fields:
     - name: "filename"
       type: ["string", "Expression"]
@@ -1474,32 +1545,35 @@
     - name: "fileContent"
       type: ["string", "Expression"]
       doc: |
-        The contents of the file.
+        If the value is a string literal or an expression which evalutes to a
+        string, a new file must be created with the string as the file contents.
 
-        If the value is a [`Ref`](#ref) to an input parameter of type
-        File, this indicates that the input file should be added to the
-        designated output directory prior to executing the tool.  The input
-        file entry in the designated output directory may read-only, and may be
-        implemented through bind mounts or file system links in such a way as
-        to avoid copying the input file.
+        If the value is an expression that evaluates to a File object, this
+        indicates the referenced file should be added to the designated output
+        directory prior to executing the tool.
+
+        Files added in this way may be read-only, and may be implemented
+        through bind mounts or file system links in such a way as to avoid
+        unecessary copying of the input file.
 
 
 - name: CreateFileRequirement
   type: record
   extends: ProcessRequirement
   doc: |
-    Define a list of files that will be created by the workflow platform in
-    the designated output directory prior to executing the command line
-    tool.  See `FileDef` for details.
+    Define a list of files that must be created and placed by the workflow
+    platform in the designated output directory prior to executing the command
+    line tool.  See `FileDef` for details.
   fields:
     - name: fileDef
       type:
         type: "array"
         items: "FileDef"
+      doc: The list of files
 
 
 - type: record
-  name: "EnvironmentDef"
+  name: EnvironmentDef
   docParent: EnvVarRequirement
   doc: |
     Define an environment variable that will be set in the runtime environment
@@ -1508,8 +1582,10 @@
   fields:
     - name: "envName"
       type: "string"
+      doc: The environment variable name
     - name: "envValue"
       type: ["string", "Expression"]
+      doc: The environment variable value
 
 
 - name: EnvVarRequirement
@@ -1523,11 +1599,13 @@
       type:
         type: "array"
         items: "EnvironmentDef"
+      doc: The list of environment variables.
 
 
 - name: ScatterMethod
   type: enum
   docParent: Scatter
+  doc: The scatter method, as defined in [Scatter](#scatter).
   symbols:
     - dotproduct
     - nested_crossproduct
@@ -1536,6 +1614,41 @@
 - name: Scatter
   type: record
   extends: ProcessRequirement
+  doc: |
+    Only valid when declared on a [WorkflowStep](#workflowstep) or
+    [Subworkflow](#subworkflow).
+
+    A "scatter" operation specifies that the associated workflow step or
+    subworkflow should execute separately over a list of input elements.  Each
+    job making up a scatter operaution is independent and may be executed
+    concurrently.
+
+    The `scatter` field specifies one or more input parameters which will be
+    scattered.  An input parameter may be listed more than once.  The declared
+    type of each input parameter is implicitly wrapped in an array for each
+    time it appears in the `scatter` field.  As a result, upstream parameters
+    which are connected to scattered parameters may be arrays.
+
+    All output parameters types are also implicitly wrapped in arrays; each job
+    in the scatter results in an entry in the output array.
+
+    If `scatter` declares more than one input parameter, he `scatterMethod`
+    describes how to decompose the input into a discrete set of jobs.
+
+      * **dotproduct** specifies that each the input arrays are lined up and
+          one element taken from each array to construct the job.  It is an
+          error if the input arrays are not all the same length.
+
+      * **nested_crossproduct** specifies the cartesian product of the inputs,
+          producing a job for every combination of the scattered inputs.  The
+          output arrays must be nested for each level of scattering, in the
+          order that the input arrays are listed in the `scatter` field.
+
+      * **flat_crossproduct** specifies the cartesian product of the inputs,
+          producing a job for every combination of the scattered inputs.  The
+          output arrays must be flattened to a single level, but otherwise listed in the
+          order that the input arrays are listed in the `scatter` field.
+
   fields:
     - name: scatter
       type:
@@ -1570,11 +1683,6 @@
 - name: SchemaDefRequirement
   type: record
   extends: ProcessRequirement
-  fields:
-    - name: types
-      type:
-        type: array
-        items: SchemaDef
   doc: |
         This field consists of an
         array of type definitions which must be used when interpreting the `inputs` and
@@ -1584,35 +1692,19 @@
         found in `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
         processed in the order listed such that later schema definitions may refer to
         earlier schema definitions.
+  fields:
+    - name: types
+      type:
+        type: array
+        items: SchemaDef
+      doc: The list of type definitions.
+
 
 - type: record
   name: ExpressionEngineRequirement
   extends: ProcessRequirement
   doc: |
-    Define an expression engine.  Expressions are fragments of code which
-    affect the control of the workflow engine.
-
-    An expression engine is a command line program following the following
-    protocol:
-
-      * On standard input, receive a JSON object with the following fields:
-
-        - expressionDefs: A list of strings from the `expressionDefs` field, or
-          `null` if `expressionDefs` is not specified.
-
-        - job: The input object of the current Process (context dependent).
-
-        - context: The specific value being transformed (context dependent).  May
-          be null.
-
-        - script: The code fragment to evaluate.
-
-      * On standard output, print a single JSON value (string, number, array, object,
-        boolean, or null) for the return value.
-
-    Implementations may apply limits, such as process isolation, timeouts, and
-    operating system containers/jails to minimize the security risks associated
-    with running untrusted code.
+    Define an expression engine, as described in [Expressions](#expressions).
 
   fields:
     - name: id
