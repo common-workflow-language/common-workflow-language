@@ -117,7 +117,7 @@ class Builder(object):
                     if "secondaryFiles" in binding:
                         if "secondaryFiles" not in datum:
                             datum["secondaryFiles"] = []
-                        for sf in aslist(schema["secondaryFiles"]):
+                        for sf in aslist(binding["secondaryFiles"]):
                             if isinstance(sf, dict):
                                 sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, datum["path"])
                             else:
