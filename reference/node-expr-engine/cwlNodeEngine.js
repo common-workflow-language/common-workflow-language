@@ -26,9 +26,9 @@ process.stdin.on('end', function() {
 
     var fn = '"use strict";\n';
 
-    if (j.expressionDefs) {
-        for (var index = 0; index < j.expressionDefs.length; ++index) {
-            fn += j.expressionDefs[index] + "\n";
+    if (j.engineConfig) {
+        for (var index = 0; index < j.engineConfig.length; ++index) {
+            fn += j.engineConfig[index] + "\n";
         }
     }
 

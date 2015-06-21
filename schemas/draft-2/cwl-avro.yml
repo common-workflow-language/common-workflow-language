@@ -287,8 +287,8 @@
 
       * On standard input, receive a JSON object with the following fields:
 
-        - **expressionDefs**: A list of strings from the `expressionDefs` field, or
-          `null` if `expressionDefs` is not specified.
+        - **engineConfig**: A list of strings from the `engineConfig` field, or
+          `null` if `engineConfig` is not specified.
 
         - **job**: The input object of the current Process (context dependent).
 
@@ -1788,11 +1788,13 @@
         - type: array
           items: string
       doc: "The command line to invoke the expression engine."
-    - name: expressionDefs
+    - name: engineConfig
       type:
         - "null"
         - type: array
           items: string
       doc: |
-        Code fragments that should be evaluated before evaluating the script.
-        Can be used to provide function definitions used in multiple places.
+        Additional configuration or code fragments that will also be passed to
+        the expression engine.  The semantics of this field are defined by the
+        underlying expression engine.  Intended for uses such as providing
+        function definitions that will be called from CWL expressions.

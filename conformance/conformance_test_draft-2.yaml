@@ -57,7 +57,7 @@
       '}
   job: draft-2/cat-job.json
   tool: draft-2/template-tool.cwl
-  doc: Test CreateFileRequirement feature
+  doc: Test CreateFileRequirement ExpressionEngineRequirement.engineConfig features
 
 - job: draft-2/cat-job.json
   output:

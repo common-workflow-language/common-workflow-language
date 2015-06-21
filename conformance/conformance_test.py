@@ -57,7 +57,8 @@ def run_test(i, t):
         print v
         print outstr
     except subprocess.CalledProcessError:
-        print """Test failed: %s""" % " ".join([pipes.quote(t) for t in test_command])
+        print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
+        print t.get("doc")
         print "Returned non-zero"
         failures += 1
         return

@@ -31,7 +31,7 @@ def exeval(ex, jobinput, requirements, docpath, context, pull_image):
                 runtime = ["docker", "run", "-i", "--rm", img_id]
 
             exdefs = []
-            for exdef in r.get("expressionDefs", []):
+            for exdef in r.get("engineConfig", []):
                 if isinstance(exdef, dict) and "ref" in exdef:
                     with open(exdef["ref"][7:]) as f:
                         exdefs.append(f.read())
@@ -40,7 +40,7 @@ def exeval(ex, jobinput, requirements, docpath, context, pull_image):
 
             inp = {
                 "script": ex["script"],
-                "expressionDefs": exdefs,
+                "engineConfig": exdefs,
                 "job": jobinput,
                 "context": context
             }
