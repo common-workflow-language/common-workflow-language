@@ -15,8 +15,11 @@ _logger = logging.getLogger("cwltool")
 class CommandLineJob(object):
     def run(self, outdir, dry_run=False, pull_image=True, rm_container=True):
 
-        with open(os.path.join(outdir, "cwl.input.json"), "w") as fp:
-            json.dump(self.joborder, fp)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        #with open(os.path.join(outdir, "cwl.input.json"), "w") as fp:
+        #    json.dump(self.joborder, fp)
 
         runtime = []
         env = {}

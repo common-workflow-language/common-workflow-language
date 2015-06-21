@@ -831,7 +831,7 @@
   docParent: OutputParameter
   specialize: {Schema: OutputSchema}
   fields:
-    - name: "outputBinding"
+    - name: outputBinding
       type: [ "null", "Binding" ]
       doc: |
         Describes how to handle the concrete outputs of a process (such as
@@ -1352,6 +1352,15 @@
           items: DataLink
 
 
+- name: LinkMergeMethod
+  type: enum
+  docParent: WorkflowStepInput
+  doc: The input link merge method, described in [WorkflowStepInput](#workflowstepinput)
+  symbols:
+    - merge_nested
+    - merge_flattened
+
+
 - type: record
   name: WorkflowStepInput
   extends: Parameter
@@ -1360,6 +1369,25 @@
     The input of a workflow step connects an upstream parameter (from the
     workflow inputs, or the outputs of other workflows steps) with the input
     parameters of the underlying process.
+
+    If the sink parameter is an array, or named in a [workflow
+    scatter](#scatter) operation, there may be multiple inbound data links
+    listed in the `connect` field.  The values from the input links are merged
+    depending on the method specified in the `linkMerge` field.  If not
+    specified, the default method is **merge_nested**:
+
+    * **merge_nested** specifies that the input shall be an array consisting of
+    exactly one entry for each input link.
+
+    * **merge_flattened**
+
+      1. The source and sink parameters must be compatible types, or the source
+         type must be compatible with single element from the "items" type of
+         the destination array parameter.
+      2. Source parameters which are arrays are concatenated;
+         source parameters which are single element types are appended as
+         single elements.
+
   fields:
     - name: id
       type: ["null", string]
@@ -1384,6 +1412,11 @@
         - DataLink
         - type: array
           items: DataLink
+    - name: linkMerge
+      type: ["null", LinkMergeMethod]
+      doc: |
+        The method to use to merge multiple inbound links into a single array.
+        If not specified, the default method is **merge_nested**:
 
 
 - type: record
@@ -1452,20 +1485,6 @@
     [`DataLink.source`](#datalink), that value is propagated to the destination
     parameter.  When all data links inbound to a given step are fufilled, the
     step is ready to execute.
-
-    ## Multiple inbound data links
-
-    There may be multiple inbound data links sending data to a parameter (the
-    "sink").  If so, the following rules apply to combine the inputs:
-
-      1. The sink parameter type must be an array, or named in a [workflow scatter](#scatter)
-         operation.
-      2. The source and sink parameters must be compatible types, or the source
-         type must be compatible with single element type "items" type of the
-         "sink" array type.
-      3. Source parameters which are array of the same type are concatenated;
-         source parameters which are single element types are appended added as
-         single elements.
 
     # Extensions
 

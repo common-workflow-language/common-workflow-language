@@ -74,12 +74,13 @@ def run_test(i, t):
             if isinstance(t["output"][a], dict) and "path" in t["output"][a]:
                 t["output"][a]["path"] = os.path.join(outdir, t["output"][a]["path"])
     else:
-        checkkeys = ["args", "stdin", "stdout", "generatefiles"]
+        checkkeys = ["args", "stdin", "stdout", "createfiles"]
 
     for key in checkkeys:
         if t.get(key) != out.get(key):
             if not failed:
                 print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
+                print t.get("doc")
                 failed = True
             print "%s expected %s\n%s      got %s" % (key, t.get(key), " " * len(key), out.get(key))
     if failed:

@@ -55,30 +55,30 @@ class Workflow(Process):
 
         step.completed = True
 
-    def match_types(self, sinktype, src, iid, inputobj):
+    def match_types(self, sinktype, src, iid, inputobj, linkMerge):
         if isinstance(sinktype, list):
             # Union type
             for st in sinktype:
-                if self.match_types(st, src, iid, inputobj):
+                if self.match_types(st, src, iid, inputobj, linkMerge):
                     return True
         else:
             is_array = isinstance(sinktype, dict) and sinktype["type"] == "array"
-            if src.parameter["type"] == sinktype:
-                # source and input types are the same
-                if is_array and iid in inputobj:
-                    # there's already a value in the input object, so extend the existing array
-                    inputobj[iid].extend(src.value)
-                else:
-                    # simply assign the value from state to input
-                    inputobj[iid] = copy.deepcopy(src.value)
-                return True
-            elif is_array and src.parameter["type"] == sinktype["items"]:
-                # source type is the item type on the input array
-                # promote single item to array entry
-                if iid in inputobj:
+            if is_array and linkMerge:
+                if iid not in inputobj:
+                    inputobj[iid] = []
+                if linkMerge == "merge_nested":
                     inputobj[iid].append(src.value)
+                elif linkMerge == "merge_flattened":
+                    if isinstance(src.value, list):
+                        inputobj[iid].extend(src.value)
+                    else:
+                        inputobj[iid].append(src.value)
                 else:
-                    inputobj[iid] = [src.value]
+                    raise WorkflowException("Unrecognized linkMerge enum '%s'" % linkMerge)
+                return True
+            elif src.parameter["type"] == sinktype:
+                # simply assign the value from state to input
+                inputobj[iid] = copy.deepcopy(src.value)
                 return True
         return False
 
@@ -120,7 +120,8 @@ class Workflow(Process):
                 for connection in aslist(connections):
                     src = connection["source"]
                     if src in self.state and self.state[src] is not None:
-                        if not self.match_types(inp["type"], self.state[src], inp["id"], inputobj):
+                        if not self.match_types(inp["type"], self.state[src], inp["id"], inputobj,
+                                                inp.get("linkMerge", ("merge_nested" if len(connections) > 1 else None))):
                             raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"], inp["type"]))
                     elif src not in self.state:
                         raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))

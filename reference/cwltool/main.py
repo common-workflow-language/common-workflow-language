@@ -164,7 +164,7 @@ def main():
             if job.stdout:
                 a["stdout"] = job.stdout
             if job.generatefiles:
-                a["generatefiles"] = job.generatefiles
+                a["createfiles"] = job.generatefiles
             print json.dumps(a)
         else:
             last = None

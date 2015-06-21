@@ -3,6 +3,7 @@
   job: draft-2/bwa-mem-job.json
   stdout: output.sam
   tool: draft-2/bwa-mem-tool.cwl
+  doc: General test of command line generation
 
 - args: [bwa, mem, draft-2/rabix/tests/test-files/chr20.fa,
     "-XXX",
@@ -10,6 +11,7 @@
     "-YYY", draft-2/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
   job: draft-2/bwa-mem-job.json
   tool: draft-2/binding-test.cwl
+  doc: Test nested prefixes with arrays
 
 - args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
     '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
@@ -18,37 +20,44 @@
   stdin: draft-2/reads.fastq
   stdout: output.sam
   tool: draft-2/tmap-tool.cwl
+  doc: Test nested command line bindings and stdin/stdout redirection
 
 - args: [cat, draft-2/hello.txt]
   job: draft-2/cat-job.json
   tool: draft-2/cat1-tool.cwl
+  doc: Test command line with optional input (missing)
 
 - args: [cat, -n, draft-2/hello.txt]
   job: draft-2/cat-n-job.json
   tool: draft-2/cat1-tool.cwl
+  doc: Test command line with optional input (provided)
 
 - args: [cat]
   job: draft-2/cat-job.json
   stdin: draft-2/hello.txt
   tool: draft-2/cat2-tool.cwl
+  doc: Test command line with stdin redirection
 
 - args: [cat, draft-2/hello.txt]
   job: draft-2/cat-job.json
   stdout: output.txt
   tool: draft-2/cat3-tool.cwl
+  doc: Test command line with stdout redirection
 
 - args: [cat]
   job: draft-2/cat-job.json
   stdin: draft-2/hello.txt
   stdout: output.txt
   tool: draft-2/cat4-tool.cwl
+  doc: Test command line with stdin and stdout redirection
 
 - args: [cat, foo.txt]
-  generatefiles: {foo.txt: 'The file is draft-2/hello.txt
+  createfiles: {foo.txt: 'The file is draft-2/hello.txt
 
       '}
   job: draft-2/cat-job.json
   tool: draft-2/template-tool.cwl
+  doc: Test CreateFileRequirement feature
 
 - job: draft-2/cat-job.json
   output:
@@ -58,6 +67,7 @@
       path: output.txt
       size: 13
   tool: draft-2/cat3-tool.cwl
+  doc: Test command execution in Docker with stdout redirection
 
 - job: draft-2/cat-job.json
   output:
@@ -67,6 +77,7 @@
       path: output.txt
       size: 13
   tool: draft-2/cat4-tool.cwl
+  doc: Test command execution in Docker with stdin and stdout redirection
 
 - job: draft-2/wc-job.json
   output:
@@ -76,40 +87,67 @@
       path: output
       size: 15
   tool: draft-2/wc-tool.cwl
+  doc: Test command execution in with stdin and stdout redirection
 
 - job: draft-2/parseInt-job.json
   output: {output: 42}
   tool: draft-2/parseInt-tool.cwl
+  doc: Test ExpressionTool with Docker-based expression engine
 
 - job: draft-2/wc-job.json
   output: {output: 16}
   tool: draft-2/wc2-tool.cwl
+  doc: Test outputEval to transform output
 
 - job: draft-2/wc-job.json
   output: {count_output: 16}
   tool: draft-2/count-lines1-wf.cwl
+  doc: Test two step workflow with imported tools
 
 - job: draft-2/wc-job.json
   output: {count_output: 16}
   tool: draft-2/count-lines2-wf.cwl
+  doc: Test two step workflow with inline tools
 
 - job: draft-2/count-lines3-job.json
   output:
     count_output: [16, 1]
   tool: draft-2/count-lines3-wf.cwl
+  doc: Test single step workflow with Scatter step
 
 - job: draft-2/count-lines4-job.json
   output:
     count_output: [16, 1]
   tool: draft-2/count-lines4-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, default merge behavior
+
+- job: draft-2/count-lines6-job.json
+  output:
+    count_output: [32, 2]
+  tool: draft-2/count-lines6-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, nested merge behavior
+
+- job: draft-2/count-lines6-job.json
+  output:
+    count_output: 34
+  tool: draft-2/count-lines7-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, flattened merge behavior
 
 - job: draft-2/empty.json
   output: {count_output: 1}
   tool: draft-2/count-lines5-wf.cwl
+  doc: Test workflow with default value for input parameter (missing)
 
 - job: draft-2/wc-job.json
   output: {count_output: 16}
   tool: draft-2/count-lines5-wf.cwl
+  doc: Test workflow with default value for input parameter (provided)
 
 - job: draft-2/env-job.json
   output:
@@ -119,23 +157,34 @@
       path: out
       size: 15
   tool: draft-2/env-tool.cwl
+  doc: Test EnvVarRequirement
 
 - job: draft-2/scatter-job1.json
   output:
     out: ["foo one", "foo two", "foo three", "foo four"]
   tool: draft-2/scatter-wf1.cwl
+  doc: Test workflow scatter with single scatter parameter
 
 - job: draft-2/scatter-job2.json
   output:
     out: [["foo one three", "foo one four"], ["foo two three", "foo two four"]]
   tool: draft-2/scatter-wf2.cwl
+  doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method
 
 - job: draft-2/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
   tool: draft-2/scatter-wf3.cwl
+  doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
+
+- job: draft-2/scatter-job2.json
+  output:
+    out: ["foo one three", "foo two four"]
+  tool: draft-2/scatter-wf4.cwl
+  doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
 - tool: draft-2/echo-tool.cwl
   job: draft-2/env-job.json
   output:
     {"out": "hello test env\n"}
+  doc: Test Any type input parameter
