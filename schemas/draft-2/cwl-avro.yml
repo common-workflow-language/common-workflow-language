@@ -530,7 +530,7 @@
 
 - name: Datatype
   type: enum
-  docParent: Schema
+  docAfter: ProcessRequirement
   symbols:
     - "null"
     - boolean
@@ -700,6 +700,11 @@
         "@container": "@list"
       doc: "When `type` is `map`, defines the value type for the key/value pairs."
 
+- name: Any_type
+  type: record
+  docParent: Datatype
+  fields: []
+  doc: Stand-in to indicate that Any non-null data type is allowed.
 
 - name: Parameter
   type: record
@@ -735,13 +740,18 @@
         - string
       jsondldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this parameter object."
-
-    # - name: "default"
-    #   type:
-    #     - "null"
-    #   doc: |
-    #     The default value for this parameter if there is no `connect`
-    #     field.
+    - name: streamable
+      type: ["null", "boolean"]
+      doc: |
+        Currently only applies if `type` is `File`.  A value of `true`
+        indicates that the file is read or written sequentially without
+        seeking.  An implementation may use this flag to indicate whether it is
+        valid to stream file contents using a named pipe.  Default: `false`.
+    - name: default
+      type: ["null", Any_type]
+      doc: |
+        The default value for this parameter if there is no `connect`
+        field.
 
 - name: JsonPointer
   type: enum
@@ -781,13 +791,8 @@
         - "null"
         - boolean
       doc: |
-        Read up to the first 64 KiB of text from the file and place it in the
+        Only applies when `type` is `File`.  Read up to the first 64 KiB of text from the file and place it in the
         "contents" field of the file object for manipulation by expressions.
-    - name: streamable
-      type: ["null", "boolean"]
-      doc: |
-        Only applies when `type` is `File`.  A value of `true` indicates that the file will
-        be read or written sequentially without seeking.  Default: `false`.
     - name: secondaryFiles
       type:
         - "null"
@@ -796,7 +801,7 @@
         - type: "array"
           items: ["string", "Expression"]
       doc: |
-        Applies when `type` is `File`.  Describes files that must be
+        Only applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
 
         If the value is Expression, the context of the expression is the input
