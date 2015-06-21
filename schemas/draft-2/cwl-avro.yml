@@ -805,11 +805,11 @@
         Where the value is a string, it specifies that the following pattern
         should be applied to the primary file:
 
-          # If string begins with one or more caret `^` characters, for each
+          1. If string begins with one or more caret `^` characters, for each
             caret, remove the last file extension from the path (the last
             period `.` and all following characters).  If there are no file
             extensions, the path is unchanged.
-          # Append the remainder of the string to the end of the file path.
+          2. Append the remainder of the string to the end of the file path.
 
 
 - name: InputSchema
@@ -830,14 +830,6 @@
   extends: Schema
   docParent: OutputParameter
   specialize: {Schema: OutputSchema}
-  fields:
-    - name: outputBinding
-      type: [ "null", "Binding" ]
-      doc: |
-        Describes how to handle the concrete outputs of a process (such as
-        files created by a programs) and describe them in the process output
-        parameter.
-
 
 - name: InputParameter
   type: record
@@ -865,12 +857,7 @@
       type: string
       jsonldPredicate: "@id"
       doc: "The unique identifier for this parameter object."
-    - name: "outputBinding"
-      type: [ "null", "Binding" ]
-      doc: |
-        Describes how to handle the concrete outputs of a process step (such as
-        files created by a program) and describe them in the process output
-        parameter.
+
 
 - type: record
   name: ProcessRequirement
@@ -1090,7 +1077,13 @@
   docParent: CommandOutputParameter
   specialize:
     OutputSchema: CommandOutputSchema
-    Binding: CommandOutputBinding
+  fields:
+    - name: "outputBinding"
+      type: [ "null", CommandOutputBinding ]
+      doc: |
+        Describes how to handle the concrete outputs of a process step (such as
+        files created by a program) and describe them in the process output
+        parameter.
 
 
 - type: record
@@ -1110,7 +1103,14 @@
   doc: An output parameter for a CommandLineTool.
   specialize:
     OutputSchema: CommandOutputSchema
-    Binding: CommandOutputBinding
+  fields:
+    - name: "outputBinding"
+      type: [ "null", CommandOutputBinding ]
+      doc: |
+        Describes how to handle the concrete outputs of a process step (such as
+        files created by a program) and describe them in the process output
+        parameter.
+
 
 - type: record
   name: CommandLineTool
