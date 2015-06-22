@@ -7,8 +7,7 @@ outputs:
     outputBinding:
       glob: "out"
 
-requirements:
-  - import: "node-engine.cwl"
+hints:
   - class: EnvVarRequirement
     envDef:
       - envName: "TEST_ENV"
