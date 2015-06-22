@@ -127,8 +127,9 @@
 
     ## Syntax
 
-    Documents containing CWL objects are serialized and loaded using YAML syntax.
-    A conforming implementation must accept all valid YAML documents.
+    Documents containing CWL objects are serialized and loaded using YAML
+    syntax and UTF-8 text encoding.  A conforming implementation must accept
+    all valid YAML documents.
 
     The CWL schema is defined using Avro Linked Data (avro-ld).  Avro-ld is an
     extension of the Apache Avro schema language to support additional
@@ -550,6 +551,8 @@
   jsonldPredicate:
     - symbol: File
       predicate: "cwl:File"
+    - symbol: Any
+      predicate: "cwl:Any"
   doc: |
    CWL data types are based on Avro schema declarations.  Refer to the [Avro
    schema declaration
@@ -581,8 +584,7 @@
 
    ## Any type
 
-   The **Any** type validates for any non-null value.
-
+   See [Any](#any) below.
 
 - name: File
   type: record
@@ -622,6 +624,12 @@
         `secondaryFiles` may itself include `secondaryFiles` for which the same
         rules apply.
 
+- name: Any
+  type: enum
+  docParent: Datatype
+  symbols: ["Any"]
+  doc: |
+    The **Any** type validates for any non-null value.
 
 - name: DataLink
   type: record
@@ -700,12 +708,6 @@
         "@container": "@list"
       doc: "When `type` is `map`, defines the value type for the key/value pairs."
 
-- name: Any_type
-  type: record
-  docParent: Datatype
-  fields: []
-  doc: Stand-in to indicate that Any non-null data type is allowed.
-
 - name: Parameter
   type: record
   docParent: Process
@@ -748,7 +750,7 @@
         seeking.  An implementation may use this flag to indicate whether it is
         valid to stream file contents using a named pipe.  Default: `false`.
     - name: default
-      type: ["null", Any_type]
+      type: ["null", Any]
       doc: |
         The default value for this parameter if there is no `connect`
         field.

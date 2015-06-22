@@ -142,7 +142,7 @@ class Loader(object):
         elif scheme == 'file':
             try:
                 with open(path) as fp:
-                    return fp.read()
+                    return fp.read().decode("utf-8")
             except (OSError, IOError) as e:
                 raise RuntimeError('Failed for %s: %s' % (url, e))
         else:

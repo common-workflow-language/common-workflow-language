@@ -45,7 +45,7 @@ def exeval(ex, jobinput, requirements, docpath, context, pull_image):
                 "context": context
             }
 
-            _logger.debug(json.dumps(inp))
+            _logger.debug(json.dumps(inp, indent=4))
 
             sp = subprocess.Popen(runtime + aslist(r["engineCommand"]),
                              shell=False,

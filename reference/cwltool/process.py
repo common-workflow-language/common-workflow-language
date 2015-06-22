@@ -57,12 +57,6 @@ class Process(object):
         for t in self.tool.get("hints", []):
             t["_docpath"] = docpath
 
-        avro.schema.make_avsc_object({
-            "name": "Any",
-            "type": "enum",
-            "symbols": ["Any"]
-        }, self.names)
-
         self.schemaDefs = {}
 
         sd, _ = get_feature("SchemaDefRequirement", requirements=self.tool.get("requirements"), hints=self.tool.get("hints"))
