@@ -7,13 +7,12 @@ inputs:
 outputs:
     - id: "#count_output"
       type: int
-      connect: {"source": "#step1_output"}
+      source: "#step1.output"
 steps:
   - id: "#step1"
     run: {import: wc2-tool.cwl}
     inputs:
-      - param: "wc2-tool.cwl#file1"
-        connect: {"source": "#file1"}
+      - id: "#step1.file1"
+        source: "#file1"
     outputs:
-      - param: "wc2-tool.cwl#output"
-        id: "#step1_output"
+      - id: "#step1.output"

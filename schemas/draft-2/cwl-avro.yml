@@ -648,22 +648,22 @@
     The **Any** type validates for any non-null value.
 
 
-- name: DataLink
-  type: record
-  docAfter: WorkflowStep
-  doc: |
-    A data link connects the value of one parameter to another such that when a
-    value becomes available for the parameter specified by `source`, that value
-    of the parameter is propagated to the destination parameter.
-  fields:
-    - name: source
-      type: string
-      jsonldPredicate:
-        "@id": "wfdesc:hasSource"
-        "@type": "@id"
-      doc: |
-        A workflow parameter, either an input parameter of the workflow or an
-        output parameter of another workflow step.
+# - name: DataLink
+#   type: record
+#   docAfter: WorkflowStep
+#   doc: |
+#     A data link connects the value of one parameter to another such that when a
+#     value becomes available for the parameter specified by `source`, that value
+#     of the parameter is propagated to the destination parameter.
+#   fields:
+#     - name: source
+#       type: string
+#       jsonldPredicate:
+#         "@id": "wfdesc:hasSource"
+#         "@type": "@id"
+#       doc: |
+#         A workflow parameter, either an input parameter of the workflow or an
+#         output parameter of another workflow step.
 
 
 - name: Schema
@@ -770,8 +770,8 @@
     - name: default
       type: ["null", Any]
       doc: |
-        The default value for this parameter if there is no `connect`
-        field.
+        The default value for this parameter if not provided in the input
+        object.
 
 
 - name: JsonPointer
@@ -1410,29 +1410,6 @@
         matches the output parameters of the ExpressionTool.
 
 
-- name: WorkflowOutputParameter
-  type: record
-  extends: OutputParameter
-  docParent: Workflow
-  doc: |
-    Describe an output parameter of a workflow.  The parameter must be
-    connected to one or more parameters defined in the workflow that will
-    provide the value of the output parameter.
-  fields:
-    - name: connect
-      doc: |
-        Connect this parameter to one or parameters in the workflow
-        which will provide the workflow output.
-      jsonldPredicate:
-        "@reverse": "wfdesc:hasSink"
-        "@type": "@id"
-      type:
-        - "null"
-        - DataLink
-        - type: array
-          items: DataLink
-
-
 - name: LinkMergeMethod
   type: enum
   docParent: WorkflowStepInput
@@ -1442,9 +1419,36 @@
     - merge_flattened
 
 
+- name: WorkflowOutputParameter
+  type: record
+  extends: OutputParameter
+  docParent: Workflow
+  doc: |
+    Describe an output parameter of a workflow.  The parameter must be
+    connected to one or more parameters defined in the workflow that will
+    provide the value of the output parameter.
+  fields:
+    - name: source
+      doc: |
+        Specifies one or more workflow parameters that will provide this output
+        value.
+      jsonldPredicate:
+        "@id": "cwl:source"
+        "@type": "@id"
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+    - name: linkMerge
+      type: ["null", LinkMergeMethod]
+      doc: |
+        The method to use to merge multiple inbound links into a single array.
+        If not specified, the default method is **merge_nested**:
+
+
 - type: record
   name: WorkflowStepInput
-  extends: Parameter
   docParent: WorkflowStep
   doc: |
     The input of a workflow step connects an upstream parameter (from the
@@ -1474,39 +1478,34 @@
 
   fields:
     - name: id
-      type: ["null", string]
+      type: string
       jsonldPredicate: "@id"
       doc: "A unique identifier for this workflow input parameter."
-    - name: param
-      type: string
-      jsonldPredicate:
-        "@id": "wfdesc:hasArtifact"
-        "@type": "@id"
+    - name: source
       doc: |
-        The input parameter of the underlying process (specified in the `run` field
-        of `WorkflowStep`) that will get the value from `connect`.
-    - name: connect
-      doc: |
-        Specifies one or more workflow parameters that will provide input to the underlying process parameter specified in `param`.
+        Specifies one or more workflow parameters that will provide input to the underlying process parameter.
       jsonldPredicate:
-        "@reverse": "wfdesc:hasSink"
+        "@id": "cwl:source"
         "@type": "@id"
       type:
         - "null"
-        - DataLink
+        - string
         - type: array
-          items: DataLink
+          items: string
     - name: linkMerge
       type: ["null", LinkMergeMethod]
       doc: |
         The method to use to merge multiple inbound links into a single array.
         If not specified, the default method is **merge_nested**:
-
+    - name: default
+      type: ["null", Any]
+      doc: |
+        The default value for this parameter if there is no `source`
+        field.
 
 - type: record
   name: WorkflowStepOutput
   docParent: WorkflowStep
-  extends: Parameter
   doc: |
     Associate an output parameter of the underlying process with a workflow
     parameter.  The workflow parameter (given in the `id` field) be may be used
@@ -1520,14 +1519,6 @@
         A unique identifier for this workflow output parameter.  This is the
         identifier to use in the `source` field of `DataLink` to connect the
         output value to downstream parameters.
-    - name: param
-      type: string
-      jsonldPredicate:
-        "@id": "wfdesc:hasArtifact"
-        "@type": "@id"
-      doc: |
-        The output parameter of the underlying process (specified in the `run` field
-        of `WorkflowStep`) that will provide the value for this this parameter.
 
 
 - name: ScatterMethod
@@ -1594,7 +1585,7 @@
 
   fields:
     - name: id
-      type: ["null", string]
+      type: string
       jsonldPredicate: "@id"
       doc: "The unique identifier for this workflow step."
     - name: inputs
@@ -1603,7 +1594,7 @@
         items: WorkflowStepInput
       jsonldPredicate: "wfdesc:hasInput"
       doc: |
-        Defines the input parameters of the process.  The process is ready to
+        Defines the input parameters of the workflow step.  The process is ready to
         run when all required input parameters are associated with concrete
         values.  Input parameters include a schema for each parameter and is
         used to validate the input object, it may also be used build a user

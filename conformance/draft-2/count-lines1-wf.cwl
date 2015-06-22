@@ -5,17 +5,21 @@ inputs:
   - { id: "#file1", type: File }
 
 outputs:
-  - { id: "#count_output", type: int, connect: {"source": "#step2_output"} }
+  - id: "#count_output"
+    type: int
+    source: "#step2.output"
 
 steps:
-  - run: {import: wc-tool.cwl}
+  - id: "#step1"
+    run: {import: wc-tool.cwl}
     inputs:
-      - {param: "wc-tool.cwl#file1", connect: {source: "#file1"}}
+      - {id: "#step1.file1", source: "#file1"}
     outputs:
-      - {id: "#step1_output", param: "wc-tool.cwl#output"}
+      - {id: "#step1.output"}
 
-  - run: {import: parseInt-tool.cwl}
+  - id: "#step2"
+    run: {import: parseInt-tool.cwl}
     inputs:
-      - {param: "parseInt-tool.cwl#file1", connect: {source: "#step1_output"}}
+      - {id: "#step2.file1", source: "#step1.output"}
     outputs:
-      - {id: "#step2_output", param: "parseInt-tool.cwl#output"}
+      - {id: "#step2.output"}

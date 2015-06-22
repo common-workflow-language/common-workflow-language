@@ -11,10 +11,10 @@ requirements:
 steps:
   - id: "#step1"
     inputs:
-      - {id: "#step1_in", param: "#echo_in", connect: {source: "#inp"}}
+      - {id: "#step1.echo_in", source: "#inp"}
     outputs:
-      - {id: "#step1_out", param: "#echo_out"}
-    scatter: "#step1_in"
+      - id: "#step1.echo_out"
+    scatter: "#step1.echo_in"
     run:
       class: CommandLineTool
       inputs:
@@ -41,4 +41,4 @@ outputs:
     type:
       type: array
       items: string
-    connect: {source: "#step1_out"}
+    source: "#step1.echo_out"

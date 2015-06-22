@@ -7,7 +7,7 @@ inputs:
 outputs:
     - id: "#out"
       type: File
-      connect: {"source": "#step1_output"}
+      source: "#step1.out"
 
 requirements:
   - class: SubworkflowFeatureRequirement
@@ -20,6 +20,6 @@ steps:
   - id: "#step1"
     run: {import: env-tool1.cwl}
     inputs:
-      - { param: "env-tool1.cwl#in", connect: {source: "#in"} }
+      - { id: "#step1.in", source: "#in" }
     outputs:
-      - { id: "#step1_output", param: "env-tool1.cwl#out" }
+      - { id: "#step1.out" }

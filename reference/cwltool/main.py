@@ -192,7 +192,7 @@ def main():
     except workflow.WorkflowException as e:
         _logger.error("Workflow error:\n%s" % e)
         if args.debug:
-            _logger.exception()
+            _logger.exception("")
         return 1
 
     return 0

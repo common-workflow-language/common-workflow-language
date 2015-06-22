@@ -14,12 +14,12 @@ requirements:
 steps:
   - id: "#step1"
     inputs:
-      - { id: "#step1_in1", param: "#echo_in1", connect: {source: "#inp1"} }
-      - { id: "#step1_in2", param: "#echo_in2", connect: {source: "#inp2"} }
+      - { id: "#step1.echo_in1", source: "#inp1"}
+      - { id: "#step1.echo_in2", source: "#inp2"}
     outputs:
-      - { id: "#step1_out", param: "#echo_out" }
+      - id: "#step1.echo_out"
 
-    scatter: ["#step1_in1", "#step1_in2"]
+    scatter: ["#step1.echo_in1", "#step1.echo_in2"]
     scatterMethod: nested_crossproduct
     run:
       class: CommandLineTool
@@ -47,7 +47,7 @@ steps:
 
 outputs:
   - id: "#out"
-    connect: {source: "#step1_out"}
+    source: "#step1.echo_out"
     type:
       type: array
       items:

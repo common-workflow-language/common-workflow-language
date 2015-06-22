@@ -4,7 +4,7 @@ inputs:
     - { id: "#file1", type: File }
 
 outputs:
-    - { id: "#count_output", type: int, connect: {"source": "#step2_output"} }
+    - { id: "#count_output", type: int, source: "#step2.parseInt_output"}
 
 requirements:
   - import: node-engine.cwl
@@ -12,9 +12,9 @@ requirements:
 steps:
   - id: "#step1"
     inputs:
-      - { param: "#wc_file1", connect: {"source": "#file1"} }
+      - { id: "#step1.wc_file1", source: "#file1" }
     outputs:
-      - { id: "#step1_output", param: "#wc_output" }
+      - { id: "#step1.wc_output" }
     run:
       class: CommandLineTool
       inputs:
@@ -26,9 +26,9 @@ steps:
 
   - id: "#step2"
     inputs:
-      - { "param": "#parseInt_file1", connect: {"source": "#step1_output"} }
+      - { "id": "#step2.parseInt_file1", source: "#step1.wc_output" }
     outputs:
-      - { "id": "#step2_output", param: "#parseInt_output" }
+      - { "id": "#step2.parseInt_output" }
     run:
       class: ExpressionTool
       inputs:

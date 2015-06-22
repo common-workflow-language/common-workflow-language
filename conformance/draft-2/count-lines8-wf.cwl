@@ -7,7 +7,7 @@ inputs:
 outputs:
     - id: "#count_output"
       type: int
-      connect: {"source": "#step1_output"}
+      source: "#step1.count_output"
 
 requirements:
   - class: SubworkflowFeatureRequirement
@@ -16,8 +16,7 @@ steps:
   - id: "#step1"
     run: {import: count-lines1-wf.cwl}
     inputs:
-      - id: "#step1file1"
-        param: "count-lines1-wf.cwl#file1"
-        connect: {source: "#file1"}
+      - id: "#step1.file1"
+        source: "#file1"
     outputs:
-      - { id: "#step1_output", param: "count-lines1-wf.cwl#count_output" }
+      - { id: "#step1.count_output" }

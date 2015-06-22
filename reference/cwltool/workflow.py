@@ -50,7 +50,7 @@ class Workflow(Process):
                 if i["id"] in jobout:
                     self.state[i["id"]] = WorkflowStateItem(i, jobout[i["id"]])
                 else:
-                    raise WorkflowException("Output is missing expected field %s" % d)
+                    raise WorkflowException("Output is missing expected field %s" % i["id"])
         if processStatus != "success":
             if self.processStatus != "permanentFail":
                 self.processStatus = processStatus
@@ -89,64 +89,73 @@ class Workflow(Process):
                 return True
         return False
 
-    def try_make_job(self, step, basedir, **kwargs):
+    def object_from_state(self, parms, frag_only):
         inputobj = {}
-
-        _logger.debug("Try to make job %s", step.id)
-
-        requirements = kwargs.get("requirements", []) + step.tool.get("requirements", [])
-        hints = kwargs.get("hints", []) + step.tool.get("hints", [])
-
-        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
-        if scatterSpec and "scatter" in step.tool:
-            inputparms = copy.deepcopy(step.tool["inputs"])
-            outputparms = copy.deepcopy(step.tool["outputs"])
-            scatter = aslist(step.tool["scatter"])
-
-            inp_map = {i["id"]: i for i in inputparms}
-            for s in scatter:
-                if s not in inp_map:
-                    raise WorkflowException("Invalid Scatter parameter '%s'" % s)
-
-                inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
-
-            if step.tool.get("scatterMethod") == "nested_crossproduct":
-                nesting = len(scatter)
-            else:
-                nesting = 1
-
-            for r in xrange(0, nesting):
-                for i in outputparms:
-                    i["type"] = {"type": "array", "items": i["type"]}
-        else:
-            inputparms = step.tool["inputs"]
-            outputparms = step.tool["outputs"]
-
-        for inp in inputparms:
-            _logger.debug("Trying input %s", inp)
+        for inp in parms:
             iid = inp["id"]
-            if "connect" in inp:
-                connections = inp["connect"]
-                for connection in aslist(connections):
-                    src = connection["source"]
+            if frag_only:
+                (_, iid) = urlparse.urldefrag(iid)
+                iid = iid.split(".")[-1]
+            if "source" in inp:
+                connections = aslist(inp["source"])
+                for src in connections:
                     if src in self.state and self.state[src] is not None:
-                        if not self.match_types(inp["type"], self.state[src], inp["id"], inputobj,
+                        if not self.match_types(inp["type"], self.state[src], iid, inputobj,
                                                 inp.get("linkMerge", ("merge_nested" if len(connections) > 1 else None))):
                             raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"], inp["type"]))
                     elif src not in self.state:
                         raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
                     else:
-                        return
+                        return None
             elif "default" in inp:
                 inputobj[iid] = inp["default"]
             else:
                 raise WorkflowException("Value for %s not specified" % (inp["id"]))
+        return inputobj
+
+    def adjust_for_scatter(self, steps):
+        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
+        for step in steps:
+            if scatterSpec and "scatter" in step.tool:
+                inputparms = copy.deepcopy(step.tool["inputs"])
+                outputparms = copy.deepcopy(step.tool["outputs"])
+                scatter = aslist(step.tool["scatter"])
+
+                inp_map = {i["id"]: i for i in inputparms}
+                for s in scatter:
+                    if s not in inp_map:
+                        raise WorkflowException("Invalid Scatter parameter '%s'" % s)
+
+                    inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
+
+                if step.tool.get("scatterMethod") == "nested_crossproduct":
+                    nesting = len(scatter)
+                else:
+                    nesting = 1
+
+                for r in xrange(0, nesting):
+                    for i in outputparms:
+                        i["type"] = {"type": "array", "items": i["type"]}
+                step.tool["inputs"] = inputparms
+                step.tool["outputs"] = outputparms
+
+    def try_make_job(self, step, basedir, **kwargs):
+        _logger.debug("Try to make job %s", step.id)
+
+        inputparms = step.tool["inputs"]
+        outputparms = step.tool["outputs"]
+
+        inputobj = self.object_from_state(inputparms, False)
+        if inputobj is None:
+            return
 
         _logger.info("Creating job with input: %s", pprint.pformat(inputobj))
 
         callback = functools.partial(self.receive_output, step, outputparms)
 
+        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
         if scatterSpec and "scatter" in step.tool:
+            scatter = aslist(step.tool["scatter"])
             method = step.tool.get("scatterMethod")
             if method is None and len(scatter) != 1:
                 raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
@@ -171,6 +180,9 @@ class Workflow(Process):
         kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
 
         steps = [makeTool(step, basedir, requirements=self.requirements, hints=self.hints) for step in self.tool.get("steps", [])]
+
+        self.adjust_for_scatter(steps)
+
         random.shuffle(steps)
 
         self.state = {}
@@ -204,14 +216,7 @@ class Workflow(Process):
             if not made_progress and completed < len(steps):
                 yield None
 
-        wo = {}
-        for i in self.tool["outputs"]:
-            if "connect" in i:
-                (_, src) = urlparse.urldefrag(i['id'])
-                if i["connect"]["source"] not in self.state:
-                    raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (i["connect"]["source"], inp["id"]))
-                wo[src] = self.state[i["connect"]["source"]].value
-
+        wo = self.object_from_state(self.tool["outputs"], True)
         output_callback(wo, self.processStatus)
 
 class WorkflowStep(Process):
@@ -221,42 +226,26 @@ class WorkflowStep(Process):
         except validate.ValidationException as v:
             raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, toolpath_object["run"]["id"]), validate.indent(str(v))))
 
-        if "id" in toolpath_object:
-            self.id = toolpath_object["id"]
-        else:
-            self.id = "#step_" + str(random.randint(1, 1000000000))
+        self.id = toolpath_object["id"]
 
-        for i in toolpath_object["inputs"]:
-            p = i["param"] if 'param' in i else self.id
-            (_, d) = urlparse.urldefrag(p)
-            toolid = i.get("id", self.id + "." + d)
-            found = False
-            for a in self.embedded_tool.tool["inputs"]:
-                if a["id"] == p:
-                    i.update(a)
-                    found = True
-            if not found:
-                raise WorkflowException("Did not find input parameter '%s' in workflow step" % (p))
-
-            i["id"] = toolid
-
-        for i in toolpath_object["outputs"]:
-            p = i["param"] if 'param' in i else i['id']
-            toolid = i["id"]
-            found = False
-            for a in self.embedded_tool.tool["outputs"]:
-                if a["id"] == p:
-                    i.update(a)
-                    found = True
-            if not found:
-                raise WorkflowException("Did not find output parameter '%s' in workflow step" % (p))
-
-            i["id"] = toolid
+        for field in ("inputs", "outputs"):
+            for i in toolpath_object[field]:
+                inputid = i["id"]
+                (_, d) = urlparse.urldefrag(inputid)
+                frag = d.split(".")[-1]
+                p = urlparse.urljoin(toolpath_object["run"].get("id", self.id), "#" + frag)
+                found = False
+                for a in self.embedded_tool.tool[field]:
+                    if a["id"] == p:
+                        i.update(a)
+                        found = True
+                if not found:
+                    raise WorkflowException("Did not find %s parameter '%s' in workflow step" % (field, p))
+                i["id"] = inputid
 
         super(WorkflowStep, self).__init__(toolpath_object, "WorkflowStep", docpath, **kwargs)
 
         if self.embedded_tool.tool["class"] == "Workflow":
-            _logger.warn("WorkflowStep %s %s", self.requirements, self.hints)
             (feature, _) = self.get_requirement("SubworkflowFeatureRequirement")
             if not feature:
                 raise WorkflowException("Workflow contains embedded workflow but SubworkflowFeatureRequirement not declared")
@@ -265,14 +254,17 @@ class WorkflowStep(Process):
         _logger.debug("WorkflowStep output from run is %s", jobout)
         self.output = {}
         for i in self.tool["outputs"]:
-            (_, d) = urlparse.urldefrag(i["param"] if "param" in i else i["id"])
-            self.output[i["id"]] = jobout[d]
+            (_, d) = urlparse.urldefrag(i["id"])
+            field = d.split(".")[-1]
+            self.output[i["id"]] = jobout[field]
         self.processStatus = processStatus
 
     def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
-            (_, d) = urlparse.urldefrag(i["param"])
-            joborder[d] = joborder[i["id"]]
+            p = i["id"]
+            (_, d) = urlparse.urldefrag(p)
+            field = d.split(".")[-1]
+            joborder[field] = joborder[i["id"]]
             del joborder[i["id"]]
 
         kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])

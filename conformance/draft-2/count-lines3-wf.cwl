@@ -7,7 +7,7 @@ inputs:
 outputs:
     - id: "#count_output"
       type: { type: array, items: int }
-      connect: {"source": "#step1_output"}
+      source: "#step1.output"
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -15,11 +15,9 @@ requirements:
 steps:
   - id: "#step1"
     run: {import: wc2-tool.cwl}
-    scatter: "#step1file"
+    scatter: "#step1.file1"
     inputs:
-      - id: "#step1file"
-        param: "wc2-tool.cwl#file1"
-        connect: {"source": "#file1"}
+      - id: "#step1.file1"
+        source: "#file1"
     outputs:
-      - id: "#step1_output"
-        param: "wc2-tool.cwl#output"
+      - id: "#step1.output"

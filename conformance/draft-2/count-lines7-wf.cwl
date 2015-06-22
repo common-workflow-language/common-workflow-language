@@ -8,17 +8,14 @@ inputs:
 outputs:
     - id: "#count_output"
       type: int
-      connect: {"source": "#step1_output"}
+      source: "#step1.output"
 
 steps:
   - id: "#step1"
     run: {import: wc3-tool.cwl}
     inputs:
-      - id: "#step1file1"
-        param: "wc3-tool.cwl#file1"
-        connect:
-          - "source": "#file1"
-          - "source": "#file2"
+      - id: "#step1.file1"
+        source: ["#file1", "#file2"]
         linkMerge: merge_flattened
     outputs:
-      - { id: "#step1_output", param: "wc3-tool.cwl#output" }
+      - { id: "#step1.output" }
