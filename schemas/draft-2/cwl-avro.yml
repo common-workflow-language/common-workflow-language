@@ -887,8 +887,61 @@
 
 
 - type: record
+  name: "FileDef"
+  docParent: CreateFileRequirement
+  doc: |
+    Define a file that must be placed by in the designated output directory
+    prior to executing the command line tool.  May be the result of executing
+    an expression, such as building a configuration file from a template.
+  fields:
+    - name: "filename"
+      type: ["string", "Expression"]
+      doc: "The name of the file to create in the output directory."
+    - name: "fileContent"
+      type: ["string", "Expression"]
+      doc: |
+        If the value is a string literal or an expression which evalutes to a
+        string, a new file must be created with the string as the file contents.
+
+        If the value is an expression that evaluates to a File object, this
+        indicates the referenced file should be added to the designated output
+        directory prior to executing the tool.
+
+        Files added in this way may be read-only, and may be implemented
+        through bind mounts or file system links in such a way as to avoid
+        unecessary copying of the input file.
+
+
+- type: record
+  name: EnvironmentDef
+  docParent: EnvVarRequirement
+  doc: |
+    Define an environment variable that will be set in the runtime environment
+    by the workflow platform when executing the command line tool.  May be the
+    result of executing an expression, such as getting a parameter from input.
+  fields:
+    - name: "envName"
+      type: "string"
+      doc: The environment variable name
+    - name: "envValue"
+      type: ["string", "Expression"]
+      doc: The environment variable value
+
+
+- type: record
+  name: SchemaDef
+  extends: Schema
+  docParent: SchemaDefRequirement
+  fields:
+    - name: name
+      type: string
+      doc: "The type name being defined."
+
+
+- type: record
   name: ProcessRequirement
   docAfter: ExpressionTool
+  abstract: true
   doc: |
     A process requirement declares a prerequisite that may or must be fufilled
     before executing a process.  See [`Process.hints`](#process) and
@@ -1489,13 +1542,9 @@
 
 - name: WorkflowStep
   type: record
-  extends: Process
   docParent: Workflow
-  specialize:
-    InputParameter: WorkflowStepInput
-    OutputParameter: WorkflowStepOutput
   doc: |
-    A workflow step is the basic executable element of a workflow.  It specifies the
+    A workflow step is an executable element of a workflow.  It specifies the
     underlying process implementation (such as `CommandLineTool`) in the `run`
     field and connects the input and output parameters of the underlying
     process to workflow parameters.
@@ -1537,10 +1586,74 @@
           output arrays must be flattened to a single level, but otherwise listed in the
           order that the input arrays are listed in the `scatter` field.
 
+    # Subworkflows
+
+    To specify a nested workflow as part of a workflow step,
+    (SubworkflowFeatureRequirement)(#SubworkflowFeatureRequirement) must be
+    specified in the workflow or workflow step requirements.
+
   fields:
+    - name: id
+      type: ["null", string]
+      jsonldPredicate: "@id"
+      doc: "The unique identifier for this workflow step."
+    - name: inputs
+      type:
+        type: array
+        items: WorkflowStepInput
+      jsonldPredicate: "wfdesc:hasInput"
+      doc: |
+        Defines the input parameters of the process.  The process is ready to
+        run when all required input parameters are associated with concrete
+        values.  Input parameters include a schema for each parameter and is
+        used to validate the input object, it may also be used build a user
+        interface for constructing the input object.
+    - name: outputs
+      type:
+        type: array
+        items: WorkflowStepOutput
+      jsonldPredicate: "wfdesc:hasOutput"
+      doc: |
+        Defines the parameters representing the output of the process.  May be
+        used to generate and/or validate the output object.
+    - name: requirements
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: >
+        Declares requirements that apply to either the runtime environment or the
+        workflow engine that must be met in order to execute this workflow step.  If
+        an implementation cannot satisfy all requirements, or a requirement is
+        listed which is not recognized by the implementation, it is a fatal
+        error and the implementation must not attempt to run the process,
+        unless overridden at user option.
+    - name: hints
+      type:
+        - "null"
+        - type: array
+          items: ProcessRequirement
+      doc: >
+        Declares hints applying to either the runtime environment or the
+        workflow engine that may be helpful in executing this workflow step.  It is
+        not an error if an implementation cannot satisfy all hints, however
+        the implementation may report a warning.
+    - name: label
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this process object."
+    - name: description
+      type:
+        - "null"
+        - string
+      jsondldPredicate: "rdfs:comment"
+      doc: "A long, human-readable description of this process object."
     - name: run
-      type: [CommandLineTool, ExpressionTool]
-      doc: "Specifies the process to run."
+      type: Process
+      doc: |
+        Specifies the process to run.
     - name: scatter
       type:
         - "null"
@@ -1661,61 +1774,12 @@
         Docker container.
 
 
-- name: Subworkflow
-  type: record
-  extends: Process
-  docParent: Subworkflows
-  specialize:
-    InputParameter: WorkflowStepInput
-    OutputParameter: WorkflowStepOutput
-  doc: |
-    A nested workflow to run as part of a larger workflow.  The workflow is
-    specified in the `run` field and connects the input and output parameters
-    of the nested workflow to workflow parameters.
-  fields:
-    - name: run
-      type: Workflow
-      doc: "Specifies the nested workflow to run."
-
-
 - type: record
-  name: Subworkflows
+  name: SubworkflowFeatureRequirement
   extends: ProcessRequirement
   doc: |
-    Specify one or more subworkflows to execute alongside the process steps.
-    Only valid when in the requirements list of a [Workflow](#workflow).
-  fields:
-    - name: subworkflows
-      type:
-        type: array
-        items: Subworkflow
-      doc: "A list of subworkflows to execute as part of the overall parent workflow."
-
-
-- type: record
-  name: "FileDef"
-  docParent: CreateFileRequirement
-  doc: |
-    Define a file that must be placed by in the designated output directory
-    prior to executing the command line tool.  May be the result of executing
-    an expression, such as building a configuration file from a template.
-  fields:
-    - name: "filename"
-      type: ["string", "Expression"]
-      doc: "The name of the file to create in the output directory."
-    - name: "fileContent"
-      type: ["string", "Expression"]
-      doc: |
-        If the value is a string literal or an expression which evalutes to a
-        string, a new file must be created with the string as the file contents.
-
-        If the value is an expression that evaluates to a File object, this
-        indicates the referenced file should be added to the designated output
-        directory prior to executing the tool.
-
-        Files added in this way may be read-only, and may be implemented
-        through bind mounts or file system links in such a way as to avoid
-        unecessary copying of the input file.
+    Indicates that the workflow infrastructure must support nested workflows in
+    the `run` field of (WorkflowStep)(#workflowstep).
 
 
 - name: CreateFileRequirement
@@ -1731,22 +1795,6 @@
         type: "array"
         items: "FileDef"
       doc: The list of files
-
-
-- type: record
-  name: EnvironmentDef
-  docParent: EnvVarRequirement
-  doc: |
-    Define an environment variable that will be set in the runtime environment
-    by the workflow platform when executing the command line tool.  May be the
-    result of executing an expression, such as getting a parameter from input.
-  fields:
-    - name: "envName"
-      type: "string"
-      doc: The environment variable name
-    - name: "envValue"
-      type: ["string", "Expression"]
-      doc: The environment variable value
 
 
 - name: EnvVarRequirement
@@ -1769,16 +1817,6 @@
   doc: |
     Indicates that the workflow infrastructure must support the `scatter` and
     `scatterMethod` fields of (WorkflowStep)(#workflowstep).
-
-
-- type: record
-  name: SchemaDef
-  extends: Schema
-  docParent: SchemaDefRequirement
-  fields:
-    - name: name
-      type: string
-      doc: "The type name being defined."
 
 
 - name: SchemaDefRequirement

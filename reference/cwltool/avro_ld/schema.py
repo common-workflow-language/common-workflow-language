@@ -1,40 +1,55 @@
 import avro
 import copy
 from  makedoc import add_dictlist
+import sys
+import pprint
 
-def specialize(items, spec, extended_by):
+def replace_type(items, spec):
     if isinstance(items, dict):
         for n in ("type", "items", "values"):
             if n in items:
-                items[n] = specialize(items[n], spec, extended_by)
+                items[n] = replace_type(items[n], spec)
         return items
     if isinstance(items, list):
         n = []
         for i in items:
-            n.append(specialize(i, spec, extended_by))
+            n.append(replace_type(i, spec))
         return n
     if isinstance(items, basestring):
         if items in spec:
             return spec[items]
-        if items in extended_by:
-            return extended_by[items]
+    return items
+
+def first_def(items, found):
+    if isinstance(items, dict):
+        if "type" in items and items["type"] in ("record", "enum"):
+            if items.get("abstract"):
+                return items
+            if items["name"] in found:
+                return items["name"]
+            else:
+                found.add(items["name"])
+        for n in ("type", "items", "values", "fields"):
+            if n in items:
+                items[n] = first_def(items[n], found)
+        return items
+    if isinstance(items, list):
+        n = []
+        for i in items:
+            n.append(first_def(i, found))
+        return n
     return items
 
 def extend_avro(items):
     types = {t["name"]: t for t in items}
     n = []
 
-    extended_by = {}
-    for t in items:
-        if "extends" in t and types[t["extends"]].get("abstract"):
-            add_dictlist(extended_by, t["extends"], t["name"])
-
     for t in items:
         if "extends" in t:
             r = copy.deepcopy(types[t["extends"]])
             r["name"] = t["name"]
             if "specialize" in t:
-                r["fields"] = specialize(r["fields"], t["specialize"], {})
+                r["fields"] = replace_type(r["fields"], t["specialize"])
 
             for f in r["fields"]:
                 if "inherited_from" not in f:
@@ -56,17 +71,27 @@ def extend_avro(items):
             t = r
         n.append(t)
 
-    # for t in n:
-    #     if "fields" in t:
-    #         t["fields"] = specialize(t["fields"], "", extended_by)
+    ex_types = {t["name"]: t for t in n}
+
+    extended_by = {}
+    for t in n:
+        if "extends" in t and ex_types[t["extends"]].get("abstract"):
+            add_dictlist(extended_by, t["extends"], ex_types[t["name"]])
+
+    for t in n:
+        if "fields" in t:
+            t["fields"] = replace_type(t["fields"], extended_by)
+
+    n = replace_type(n, ex_types)
 
     return n
 
 def schema(j):
     names = avro.schema.Names()
     j = extend_avro(j)
+    j = first_def(j, set())
     for t in j:
-        if not t.get("abstract") and t.get("type") != "doc":
+        if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "doc":
             avro.schema.make_avsc_object(t, names)
 
     return names

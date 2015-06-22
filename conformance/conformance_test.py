@@ -34,6 +34,7 @@ def run_test(i, t):
             outdir = tempfile.mkdtemp()
             test_command = [args.tool,
                             "--outdir=%s" % outdir,
+                            "--strict",
                             t["tool"],
                             t["job"]]
             outstr = subprocess.check_output(test_command)
@@ -43,6 +44,7 @@ def run_test(i, t):
                             "--conformance-test",
                             "--basedir=" + args.basedir,
                             "--no-container",
+                            "--strict",
                             t["tool"],
                             t["job"]]
 

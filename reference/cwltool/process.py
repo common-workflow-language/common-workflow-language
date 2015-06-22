@@ -24,15 +24,13 @@ def get_schema():
         j = yaml.load(f)
         return (j, avro_ld.schema.schema(j))
 
-def get_feature(feature, **kwargs):
-    if kwargs.get("requirements"):
-        for t in reversed(kwargs["requirements"]):
-            if t["class"] == feature:
-                return (t, True)
-    if kwargs.get("hints"):
-        for t in reversed(kwargs.get("hints", [])):
-            if t["class"] == feature:
-                return (t, False)
+def get_feature(self, feature):
+    for t in reversed(self.requirements):
+        if t["class"] == feature:
+            return (t, True)
+    for t in reversed(self.hints):
+        if t["class"] == feature:
+            return (t, False)
     return (None, None)
 
 class Process(object):
@@ -44,12 +42,15 @@ class Process(object):
 
         try:
             # Validate tool documument
-            validate.validate_ex(self.names.get_name(validateAs, ""), self.tool, **kwargs)
+            validate.validate_ex(self.names.get_name(validateAs, ""), self.tool, strict=kwargs.get("strict"))
         except validate.ValidationException as v:
             raise validate.ValidationException("Could not validate %s:\n%s" % (self.tool.get("id"), validate.indent(str(v))))
 
-        self.validate_requirements(self.tool, "requirements")
-        self.validate_requirements(self.tool, "hints")
+        self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+
+        #self.validate_requirements(self.tool, "requirements")
+        #self.validate_requirements(self.tool, "hints")
 
         for t in self.tool.get("requirements", []):
             t["_docpath"] = docpath
@@ -59,7 +60,8 @@ class Process(object):
 
         self.schemaDefs = {}
 
-        sd, _ = get_feature("SchemaDefRequirement", requirements=self.tool.get("requirements"), hints=self.tool.get("hints"))
+        sd, _ = self.get_requirement("SchemaDefRequirement")
+
         if sd:
             for i in sd["types"]:
                 avro.schema.make_avsc_object(i, self.names)
@@ -102,19 +104,22 @@ class Process(object):
 
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
-    def validate_requirements(self, tool, field):
-        for r in tool.get(field, []):
-            try:
-                if self.names.get_name(r["class"], "") is None:
-                    raise validate.ValidationException("Unknown requirement %s" % (r["class"]))
-                validate.validate_ex(self.names.get_name(r["class"], ""), r)
-                if "requirements" in r:
-                    self.validate_requirements(r, "requirements")
-                if "hints" in r:
-                    self.validate_requirements(r, "hints")
-            except validate.ValidationException as v:
-                err = "While validating %s %s\n%s" % (field, r["class"], validate.indent(str(v)))
-                if field == "hints":
-                    _logger.warn(err)
-                else:
-                    raise validate.ValidationException(err)
+    # def validate_requirements(self, tool, field):
+    #     for r in tool.get(field, []):
+    #         try:
+    #             if self.names.get_name(r["class"], "") is None:
+    #                 raise validate.ValidationException("Unknown requirement %s" % (r["class"]))
+    #             validate.validate_ex(self.names.get_name(r["class"], ""), r)
+    #             if "requirements" in r:
+    #                 self.validate_requirements(r, "requirements")
+    #             if "hints" in r:
+    #                 self.validate_requirements(r, "hints")
+    #         except validate.ValidationException as v:
+    #             err = "While validating %s %s\n%s" % (field, r["class"], validate.indent(str(v)))
+    #             if field == "hints":
+    #                 _logger.warn(err)
+    #             else:
+    #                 raise validate.ValidationException(err)
+
+    def get_requirement(self, feature):
+        return get_feature(self, feature)

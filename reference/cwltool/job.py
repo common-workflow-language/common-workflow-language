@@ -24,7 +24,7 @@ class CommandLineJob(object):
         runtime = []
         env = {}
 
-        (docker_req, docker_is_req) = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
+        (docker_req, docker_is_req) = get_feature(self, "DockerRequirement")
 
         for f in self.pathmapper.files():
             if not os.path.exists(self.pathmapper.mapper(f)[0]):

@@ -19,8 +19,15 @@ WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
 def makeTool(toolpath_object, docpath, **kwargs):
     """docpath is the directory the tool file is located."""
-    if "run" in toolpath_object: # and toolpath_object.get("class", "External") == "External":
-        return External(toolpath_object, docpath)
+
+    class DR(object):
+        pass
+    dr = DR()
+    dr.requirements = kwargs.get("requirements", [])
+    dr.hints = kwargs.get("hints", [])
+
+    if "run" in toolpath_object:
+        return WorkflowStep(toolpath_object, docpath, **kwargs)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
             return draft2tool.CommandLineTool(toolpath_object, docpath, **kwargs)
@@ -90,7 +97,7 @@ class Workflow(Process):
         requirements = kwargs.get("requirements", []) + step.tool.get("requirements", [])
         hints = kwargs.get("hints", []) + step.tool.get("hints", [])
 
-        (scatterSpec, _) = get_feature("ScatterFeatureRequirement", requirements=requirements, hints=hints)
+        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
         if scatterSpec and "scatter" in step.tool:
             inputparms = copy.deepcopy(step.tool["inputs"])
             outputparms = copy.deepcopy(step.tool["outputs"])
@@ -160,10 +167,10 @@ class Workflow(Process):
         # Validate job order
         validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
-        requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+        kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
+        kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
 
-        steps = [makeTool(step, basedir) for step in self.tool.get("steps", [])]
+        steps = [makeTool(step, basedir, requirements=self.requirements, hints=self.hints) for step in self.tool.get("steps", [])]
         random.shuffle(steps)
 
         self.state = {}
@@ -190,7 +197,7 @@ class Workflow(Process):
                 if step.completed:
                     completed += 1
                 else:
-                    for newjob in self.try_make_job(step, basedir, requirements=requirements, hints=hints, **kwargs):
+                    for newjob in self.try_make_job(step, basedir, **kwargs):
                         if newjob:
                             made_progress = True
                             yield newjob
@@ -207,10 +214,10 @@ class Workflow(Process):
 
         output_callback(wo, self.processStatus)
 
-class External(Process):
-    def __init__(self, toolpath_object, docpath):
+class WorkflowStep(Process):
+    def __init__(self, toolpath_object, docpath, **kwargs):
         try:
-            self.embedded_tool = makeTool(toolpath_object["run"], docpath)
+            self.embedded_tool = makeTool(toolpath_object["run"], docpath, **kwargs)
         except validate.ValidationException as v:
             raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, toolpath_object["run"]["id"]), validate.indent(str(v))))
 
@@ -246,7 +253,13 @@ class External(Process):
 
             i["id"] = toolid
 
-        super(External, self).__init__(toolpath_object, "WorkflowStep", docpath)
+        super(WorkflowStep, self).__init__(toolpath_object, "WorkflowStep", docpath, **kwargs)
+
+        if self.embedded_tool.tool["class"] == "Workflow":
+            _logger.warn("WorkflowStep %s %s", self.requirements, self.hints)
+            (feature, _) = self.get_requirement("SubworkflowFeatureRequirement")
+            if not feature:
+                raise WorkflowException("Workflow contains embedded workflow but SubworkflowFeatureRequirement not declared")
 
     def receive_output(self, jobout, processStatus):
         _logger.debug("WorkflowStep output from run is %s", jobout)

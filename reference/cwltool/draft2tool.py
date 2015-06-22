@@ -14,7 +14,6 @@ import hashlib
 import random
 from process import Process
 from process import WorkflowException
-from process import get_feature
 import avro_ld.validate as validate
 from aslist import aslist
 import expression
@@ -28,9 +27,7 @@ CONTENT_LIMIT = 64 * 1024
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
 supportedProcessRequirements = ("DockerRequirement",
-                                "MemoryRequirement",
                                 "ExpressionEngineRequirement",
-                                "Scatter",
                                 "SchemaDefRequirement",
                                 "EnvVarRequirement",
                                 "CreateFileRequirement")
@@ -195,9 +192,6 @@ class Tool(Process):
             if r["class"] not in supportedProcessRequirements:
                 raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
 
-        self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
-
         builder.input_basedir = input_basedir
         builder.files = []
         builder.bindings = []
@@ -291,7 +285,7 @@ class CommandLineTool(Tool):
             if os.path.isabs(j.stdout):
                 raise validate.ValidationException("stdout must be a relative path")
 
-        dockerReq, _ = get_feature("DockerRequirement", requirements=self.requirements, hints=self.hints)
+        dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and use_container:
                 builder.pathmapper = DockerPathMapper(reffiles, input_basedir)
 
@@ -307,13 +301,13 @@ class CommandLineTool(Tool):
         builder.requirements = j.requirements
 
         j.generatefiles = {}
-        createFiles, _ = get_feature("CreateFileRequirement", requirements=self.requirements, hints=self.hints)
+        createFiles, _ = self.get_requirement("CreateFileRequirement")
         if createFiles:
             for t in createFiles["fileDef"]:
                 j.generatefiles[t["filename"]] = expression.do_eval(t["fileContent"], builder.job, j.requirements, self.docpath)
 
         j.environment = {}
-        evr, _ = get_feature("EnvVarRequirement", requirements=self.requirements, hints=self.hints)
+        evr, _ = self.get_requirement("EnvVarRequirement")
         if evr:
             for t in evr["envDef"]:
                 j.environment[t["envName"]] = expression.do_eval(t["envValue"], builder.job, j.requirements, self.docpath)

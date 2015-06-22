@@ -5,11 +5,9 @@
   inputs:
     - id: "#echo_in1"
       type: string
-      connect: {source: "#inp1"}
       inputBinding: {}
     - id: "#echo_in2"
       type: string
-      connect: {source: "#inp2"}
       inputBinding: {}
   outputs:
     - id: "#echo_out"
@@ -18,7 +16,6 @@
         glob: "step1_out"
         loadContents: true
         outputEval:
-          class: Expression
           engine: cwl:JsonPointer
           script: "context/0/contents"
   baseCommand: "echo"

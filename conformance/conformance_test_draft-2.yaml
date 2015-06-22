@@ -188,3 +188,8 @@
   output:
     {"out": "hello test env\n"}
   doc: Test Any type input parameter
+
+- job: draft-2/wc-job.json
+  output: {count_output: 16}
+  tool: draft-2/count-lines8-wf.cwl
+  doc: Test nested workflow
