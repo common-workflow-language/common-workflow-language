@@ -6,16 +6,15 @@ inputs:
     type:
       type: array
       items: string
-
+requirements:
+  - class: ScatterFeatureRequirement
 steps:
   - id: "#step1"
     inputs:
       - {id: "#step1_in", param: "#echo_in", connect: {source: "#inp"}}
     outputs:
       - {id: "#step1_out", param: "#echo_out"}
-    requirements:
-      - class: Scatter
-        scatter: "#step1_in"
+    scatter: "#step1_in"
     run:
       class: CommandLineTool
       inputs:

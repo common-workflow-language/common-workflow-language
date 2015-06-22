@@ -32,12 +32,12 @@
       type: { type: array, items: string }
     - id: "#inp2"
       type: { type: array, items: string }
+  requirements:
+    - class: ScatterFeatureRequirement
   steps:
     - id: "#step1"
-      requirements:
-        - class: Scatter
-          scatter: ["#step1_in1", "#step1_in2"]
-          scatterMethod: dotproduct
+      scatter: ["#step1_in1", "#step1_in2"]
+      scatterMethod: dotproduct
       inputs:
         - { id: "#step1_in1", param: "#echo_in1", connect: {source: "#inp1"} }
         - { id: "#step1_in2", param: "#echo_in2", connect: {source: "#inp2"} }

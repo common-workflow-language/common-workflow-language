@@ -8,6 +8,9 @@ inputs:
   - id: "#inp2"
     type: { type: array, items: string }
 
+requirements:
+  - class: ScatterFeatureRequirement
+
 steps:
   - id: "#step1"
     inputs:
@@ -15,10 +18,9 @@ steps:
       - { id: "#step1_in2", param: "#echo_in2", connect: {source: "#inp2"} }
     outputs:
       - { id: "#step1_out", param: "#echo_out" }
-    requirements:
-      - class: Scatter
-        scatter: ["#step1_in1", "#step1_in2"]
-        scatterMethod: nested_crossproduct
+
+    scatter: ["#step1_in1", "#step1_in2"]
+    scatterMethod: nested_crossproduct
     run:
       class: CommandLineTool
       inputs:

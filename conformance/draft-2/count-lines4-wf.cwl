@@ -10,12 +10,13 @@ outputs:
       type: {type: array, items: int}
       connect: {"source": "#step1_output"}
 
+requirements:
+  - class: ScatterFeatureRequirement
+
 steps:
   - id: "#step1"
     run: {import: wc2-tool.cwl}
-    requirements:
-      - class: Scatter
-        scatter: "#step1file1"
+    scatter: "#step1file1"
     inputs:
       - id: "#step1file1"
         param: "wc2-tool.cwl#file1"
