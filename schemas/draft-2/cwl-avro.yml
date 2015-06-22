@@ -62,7 +62,7 @@
     ranging from individual workstation to cluster, grid, cloud, and high
     performance computing systems.
 
-    ## Dependencies on Other Specifications
+    ## References to Other Specifications
 
     * [JSON](http://json.org)
     * [JSON-LD](http://json-ld.org)
@@ -70,6 +70,8 @@
     * [YAML](http://yaml.org)
     * [Avro](https://avro.apache.org/docs/current/spec.html)
     * [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
+    * [UTF-8](https://www.ietf.org/rfc/rfc2279.txt)
+    * [Portable Operating System Interface (POSIX.1-2008)](http://pubs.opengroup.org/onlinepubs/9699919799/)
 
     ## Scope
 
@@ -258,11 +260,20 @@
 
     Requirements are inherited.  A requirement specified in a Workflow applies
     to all workflow steps; a requirement specified on a workflow step will
-    apply to the process implementation.  However, when determining how to
-    apply a requirement, the closest instance of the requirement is used, that
-    is, the requirement on a CommandLineTool will take precendence over the
-    workflow step, and a requirement on a workflow step takes precedence over
-    the workflow.
+    apply to the process implementation.
+
+    If the same process requirement appears at different levels of the
+    workflow, the most specific instance of the requirement is used, that is,
+    an entry in `requirements` on a process implementation such as
+    CommandLineTool will take precendence over an entry in `requirements`
+    specified in a workflow step, and an entry in `requirements` on a workflow
+    step takes precedence over the workflow.  Entries in `hints` are resolved
+    the same way.
+
+    Requirements override hints.  If a process implementation provides a
+    process requirement in `hints` which is also provided in `requirements` by
+    an enclosing workflow or workflow step, the enclosing `requirements` takes
+    precedence.
 
     Process requirements are the primary mechanism for specifying extensions to
     the CWL core specification.
@@ -589,6 +600,10 @@
 - name: File
   type: record
   docParent: Datatype
+  doc: |
+    Represents a file (or group of files if `secondaryFiles` is specified) that
+    must be accessible by tools using standard POSIX file system call API such as
+    open(2) and read(2).
   fields:
     - name: "class"
       type:
@@ -624,12 +639,14 @@
         `secondaryFiles` may itself include `secondaryFiles` for which the same
         rules apply.
 
+
 - name: Any
   type: enum
   docParent: Datatype
   symbols: ["Any"]
   doc: |
     The **Any** type validates for any non-null value.
+
 
 - name: DataLink
   type: record
@@ -708,6 +725,7 @@
         "@container": "@list"
       doc: "When `type` is `map`, defines the value type for the key/value pairs."
 
+
 - name: Parameter
   type: record
   docParent: Process
@@ -755,12 +773,14 @@
         The default value for this parameter if there is no `connect`
         field.
 
+
 - name: JsonPointer
   type: enum
   docParent: Expression
   symbols:
     - "JsonPointer"
   jsonldPrefix: "cwl"
+
 
 - type: record
   name: Expression
@@ -1129,12 +1149,13 @@
   doc: |
 
     A CommandLineTool process is a process implementation for executing a
-    standalone, non-interactive command line applications.  To help accomodate
-    of the enormous variety in syntax and semantics for input, runtime
-    environment, invocation, and output of arbitrary programs, CommandLineTool
-    provides the concept of "input binding" to describe how to translate input
-    parameters to an actual program invocation, and "output binding" to
-    describe how generate output parameters from program output.
+    standalone, non-interactive command line application in a POSIX
+    environment.  To help accomodate of the enormous variety in syntax and
+    semantics for input, runtime environment, invocation, and output of
+    arbitrary programs, CommandLineTool provides the concept of "input binding"
+    to describe how to translate input parameters to an actual program
+    invocation, and "output binding" to describe how generate output parameters
+    from program output.
 
     # Input binding
 
