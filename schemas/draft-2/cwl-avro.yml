@@ -1483,7 +1483,8 @@
       doc: "A unique identifier for this workflow input parameter."
     - name: source
       doc: |
-        Specifies one or more workflow parameters that will provide input to the underlying process parameter.
+        Specifies one or more workflow parameters that will provide input to
+        the underlying process parameter.
       jsonldPredicate:
         "@id": "cwl:source"
         "@type": "@id"
@@ -1502,6 +1503,7 @@
       doc: |
         The default value for this parameter if there is no `source`
         field.
+
 
 - type: record
   name: WorkflowStepOutput

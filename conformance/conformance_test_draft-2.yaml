@@ -213,3 +213,8 @@
       size: 9
   tool: draft-2/env-wf2.cwl
   doc: Test requirements override hints
+
+- job: draft-2/empty.json
+  output: {count_output: 16}
+  tool: draft-2/count-lines9-wf.cwl
+  doc: Test default value on input parameter
