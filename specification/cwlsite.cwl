@@ -3,39 +3,39 @@
 - id: "#makedoc"
   class: CommandLineTool
   inputs:
-    - id: "#makedoc.source"
+    - id: "#makedoc_source"
       type: File
       inputBinding: {position: 1}
-    - id: "#makedoc.title"
+    - id: "#makedoc_title"
       type: ["null", string]
       inputBinding: {position: 2}
-    - id: "#makedoc.target"
+    - id: "#makedoc_target"
       type: string
   outputs:
-    - id: "#makedoc.out"
+    - id: "#makedoc_out"
       type: File
       outputBinding:
         glob:
           engine: "cwl:JsonPointer"
-          script: "job/makedoc.target"
+          script: "job/makedoc_target"
   baseCommand: [python, "-mcwltool.avro_ld.makedoc"]
   stdout:
     engine: "cwl:JsonPointer"
-    script: "job/makedoc.target"
+    script: "job/makedoc_target"
 
 - id: "#strip_leading_lines"
   class: CommandLineTool
   inputs:
-    - id: "#strip_leading_lines.in"
+    - id: "#strip_leading_lines_in"
       type: File
       inputBinding: {}
-    - id: "#strip_leading_lines.count"
+    - id: "#strip_leading_lines_count"
       type: int
       inputBinding:
         prefix: "-n+"
         separate: false
   outputs:
-    - id: "#strip_leading_lines.out"
+    - id: "#strip_leading_lines_out"
       type: File
       outputBinding:
         glob: "_tail_tmp.txt"
@@ -61,8 +61,8 @@
       type: string
 
   outputs:
-    - { id: "#draft2_spec", type: File, connect: {source: "#spec.index.html" } }
-    - { id: "#main_index", type: File, connect: {source: "#readme.index.html" } }
+    - { id: "#draft2_spec", type: File, source: "#spec.makedoc_out" }
+    - { id: "#main_index", type: File, source: "#readme.makedoc_out" }
 
   hints:
     - class: DockerRequirement
@@ -70,25 +70,25 @@
   steps:
   - id: "#spec"
     inputs:
-      - { param: "#makedoc.source", connect: { source: "#cwl_schema_in" } }
-      - { param: "#makedoc.target", connect: { source: "#cwl_schema_target" } }
+      - { id: "#spec.makedoc_source", source: "#cwl_schema_in" }
+      - { id: "#spec.makedoc_target", source: "#cwl_schema_target" }
     outputs:
-      - { id: "#spec.index.html", param: "#makedoc.out" }
+      - { id: "#spec.makedoc_out" }
     run: {import: "#makedoc"}
 
   - id: "#strip_lines"
     inputs:
-      - { param: "#strip_leading_lines.in", connect: {source: "#main_index_in" } }
-      - { param: "#strip_leading_lines.count", connect: {source: "#main_index_strip_lines" } }
+      - { id: "#strip_lines.strip_leading_lines_in", source: "#main_index_in" }
+      - { id: "#strip_lines.strip_leading_lines_count", source: "#main_index_strip_lines" }
     outputs:
-      - { id: "#strip_lines.out", param: "#strip_leading_lines.out" }
+      - { id: "#strip_lines.strip_leading_lines_out" }
     run:  {import: "#strip_leading_lines"}
 
   - id: "#readme"
     inputs:
-      - { param: "#makedoc.source", connect: {source: "#strip_lines.out" } }
-      - { param: "#makedoc.target", connect: {source: "#main_index_target" } }
-      - { param: "#makedoc.title", connect: {source: "#main_title" } }
+      - { id: "#readme.makedoc_source", source: "#strip_lines.strip_leading_lines_out" }
+      - { id: "#readme.makedoc_target", source: "#main_index_target" }
+      - { id: "#readme.makedoc_title", source: "#main_title" }
     outputs:
-      - { id: "#readme.index.html", param: "#makedoc.out" }
+      - { id: "#readme.makedoc_out" }
     run:  {import: "#makedoc"}

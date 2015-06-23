@@ -79,15 +79,17 @@ class ToC(object):
 
 def typefmt(tp, nbsp=False):
     if isinstance(tp, list):
-        if nbsp:
+        if nbsp and len(tp) <= 3:
             return "&nbsp;|&nbsp;".join([typefmt(n) for n in tp])
         else:
             return " | ".join([typefmt(n) for n in tp])
     if isinstance(tp, dict):
         if tp["type"] == "array":
             return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
-        if tp["type"] == "enum":
-            return tp["name"]
+        if tp["type"] in ("record", "enum"):
+            return """<a href="#%s">%s</a>""" % (to_id(str(tp["name"])), str(tp["name"]))
+        if isinstance(tp["type"], dict):
+            return typefmt(tp["type"])
     else:
         if str(tp) in ("null", "boolean", "int", "long", "float", "double", "bytes", "string", "record", "enum", "array", "map"):
             return """<a href="#datatype">%s</a>""" % str(tp)
@@ -214,7 +216,11 @@ class RenderType(object):
                     tp = tp[1:]
                 else:
                     opt = True
-                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(i["doc"]))
+
+                desc = i["doc"]
+                if "inherited_from" in i:
+                    desc = "%s _Inherited from [%s](#%s)_" % (desc, i["inherited_from"], to_id(i["inherited_from"]))
+                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(desc))
                 doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
