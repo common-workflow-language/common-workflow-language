@@ -72,7 +72,7 @@ class Builder(object):
                     schema = copy.deepcopy(schema)
                     schema["type"] = t
                     return self.bind_input(schema, datum, lead_pos=lead_pos, tail_pos=tail_pos)
-            raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
+            raise validate.ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
         elif isinstance(schema["type"], dict):
             st = copy.deepcopy(schema["type"])
             if binding and "inputBinding" not in st and "itemSeparator" not in binding and st["type"] in ("array", "map"):
@@ -391,7 +391,9 @@ class CommandLineTool(Tool):
                     raise WorkflowException("Expression must return a file object.")
 
             if schema["type"] == "File":
-                if len(r) != 1:
+                if not r:
+                    raise WorkflowException("No matches for output file with glob: {}.".format(binding["glob"]))
+                if len(r) > 1:
                     raise WorkflowException("Multiple matches for output item that is a single file.")
                 r = r[0]
 
