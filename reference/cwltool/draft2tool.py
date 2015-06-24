@@ -72,7 +72,7 @@ class Builder(object):
                     schema = copy.deepcopy(schema)
                     schema["type"] = t
                     return self.bind_input(schema, datum, lead_pos=lead_pos, tail_pos=tail_pos)
-            raise ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
+            raise validate.ValidationException("'%s' is not a valid union %s" % (datum, schema["type"]))
         elif isinstance(schema["type"], dict):
             st = copy.deepcopy(schema["type"])
             if binding and "inputBinding" not in st and "itemSeparator" not in binding and st["type"] in ("array", "map"):
@@ -117,7 +117,7 @@ class Builder(object):
                     if "secondaryFiles" in binding:
                         if "secondaryFiles" not in datum:
                             datum["secondaryFiles"] = []
-                        for sf in aslist(schema["secondaryFiles"]):
+                        for sf in aslist(binding["secondaryFiles"]):
                             if isinstance(sf, dict):
                                 sfpath = self.do_eval(sf, context=datum["path"])
                             else:
