@@ -117,7 +117,7 @@ class Builder(object):
                     if "secondaryFiles" in binding:
                         if "secondaryFiles" not in datum:
                             datum["secondaryFiles"] = []
-                        for sf in aslist(schema["secondaryFiles"]):
+                        for sf in aslist(binding["secondaryFiles"]):
                             if isinstance(sf, dict):
                                 sfpath = self.do_eval(sf, context=datum["path"])
                             else:
@@ -401,7 +401,7 @@ class CommandLineTool(Tool):
                     if isinstance(sf, dict):
                         sfpath = builder.do_eval(sf, context=r["path"])
                     else:
-                        sfpath = {"path": substitute(r["path"], sf)}
+                        sfpath = {"path": substitute(r["path"], sf), "class": "File"}
                     if isinstance(sfpath, list):
                         r["secondaryFiles"].extend(sfpath)
                     else:

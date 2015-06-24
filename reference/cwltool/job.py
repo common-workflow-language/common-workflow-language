@@ -70,8 +70,11 @@ class CommandLineJob(object):
         os.chdir(self.outdir)
 
         for t in self.generatefiles:
-            with open(os.path.join(self.outdir, t), "w") as f:
-                f.write(self.generatefiles[t])
+            if isinstance(self.generatefiles[t], dict):
+                os.symlink(self.generatefiles[t]["path"], os.path.join(self.outdir, t))
+            else:
+                with open(os.path.join(self.outdir, t), "w") as f:
+                    f.write(self.generatefiles[t])
 
         if self.stdin:
             stdin = open(self.stdin, "rb")

@@ -238,3 +238,15 @@
       size: 13
   tool: draft-2/cat5-tool.cwl
   doc: Test unknown hints are ignored.
+
+- job: draft-2/search-job.json
+  output:
+    outfile:
+      class: File
+      checksum: sha1$e2dc9daaef945ac15f01c238ed2f1660f60909a0
+      path: result.txt
+      size: 142
+  tool: draft-2/search.cwl
+  doc: |
+    Test CreateFileRequirement linking input files and capturing secondaryFiles
+    on input and output.
