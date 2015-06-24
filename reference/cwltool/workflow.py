@@ -12,6 +12,8 @@ import functools
 import avro_ld.validate as validate
 import urlparse
 import pprint
+import tempfile
+import shutil
 
 _logger = logging.getLogger("cwltool")
 
@@ -38,10 +40,27 @@ def makeTool(toolpath_object, docpath, **kwargs):
     else:
         raise WorkflowException("Missing 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
 
+def findfiles(wo, fn=[]):
+    if isinstance(wo, dict):
+        if wo.get("class") == "File":
+            fn.append(wo)
+            return findfiles(wo.get("secondaryFiles", None), fn)
+        else:
+            for w in wo.values():
+                findfiles(w, fn)
+    elif isinstance(wo, list):
+        for w in wo:
+            findfiles(w, fn)
+    return fn
 
 class Workflow(Process):
     def __init__(self, toolpath_object, docpath, **kwargs):
         super(Workflow, self).__init__(toolpath_object, "Workflow", docpath, **kwargs)
+
+        kwargs["requirements"] = self.requirements
+        kwargs["hints"] = self.hints
+
+        self.steps = [makeTool(step, docpath, **kwargs) for step in self.tool.get("steps", [])]
 
     def receive_output(self, step, outputparms, jobout, processStatus):
         _logger.debug("WorkflowStep completed with %s", jobout)
@@ -172,18 +191,14 @@ class Workflow(Process):
         for j in jobs:
             yield j
 
+
     def job(self, joborder, basedir, output_callback, **kwargs):
         # Validate job order
         validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
 
-        kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
+        self.adjust_for_scatter(self.steps)
 
-        steps = [makeTool(step, basedir, requirements=self.requirements, hints=self.hints) for step in self.tool.get("steps", [])]
-
-        self.adjust_for_scatter(steps)
-
-        random.shuffle(steps)
+        random.shuffle(self.steps)
 
         self.state = {}
         self.processStatus = "success"
@@ -196,27 +211,71 @@ class Workflow(Process):
             else:
                 raise WorkflowException("Input '%s' not in input object and does not have a default value." % (i["id"]))
 
-        for s in steps:
+        for s in self.steps:
             for out in s.tool["outputs"]:
                 self.state[out["id"]] = None
             s.completed = False
 
+        if "outdir" in kwargs:
+            outdir = kwargs["outdir"]
+            del kwargs["outdir"]
+        else:
+            outdir = tempfile.mkdtemp()
+
+        actual_jobs = []
+
         completed = 0
-        while completed < len(steps):
+        while completed < len(self.steps):
             made_progress = False
             completed = 0
-            for step in steps:
+            for step in self.steps:
                 if step.completed:
                     completed += 1
                 else:
                     for newjob in self.try_make_job(step, basedir, **kwargs):
                         if newjob:
                             made_progress = True
+                            actual_jobs.append(newjob)
                             yield newjob
-            if not made_progress and completed < len(steps):
+            if not made_progress and completed < len(self.steps):
                 yield None
 
         wo = self.object_from_state(self.tool["outputs"], True)
+
+        if kwargs.get("move_outputs", True):
+            targets = set()
+            conflicts = set()
+
+            for f in findfiles(wo):
+                for a in actual_jobs:
+                    if a.outdir and f["path"].startswith(a.outdir):
+                        src = f["path"]
+                        dst = os.path.join(outdir, src[len(a.outdir)+1:])
+                        if dst in targets:
+                            conflicts.add(dst)
+                        else:
+                            targets.add(dst)
+
+            for f in findfiles(wo):
+                for a in actual_jobs:
+                    if a.outdir and f["path"].startswith(a.outdir):
+                        src = f["path"]
+                        dst = os.path.join(outdir, src[len(a.outdir)+1:])
+                        if dst in conflicts:
+                            sp = os.path.splitext(dst)
+                            dst = "%s-%s%s" % (sp[0], str(random.randint(1, 1000000000)), sp[1])
+                        dirname = os.path.dirname(dst)
+                        if not os.path.exists(dirname):
+                            os.makedirs(dirname)
+                        _logger.info("Moving '%s' to '%s'", src, dst)
+                        shutil.move(src, dst)
+                        f["path"] = dst
+
+            for a in actual_jobs:
+                if a.outdir:
+                    _logger.info("Removing intermediate output directory %s", a.outdir)
+                    shutil.rmtree(a.outdir, True)
+
         output_callback(wo, self.processStatus)
 
 class WorkflowStep(Process):
@@ -226,7 +285,11 @@ class WorkflowStep(Process):
         except validate.ValidationException as v:
             raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, toolpath_object["run"]["id"]), validate.indent(str(v))))
 
-        self.id = toolpath_object["id"]
+
+        if "id" in toolpath_object:
+            self.id = toolpath_object["id"]
+        else:
+            self.id = "#step_" + str(random.randint(1, 1000000000))
 
         for field in ("inputs", "outputs"):
             for i in toolpath_object[field]:
@@ -243,7 +306,7 @@ class WorkflowStep(Process):
                     raise WorkflowException("Did not find %s parameter '%s' in workflow step" % (field, p))
                 i["id"] = inputid
 
-        super(WorkflowStep, self).__init__(toolpath_object, "WorkflowStep", docpath, **kwargs)
+        super(WorkflowStep, self).__init__(toolpath_object, "Process", docpath, do_validate=False, **kwargs)
 
         if self.embedded_tool.tool["class"] == "Workflow":
             (feature, _) = self.get_requirement("SubworkflowFeatureRequirement")
@@ -256,7 +319,10 @@ class WorkflowStep(Process):
         for i in self.tool["outputs"]:
             (_, d) = urlparse.urldefrag(i["id"])
             field = d.split(".")[-1]
-            self.output[i["id"]] = jobout[field]
+            if field in jobout:
+                self.output[i["id"]] = jobout[field]
+            else:
+                processStatus = "permanentFail"
         self.processStatus = processStatus
 
     def job(self, joborder, basedir, output_callback, **kwargs):

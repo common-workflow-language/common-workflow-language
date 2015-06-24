@@ -206,9 +206,9 @@
     (if applicable, such as the Python interpreter or the JVM), libraries, modules,
     packages, utilities, and data files required to run the tool.
 
-    A **workflow platform** is a specific hardware and software and implementation
+    A **workflow platform** is a specific hardware and software implementation
     capable of interpreting a CWL document and executing the processes specified by
-    the document.  The responsibilities of the workflow infrastructure may include
+    the document.  The responsibilities of the workflow platform may include
     scheduling process invocation, setting up the necessary runtime environment,
     making input data available, invoking the tool process, and collecting output.
 
@@ -283,9 +283,10 @@
     An expression is a fragment of executable code which is evaluated by
     workflow platform to affect the inputs, outputs, or behavior of a process.
     In the generic execution sequence, expressions may be evaluated during step
-    5 (process setup), step 6 (execute process), and/or step 7 (build output).
-    Expressions are distinct from regular processes in that they are intended
-    to modify the workflow
+    5 (process setup), step 6 (execute process), and/or step 7 (capture
+    output).  Expressions are distinct from regular processes in that they are
+    intended to modify the behavior of the workflow itself rather than perform
+    the primary work of the workflow.
 
     An implementation must provide the predefined `cwl:JsonPointer` expression
     engine.  This expression engine specifies a [JSON
@@ -308,6 +309,14 @@
           be null.
 
         - **script**: The code fragment to evaluate.
+
+        - **outdir**: When used in the context of a CommandLineTool, this is
+          the designated output directory that will be used when executing the
+          tool.  Null if not applicable.
+
+        - **tmpdir**: When used in the context of a CommandLineTool, this is
+          the designated temporary directory that will be used when executing
+          the tool.  Null if not applicable.
 
       * On standard output, print a single JSON value (string, number, array, object,
         boolean, or null) for the return value.
@@ -441,7 +450,7 @@
     # This is a two-step workflow which uses "revtool" and "sorttool" defined above.
     #
     class: Workflow
-    description: "Reverse the lines in a document, then sort lines."
+    description: "Reverse the lines in a document, then sort those lines."
 
     # Requirements specify prerequisites and extensions to the workflow.
     # In this example, DockerRequirement specifies a default Docker container
@@ -474,7 +483,7 @@
     outputs:
       - id: "#output"
         type: File
-        connect: { source: "#sorted" }
+        source: "#sorted.output"
         description: "The output with the lines reversed and sorted."
 
     # The "steps" array lists the executable steps that make up the workflow.
@@ -489,16 +498,16 @@
     # tool "sorttool.cwl#input".
     steps:
       - inputs:
-          - { param: "revtool.cwl#input", connect: { source: "#input" } }
+          - { id: "#rev.input", source: "#input" }
         outputs:
-          - { id: "#reversed", param: "revtool.cwl#output" }
+          - { id: "#rev.output" }
         run: { import: revtool.cwl }
 
       - inputs:
-          - { param: "sorttool.cwl#input", connect: { source: "#reversed" } }
-          - { param: "sorttool.cwl#reverse", connect: { source: "#reverse_sort" } }
+          - { id: "#sorted.input", source: "#rev.output" }
+          - { id: "#sorted.reverse", source: "#reverse_sort" }
         outputs:
-          - { id: "#sorted", param: "sorttool.cwl#output" }
+          - { id: "#sorted.output" }
         run: { import: sorttool.cwl }
     ```
 
@@ -786,8 +795,11 @@
   name: Expression
   docAfter: ExpressionTool
   doc: |
-    See [ExpressionEngineRequirement](#expressionenginerequirement)
-    for information on how to define a expression engine.
+    Define an expression that will be evaluated and used to modify the behavior
+    of a tool or workflow.  See [Expressions](#expressions) for more
+    information about expressions
+    and [ExpressionEngineRequirement](#expressionenginerequirement) for
+    information on how to define a expression engine.
   fields:
     - name: engine
       type:
@@ -1265,7 +1277,7 @@
     The `TMPDIR` environment variable must be set in the runtime environment to
     the **designated temporary directory**.  Any files written to the
     designated temporary directory may be deleted by the workflow
-    infrastructure when the tool invocation is complete.
+    platform when the tool invocation is complete.
 
     An implementation may forbid the tool from writing to any location in the
     runtime environment file system other than the designated temporary
@@ -1587,7 +1599,7 @@
 
   fields:
     - name: id
-      type: string
+      type: ["null", string]
       jsonldPredicate: "@id"
       doc: "The unique identifier for this workflow step."
     - name: inputs
@@ -1771,7 +1783,7 @@
   name: SubworkflowFeatureRequirement
   extends: ProcessRequirement
   doc: |
-    Indicates that the workflow infrastructure must support nested workflows in
+    Indicates that the workflow platform must support nested workflows in
     the `run` field of (WorkflowStep)(#workflowstep).
 
 
@@ -1808,7 +1820,7 @@
   type: record
   extends: ProcessRequirement
   doc: |
-    Indicates that the workflow infrastructure must support the `scatter` and
+    Indicates that the workflow platform must support the `scatter` and
     `scatterMethod` fields of (WorkflowStep)(#workflowstep).
 
 

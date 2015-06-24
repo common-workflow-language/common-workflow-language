@@ -33,20 +33,54 @@ def main():
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
     parser.add_argument("--outdir", type=str)
-    parser.add_argument("--no-container", action="store_true", help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool")
-    parser.add_argument("--leave-container", action="store_true", help="Do not delete Docker container used by jobs after they exit")
-    parser.add_argument("--no-pull", default=False, action="store_true", help="Do not try to pull Docker images")
-    parser.add_argument("--dry-run", action="store_true", help="Load and validate but do not execute")
 
-    parser.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for workflow")
-    parser.add_argument("--rdf-serializer", help="Output RDF serialization format (one of turtle (default), n3, nt, xml)", default="turtle")
+    parser.add_argument("--no-container", action="store_false", default=True,
+                        help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool",
+                        dest="use_container")
 
-    parser.add_argument("--print-spec", action="store_true", help="Print HTML specification document")
-    parser.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file")
-    parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file")
-    parser.add_argument("--print-avro", action="store_true", help="Print Avro schema")
-    parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing")
-    parser.add_argument("--strict", action="store_true", help="Strict validation (unrecognized fields are an error) (default false)")
+    parser.add_argument("--rm-container", action="store_true", default=True,
+                        help="Delete Docker container used by jobs after they exit (default)",
+                        dest="rm_container")
+
+    parser.add_argument("--leave-container", action="store_false",
+                        default=True, help="Do not delete Docker container used by jobs after they exit",
+                        dest="rm_container")
+
+    parser.add_argument("--rm-tmpdir", action="store_true", default=True,
+                        help="Delete intermediate temporary directories (default)",
+                        dest="rm_tmpdir")
+
+    parser.add_argument("--leave-tmpdir", action="store_false",
+                        default=True, help="Do not elete intermediate temporary directories",
+                        dest="rm_tmpdir")
+
+    parser.add_argument("--move-outputs", action="store_true", default=True,
+                        help="Move output files to the workflow output directory and delete intermediate output directories (default).",
+                        dest="move_outputs")
+
+    parser.add_argument("--leave-outputs", action="store_false", default=True,
+                        help="Leave output files in intermediate output directories.",
+                        dest="move_outputs")
+
+    parser.add_argument("--no-pull", default=False, action="store_true",
+                        help="Do not try to pull Docker images")
+
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Load and validate but do not execute")
+
+    parser.add_argument("--print-rdf", action="store_true",
+                        help="Print corresponding RDF graph for workflow and exit")
+
+    parser.add_argument("--rdf-serializer",
+                        help="Output RDF serialization format used by --print-rdf (one of turtle (default), n3, nt, xml)",
+                        default="turtle")
+
+    parser.add_argument("--print-spec", action="store_true", help="Print HTML specification document and exit")
+    parser.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file and exit")
+    parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file and exit")
+    parser.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
+    parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
+    parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
 
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
@@ -129,7 +163,7 @@ def main():
     except (avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
-            _logger.exception()
+            _logger.exception("")
         return 1
     except RuntimeError as e:
         _logger.error(e)
@@ -155,7 +189,17 @@ def main():
                 _logger.warn("Overall job status is %s", processStatus)
             final_output.append(out)
 
-        jobiter = t.job(loader.resolve_ref(args.job_order), input_basedir, output_callback, use_container=(not args.no_container))
+        if args.dry_run:
+            outdir = "/tmp"
+        elif args.outdir:
+            outdir = args.outdir
+        else:
+            outdir = tempfile.mkdtemp()
+        jobiter = t.job(loader.resolve_ref(args.job_order),
+                        input_basedir,
+                        output_callback,
+                        use_container=args.use_container,
+                        outdir=outdir)
         if args.conformance_test:
             job = jobiter.next()
             a = {"args": job.command_line}
@@ -170,13 +214,7 @@ def main():
             last = None
             for r in jobiter:
                 if r:
-                    if args.dry_run:
-                        outdir = "/tmp"
-                    elif args.outdir:
-                        outdir = args.outdir
-                    else:
-                        outdir = tempfile.mkdtemp()
-                    r.run(outdir, dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=(not args.leave_container))
+                    r.run(dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=args.rm_container, rm_tmpdir=args.rm_tmpdir)
                 else:
                     print "Workflow deadlocked."
                     return 1
@@ -187,7 +225,7 @@ def main():
     except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:
-            _logger.exception()
+            _logger.exception("")
         return 1
     except workflow.WorkflowException as e:
         _logger.error("Workflow error:\n%s" % e)

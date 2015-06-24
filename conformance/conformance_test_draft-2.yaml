@@ -218,3 +218,13 @@
   output: {count_output: 16}
   tool: draft-2/count-lines9-wf.cwl
   doc: Test default value on input parameter
+
+- job: draft-2/revsort-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
+      path: output.txt
+      size: 1111
+  tool: draft-2/revsort.cwl
+  doc: Test sample workflows from the specification

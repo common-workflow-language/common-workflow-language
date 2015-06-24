@@ -1,6 +1,23 @@
+#
+# This is a two-step workflow which uses "revtool" and "sorttool" defined above.
+#
 class: Workflow
 description: "Reverse the lines in a document, then sort those lines."
 
+# Requirements specify prerequisites and extensions to the workflow.
+# In this example, DockerRequirement specifies a default Docker container
+# in which the command line tools will execute.
+requirements:
+  - class: DockerRequirement
+    dockerPull: debian:8
+
+
+# The inputs array defines the structure of the input object that describes
+# the inputs to the workflow.
+#
+# The "reverse_sort" input parameter demonstrates the "default" field.  If the
+# field "reverse_sort" is not provided in the input object, the default value will
+# be used.
 inputs:
   - id: "#input"
     type: File
@@ -10,22 +27,38 @@ inputs:
     default: true
     description: "If true, reverse (decending) sort"
 
+# The "outputs" array defines the structure of the output object that describes
+# the outputs of the workflow.
+#
+# Each output field must be connected to the output of one of the workflow
+# steps using the "connect" field.  Here, the parameter "#output" of the
+# workflow comes from the "#sorted" output of the "sort" step.
 outputs:
   - id: "#output"
     type: File
-    connect: { source: "#sorted" }
+    source: "#sorted.output"
     description: "The output with the lines reversed and sorted."
 
+# The "steps" array lists the executable steps that make up the workflow.
+# The tool to execute each step is listed in the "run" field.
+#
+# In the first step, the "inputs" field of the step connects the upstream
+# parameter "#input" of the workflow to the input parameter of the tool
+# "revtool.cwl#input"
+#
+# In the second step, the "inputs" field of the step connects the output
+# parameter "#reversed" from the first step to the input parameter of the
+# tool "sorttool.cwl#input".
 steps:
   - inputs:
-      - { param: "revtool.cwl#input", connect: { source: "#input" } }
+      - { id: "#rev.input", source: "#input" }
     outputs:
-      - { id: "#reversed", param: "revtool.cwl#output" }
+      - { id: "#rev.output" }
     run: { import: revtool.cwl }
 
   - inputs:
-      - { param: "sorttool.cwl#input", connect: { source: "#reversed" } }
-      - { param: "sorttool.cwl#reverse", connect: { source: "#reverse_sort" } }
+      - { id: "#sorted.input", source: "#rev.output" }
+      - { id: "#sorted.reverse", source: "#reverse_sort" }
     outputs:
-      - { id: "#sorted", param: "sorttool.cwl#output" }
+      - { id: "#sorted.output" }
     run: { import: sorttool.cwl }

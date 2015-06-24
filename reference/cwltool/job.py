@@ -9,20 +9,21 @@ import sys
 import requests
 import docker
 from process import WorkflowException, get_feature
+import shutil
 
 _logger = logging.getLogger("cwltool")
 
 class CommandLineJob(object):
-    def run(self, outdir, dry_run=False, pull_image=True, rm_container=True):
+    def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True):
 
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+        if not os.path.exists(self.outdir):
+            os.makedirs(self.outdir)
 
         #with open(os.path.join(outdir, "cwl.input.json"), "w") as fp:
         #    json.dump(self.joborder, fp)
 
         runtime = []
-        env = {}
+        env = {"TMPDIR": self.tmpdir}
 
         (docker_req, docker_is_req) = get_feature(self, "DockerRequirement")
 
@@ -35,16 +36,25 @@ class CommandLineJob(object):
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
                 runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
-            runtime.append("--volume=%s:%s:rw" % (os.path.abspath(outdir), "/tmp/job_output"))
+            runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.outdir), "/tmp/job_output"))
+            runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.tmpdir), "/tmp/job_tmp"))
             runtime.append("--workdir=%s" % ("/tmp/job_output"))
             runtime.append("--user=%s" % (os.geteuid()))
+
             if rm_container:
                 runtime.append("--rm")
+
+            runtime.append("--env=TMPDIR=/tmp/job_tmp")
+
             for t,v in self.environment.items():
                 runtime.append("--env=%s=%s" % (t, v))
+
             runtime.append(img_id)
         else:
             env = self.environment
+            if not os.path.exists(self.tmpdir):
+                os.makedirs(self.tmpdir)
+            env["TMPDIR"] = self.tmpdir
 
         stdin = None
         stdout = None
@@ -55,12 +65,12 @@ class CommandLineJob(object):
                      ' > %s' % (self.stdout) if self.stdout else '')
 
         if dry_run:
-            return (outdir, {})
+            return (self.outdir, {})
 
-        os.chdir(outdir)
+        os.chdir(self.outdir)
 
         for t in self.generatefiles:
-            with open(os.path.join(outdir, t), "w") as f:
+            with open(os.path.join(self.outdir, t), "w") as f:
                 f.write(self.generatefiles[t])
 
         if self.stdin:
@@ -82,7 +92,7 @@ class CommandLineJob(object):
                               stdin=stdin,
                               stdout=stdout,
                               env=env,
-                              cwd=outdir)
+                              cwd=self.outdir)
 
         if stdin == subprocess.PIPE:
             sp.stdin.close()
@@ -95,7 +105,7 @@ class CommandLineJob(object):
         if stdout is not sys.stderr:
             stdout.close()
 
-        outputs = self.collect_outputs(outdir)
+        outputs = self.collect_outputs(self.outdir)
 
         if self.successCodes and rcode in self.successCodes:
             processStatus = "success"
@@ -109,3 +119,7 @@ class CommandLineJob(object):
             processStatus = "permanentFail"
 
         self.output_callback(outputs, processStatus)
+
+        if rm_tmpdir:
+            _logger.info("Removing temporary directory %s", self.tmpdir)
+            shutil.rmtree(self.tmpdir, True)

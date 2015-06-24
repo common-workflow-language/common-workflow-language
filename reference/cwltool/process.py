@@ -10,6 +10,7 @@ import pprint
 from aslist import aslist
 import avro_ld.schema
 import urlparse
+import pprint
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -34,17 +35,18 @@ def get_feature(self, feature):
     return (None, None)
 
 class Process(object):
-    def __init__(self, toolpath_object, validateAs, docpath, **kwargs):
+    def __init__(self, toolpath_object, validateAs, docpath, do_validate=True, **kwargs):
         (_, self.names) = get_schema()
         self.docpath = docpath
 
         self.tool = toolpath_object
 
-        try:
-            # Validate tool documument
-            validate.validate_ex(self.names.get_name(validateAs, ""), self.tool, strict=kwargs.get("strict"))
-        except validate.ValidationException as v:
-            raise validate.ValidationException("Could not validate %s:\n%s" % (self.tool.get("id"), validate.indent(str(v))))
+        if do_validate:
+            try:
+                # Validate tool documument
+                validate.validate_ex(self.names.get_name(validateAs, ""), self.tool, strict=kwargs.get("strict"))
+            except validate.ValidationException as v:
+                raise validate.ValidationException("Could not validate %s as %s:\n%s" % (self.tool.get("id"), validateAs, validate.indent(str(v))))
 
         self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])

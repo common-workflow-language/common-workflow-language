@@ -19,6 +19,7 @@ from aslist import aslist
 import expression
 import re
 import urlparse
+import tempfile
 
 _logger = logging.getLogger("cwltool")
 
@@ -30,7 +31,9 @@ supportedProcessRequirements = ("DockerRequirement",
                                 "ExpressionEngineRequirement",
                                 "SchemaDefRequirement",
                                 "EnvVarRequirement",
-                                "CreateFileRequirement")
+                                "CreateFileRequirement",
+                                "ScatterFeatureRequirement",
+                                "SubworkflowFeatureRequirement")
 
 def substitute(value, replace):
     if replace[0] == "^":
@@ -116,7 +119,7 @@ class Builder(object):
                             datum["secondaryFiles"] = []
                         for sf in aslist(schema["secondaryFiles"]):
                             if isinstance(sf, dict):
-                                sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, datum["path"])
+                                sfpath = self.do_eval(sf, context=datum["path"])
                             else:
                                 sfpath = {"path": substitute(datum["path"], sf)}
                             if isinstance(sfpath, list):
@@ -136,7 +139,7 @@ class Builder(object):
     def generate_arg(self, binding):
         value = binding["valueFrom"]
         if "do_eval" in binding:
-            value = expression.do_eval(binding["do_eval"], self.job, self.requirements, self.docpath, value)
+            value = self.do_eval(binding["do_eval"], context=value)
 
         prefix = binding.get("prefix")
         sep = binding.get("separate", True)
@@ -171,6 +174,9 @@ class Builder(object):
 
         return [a for a in args if a is not None]
 
+    def do_eval(self, ex, context=None, pull_image=True):
+        return expression.do_eval(ex, self.job, self.requirements, self.outdir, self.tmpdir, context=context, pull_image=pull_image)
+
 
 class Tool(Process):
     def _init_job(self, joborder, input_basedir, **kwargs):
@@ -188,7 +194,7 @@ class Tool(Process):
         except validate.ValidationException as e:
             raise WorkflowException("Error validating input record, " + str(e))
 
-        for r in self.tool.get("requirements", []):
+        for r in self.requirements:
             if r["class"] not in supportedProcessRequirements:
                 raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
 
@@ -198,6 +204,15 @@ class Tool(Process):
         builder.schemaDefs = self.schemaDefs
         builder.docpath = self.docpath
         builder.names = self.names
+        builder.requirements = self.requirements
+
+        dockerReq, _ = self.get_requirement("DockerRequirement")
+        if dockerReq and kwargs.get("use_container"):
+            builder.outdir = "/tmp/job_output"
+            builder.tmpdir = "/tmp/job_tmp"
+        else:
+            builder.outdir = kwargs.get("outdir", tempfile.mkdtemp())
+            builder.tmpdir = tempfile.mkdtemp()
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 
@@ -209,9 +224,9 @@ class ExpressionTool(Tool):
         super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", docpath, **kwargs)
 
     class ExpressionJob(object):
-        def run(self, outdir=None, **kwargs):
+        def run(self, **kwargs):
             try:
-                self.output_callback(expression.do_eval(self.script, self.builder.job, self.requirements, self.builder.docpath), "success")
+                self.output_callback(self.builder.do_eval(self.script), "success")
             except Exception:
                 self.output_callback({}, "permanentFail")
 
@@ -222,8 +237,10 @@ class ExpressionTool(Tool):
         j.builder = builder
         j.script = self.tool["expression"]
         j.output_callback = output_callback
-        j.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
-        j.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
+        j.requirements = self.requirements
+        j.hints = self.hints
+        j.outdir = None
+        j.tmpdir = None
 
         yield j
 
@@ -231,7 +248,7 @@ class CommandLineTool(Tool):
     def __init__(self, toolpath_object, docpath, **kwargs):
         super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath, **kwargs)
 
-    def job(self, joborder, input_basedir, output_callback, use_container=True, **kwargs):
+    def job(self, joborder, input_basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, input_basedir, **kwargs)
 
         if self.tool["baseCommand"]:
@@ -275,19 +292,24 @@ class CommandLineTool(Tool):
         builder.pathmapper = None
 
         if self.tool.get("stdin"):
-            j.stdin = expression.do_eval(self.tool["stdin"], builder.job, self.requirements, self.docpath, j.stdin)
+            j.stdin = builder.do_eval(self.tool["stdin"])
             if isinstance(j.stdin, dict) and "ref" in j.stdin:
                 j.stdin = builder.job[j.stdin["ref"][1:]]["path"]
             reffiles.append(j.stdin)
 
         if self.tool.get("stdout"):
-            j.stdout = expression.do_eval(self.tool["stdout"], builder.job, j.requirements, self.docpath)
+            j.stdout = builder.do_eval(self.tool["stdout"])
             if os.path.isabs(j.stdout):
                 raise validate.ValidationException("stdout must be a relative path")
 
         dockerReq, _ = self.get_requirement("DockerRequirement")
-        if dockerReq and use_container:
-                builder.pathmapper = DockerPathMapper(reffiles, input_basedir)
+        if dockerReq and kwargs.get("use_container"):
+            builder.pathmapper = DockerPathMapper(reffiles, input_basedir)
+            j.outdir = kwargs.get("outdir", tempfile.mkdtemp())
+            j.tmpdir = tempfile.mkdtemp()
+        else:
+            j.outdir = builder.outdir
+            j.tmpdir = builder.tmpdir
 
         if builder.pathmapper is None:
             builder.pathmapper = PathMapper(reffiles, input_basedir)
@@ -304,13 +326,13 @@ class CommandLineTool(Tool):
         createFiles, _ = self.get_requirement("CreateFileRequirement")
         if createFiles:
             for t in createFiles["fileDef"]:
-                j.generatefiles[t["filename"]] = expression.do_eval(t["fileContent"], builder.job, j.requirements, self.docpath)
+                j.generatefiles[t["filename"]] = builder.do_eval(t["fileContent"])
 
         j.environment = {}
         evr, _ = self.get_requirement("EnvVarRequirement")
         if evr:
             for t in evr["envDef"]:
-                j.environment[t["envName"]] = expression.do_eval(t["envValue"], builder.job, j.requirements, self.docpath)
+                j.environment[t["envName"]] = builder.do_eval(t["envValue"])
 
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
@@ -346,7 +368,7 @@ class CommandLineTool(Tool):
             binding = schema["outputBinding"]
             if "glob" in binding:
                 r = []
-                bg = expression.do_eval(binding["glob"], builder.job, self.requirements, self.docpath)
+                bg = builder.do_eval(binding["glob"])
                 for gb in aslist(bg):
                     r.extend([{"path": g, "class": "File"} for g in glob.glob(os.path.join(outdir, gb))])
                 for files in r:
@@ -364,7 +386,7 @@ class CommandLineTool(Tool):
                     files["size"] = filesize
 
             if "outputEval" in binding:
-                r = expression.do_eval(binding["outputEval"], builder.job, self.requirements, self.docpath, r)
+                r = builder.do_eval(binding["outputEval"], context=r)
                 if schema["type"] == "File" and (not isinstance(r, dict) or "path" not in r):
                     raise WorkflowException("Expression must return a file object.")
 
@@ -377,7 +399,7 @@ class CommandLineTool(Tool):
                 r["secondaryFiles"] = []
                 for sf in aslist(binding["secondaryFiles"]):
                     if isinstance(sf, dict):
-                        sfpath = expression.do_eval(sf, self.job, self.requirements, self.docpath, r["path"])
+                        sfpath = builder.do_eval(sf, context=r["path"])
                     else:
                         sfpath = {"path": substitute(r["path"], sf)}
                     if isinstance(sfpath, list):
