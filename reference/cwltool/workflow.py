@@ -37,8 +37,8 @@ def makeTool(toolpath_object, docpath, **kwargs):
             return draft2tool.ExpressionTool(toolpath_object, docpath, **kwargs)
         elif toolpath_object["class"] == "Workflow":
             return Workflow(toolpath_object, docpath, **kwargs)
-    else:
-        raise WorkflowException("Missing 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
+
+    raise WorkflowException("Missing or invalid 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
 
 def findfiles(wo, fn=[]):
     if isinstance(wo, dict):

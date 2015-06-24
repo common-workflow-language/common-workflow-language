@@ -51,8 +51,7 @@ class Process(object):
         self.requirements = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
 
-        #self.validate_requirements(self.tool, "requirements")
-        #self.validate_requirements(self.tool, "hints")
+        self.validate_hints(self.tool.get("hints", []), strict=kwargs.get("strict"))
 
         for t in self.tool.get("requirements", []):
             t["_docpath"] = docpath
@@ -106,22 +105,15 @@ class Process(object):
 
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
-    # def validate_requirements(self, tool, field):
-    #     for r in tool.get(field, []):
-    #         try:
-    #             if self.names.get_name(r["class"], "") is None:
-    #                 raise validate.ValidationException("Unknown requirement %s" % (r["class"]))
-    #             validate.validate_ex(self.names.get_name(r["class"], ""), r)
-    #             if "requirements" in r:
-    #                 self.validate_requirements(r, "requirements")
-    #             if "hints" in r:
-    #                 self.validate_requirements(r, "hints")
-    #         except validate.ValidationException as v:
-    #             err = "While validating %s %s\n%s" % (field, r["class"], validate.indent(str(v)))
-    #             if field == "hints":
-    #                 _logger.warn(err)
-    #             else:
-    #                 raise validate.ValidationException(err)
+    def validate_hints(self, hints, strict):
+        for r in hints:
+            try:
+                if self.names.get_name(r["class"], "") is not None:
+                    validate.validate_ex(self.names.get_name(r["class"], ""), r, strict=strict)
+                else:
+                    _logger.info(validate.ValidationException("Unknown hint %s" % (r["class"])))
+            except validate.ValidationException as v:
+                raise validate.ValidationException("Validating hint `%s`: %s" % (r["class"], str(v)))
 
     def get_requirement(self, feature):
         return get_feature(self, feature)

@@ -165,7 +165,7 @@ def main():
         if args.debug:
             _logger.exception("")
         return 1
-    except RuntimeError as e:
+    except (RuntimeError, workflow.WorkflowException) as e:
         _logger.error(e)
         if args.debug:
             _logger.exception()

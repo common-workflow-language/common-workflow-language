@@ -1021,7 +1021,7 @@
       type:
         - "null"
         - type: array
-          items: ProcessRequirement
+          items: Any
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
@@ -1637,7 +1637,7 @@
       type:
         - "null"
         - type: array
-          items: ProcessRequirement
+          items: Any
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this workflow step.  It is
