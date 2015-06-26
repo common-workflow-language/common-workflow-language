@@ -8,7 +8,7 @@ import shutil
 from setuptools import setup, find_packages
 
 SETUP_DIR = os.path.dirname(__file__)
-README = os.path.join(SETUP_DIR, 'README.rst')
+README = os.path.join(SETUP_DIR, 'README')
 
 setup(name='cwl_runner',
       version='1.0',
