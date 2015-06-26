@@ -1,0 +1,4 @@
+This an optional companion package to "cwltool" which provides provides an
+additional entry point under the alias "cwl-runner", which is the
+implementation-agnostic name for the default CWL interpreter installed on a
+host.

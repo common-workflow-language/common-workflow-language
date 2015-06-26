@@ -8,11 +8,13 @@ files as well as provide other tools related to working with CWL.
 
 This is written and tested for Python 2.7.
 
-There are two packages.  The "cwltool" package is the primary Python module
-containing the reference implementation.  The "cwl-runner" package is optional
-and provides an additional entry point under the alias "cwl-runner", which is
-the implementation-agnostic name for the default CWL interpreter installed on a
-host.
+The reference implementation consists of two packages.  The "cwltool" package
+is the primary Python module containing the reference implementation in the
+"cwltool" module and console executable by the same name.
+
+The "cwl-runner" package is optional and provides an additional entry point
+under the alias "cwl-runner", which is the implementation-agnostic name for the
+default CWL interpreter installed on a host.
 
 Install
 -------

@@ -8,13 +8,12 @@ import shutil
 from setuptools import setup, find_packages
 
 SETUP_DIR = os.path.dirname(__file__)
-
-
+README = os.path.join(SETUP_DIR, 'README.rst')
 
 setup(name='cwl_runner',
       version='1.0',
       description='Common workflow language reference implementation',
-      long_description="""This provides an alternate entry point to 'cwltool' allowing 'cwl-runner' to be used as an implementation-agnostic script interpreter via #!/usr/bin/env cwl-runner.""",
+      long_description=open(README).read(),
       author='Common workflow language working group',
       author_email='common-workflow-language@googlegroups.com',
       url="https://github.com/common-workflow-language/common-workflow-language",
