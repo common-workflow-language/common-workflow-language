@@ -8,38 +8,23 @@ import shutil
 from setuptools import setup, find_packages
 
 SETUP_DIR = os.path.dirname(__file__)
-README = os.path.join(SETUP_DIR, 'README.rst')
 
-try:
-    import gittaggers
-    tagger = gittaggers.EggInfoFromGit
-except ImportError:
-    tagger = egg_info_cmd.egg_info
 
-setup(name='cwltool',
+
+setup(name='cwl_runner',
       version='1.0',
       description='Common workflow language reference implementation',
-      long_description=open(README).read(),
+      long_description="""This provides an alternate entry point to 'cwltool' allowing 'cwl-runner' to be used as an implementation-agnostic script interpreter via #!/usr/bin/env cwl-runner.""",
       author='Common workflow language working group',
       author_email='common-workflow-language@googlegroups.com',
       url="https://github.com/common-workflow-language/common-workflow-language",
       download_url="https://github.com/common-workflow-language/common-workflow-language",
       license='Apache 2.0',
-      packages=["cwltool", "cwltool.avro_ld"],
-      package_data={'cwltool': ['schemas/draft-1/*', 'schemas/draft-2/*']},
       install_requires=[
-          'requests',
-          'PyYAML',
-          'avro',
-          'rdflib >= 4.2.0',
-          'rdflib-jsonld >= 0.3.0',
-          'mistune'
+          'cwltool'
         ],
-      test_suite='tests',
-      tests_require=[],
       entry_points={
-          'console_scripts': [ "cwltool=cwltool.main:main" ]
+          'console_scripts': [ "cwl-runner=cwltool.main:main" ]
       },
-      zip_safe=True,
-      cmdclass={'egg_info': tagger},
+      zip_safe=True
 )

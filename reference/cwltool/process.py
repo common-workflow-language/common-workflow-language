@@ -11,8 +11,7 @@ from aslist import aslist
 import avro_ld.schema
 import urlparse
 import pprint
-
-module_dir = os.path.dirname(os.path.abspath(__file__))
+from pkg_resources import resource_stream
 
 _logger = logging.getLogger("cwltool")
 
@@ -20,10 +19,9 @@ class WorkflowException(Exception):
     pass
 
 def get_schema():
-    cwl_avsc = os.path.join(module_dir, 'schemas/draft-2/cwl-avro.yml')
-    with open(cwl_avsc) as f:
-        j = yaml.load(f)
-        return (j, avro_ld.schema.schema(j))
+    f = resource_stream(__name__, 'schemas/draft-2/cwl-avro.yml')
+    j = yaml.load(f)
+    return (j, avro_ld.schema.schema(j))
 
 def get_feature(self, feature):
     for t in reversed(self.requirements):

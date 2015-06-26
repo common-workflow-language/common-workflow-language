@@ -25,8 +25,6 @@ _logger = logging.getLogger("cwltool")
 
 CONTENT_LIMIT = 64 * 1024
 
-module_dir = os.path.dirname(os.path.abspath(__file__))
-
 supportedProcessRequirements = ("DockerRequirement",
                                 "ExpressionEngineRequirement",
                                 "SchemaDefRequirement",

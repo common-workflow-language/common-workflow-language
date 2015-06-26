@@ -2,8 +2,17 @@
 Common workflow language tool description reference implementation
 ==================================================================
 
-This is intended to be a lightweight reference implementation of the common
-workflow language tool description.
+This is the reference implementation of the Common Workflow Language.  It is
+intended to be feature complete and provide comprehensive validation of CWL
+files as well as provide other tools related to working with CWL.
+
+This is written and tested for Python 2.7.
+
+There are two packages.  The "cwltool" package is the primary Python module
+containing the reference implementation.  The "cwl-runner" package is optional
+and provides an additional entry point under the alias "cwl-runner", which is
+the implementation-agnostic name for the default CWL interpreter installed on a
+host.
 
 Install
 -------
@@ -11,20 +20,19 @@ Install
 From source::
 
   git clone https://github.com/common-workflow-language/common-workflow-language.git
-  cd common-workflow-language/reference
-  easy_install .
+  cd common-workflow-language/reference && easy_install .
+  cd cwl-runner && easy_install .
 
-With pip::
+With pip (will install "cwltool" package as well)::
 
-  pip install cwltool
-
+  pip install cwl-runner
 
 Run on the command line
 -----------------------
 
-  ``cwltool [tool] [job]``
+  ``cwl-runner [tool] [job]``
 
-Use as a library
+Import as a module
 ----------------
 
 Add::

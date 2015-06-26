@@ -363,11 +363,19 @@
     * If all workflow steps are executed and complete with `success` then the workflow
     status is `success`.
 
+    ## Executing CWL documents as scripts
+
+    By convention, a CWL document may begin with `#!/usr/bin/env cwl-runner`
+    and be marked as executable (the POSIX "+x" permission bits) to enable it
+    to be executed directly.  A workflow platform may support this mode of
+    operation, if so, it must provide `cwl-runner` as an alias for the
+    platform's CWL implementation.
 
     # Sample CWL workflow
 
     revtool.cwl:
     ```
+    #!/usr/bin/env cwl-runner
     #
     # Simplest example command line program wrapper for the Unix tool "rev".
     #
@@ -408,6 +416,8 @@
 
     sorttool.cwl:
     ```
+    #!/usr/bin/env cwl-runner
+    #
     # Example command line program wrapper for the Unix tool "sort"
     # demonstrating command line flags.
     class: CommandLineTool
@@ -446,6 +456,7 @@
 
     revsort.cwl:
     ```
+    #!/usr/bin/env cwl-runner
     #
     # This is a two-step workflow which uses "revtool" and "sorttool" defined above.
     #
