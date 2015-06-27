@@ -200,7 +200,6 @@ class Tool(Process):
         builder.files = []
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
-        builder.docpath = self.docpath
         builder.names = self.names
         builder.requirements = self.requirements
 
@@ -218,8 +217,8 @@ class Tool(Process):
 
 
 class ExpressionTool(Tool):
-    def __init__(self, toolpath_object, docpath, **kwargs):
-        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", docpath, **kwargs)
+    def __init__(self, toolpath_object, **kwargs):
+        super(ExpressionTool, self).__init__(toolpath_object, "ExpressionTool", **kwargs)
 
     class ExpressionJob(object):
         def run(self, **kwargs):
@@ -243,8 +242,8 @@ class ExpressionTool(Tool):
         yield j
 
 class CommandLineTool(Tool):
-    def __init__(self, toolpath_object, docpath, **kwargs):
-        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", docpath, **kwargs)
+    def __init__(self, toolpath_object, **kwargs):
+        super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", **kwargs)
 
     def job(self, joborder, input_basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, input_basedir, **kwargs)

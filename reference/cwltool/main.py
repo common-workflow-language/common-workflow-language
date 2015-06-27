@@ -15,16 +15,10 @@ import avro_ld.makedoc
 import yaml
 import urlparse
 import process
+from cwlrdf import printrdf, printdot
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
-
-def printrdf(workflow, wf, ctx, sr):
-    from rdflib import Graph, plugin
-    from rdflib.serializer import Serializer
-    wf["@context"] = ctx
-    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
-    print(g.serialize(format=sr))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -80,6 +74,7 @@ def main():
     parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file and exit")
     parser.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
     parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
+    parser.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
 
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
@@ -122,8 +117,9 @@ def main():
         return 0
 
     if not args.workflow:
-        _logger.error("CWL document required")
         parser.print_help()
+        _logger.error("")
+        _logger.error("CWL document required")
         return 1
 
     idx = {}
@@ -159,7 +155,7 @@ def main():
         processobj = loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
     try:
-        t = workflow.makeTool(processobj, input_basedir, strict=args.strict)
+        t = workflow.makeTool(processobj, strict=args.strict)
     except (avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
@@ -175,9 +171,14 @@ def main():
         printrdf(args.workflow, processobj, ctx, args.rdf_serializer)
         return 0
 
+    if args.print_dot:
+        printdot(args.workflow, processobj, ctx, args.rdf_serializer)
+        return 0
+
     if not args.job_order:
+        parser.print_help()
+        _logger.error("")
         _logger.error("Input object required")
-        _logger.error("Use --help for command line options")
         return 1
 
     try:

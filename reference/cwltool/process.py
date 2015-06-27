@@ -33,10 +33,8 @@ def get_feature(self, feature):
     return (None, None)
 
 class Process(object):
-    def __init__(self, toolpath_object, validateAs, docpath, do_validate=True, **kwargs):
+    def __init__(self, toolpath_object, validateAs, do_validate=True, **kwargs):
         (_, self.names) = get_schema()
-        self.docpath = docpath
-
         self.tool = toolpath_object
 
         if do_validate:
@@ -50,12 +48,6 @@ class Process(object):
         self.hints = kwargs.get("hints", []) + self.tool.get("hints", [])
 
         self.validate_hints(self.tool.get("hints", []), strict=kwargs.get("strict"))
-
-        for t in self.tool.get("requirements", []):
-            t["_docpath"] = docpath
-
-        for t in self.tool.get("hints", []):
-            t["_docpath"] = docpath
 
         self.schemaDefs = {}
 

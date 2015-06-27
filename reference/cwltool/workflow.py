@@ -19,9 +19,7 @@ _logger = logging.getLogger("cwltool")
 
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
-def makeTool(toolpath_object, docpath, **kwargs):
-    """docpath is the directory the tool file is located."""
-
+def makeTool(toolpath_object, **kwargs):
     class DR(object):
         pass
     dr = DR()
@@ -29,14 +27,14 @@ def makeTool(toolpath_object, docpath, **kwargs):
     dr.hints = kwargs.get("hints", [])
 
     if "run" in toolpath_object:
-        return WorkflowStep(toolpath_object, docpath, **kwargs)
+        return WorkflowStep(toolpath_object, **kwargs)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
-            return draft2tool.CommandLineTool(toolpath_object, docpath, **kwargs)
+            return draft2tool.CommandLineTool(toolpath_object, **kwargs)
         elif toolpath_object["class"] == "ExpressionTool":
-            return draft2tool.ExpressionTool(toolpath_object, docpath, **kwargs)
+            return draft2tool.ExpressionTool(toolpath_object, **kwargs)
         elif toolpath_object["class"] == "Workflow":
-            return Workflow(toolpath_object, docpath, **kwargs)
+            return Workflow(toolpath_object, **kwargs)
 
     raise WorkflowException("Missing or invalid 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
 
@@ -54,13 +52,13 @@ def findfiles(wo, fn=[]):
     return fn
 
 class Workflow(Process):
-    def __init__(self, toolpath_object, docpath, **kwargs):
-        super(Workflow, self).__init__(toolpath_object, "Workflow", docpath, **kwargs)
+    def __init__(self, toolpath_object, **kwargs):
+        super(Workflow, self).__init__(toolpath_object, "Workflow", **kwargs)
 
         kwargs["requirements"] = self.requirements
         kwargs["hints"] = self.hints
 
-        self.steps = [makeTool(step, docpath, **kwargs) for step in self.tool.get("steps", [])]
+        self.steps = [makeTool(step, **kwargs) for step in self.tool.get("steps", [])]
 
     def receive_output(self, step, outputparms, jobout, processStatus):
         _logger.debug("WorkflowStep completed with %s", jobout)
@@ -279,12 +277,11 @@ class Workflow(Process):
         output_callback(wo, self.processStatus)
 
 class WorkflowStep(Process):
-    def __init__(self, toolpath_object, docpath, **kwargs):
+    def __init__(self, toolpath_object, **kwargs):
         try:
-            self.embedded_tool = makeTool(toolpath_object["run"], docpath, **kwargs)
+            self.embedded_tool = makeTool(toolpath_object["run"], **kwargs)
         except validate.ValidationException as v:
-            raise WorkflowException("Tool definition %s failed validation:\n%s" % (os.path.join(docpath, toolpath_object["run"]["id"]), validate.indent(str(v))))
-
+            raise WorkflowException("Tool definition %s failed validation:\n%s" % (toolpath_object["run"]["id"], validate.indent(str(v))))
 
         if "id" in toolpath_object:
             self.id = toolpath_object["id"]
@@ -306,7 +303,7 @@ class WorkflowStep(Process):
                     raise WorkflowException("Did not find %s parameter '%s' in workflow step" % (field, p))
                 i["id"] = inputid
 
-        super(WorkflowStep, self).__init__(toolpath_object, "Process", docpath, do_validate=False, **kwargs)
+        super(WorkflowStep, self).__init__(toolpath_object, "Process", do_validate=False, **kwargs)
 
         if self.embedded_tool.tool["class"] == "Workflow":
             (feature, _) = self.get_requirement("SubworkflowFeatureRequirement")

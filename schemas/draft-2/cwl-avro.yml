@@ -547,7 +547,6 @@
   jsonldPrefixes: {
     "cwl": "http://github.com/common-workflow-language#",
     "avro": "http://github.com/common-workflow-language/avro#",
-    "wfdesc": "http://purl.org/wf4ever/wfdesc#",
     "dct": "http://purl.org/dc/terms/",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
@@ -666,24 +665,6 @@
   symbols: ["Any"]
   doc: |
     The **Any** type validates for any non-null value.
-
-
-# - name: DataLink
-#   type: record
-#   docAfter: WorkflowStep
-#   doc: |
-#     A data link connects the value of one parameter to another such that when a
-#     value becomes available for the parameter specified by `source`, that value
-#     of the parameter is propagated to the destination parameter.
-#   fields:
-#     - name: source
-#       type: string
-#       jsonldPredicate:
-#         "@id": "wfdesc:hasSource"
-#         "@type": "@id"
-#       doc: |
-#         A workflow parameter, either an input parameter of the workflow or an
-#         output parameter of another workflow step.
 
 
 - name: Schema
@@ -1001,7 +982,6 @@
       type:
         type: array
         items: InputParameter
-      jsonldPredicate: "wfdesc:hasInput"
       doc: |
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -1012,7 +992,6 @@
       type:
         type: array
         items: OutputParameter
-      jsonldPredicate: "wfdesc:hasOutput"
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -1617,7 +1596,6 @@
       type:
         type: array
         items: WorkflowStepInput
-      jsonldPredicate: "wfdesc:hasInput"
       doc: |
         Defines the input parameters of the workflow step.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -1628,7 +1606,6 @@
       type:
         type: array
         items: WorkflowStepOutput
-      jsonldPredicate: "wfdesc:hasOutput"
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -1726,7 +1703,6 @@
         "@type": "@vocab"
       type: string
     - name: steps
-      jsonldPredicate: "wfdesc:hasSubProcess"
       doc: |
         The individual steps that make up the workflow.  Steps are executed when all
         input data links are fufilled.  An implementation may choose to execute
