@@ -13,7 +13,7 @@
     * Michael R. Crusoe <mcrusoe@msu.edu>, Michigan State University
     * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
     * Maxim Mikheev <mikhmv@biodatomics.com>, BioDatomics
-    * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>, University of Manchester
+    * Stian Soiland-Reyes [soiland-reyes@cs.manchester.ac.uk](mailto:soiland-reyes@cs.manchester.ac.uk), University of Manchester
 
     # Abstract
 
@@ -127,6 +127,9 @@
 
     A **output schema** describes the valid format for a output object.
 
+    **metadata** is information about workflows, tools or input items that is
+    not used directly in the computation.
+
     ## Syntax
 
     Documents containing CWL objects are serialized and loaded using YAML
@@ -182,6 +185,21 @@
     document and the `include` directive implicitly replaced by a string with
     the contents of the document.  Because the loaded resource is unparsed,
     URIs used with `include` must not include fragments.
+
+    ## Extensions and Metadata
+
+    Implementation extensions not required for correct
+    execution (for example, fields related to GUI rendering) may
+    be stored in [process hints](#requirements_and_hints).
+
+    Input metadata (for example, a lab sample identifier) may be explicitly
+    represented within a workflow using input parameters which are propagated
+    to output.  Future versions of this specification may define additional
+    facilities for working with input/output metadata.
+
+    Fields for tool and workflow metadata (for example, authorship for use in
+    citations) are not defined in this specification.  Future versions of this
+    specification may define such fields.
 
     # Execution model
 
@@ -1204,23 +1222,23 @@
   doc: |
 
     A CommandLineTool process is a process implementation for executing a
-    standalone, non-interactive command line application in a POSIX
-    environment.  To help accomodate of the enormous variety in syntax and
-    semantics for input, runtime environment, invocation, and output of
-    arbitrary programs, CommandLineTool provides the concept of "input binding"
-    to describe how to translate input parameters to an actual program
-    invocation, and "output binding" to describe how generate output parameters
-    from program output.
+    non-interactive application in a POSIX environment.  To help accomodate of
+    the enormous variety in syntax and semantics for input, runtime
+    environment, invocation, and output of arbitrary programs, CommandLineTool
+    provides the concept of "input binding" to describe how to translate input
+    parameters to an actual program invocation, and "output binding" to
+    describe how generate output parameters from program output.
 
     # Input binding
 
     The tool command line is built by applying command line bindings to the
     input object.  Bindings are listed either as part of an [input
-    parameter](#commandlineinputparameter) using the `inputBinding` field, or
+    parameter](#commandinputparameter) using the `inputBinding` field, or
     separately using the `arguments` field of the CommandLineTool.
 
     The algorithm to build the command line is as follows.  In this algorithm,
-    the sort key is a list consisting of one or more numeric and string elements.
+    the sort key is a list consisting of one or more numeric and string
+    elements.  Strings are sorted lexicographically based on UTF-8 encoding.
 
       1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
       key `[position, i]` where `position` is
@@ -1239,9 +1257,8 @@
       must be broken using the lexographic ordering of the field or parameter
       name immediately containing the binding.
 
-      4. Sort elements lexicographically using the assigned sorting keys.
-      Numeric entries sort before strings.  Strings are sorted based on UTF-8
-      encoding.
+      4. Sort elements using the assigned sorting keys.  Numeric entries sort
+      before strings.
 
       5. In the sorted order, apply the rules defined in
       [`CommandLineBinding`](#commandlinebinding) to convert bindings to actual
@@ -1458,7 +1475,7 @@
     parameters of the underlying process.
 
     If the sink parameter is an array, or named in a [workflow
-    scatter](#scatter) operation, there may be multiple inbound data links
+    scatter](#workflowstep) operation, there may be multiple inbound data links
     listed in the `connect` field.  The values from the input links are merged
     depending on the method specified in the `linkMerge` field.  If not
     specified, the default method is **merge_nested**:
@@ -1521,14 +1538,14 @@
       jsonldPredicate: "@id"
       doc: |
         A unique identifier for this workflow output parameter.  This is the
-        identifier to use in the `source` field of `DataLink` to connect the
-        output value to downstream parameters.
+        identifier to use in the `source` field of `WorkflowStepInput` to
+        connect the output value to downstream parameters.
 
 
 - name: ScatterMethod
   type: enum
-  docParent: Scatter
-  doc: The scatter method, as defined in [Scatter](#scatter).
+  docParent: WorkflowStep
+  doc: The scatter method, as described in [workflow step scatter](#workflowstep).
   symbols:
     - dotproduct
     - nested_crossproduct
@@ -1564,7 +1581,7 @@
     All output parameters types are also implicitly wrapped in arrays; each job
     in the scatter results in an entry in the output array.
 
-    If `scatter` declares more than one input parameter, he `scatterMethod`
+    If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
 
       * **dotproduct** specifies that each the input arrays are aligned and one
@@ -1584,7 +1601,7 @@
     # Subworkflows
 
     To specify a nested workflow as part of a workflow step,
-    (SubworkflowFeatureRequirement)(#SubworkflowFeatureRequirement) must be
+    [SubworkflowFeatureRequirement](#subworkflowfeaturerequirement) must be
     specified in the workflow or workflow step requirements.
 
   fields:
@@ -1681,20 +1698,21 @@
 
     # Dependencies
 
-    Dependencies between parameters are expressed by [data links](#datalink)
-    on [workflow step input parameters](#workflowstepinput)
-    and [workflow output parameters](#workflowoutputparameter).
+    Dependencies between parameters are expressed using the `source` field on
+    [workflow step input parameters](#workflowstepinput) and [workflow output
+    parameters](#workflowoutputparameter).
 
-    A data link expresses the dependency of one parameter on another such that
-    when a value is associated with the parameter specified by
-    [`DataLink.source`](#datalink), that value is propagated to the destination
-    parameter.  When all data links inbound to a given step are fufilled, the
-    step is ready to execute.
+    The `source` field expresses the dependency of one parameter on another
+    such that when a value is associated with the parameter specified by
+    `source`, that value is propagated to the destination parameter.  When all
+    data links inbound to a given step are fufilled, the step is ready to
+    execute.
 
     # Extensions
 
-    [Scatter](#scatter) and [Subworkflows](#Subworkflows) are available
-    as standard extensions to core workflow semantics.
+    [ScatterFeatureRequirement](#scatterfeaturerequirement) and
+    [SubworkflowFeatureRequirement](#subworkflowfeaturerequirement) are
+    available as standard extensions to core workflow semantics.
 
   fields:
     - name: "class"
