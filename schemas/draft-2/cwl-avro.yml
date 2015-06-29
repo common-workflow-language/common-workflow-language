@@ -1281,10 +1281,17 @@
     The initial current working directory when executing the tool must be the
     designated output directory.
 
+    When executing the tool, the child process must not inherit environment
+    variables from the parent process.  The tool must execute in a new, empty
+    environment, containing only environment variables defined by
+    [EnvVarRequirement](#envvarrequirement), the default environment of the
+    Docker container specified in [DockerRequirement](#dockerrequirement) (if
+    applicable), and `TMPDIR`.
+
     The `TMPDIR` environment variable must be set in the runtime environment to
     the **designated temporary directory**.  Any files written to the
-    designated temporary directory may be deleted by the workflow
-    platform when the tool invocation is complete.
+    designated temporary directory may be deleted by the workflow platform when
+    the tool invocation is complete.
 
     An implementation may forbid the tool from writing to any location in the
     runtime environment file system other than the designated temporary
