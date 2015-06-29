@@ -205,11 +205,11 @@ class Tool(Process):
 
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and kwargs.get("use_container"):
-            builder.outdir = "/tmp/job_output"
-            builder.tmpdir = "/tmp/job_tmp"
+            builder.outdir = kwargs.get("docker_outdir") or "/tmp/job_output"
+            builder.tmpdir = kwargs.get("docker_tmpdir") or "/tmp/job_tmp"
         else:
-            builder.outdir = kwargs.get("outdir", tempfile.mkdtemp())
-            builder.tmpdir = tempfile.mkdtemp()
+            builder.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
+            builder.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp()
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 
@@ -245,6 +245,17 @@ class CommandLineTool(Tool):
     def __init__(self, toolpath_object, **kwargs):
         super(CommandLineTool, self).__init__(toolpath_object, "CommandLineTool", **kwargs)
 
+    def makeJobRunner(self):
+        return CommandLineJob()
+
+    def makePathMapper(self, reffiles, input_basedir, **kwargs):
+        dockerReq, _ = self.get_requirement("DockerRequirement")
+        if dockerReq and kwargs.get("use_container"):
+            return DockerPathMapper(reffiles, input_basedir)
+        else:
+            return PathMapper(reffiles, input_basedir)
+
+
     def job(self, joborder, input_basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, input_basedir, **kwargs)
 
@@ -276,7 +287,7 @@ class CommandLineTool(Tool):
 
         reffiles = [f["path"] for f in builder.files]
 
-        j = CommandLineJob()
+        j = self.makeJobRunner()
         j.joborder = builder.job
         j.stdin = None
         j.stdout = None
@@ -299,17 +310,15 @@ class CommandLineTool(Tool):
             if os.path.isabs(j.stdout):
                 raise validate.ValidationException("stdout must be a relative path")
 
+        builder.pathmapper = self.makePathMapper(reffiles, input_basedir, **kwargs)
+
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and kwargs.get("use_container"):
-            builder.pathmapper = DockerPathMapper(reffiles, input_basedir)
-            j.outdir = kwargs.get("outdir", tempfile.mkdtemp())
-            j.tmpdir = tempfile.mkdtemp()
+            j.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
+            j.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp()
         else:
             j.outdir = builder.outdir
             j.tmpdir = builder.tmpdir
-
-        if builder.pathmapper is None:
-            builder.pathmapper = PathMapper(reffiles, input_basedir)
 
         for f in builder.files:
             f["path"] = builder.pathmapper.mapper(f["path"])[1]
@@ -342,10 +351,23 @@ class CommandLineTool(Tool):
 
         yield j
 
-    def collect_output_ports(self, ports, builder, outdir):
+    class DefaultFsAccess(object):
+        def glob(self, pattern):
+            return glob.glob(pattern)
+
+        def open(self, fn, mode):
+            return open(fn, mode)
+
+        def exists(self, fn):
+            return os.path.exists(fn)
+
+    def collect_output_ports(self, ports, builder, outdir, fs_access=None):
         try:
+            if fs_access is None:
+                fs_access = CommandLineTool.DefaultFsAccess()
+
             custom_output = os.path.join(outdir, "cwl.output.json")
-            if os.path.exists(custom_output):
+            if fs_access.exists(custom_output):
                 outputdoc = yaml.load(custom_output)
                 validate.validate_ex(self.names.get_name("outputs_record_schema", ""), outputdoc)
                 return outputdoc
@@ -353,13 +375,13 @@ class CommandLineTool(Tool):
             ret = {}
             for port in ports:
                 doc_url, fragment = urlparse.urldefrag(port['id'])
-                ret[fragment] = self.collect_output(port, builder, outdir)
+                ret[fragment] = self.collect_output(port, builder, outdir, fs_access=fs_access)
             validate.validate_ex(self.names.get_name("outputs_record_schema", ""), ret)
             return ret if ret is not None else {}
         except validate.ValidationException as e:
             raise WorkflowException("Error validating output record, " + str(e) + "\n in " + json.dumps(ret, indent=4))
 
-    def collect_output(self, schema, builder, outdir):
+    def collect_output(self, schema, builder, outdir, fs_access=None):
         r = None
         if "outputBinding" in schema:
             binding = schema["outputBinding"]
@@ -367,10 +389,10 @@ class CommandLineTool(Tool):
                 r = []
                 bg = builder.do_eval(binding["glob"])
                 for gb in aslist(bg):
-                    r.extend([{"path": g, "class": "File"} for g in glob.glob(os.path.join(outdir, gb))])
+                    r.extend([{"path": g, "class": "File"} for g in fs_access.glob(os.path.join(outdir, gb))])
                 for files in r:
                     checksum = hashlib.sha1()
-                    with open(files["path"], "rb") as f:
+                    with fs_access.open(files["path"], "rb") as f:
                         contents = f.read(CONTENT_LIMIT)
                         if binding.get("loadContents"):
                             files["contents"] = contents

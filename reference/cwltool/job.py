@@ -14,7 +14,7 @@ import shutil
 _logger = logging.getLogger("cwltool")
 
 class CommandLineJob(object):
-    def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True):
+    def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, **kwargs):
 
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
@@ -31,7 +31,7 @@ class CommandLineJob(object):
             if not os.path.exists(self.pathmapper.mapper(f)[0]):
                 raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
-        if docker_req:
+        if docker_req and kwargs.get("use_container") is not False:
             img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             runtime = ["docker", "run", "-i"]
             for d in self.pathmapper.dirs:
