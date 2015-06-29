@@ -4,7 +4,7 @@ read -rd "\000" helpmessage <<EOF
 $(basename $0): Run common workflow tool description language conformance tests.
 
 Syntax:
-        $(basename $0) [CWLTOOL=/path/to/cwltool] [RABIX=/path/to/rabix]
+        $(basename $0) [CWLTOOL=/path/to/cwltool] [RABIX=/path/to/rabix] [ARVADOS=/path/to/rabix]
 
 Options:
 EOF
@@ -49,7 +49,7 @@ runtest() {
 }
 
 # Add your tool test here.
-for t in "$CWLTOOL/cwltool/main.py" "$RABIX/rabix/cliche/main.py" ; do
+for t in "$CWLTOOL/cwltool/main.py" "$RABIX/rabix/cliche/main.py" "$ARVADOS/sdk/python/bin/cwl-runner" ; do
     if [[ -x "$t" ]]; then
         runtest "$t"
     fi

@@ -19,15 +19,7 @@ _logger = logging.getLogger("cwltool")
 
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
-def makeTool(toolpath_object, **kwargs):
-    class DR(object):
-        pass
-    dr = DR()
-    dr.requirements = kwargs.get("requirements", [])
-    dr.hints = kwargs.get("hints", [])
-
-    if "run" in toolpath_object:
-        return WorkflowStep(toolpath_object, **kwargs)
+def defaultMakeTool(toolpath_object, **kwargs):
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
             return draft2tool.CommandLineTool(toolpath_object, **kwargs)
@@ -58,7 +50,8 @@ class Workflow(Process):
         kwargs["requirements"] = self.requirements
         kwargs["hints"] = self.hints
 
-        self.steps = [makeTool(step, **kwargs) for step in self.tool.get("steps", [])]
+        makeTool = kwargs.get("makeTool")
+        self.steps = [WorkflowStep(step, **kwargs) for step in self.tool.get("steps", [])]
 
     def receive_output(self, step, outputparms, jobout, processStatus):
         _logger.debug("WorkflowStep completed with %s", jobout)
@@ -279,6 +272,7 @@ class Workflow(Process):
 class WorkflowStep(Process):
     def __init__(self, toolpath_object, **kwargs):
         try:
+            makeTool = kwargs.get("makeTool")
             self.embedded_tool = makeTool(toolpath_object["run"], **kwargs)
         except validate.ValidationException as v:
             raise WorkflowException("Tool definition %s failed validation:\n%s" % (toolpath_object["run"]["id"], validate.indent(str(v))))

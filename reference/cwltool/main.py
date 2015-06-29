@@ -15,12 +15,13 @@ import avro_ld.makedoc
 import yaml
 import urlparse
 import process
+import job
 from cwlrdf import printrdf, printdot
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
 
-def main():
+def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("workflow", type=str, nargs="?", default=None)
     parser.add_argument("job_order", type=str, nargs="?", default=None)
@@ -45,7 +46,7 @@ def main():
                         dest="rm_tmpdir")
 
     parser.add_argument("--leave-tmpdir", action="store_false",
-                        default=True, help="Do not elete intermediate temporary directories",
+                        default=True, help="Do not delete intermediate temporary directories",
                         dest="rm_tmpdir")
 
     parser.add_argument("--move-outputs", action="store_true", default=True,
@@ -56,8 +57,11 @@ def main():
                         help="Leave output files in intermediate output directories.",
                         dest="move_outputs")
 
-    parser.add_argument("--no-pull", default=False, action="store_true",
-                        help="Do not try to pull Docker images")
+    parser.add_argument("--enable-pull", default=True, action="store_true",
+                        help="Try to pull Docker images", dest="enable_pull")
+
+    parser.add_argument("--disable-pull", default=True, action="store_false",
+                        help="Do not try to pull Docker images", dest="enable_pull")
 
     parser.add_argument("--dry-run", action="store_true",
                         help="Load and validate but do not execute")
@@ -80,7 +84,60 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Print more logging")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
 
-    args = parser.parse_args()
+    return parser
+
+def single_job_executor(t, job_order, input_basedir, **kwargs):
+    final_output = []
+
+    def output_callback(out, processStatus):
+        if processStatus == "success":
+            _logger.info("Overall job status is %s", processStatus)
+        else:
+            _logger.warn("Overall job status is %s", processStatus)
+        final_output.append(out)
+
+    if kwargs.get("outdir"):
+        pass
+    elif kwargs.get("dry_run"):
+        kwargs["outdir"] = "/tmp"
+    else:
+        kwargs["outdir"] = tempfile.mkdtemp()
+
+    _logger.info("Output directory is %s", kwargs["outdir"])
+
+    jobiter = t.job(job_order,
+                    input_basedir,
+                    output_callback,
+                    **kwargs)
+
+    if kwargs.get("conformance_test"):
+        job = jobiter.next()
+        a = {"args": job.command_line}
+        if job.stdin:
+            a["stdin"] = job.stdin
+        if job.stdout:
+            a["stdout"] = job.stdout
+        if job.generatefiles:
+            a["createfiles"] = job.generatefiles
+        return a
+    else:
+        for r in jobiter:
+            if r:
+                r.run(**kwargs)
+            else:
+                raise workflow.WorkflowException("Workflow deadlocked.")
+
+        return final_output[0]
+
+
+def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeTool, parser=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    if parser is None:
+        parser = arg_parser()
+
+    args = parser.parse_args(args)
 
     if args.verbose:
         logging.getLogger("cwltool").setLevel(logging.INFO)
@@ -131,9 +188,6 @@ def main():
             _logger.exception("")
         return 1
 
-    #_logger.warn(url_fields)
-    #_logger.warn(json.dumps(loader.idx, indent=4))
-
     if args.print_pre:
         print json.dumps(processobj, indent=4)
         return 0
@@ -155,7 +209,7 @@ def main():
         processobj = loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
     try:
-        t = workflow.makeTool(processobj, strict=args.strict)
+        t = makeTool(processobj, strict=args.strict, makeTool=makeTool)
     except (avro_ld.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
@@ -182,47 +236,17 @@ def main():
         return 1
 
     try:
-        final_output = []
-        def output_callback(out, processStatus):
-            if processStatus == "success":
-                _logger.info("Overall job status is %s", processStatus)
-            else:
-                _logger.warn("Overall job status is %s", processStatus)
-            final_output.append(out)
-
-        if args.dry_run:
-            outdir = "/tmp"
-        elif args.outdir:
-            outdir = args.outdir
-        else:
-            outdir = tempfile.mkdtemp()
-        jobiter = t.job(loader.resolve_ref(args.job_order),
-                        input_basedir,
-                        output_callback,
-                        use_container=args.use_container,
-                        outdir=outdir)
-        if args.conformance_test:
-            job = jobiter.next()
-            a = {"args": job.command_line}
-            if job.stdin:
-                a["stdin"] = job.stdin
-            if job.stdout:
-                a["stdout"] = job.stdout
-            if job.generatefiles:
-                a["createfiles"] = job.generatefiles
-            print json.dumps(a)
-        else:
-            last = None
-            for r in jobiter:
-                if r:
-                    r.run(dry_run=args.dry_run, pull_image=(not args.no_pull), rm_container=args.rm_container, rm_tmpdir=args.rm_tmpdir)
-                else:
-                    print "Workflow deadlocked."
-                    return 1
-                last = r
-
-            _logger.info("Output directory is %s", outdir)
-            print json.dumps(final_output[0], indent=4)
+        out = executor(t, loader.resolve_ref(args.job_order),
+                       input_basedir,
+                       conformance_test=args.conformance_test,
+                       dry_run=args.dry_run,
+                       outdir=args.outdir,
+                       use_container=args.use_container,
+                       pull_image=args.enable_pull,
+                       rm_container=args.rm_container,
+                       rm_tmpdir=args.rm_tmpdir,
+                       makeTool=makeTool)
+        print json.dumps(out, indent=4)
     except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:
@@ -237,4 +261,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
