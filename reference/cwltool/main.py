@@ -114,7 +114,7 @@ def single_job_executor(t, job_order, input_basedir, **kwargs):
         job = jobiter.next()
         a = {"args": job.command_line}
         if job.stdin:
-            a["stdin"] = job.stdin
+            a["stdin"] = job.pathmapper.mapper(job.stdin)[1]
         if job.stdout:
             a["stdout"] = job.stdout
         if job.generatefiles:

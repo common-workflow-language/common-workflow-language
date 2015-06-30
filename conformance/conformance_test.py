@@ -23,6 +23,32 @@ with open(os.path.join(module_dir, args.test)) as f:
 
 failures = 0
 
+def compare(a, b):
+    try:
+        if isinstance(a, dict):
+            if a.get("class") == "File" and not b["path"].endswith("/" + a["path"]):
+                 return False
+            if len(a) != len(b):
+                return False
+            for c in a:
+                if a.get("class") != "File" or c != "path":
+                    if c not in b:
+                        return False
+                    if not compare(a[c], b[c]):
+                        return False
+            return True
+        elif isinstance(a, list):
+            if len(a) != len(b):
+                return False
+            for c in xrange(0, len(a)):
+                if not compare(a[c], b[c]):
+                    return False
+            return True
+        else:
+            return a == b
+    except:
+        return False
+
 def run_test(i, t):
     global failures
     sys.stdout.write("\rTest [%i/%i] " % (i+1, len(tests)))
@@ -73,14 +99,11 @@ def run_test(i, t):
     failed = False
     if "output" in t:
         checkkeys = ["output"]
-        for a in t["output"]:
-            if isinstance(t["output"][a], dict) and "path" in t["output"][a]:
-                t["output"][a]["path"] = os.path.join(outdir, t["output"][a]["path"])
     else:
         checkkeys = ["args", "stdin", "stdout", "createfiles"]
 
     for key in checkkeys:
-        if t.get(key) != out.get(key):
+        if not compare(t.get(key), out.get(key)):
             if not failed:
                 print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
                 print t.get("doc")
@@ -92,15 +115,16 @@ def run_test(i, t):
     if outdir:
         shutil.rmtree(outdir)
 
-if args.n is not None:
-    run_test(args.n-1, tests[args.n-1])
-else:
-    for i, t in enumerate(tests):
-        run_test(i, t)
+if __name__ == "__main__":
+    if args.n is not None:
+        run_test(args.n-1, tests[args.n-1])
+    else:
+        for i, t in enumerate(tests):
+            run_test(i, t)
 
-if failures == 0:
-    print "All tests passed"
-    sys.exit(0)
-else:
-    print "%i failures" % failures
-    sys.exit(1)
+    if failures == 0:
+        print "All tests passed"
+        sys.exit(0)
+    else:
+        print "%i failures" % failures
+        sys.exit(1)

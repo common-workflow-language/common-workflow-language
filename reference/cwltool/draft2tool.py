@@ -25,13 +25,13 @@ _logger = logging.getLogger("cwltool")
 
 CONTENT_LIMIT = 64 * 1024
 
-supportedProcessRequirements = ("DockerRequirement",
+supportedProcessRequirements = ["DockerRequirement",
                                 "ExpressionEngineRequirement",
                                 "SchemaDefRequirement",
                                 "EnvVarRequirement",
                                 "CreateFileRequirement",
                                 "ScatterFeatureRequirement",
-                                "SubworkflowFeatureRequirement")
+                                "SubworkflowFeatureRequirement"]
 
 def substitute(value, replace):
     if replace[0] == "^":
@@ -109,7 +109,7 @@ class Builder(object):
                 self.files.append(datum)
                 if binding:
                     if binding.get("loadContents"):
-                        with open(os.path.join(self.input_basedir, datum["path"]), "rb") as f:
+                        with self.fs_access.open(datum["path"], "rb") as f:
                             datum["contents"] = f.read(CONTENT_LIMIT)
 
                     if "secondaryFiles" in binding:
@@ -196,7 +196,6 @@ class Tool(Process):
             if r["class"] not in supportedProcessRequirements:
                 raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
 
-        builder.input_basedir = input_basedir
         builder.files = []
         builder.bindings = []
         builder.schemaDefs = self.schemaDefs
@@ -210,6 +209,8 @@ class Tool(Process):
         else:
             builder.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
             builder.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp()
+
+        builder.fs_access = kwargs.get("fs_access") or CommandLineTool.DefaultFsAccess(input_basedir)
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 
@@ -285,7 +286,7 @@ class CommandLineTool(Tool):
 
         builder.bindings.sort(key=lambda a: a["position"])
 
-        reffiles = [f["path"] for f in builder.files]
+        reffiles = set((f["path"] for f in builder.files))
 
         j = self.makeJobRunner()
         j.joborder = builder.job
@@ -303,11 +304,11 @@ class CommandLineTool(Tool):
             j.stdin = builder.do_eval(self.tool["stdin"])
             if isinstance(j.stdin, dict) and "ref" in j.stdin:
                 j.stdin = builder.job[j.stdin["ref"][1:]]["path"]
-            reffiles.append(j.stdin)
+            reffiles.add(j.stdin)
 
         if self.tool.get("stdout"):
             j.stdout = builder.do_eval(self.tool["stdout"])
-            if os.path.isabs(j.stdout):
+            if os.path.isabs(j.stdout) or ".." in j.stdout:
                 raise validate.ValidationException("stdout must be a relative path")
 
         builder.pathmapper = self.makePathMapper(reffiles, input_basedir, **kwargs)
@@ -342,9 +343,6 @@ class CommandLineTool(Tool):
 
         j.command_line = flatten(map(builder.generate_arg, builder.bindings))
 
-        if j.stdin:
-            j.stdin = j.stdin if os.path.isabs(j.stdin) else os.path.join(input_basedir, j.stdin)
-
         j.pathmapper = builder.pathmapper
         j.collect_outputs = functools.partial(self.collect_output_ports, self.tool["outputs"], builder)
         j.output_callback = output_callback
@@ -352,22 +350,28 @@ class CommandLineTool(Tool):
         yield j
 
     class DefaultFsAccess(object):
+        def __init__(self, basedir):
+            self.basedir = basedir
+
+        def _abs(self, p):
+            if os.path.isabs(p):
+                return p
+            else:
+                return os.path.join(self.basedir, p)
+
         def glob(self, pattern):
-            return glob.glob(pattern)
+            return glob.glob(self._abs(pattern))
 
         def open(self, fn, mode):
-            return open(fn, mode)
+            return open(self._abs(fn), mode)
 
         def exists(self, fn):
-            return os.path.exists(fn)
+            return os.path.exists(self._abs(fn))
 
-    def collect_output_ports(self, ports, builder, outdir, fs_access=None):
+    def collect_output_ports(self, ports, builder, outdir):
         try:
-            if fs_access is None:
-                fs_access = CommandLineTool.DefaultFsAccess()
-
             custom_output = os.path.join(outdir, "cwl.output.json")
-            if fs_access.exists(custom_output):
+            if builder.fs_access.exists(custom_output):
                 outputdoc = yaml.load(custom_output)
                 validate.validate_ex(self.names.get_name("outputs_record_schema", ""), outputdoc)
                 return outputdoc
@@ -375,13 +379,13 @@ class CommandLineTool(Tool):
             ret = {}
             for port in ports:
                 doc_url, fragment = urlparse.urldefrag(port['id'])
-                ret[fragment] = self.collect_output(port, builder, outdir, fs_access=fs_access)
+                ret[fragment] = self.collect_output(port, builder, outdir)
             validate.validate_ex(self.names.get_name("outputs_record_schema", ""), ret)
             return ret if ret is not None else {}
         except validate.ValidationException as e:
             raise WorkflowException("Error validating output record, " + str(e) + "\n in " + json.dumps(ret, indent=4))
 
-    def collect_output(self, schema, builder, outdir, fs_access=None):
+    def collect_output(self, schema, builder, outdir):
         r = None
         if "outputBinding" in schema:
             binding = schema["outputBinding"]
@@ -389,10 +393,10 @@ class CommandLineTool(Tool):
                 r = []
                 bg = builder.do_eval(binding["glob"])
                 for gb in aslist(bg):
-                    r.extend([{"path": g, "class": "File"} for g in fs_access.glob(os.path.join(outdir, gb))])
+                    r.extend([{"path": g, "class": "File"} for g in builder.fs_access.glob(os.path.join(outdir, gb))])
                 for files in r:
                     checksum = hashlib.sha1()
-                    with fs_access.open(files["path"], "rb") as f:
+                    with builder.fs_access.open(files["path"], "rb") as f:
                         contents = f.read(CONTENT_LIMIT)
                         if binding.get("loadContents"):
                             files["contents"] = contents
