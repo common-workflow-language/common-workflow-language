@@ -77,7 +77,7 @@ class CommandLineJob(object):
                     f.write(self.generatefiles[t])
 
         if self.stdin:
-            stdin = open(self.stdin, "rb")
+            stdin = open(self.pathmapper.mapper(self.stdin)[0], "rb")
         else:
             stdin = subprocess.PIPE
 
@@ -108,8 +108,6 @@ class CommandLineJob(object):
         if stdout is not sys.stderr:
             stdout.close()
 
-        outputs = self.collect_outputs(self.outdir)
-
         if self.successCodes and rcode in self.successCodes:
             processStatus = "success"
         elif self.temporaryFailCodes and rcode in self.temporaryFailCodes:
@@ -119,6 +117,13 @@ class CommandLineJob(object):
         elif rcode == 0:
             processStatus = "success"
         else:
+            processStatus = "permanentFail"
+
+        try:
+            outputs = {}
+            outputs = self.collect_outputs(self.outdir)
+        except Exception as e:
+            logger.warn(str(e))
             processStatus = "permanentFail"
 
         self.output_callback(outputs, processStatus)
