@@ -304,17 +304,17 @@ class WorkflowStep(Process):
             if not feature:
                 raise WorkflowException("Workflow contains embedded workflow but SubworkflowFeatureRequirement not declared")
 
-    def receive_output(self, jobout, processStatus):
+    def receive_output(self, output_callback, jobout, processStatus):
         _logger.debug("WorkflowStep output from run is %s", jobout)
-        self.output = {}
+        output = {}
         for i in self.tool["outputs"]:
             (_, d) = urlparse.urldefrag(i["id"])
             field = d.split(".")[-1]
             if field in jobout:
-                self.output[i["id"]] = jobout[field]
+                output[i["id"]] = jobout[field]
             else:
                 processStatus = "permanentFail"
-        self.processStatus = processStatus
+        output_callback(output, processStatus)
 
     def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
@@ -327,21 +327,17 @@ class WorkflowStep(Process):
         kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
 
-        self.output = None
-        for t in self.embedded_tool.job(joborder, basedir, self.receive_output, **kwargs):
+        for t in self.embedded_tool.job(joborder, basedir, functools.partial(self.receive_output, output_callback), **kwargs):
             yield t
-
-        while self.output is None:
-            yield None
-
-        output_callback(self.output, self.processStatus)
 
 
 class ReceiveScatterOutput(object):
-    def __init__(self, dest):
+    def __init__(self, output_callback, dest):
         self.dest = dest
         self.completed = 0
         self.processStatus = "success"
+        self.total = None
+        self.output_callback = output_callback
 
     def receive_scatter_output(self, index, jobout, processStatus):
         for k,v in jobout.items():
@@ -352,6 +348,15 @@ class ReceiveScatterOutput(object):
                 self.processStatus = jobout["processStatus"]
 
         self.completed += 1
+
+        if self.completed == self.total:
+            self.output_callback(self.dest, self.processStatus)
+
+    def setTotal(self, total):
+        self.total = total
+        if self.completed == self.total:
+            self.output_callback(self.dest, self.processStatus)
+
 
 def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
     l = None
@@ -365,7 +370,7 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
     for i in process.tool["outputs"]:
         output[i["id"]] = [None] * l
 
-    rc = ReceiveScatterOutput(output)
+    rc = ReceiveScatterOutput(output_callback, output)
 
     for n in range(0, l):
         jo = copy.copy(joborder)
@@ -375,10 +380,7 @@ def dotproduct_scatter(process, joborder, basedir, scatter_keys, output_callback
         for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
             yield j
 
-    while rc.completed < l:
-        yield None
-
-    output_callback(output, rc.processStatus)
+    rc.setTotal(l)
 
 
 def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_callback, **kwargs):
@@ -388,7 +390,7 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
     for i in process.tool["outputs"]:
         output[i["id"]] = [None] * l
 
-    rc = ReceiveScatterOutput(output)
+    rc = ReceiveScatterOutput(output_callback, output)
 
     for n in range(0, l):
         jo = copy.copy(joborder)
@@ -396,15 +398,13 @@ def nested_crossproduct_scatter(process, joborder, basedir, scatter_keys, output
 
         if len(scatter_keys) == 1:
             for j in process.job(jo, basedir, functools.partial(rc.receive_scatter_output, n), **kwargs):
-               yield j
+                yield j
         else:
             for j in nested_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], functools.partial(rc.receive_scatter_output, n), **kwargs):
-               yield j
+                yield j
 
-    while rc.completed < l:
-        yield None
+    rc.setTotal(l)
 
-    output_callback(output, rc.processStatus)
 
 def crossproduct_size(joborder, scatter_keys):
     scatter_key = scatter_keys[0]
@@ -426,7 +426,7 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
         output = {}
         for i in process.tool["outputs"]:
             output[i["id"]] = [None] * crossproduct_size(joborder, scatter_keys)
-        rc = ReceiveScatterOutput(output)
+        rc = ReceiveScatterOutput(output_callback, output)
     else:
         rc = output_callback
 
@@ -445,8 +445,4 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
                     put += 1
                 yield j
 
-    if startindex == 0 and not isinstance(output_callback, ReceiveScatterOutput):
-        while rc.completed < put:
-            yield None
-
-        output_callback(output, rc.processStatus)
+    rc.setTotal(put)
