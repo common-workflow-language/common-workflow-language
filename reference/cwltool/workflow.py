@@ -227,7 +227,7 @@ class Workflow(Process):
                         if newjob:
                             made_progress = True
                             actual_jobs.append(newjob)
-                            yield newjob
+                        yield newjob
             if not made_progress and completed < len(self.steps):
                 yield None
 
@@ -441,7 +441,8 @@ def flat_crossproduct_scatter(process, joborder, basedir, scatter_keys, output_c
             put += 1
         else:
             for j in flat_crossproduct_scatter(process, jo, basedir, scatter_keys[1:], rc, put, **kwargs):
-                put += 1
+                if j:
+                    put += 1
                 yield j
 
     if startindex == 0 and not isinstance(output_callback, ReceiveScatterOutput):
