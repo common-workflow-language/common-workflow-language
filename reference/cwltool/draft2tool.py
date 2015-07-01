@@ -210,7 +210,7 @@ class Tool(Process):
             builder.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
             builder.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp()
 
-        builder.fs_access = kwargs.get("fs_access") or CommandLineTool.DefaultFsAccess(input_basedir)
+        builder.fs_access = kwargs.get("fs_access") or StdFsAccess(input_basedir)
 
         builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
 
@@ -241,6 +241,27 @@ class ExpressionTool(Tool):
         j.tmpdir = None
 
         yield j
+
+
+class StdFsAccess(object):
+    def __init__(self, basedir):
+        self.basedir = basedir
+
+    def _abs(self, p):
+        if os.path.isabs(p):
+            return p
+        else:
+            return os.path.join(self.basedir, p)
+
+    def glob(self, pattern):
+        return glob.glob(self._abs(pattern))
+
+    def open(self, fn, mode):
+        return open(self._abs(fn), mode)
+
+    def exists(self, fn):
+        return os.path.exists(self._abs(fn))
+
 
 class CommandLineTool(Tool):
     def __init__(self, toolpath_object, **kwargs):
@@ -348,25 +369,6 @@ class CommandLineTool(Tool):
         j.output_callback = output_callback
 
         yield j
-
-    class DefaultFsAccess(object):
-        def __init__(self, basedir):
-            self.basedir = basedir
-
-        def _abs(self, p):
-            if os.path.isabs(p):
-                return p
-            else:
-                return os.path.join(self.basedir, p)
-
-        def glob(self, pattern):
-            return glob.glob(self._abs(pattern))
-
-        def open(self, fn, mode):
-            return open(self._abs(fn), mode)
-
-        def exists(self, fn):
-            return os.path.exists(self._abs(fn))
 
     def collect_output_ports(self, ports, builder, outdir):
         try:
