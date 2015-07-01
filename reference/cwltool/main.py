@@ -86,7 +86,7 @@ def arg_parser():
 
     return parser
 
-def single_job_executor(t, job_order, input_basedir, **kwargs):
+def single_job_executor(t, job_order, input_basedir, args, **kwargs):
     final_output = []
 
     def output_callback(out, processStatus):
@@ -237,7 +237,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     try:
         out = executor(t, loader.resolve_ref(args.job_order),
-                       input_basedir,
+                       input_basedir, args,
                        conformance_test=args.conformance_test,
                        dry_run=args.dry_run,
                        outdir=args.outdir,
