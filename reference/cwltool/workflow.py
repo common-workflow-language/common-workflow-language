@@ -159,6 +159,9 @@ class Workflow(Process):
         if inputobj is None:
             return
 
+        if step.submitted:
+            return
+
         _logger.info("Creating job with input: %s", pprint.pformat(inputobj))
 
         callback = functools.partial(self.receive_output, step, outputparms)
@@ -178,6 +181,8 @@ class Workflow(Process):
                 jobs = flat_crossproduct_scatter(step, inputobj, basedir, scatter, callback, 0, **kwargs)
         else:
             jobs = step.job(inputobj, basedir, callback, **kwargs)
+
+        step.submitted = True
 
         for j in jobs:
             yield j
@@ -205,6 +210,7 @@ class Workflow(Process):
         for s in self.steps:
             for out in s.tool["outputs"]:
                 self.state[out["id"]] = None
+            s.submitted = False
             s.completed = False
 
         if "outdir" in kwargs:
