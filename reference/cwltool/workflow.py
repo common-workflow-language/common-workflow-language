@@ -60,7 +60,9 @@ class Workflow(Process):
                 if i["id"] in jobout:
                     self.state[i["id"]] = WorkflowStateItem(i, jobout[i["id"]])
                 else:
-                    raise WorkflowException("Output is missing expected field %s" % i["id"])
+                    _logger.error("Output is missing expected field %s" % i["id"])
+                    processStatus = "permanentFail"
+
         if processStatus != "success":
             if self.processStatus != "permanentFail":
                 self.processStatus = processStatus
@@ -222,7 +224,7 @@ class Workflow(Process):
         actual_jobs = []
 
         completed = 0
-        while completed < len(self.steps):
+        while completed < len(self.steps) and self.processStatus == "success":
             made_progress = False
             completed = 0
             for step in self.steps:
