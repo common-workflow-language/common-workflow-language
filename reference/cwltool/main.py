@@ -125,7 +125,7 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
             if r:
                 r.run(**kwargs)
             else:
-                raise workflow.WorkflowException("Workflow deadlocked.")
+                raise workflow.WorkflowException("Workflow cannot make any more progress.")
 
         return final_output[0]
 
