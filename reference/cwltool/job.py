@@ -10,8 +10,22 @@ import requests
 import docker
 from process import WorkflowException, get_feature
 import shutil
+import stat
 
 _logger = logging.getLogger("cwltool")
+
+def deref_links(outputs):
+    if isinstance(outputs, dict):
+        if outputs.get("class") == "File":
+            st = os.lstat(outputs["path"])
+            if stat.S_ISLNK(st.st_mode):
+                outputs["path"] = os.readlink(outputs["path"])
+        else:
+            for v in outputs.values():
+                deref_links(v)
+    if isinstance(outputs, list):
+        for v in outputs:
+            deref_links(v)
 
 class CommandLineJob(object):
     def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, **kwargs):
@@ -34,8 +48,9 @@ class CommandLineJob(object):
         if docker_req and kwargs.get("use_container") is not False:
             img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             runtime = ["docker", "run", "-i"]
-            for d in self.pathmapper.dirs:
-                runtime.append("--volume=%s:%s:ro" % (os.path.abspath(d), self.pathmapper.dirs[d]))
+            for src in self.pathmapper.files():
+                vol = self.pathmapper.mapper(src)
+                runtime.append("--volume=%s:%s:ro" % vol)
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.outdir), "/tmp/job_output"))
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.tmpdir), "/tmp/job_tmp"))
             runtime.append("--workdir=%s" % ("/tmp/job_output"))
@@ -67,63 +82,68 @@ class CommandLineJob(object):
         if dry_run:
             return (self.outdir, {})
 
-        os.chdir(self.outdir)
-
-        for t in self.generatefiles:
-            if isinstance(self.generatefiles[t], dict):
-                os.symlink(self.generatefiles[t]["path"], os.path.join(self.outdir, t))
-            else:
-                with open(os.path.join(self.outdir, t), "w") as f:
-                    f.write(self.generatefiles[t])
-
-        if self.stdin:
-            stdin = open(self.pathmapper.mapper(self.stdin)[0], "rb")
-        else:
-            stdin = subprocess.PIPE
-
-        if self.stdout:
-            dn = os.path.dirname(self.stdout)
-            if dn and not os.path.exists(dn):
-                os.makedirs(dn)
-            stdout = open(self.stdout, "wb")
-        else:
-            stdout = sys.stderr
-
-        sp = subprocess.Popen(runtime + self.command_line,
-                              shell=False,
-                              close_fds=True,
-                              stdin=stdin,
-                              stdout=stdout,
-                              env=env,
-                              cwd=self.outdir)
-
-        if stdin == subprocess.PIPE:
-            sp.stdin.close()
-
-        rcode = sp.wait()
-
-        if stdin != subprocess.PIPE:
-            stdin.close()
-
-        if stdout is not sys.stderr:
-            stdout.close()
-
-        if self.successCodes and rcode in self.successCodes:
-            processStatus = "success"
-        elif self.temporaryFailCodes and rcode in self.temporaryFailCodes:
-            processStatus = "temporaryFail"
-        elif self.permanentFailCodes and rcode in self.permanentFailCodes:
-            processStatus = "permanentFail"
-        elif rcode == 0:
-            processStatus = "success"
-        else:
-            processStatus = "permanentFail"
+        outputs = {}
 
         try:
-            outputs = {}
+            for t in self.generatefiles:
+                if isinstance(self.generatefiles[t], dict):
+                    os.symlink(self.pathmapper.mapper(self.generatefiles[t]["path"])[1], os.path.join(self.outdir, t))
+                else:
+                    with open(os.path.join(self.outdir, t), "w") as f:
+                        f.write(self.generatefiles[t])
+
+            if self.stdin:
+                stdin = open(self.pathmapper.mapper(self.stdin)[0], "rb")
+            else:
+                stdin = subprocess.PIPE
+
+            if self.stdout:
+                dn = os.path.dirname(self.stdout)
+                if dn and not os.path.exists(dn):
+                    os.makedirs(dn)
+                stdout = open(self.stdout, "wb")
+            else:
+                stdout = sys.stderr
+
+            sp = subprocess.Popen(runtime + self.command_line,
+                                  shell=False,
+                                  close_fds=True,
+                                  stdin=stdin,
+                                  stdout=stdout,
+                                  env=env,
+                                  cwd=self.outdir)
+
+            if stdin == subprocess.PIPE:
+                sp.stdin.close()
+
+            rcode = sp.wait()
+
+            if stdin != subprocess.PIPE:
+                stdin.close()
+
+            if stdout is not sys.stderr:
+                stdout.close()
+
+            if self.successCodes and rcode in self.successCodes:
+                processStatus = "success"
+            elif self.temporaryFailCodes and rcode in self.temporaryFailCodes:
+                processStatus = "temporaryFail"
+            elif self.permanentFailCodes and rcode in self.permanentFailCodes:
+                processStatus = "permanentFail"
+            elif rcode == 0:
+                processStatus = "success"
+            else:
+                processStatus = "permanentFail"
+
+            for t in self.generatefiles:
+                if isinstance(self.generatefiles[t], dict):
+                    os.remove(os.path.join(self.outdir, t))
+                    os.symlink(self.pathmapper.mapper(self.generatefiles[t]["path"])[0], os.path.join(self.outdir, t))
+
             outputs = self.collect_outputs(self.outdir)
+
         except Exception as e:
-            logger.warn(str(e))
+            _logger.warn(str(e))
             processStatus = "permanentFail"
 
         self.output_callback(outputs, processStatus)

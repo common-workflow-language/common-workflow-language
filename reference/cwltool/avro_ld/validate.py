@@ -39,6 +39,12 @@ def multi(v, q=""):
     else:
         return "%s%s%s" % (q, v, q)
 
+def vpformat(datum):
+    a = pprint.pformat(datum)
+    if len(a) > 80:
+        a = a[0:80] + "[...]"
+    return a
+
 def validate_ex(expected_schema, datum, strict=False):
     """Determine if a python datum is an instance of a schema."""
 
@@ -48,45 +54,45 @@ def validate_ex(expected_schema, datum, strict=False):
         if datum is None:
             return True
         else:
-            raise ValidationException("the value `%s` is not null" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not null" % vpformat(datum))
     elif schema_type == 'boolean':
         if isinstance(datum, bool):
             return True
         else:
-            raise ValidationException("the value `%s` is not boolean" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not boolean" % vpformat(datum))
     elif schema_type == 'string':
         if isinstance(datum, basestring):
             return True
         else:
-            raise ValidationException("the value `%s` is not string" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not string" % vpformat(datum))
     elif schema_type == 'bytes':
         if isinstance(datum, str):
             return True
         else:
-            raise ValidationException("the value `%s` is not bytes" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not bytes" % vpformat(datum))
     elif schema_type == 'int':
         if ((isinstance(datum, int) or isinstance(datum, long))
             and INT_MIN_VALUE <= datum <= INT_MAX_VALUE):
             return True
         else:
-            raise ValidationException("`%s` is not int" % pprint.pformat(datum))
+            raise ValidationException("`%s` is not int" % vpformat(datum))
     elif schema_type == 'long':
         if ((isinstance(datum, int) or isinstance(datum, long))
             and LONG_MIN_VALUE <= datum <= LONG_MAX_VALUE):
             return True
         else:
-            raise ValidationException("the value `%s` is not long" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not long" % vpformat(datum))
     elif schema_type in ['float', 'double']:
         if (isinstance(datum, int) or isinstance(datum, long)
             or isinstance(datum, float)):
             return True
         else:
-            raise ValidationException("the value `%s` is not float or double" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not float or double" % vpformat(datum))
     elif schema_type == 'fixed':
         if isinstance(datum, str) and len(datum) == expected_schema.size:
             return True
         else:
-            raise ValidationException("the value `%s` is not fixed" % pprint.pformat(datum))
+            raise ValidationException("the value `%s` is not fixed" % vpformat(datum))
     elif schema_type == 'enum':
         if expected_schema.name == "Any":
             if datum is not None:
@@ -96,7 +102,7 @@ def validate_ex(expected_schema, datum, strict=False):
         if datum in expected_schema.symbols:
             return True
         else:
-            raise ValidationException("the value `%s`\n is not a valid enum symbol, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.symbols)))
+            raise ValidationException("the value `%s`\n is not a valid enum symbol, expected one of %s" % (vpformat(datum), ", ".join(expected_schema.symbols)))
     elif schema_type == 'array':
         if isinstance(datum, list):
             for i, d in enumerate(datum):
@@ -106,14 +112,14 @@ def validate_ex(expected_schema, datum, strict=False):
                     raise ValidationException("At position %i\n%s" % (i, indent(str(v))))
             return True
         else:
-            raise ValidationException("the value `%s` is not a list, expected list of %s" % (pprint.pformat(datum), friendly(expected_schema.items)))
+            raise ValidationException("the value `%s` is not a list, expected list of %s" % (vpformat(datum), friendly(expected_schema.items)))
     elif schema_type == 'map':
         if (isinstance(datum, dict) and
             False not in [isinstance(k, basestring) for k in datum.keys()] and
             False not in [validate(expected_schema.values, v, strict=strict) for v in datum.values()]):
             return True
         else:
-            raise ValidationException("`%s` is not a valid map value, expected\n %s" % (pprint.pformat(datum), pprint.pformat(expected_schema.values)))
+            raise ValidationException("`%s` is not a valid map value, expected\n %s" % (vpformat(datum), vpformat(expected_schema.values)))
     elif schema_type in ['union', 'error_union']:
         if True in [validate(s, datum, strict=strict) for s in expected_schema.schemas]:
             return True
@@ -124,12 +130,12 @@ def validate_ex(expected_schema, datum, strict=False):
                     validate_ex(s, datum, strict=strict)
                 except ValidationException as e:
                     errors.append(str(e))
-            raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(pprint.pformat(datum), '`'),
+            raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'),
                                                                                      "\n".join(["- %s, but\n %s" % (friendly(expected_schema.schemas[i]), indent(multi(errors[i]))) for i in range(0, len(expected_schema.schemas))])))
 
     elif schema_type in ['record', 'error', 'request']:
         if not isinstance(datum, dict):
-            raise ValidationException("`%s`\n is not a dict" % pprint.pformat(datum))
+            raise ValidationException("`%s`\n is not a dict" % vpformat(datum))
 
         errors = []
         for f in expected_schema.fields:

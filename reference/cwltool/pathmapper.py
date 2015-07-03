@@ -1,6 +1,7 @@
 import os
 import random
 import logging
+import stat
 
 _logger = logging.getLogger("cwltool")
 
@@ -26,6 +27,7 @@ class DockerPathMapper(PathMapper):
         self.dirs = {}
         for src in referenced_files:
             ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
+
             dir, fn = os.path.split(ab)
 
             subdir = False
@@ -55,6 +57,14 @@ class DockerPathMapper(PathMapper):
 
         for src in referenced_files:
             ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
+
+            deref = ab
+            st = os.lstat(deref)
+            while stat.S_ISLNK(st.st_mode):
+                rl = os.readlink(deref)
+                deref = rl if os.path.isabs(rl) else os.path.join(os.path.dirname(deref), rl)
+                st = os.lstat(deref)
+
             for d in self.dirs:
                 if ab.startswith(d):
-                    self._pathmap[src] = (ab, os.path.join(self.dirs[d], ab[len(d)+1:]))
+                    self._pathmap[src] = (deref, os.path.join(self.dirs[d], ab[len(d)+1:]))
