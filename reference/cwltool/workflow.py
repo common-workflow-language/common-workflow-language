@@ -76,10 +76,19 @@ class Workflow(Process):
 
     def match_types(self, sinktype, src, iid, inputobj, linkMerge):
         if isinstance(sinktype, list):
-            # Union type
+            # Sink is union type
             for st in sinktype:
                 if self.match_types(st, src, iid, inputobj, linkMerge):
                     return True
+        elif isinstance(src.parameter["type"], list):
+            # Source is union type
+            # Check that every source type is compatible with the sink.
+            for st in src.parameter["type"]:
+                srccopy = copy.deepcopy(src)
+                srccopy.parameter["type"] = st
+                if not self.match_types(st, srccopy, iid, inputobj, linkMerge):
+                    return False
+            return True
         else:
             is_array = isinstance(sinktype, dict) and sinktype["type"] == "array"
             if is_array and linkMerge:
@@ -157,37 +166,40 @@ class Workflow(Process):
         inputparms = step.tool["inputs"]
         outputparms = step.tool["outputs"]
 
-        inputobj = self.object_from_state(inputparms, False)
-        if inputobj is None:
-            return
+        try:
+            inputobj = self.object_from_state(inputparms, False)
+            if inputobj is None:
+                return
 
-        if step.submitted:
-            return
+            if step.submitted:
+                return
 
-        _logger.info("Creating job with input: %s", pprint.pformat(inputobj))
+            callback = functools.partial(self.receive_output, step, outputparms)
 
-        callback = functools.partial(self.receive_output, step, outputparms)
+            (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
+            if scatterSpec and "scatter" in step.tool:
+                scatter = aslist(step.tool["scatter"])
+                method = step.tool.get("scatterMethod")
+                if method is None and len(scatter) != 1:
+                    raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
 
-        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
-        if scatterSpec and "scatter" in step.tool:
-            scatter = aslist(step.tool["scatter"])
-            method = step.tool.get("scatterMethod")
-            if method is None and len(scatter) != 1:
-                raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
+                if method == "dotproduct" or method is None:
+                    jobs = dotproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
+                elif method == "nested_crossproduct":
+                    jobs = nested_crossproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
+                elif method == "flat_crossproduct":
+                    jobs = flat_crossproduct_scatter(step, inputobj, basedir, scatter, callback, 0, **kwargs)
+            else:
+                jobs = step.job(inputobj, basedir, callback, **kwargs)
 
-            if method == "dotproduct" or method is None:
-                jobs = dotproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
-            elif method == "nested_crossproduct":
-                jobs = nested_crossproduct_scatter(step, inputobj, basedir, scatter, callback, **kwargs)
-            elif method == "flat_crossproduct":
-                jobs = flat_crossproduct_scatter(step, inputobj, basedir, scatter, callback, 0, **kwargs)
-        else:
-            jobs = step.job(inputobj, basedir, callback, **kwargs)
+            step.submitted = True
 
-        step.submitted = True
-
-        for j in jobs:
-            yield j
+            for j in jobs:
+                yield j
+        except Exception as e:
+            _logger.error(e)
+            self.processStatus = "permanentFail"
+            step.completed = True
 
 
     def job(self, joborder, basedir, output_callback, **kwargs):
@@ -334,6 +346,8 @@ class WorkflowStep(Process):
 
         kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
+
+        _logger.info("Creating workflow step %s with input\n%s", self.id, pprint.pformat(joborder))
 
         for t in self.embedded_tool.job(joborder, basedir, functools.partial(self.receive_output, output_callback), **kwargs):
             yield t

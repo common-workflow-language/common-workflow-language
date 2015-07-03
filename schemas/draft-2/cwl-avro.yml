@@ -758,10 +758,12 @@
         - "null"
         - Datatype
         - Schema
+        - string
         - type: array
           items:
             - Datatype
             - Schema
+            - string
       jsonldPredicate:
         "@id": "avro:type"
         "@type": "@vocab"

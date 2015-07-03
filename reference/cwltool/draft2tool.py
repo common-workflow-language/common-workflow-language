@@ -56,9 +56,6 @@ class Builder(object):
                 binding["do_eval"] = binding["valueFrom"]
             binding["valueFrom"] = datum
 
-            if schema["type"] == "File":
-                binding["is_file"] = True
-
         # Handle union types
         if isinstance(schema["type"], list):
             for t in schema["type"]:
@@ -119,12 +116,13 @@ class Builder(object):
                             if isinstance(sf, dict):
                                 sfpath = self.do_eval(sf, context=datum["path"])
                             else:
-                                sfpath = {"path": substitute(datum["path"], sf)}
+                                sfpath = {"path": substitute(datum["path"], sf), "class": "File"}
                             if isinstance(sfpath, list):
                                 datum["secondaryFiles"].extend(sfpath)
+                                self.files.extend(sfpath)
                             else:
                                 datum["secondaryFiles"].append(sfpath)
-                            self.files.append(sfpath)
+                                self.files.append(sfpath)
 
         # Position to front of the sort key
         if binding:
@@ -133,6 +131,14 @@ class Builder(object):
             bindings.append(binding)
 
         return bindings
+
+    def tostr(self, value):
+        if isinstance(value, dict) and value.get("class") == "File":
+            if "path" not in value:
+                raise WorkflowException("File object must have \"path\": %s" % (value))
+            return value["path"]
+        else:
+            return str(value)
 
     def generate_arg(self, binding):
         value = binding["valueFrom"]
@@ -145,15 +151,15 @@ class Builder(object):
         l = []
         if isinstance(value, list):
             if binding.get("itemSeparator"):
-                l = [binding["itemSeparator"].join([str(v) for v in value])]
+                l = [binding["itemSeparator"].join([self.tostr(v) for v in value])]
             elif binding.get("do_eval"):
                 return ([prefix] if prefix else []) + value
             elif prefix:
                 return [prefix]
             else:
                 return []
-        elif binding.get("is_file"):
-            l = [value["path"]]
+        elif isinstance(value, dict) and value.get("class") == "File":
+            l = [value]
         elif isinstance(value, dict):
             return [prefix] if prefix else []
         elif value is True and prefix:
@@ -166,9 +172,9 @@ class Builder(object):
         args = []
         for j in l:
             if sep:
-                args.extend([prefix, str(j)])
+                args.extend([prefix, self.tostr(j)])
             else:
-                args.append(prefix + str(j))
+                args.append(prefix + self.tostr(j))
 
         return [a for a in args if a is not None]
 
@@ -307,6 +313,8 @@ class CommandLineTool(Tool):
 
         builder.bindings.sort(key=lambda a: a["position"])
 
+        _logger.debug("Files is %s", builder.files)
+
         reffiles = set((f["path"] for f in builder.files))
 
         j = self.makeJobRunner()
@@ -342,19 +350,19 @@ class CommandLineTool(Tool):
             j.outdir = builder.outdir
             j.tmpdir = builder.tmpdir
 
-        for f in builder.files:
-            f["path"] = builder.pathmapper.mapper(f["path"])[1]
-
-        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
-        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
-
         builder.requirements = j.requirements
 
         j.generatefiles = {}
         createFiles, _ = self.get_requirement("CreateFileRequirement")
         if createFiles:
             for t in createFiles["fileDef"]:
-                j.generatefiles[t["filename"]] = builder.do_eval(t["fileContent"])
+                j.generatefiles[t["filename"]] = copy.deepcopy(builder.do_eval(t["fileContent"]))
+
+        for f in builder.files:
+            f["path"] = builder.pathmapper.mapper(f["path"])[1]
+
+        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
+        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
 
         j.environment = {}
         evr, _ = self.get_requirement("EnvVarRequirement")
@@ -433,6 +441,10 @@ class CommandLineTool(Tool):
                         r["secondaryFiles"].extend(sfpath)
                     else:
                         r["secondaryFiles"].append(sfpath)
+
+                for sf in r["secondaryFiles"]:
+                    if not os.path.exists(sf["path"]):
+                        raise WorkflowException("Missing secondary file of '%s' of primary file '%s'" % (sf["path"], r["path"]))
 
 
         if not r and schema["type"] == "record":

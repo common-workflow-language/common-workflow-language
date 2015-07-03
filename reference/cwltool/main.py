@@ -27,7 +27,8 @@ def arg_parser():
     parser.add_argument("job_order", type=str, nargs="?", default=None)
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
-    parser.add_argument("--outdir", type=str)
+    parser.add_argument("--outdir", type=str, default=os.path.abspath('.'),
+                        help="Output directory, default current directory")
 
     parser.add_argument("--no-container", action="store_false", default=True,
                         help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool",
@@ -182,7 +183,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     idx = {}
     try:
         processobj = loader.resolve_ref(args.workflow)
-    except (avro_ld.validate.ValidationException) as e:
+    except (avro_ld.validate.ValidationException, RuntimeError) as e:
         _logger.error("Tool definition failed validation:\n%s" % e)
         if args.debug:
             _logger.exception("")
@@ -245,7 +246,8 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
                        pull_image=args.enable_pull,
                        rm_container=args.rm_container,
                        rm_tmpdir=args.rm_tmpdir,
-                       makeTool=makeTool)
+                       makeTool=makeTool,
+                       move_outputs=args.move_outputs)
         print json.dumps(out, indent=4)
     except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)
@@ -253,7 +255,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             _logger.exception("")
         return 1
     except workflow.WorkflowException as e:
-        _logger.error("Workflow error:\n%s" % e)
+        _logger.error("Workflow error:\n  %s" % e)
         if args.debug:
             _logger.exception("")
         return 1

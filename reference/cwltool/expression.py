@@ -65,7 +65,7 @@ def exeval(ex, jobinput, requirements, outdir, tmpdir, context, pull_image):
 
             (stdoutdata, stderrdata) = sp.communicate(json.dumps(inp) + "\n\n")
             if sp.returncode != 0:
-                raise WorkflowException("Expression engine returned non-zero exit code.")
+                raise WorkflowException("Expression engine returned non-zero exit code on evaluation of\n%s" % json.dumps(inp, indent=4))
 
             return json.loads(stdoutdata)
 
