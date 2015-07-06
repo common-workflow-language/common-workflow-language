@@ -341,6 +341,13 @@ class CommandLineTool(Tool):
                 raise validate.ValidationException("stdout must be a relative path")
 
         builder.pathmapper = self.makePathMapper(reffiles, input_basedir, **kwargs)
+        builder.requirements = j.requirements
+
+        for f in builder.files:
+            f["path"] = builder.pathmapper.mapper(f["path"])[1]
+
+        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
+        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
 
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and kwargs.get("use_container"):
@@ -350,19 +357,11 @@ class CommandLineTool(Tool):
             j.outdir = builder.outdir
             j.tmpdir = builder.tmpdir
 
-        builder.requirements = j.requirements
-
-        j.generatefiles = {}
         createFiles, _ = self.get_requirement("CreateFileRequirement")
+        j.generatefiles = {}
         if createFiles:
             for t in createFiles["fileDef"]:
                 j.generatefiles[t["filename"]] = copy.deepcopy(builder.do_eval(t["fileContent"]))
-
-        for f in builder.files:
-            f["path"] = builder.pathmapper.mapper(f["path"])[1]
-
-        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
-        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
 
         j.environment = {}
         evr, _ = self.get_requirement("EnvVarRequirement")

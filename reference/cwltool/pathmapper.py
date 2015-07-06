@@ -21,6 +21,11 @@ class PathMapper(object):
     def files(self):
         return self._pathmap.keys()
 
+    def reversemap(self, target):
+        for k,v in self._pathmap.items():
+            if v[1] == target:
+                return (k, v[0])
+
 class DockerPathMapper(PathMapper):
     def __init__(self, referenced_files, basedir):
         self._pathmap = {}

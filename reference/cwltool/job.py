@@ -74,10 +74,11 @@ class CommandLineJob(object):
         stdin = None
         stdout = None
 
+        _logger.info("outdir is %s", self.outdir)
         _logger.info("%s%s%s",
                      " ".join(runtime + self.command_line),
                      ' < %s' % (self.stdin) if self.stdin else '',
-                     ' > %s' % (self.stdout) if self.stdout else '')
+                     ' > %s' % os.path.join(self.outdir, self.stdout) if self.stdout else '')
 
         if dry_run:
             return (self.outdir, {})
@@ -87,7 +88,7 @@ class CommandLineJob(object):
         try:
             for t in self.generatefiles:
                 if isinstance(self.generatefiles[t], dict):
-                    os.symlink(self.pathmapper.mapper(self.generatefiles[t]["path"])[1], os.path.join(self.outdir, t))
+                    os.symlink(self.generatefiles[t]["path"], os.path.join(self.outdir, t))
                 else:
                     with open(os.path.join(self.outdir, t), "w") as f:
                         f.write(self.generatefiles[t])
@@ -98,10 +99,11 @@ class CommandLineJob(object):
                 stdin = subprocess.PIPE
 
             if self.stdout:
-                dn = os.path.dirname(self.stdout)
+                absout = os.path.join(self.outdir, self.stdout)
+                dn = os.path.dirname(absout)
                 if dn and not os.path.exists(dn):
                     os.makedirs(dn)
-                stdout = open(self.stdout, "wb")
+                stdout = open(absout, "wb")
             else:
                 stdout = sys.stderr
 
@@ -138,12 +140,12 @@ class CommandLineJob(object):
             for t in self.generatefiles:
                 if isinstance(self.generatefiles[t], dict):
                     os.remove(os.path.join(self.outdir, t))
-                    os.symlink(self.pathmapper.mapper(self.generatefiles[t]["path"])[0], os.path.join(self.outdir, t))
+                    os.symlink(self.pathmapper.reversemap(self.generatefiles[t]["path"])[1], os.path.join(self.outdir, t))
 
             outputs = self.collect_outputs(self.outdir)
 
         except Exception as e:
-            _logger.warn(str(e))
+            _logger.exception("Exception while running job")
             processStatus = "permanentFail"
 
         self.output_callback(outputs, processStatus)
