@@ -22,10 +22,10 @@ Install
 From source::
 
   git clone https://github.com/common-workflow-language/common-workflow-language.git
-  cd common-workflow-language/reference && easy_install .
-  cd cwl-runner && easy_install .
+  cd common-workflow-language/reference && python setup.py install
+  cd cwl-runner && python setup.py install
 
-With pip (will install "cwltool" package as well)::
+Or installing the official package from PyPi (will install "cwltool" package as well)::
 
   pip install cwl-runner
 
