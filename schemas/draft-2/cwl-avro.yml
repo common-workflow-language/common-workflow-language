@@ -1149,11 +1149,11 @@
           items: string
       doc: |
         Find files relative to the output directory, using POSIX glob(3)
-        pathname matching.  If provided an array, match all patterns in the
-        array.  If provided an expression, the expression must return a string
-        or an array of strings, which will then be evaluated as one or more glob patterns.
-        Only files which actually exist will be matched and returned.
-
+        pathname matching.  If provided an array, find files that match any
+        pattern in the array.  If provided an expression, the expression must
+        return a string or an array of strings, which will then be evaluated as
+        one or more glob patterns.  Only files which actually exist will be
+        matched and returned.
     - name: outputEval
       type:
         - "null"
@@ -1357,7 +1357,8 @@
         bindings.  If the program includes a path separator character it must
         be an absolute path, otherwise it is an error.  If the program does not
         include a path separator, search the `$PATH` variable in the runtime
-        environment find the absolute path of the executable.
+        environment of the workflow runner find the absolute path of the
+        executable.
       type:
         - string
         - type: array
@@ -1484,6 +1485,16 @@
     workflow inputs, or the outputs of other workflows steps) with the input
     parameters of the underlying process.
 
+    ## Input object
+
+    A WorkflowStepInput object must contain an `id` field in the form
+    `#fieldname` or `#stepname.fieldname`.  When the `id` field contains a
+    period `.` the field name consists of the characters following the final
+    period.  This defines a field of the workflow step input object with the
+    value of the `source` parameter(s).
+
+    ## Merging
+
     If the sink parameter is an array, or named in a [workflow
     scatter](#workflowstep) operation, there may be multiple inbound data links
     listed in the `connect` field.  The values from the input links are merged
@@ -1492,9 +1503,9 @@
 
     * **merge_nested**
 
-      The input shall be an array consisting of exactly one entry for each
+      The input must be an array consisting of exactly one entry for each
       input link.  If "merge_nested" is specified with a single link, the value
-      from the link is wrapped in a single-item list.
+      from the link must be wrapped in a single-item list.
 
     * **merge_flattened**
 
@@ -1749,12 +1760,12 @@
     [Docker](http://docker.com) container, and specifies how to fetch or build
     the image.
 
-    If a CommandLineTool lists [`DockerRequirement`](#dockerrequirement) under
+    If a CommandLineTool lists `DockerRequirement` under
     `hints` or `requirements`, it may (or must) be run in the specified Docker
     container.
 
-    The platform must first acquire or install the correct Docker image, as
-    described by [`DockerRequirement`](#dockerrequirement).
+    The platform must first acquire or install the correct Docker image as
+    specified by `dockerPull`, `dockerLoad` or `dockerFile`.
 
     The platform must execute the tool in the container using `docker run` with
     the appropriate Docker image and tool command line.
@@ -1769,6 +1780,13 @@
     presence or absence of specific software, except to assume that the
     generated command line represents a valid command within the runtime
     environment of the container.
+
+    ## Interaction with other requirements
+
+    If [EnvVarRequirement](#envvarrequirement) is specified alongside a
+    DockerRequirement, the environment variables must be provided to Docker
+    using `--env` or `--env-file` and interact with the container's preexisting
+    environment as defined by Docker.
 
   fields:
     - name: dockerPull
@@ -1786,7 +1804,7 @@
         The image id that will be used for `docker run`.  May be a
         human-readable image name or the image identifier hash.  May be skipped
         if `dockerPull` is specified, in which case the `dockerPull` image id
-        will be used.
+        must be used.
     - name: dockerOutputDirectory
       type: ["null", "string"]
       doc: |
