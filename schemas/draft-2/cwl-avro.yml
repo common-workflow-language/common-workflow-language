@@ -32,7 +32,7 @@
     https://github.com/common-workflow-language/common-workflow-language
 
     The products of the CWL working group (including this document) are made available
-    under the terms of the Apache License, version 2.
+    under the terms of the Apache License, version 2.0.
 
     # Introduction
 
@@ -48,10 +48,10 @@
     This specification represents the second milestone of the CWL group.  Since
     draft-1, this draft introduces a number of major changes and additions:
 
-    * Use of Avro schema (instead of JSON-schema) and JSON-LD for data modeling
+    * Use of Avro schema (instead of JSON-schema) and JSON-LD for data modeling.
     * Significant refactoring of the Command Line Tool description.
     * Data and execution model for Workflows.
-    * Extension mechanism though "hints" and "requirements"
+    * Extension mechanism though "hints" and "requirements".
 
     ## Purpose
 
@@ -59,7 +59,7 @@
     Bioinformatics, Chemistry, Physics, and Astronomy.  This specification is
     intended to define a data and execution model for Workflows and Command Line
     Tools that can be implemented on top of a variety of computing platforms,
-    ranging from individual workstation to cluster, grid, cloud, and high
+    ranging from an individual workstation to cluster, grid, cloud, and high
     performance computing systems.
 
     ## References to Other Specifications
@@ -72,6 +72,7 @@
     * [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
     * [UTF-8](https://www.ietf.org/rfc/rfc2279.txt)
     * [Portable Operating System Interface (POSIX.1-2008)](http://pubs.opengroup.org/onlinepubs/9699919799/)
+    * [Resource Description Framework (RDF)](http://www.w3.org/RDF/)
 
     ## Scope
 
@@ -108,7 +109,7 @@
 
     ## Data concepts
 
-    A **object** is a data structure equivalent to the "object" type in JSON,
+    An **object** is a data structure equivalent to the "object" type in JSON,
     consisting of a unordered set of name/value pairs (referred to here as
     **fields**) and where the name is a string and the value is a string, number,
     boolean, array, or object.
@@ -118,16 +119,16 @@
     A **process** is a basic unit of computation which accepts input data,
     performs some computation, and produces output data.
 
-    A **input object** is a object describing the inputs to a invocation of process.
+    An **input object** is an object describing the inputs to a invocation of process.
 
-    A **output object** is a object describing the output of an invocation of a process.
+    An **output object** is an object describing the output of an invocation of a process.
 
-    A **input schema** describes the valid format (required fields, data types)
+    An **input schema** describes the valid format (required fields, data types)
     for an input object.
 
-    A **output schema** describes the valid format for a output object.
+    An **output schema** describes the valid format for a output object.
 
-    **metadata** is information about workflows, tools or input items that is
+    **Metadata** is information about workflows, tools, or input items that is
     not used directly in the computation.
 
     ## Syntax
@@ -145,7 +146,7 @@
 
     An implementation may interpret a CWL document as
     [JSON-LD](http://json-ld.org) and convert a CWL document to a [Resource
-    Definition Framework (RDF)](http://www.w3.org/RDF/) using the JSON-LD
+    Description Framework (RDF)](http://www.w3.org/RDF/) using the JSON-LD
     context extracted from the avro-ld schema.
 
     The latest draft-2 schema is defined here:
@@ -176,7 +177,7 @@
     referenced by `import` must be loaded as a CWL document (including
     recursive preprocessing) and then the `import` object is implicitly
     replaced by the external resource.  URIs may include document fragments
-    referring to objects identified by `id` field, in which case the `import`
+    referring to objects identified by their `id` field, in which case the `import`
     directive is replaced by only the fragment object.
 
     An implementation must resolve `include` directives.  An `include`
@@ -241,8 +242,8 @@
     (except as described in [DockerRequirement](#dockerrequirement)).
     * Using remote or distributed file systems to manage input and output files.
     * Translating or rewriting file paths.
-    * Determining if a process has previously been executed and can be skipped and
-    previous results re-used.
+    * Determining if a process has previously been executed, skipping it and
+    reusing previous results.
     * Pausing and resuming of processes or workflows.
 
     Conforming CWL processes must not assume anything about the runtime
@@ -256,23 +257,23 @@
 
     1. Load and validate CWL document, yielding a process object.
     2. Load input object.
-    3. Validate input object against the `inputs` schema for the process.
+    3. Validate the input object against the `inputs` schema for the process.
     4. Validate that process requirements are met.
     5. Perform any further setup required by the specific process type.
     6. Execute the process.
-    7. Capture results of process execution into output object.
-    8. Validate output object against the `outputs` schema for the process.
-    9. Report output object to the process caller.
+    7. Capture results of process execution into the output object.
+    8. Validate the output object against the `outputs` schema for the process.
+    9. Report the output object to the process caller.
 
     ## Requirements and hints
 
-    [Process requirements](#processrequirement) modify the semantics or runtime
+    A **[process requirement](#processrequirement)** modifies the semantics or runtime
     environment of a process.  If an implementation cannot satisfy all
     requirements, or a requirement is listed which is not recognized by the
     implementation, it is a fatal error and the implementation must not attempt
     to run the process, unless overridden at user option.
 
-    A `hint` is similar to a requirement, however it is not an error if an
+    A **hint** is similar to a requirement, however it is not an error if an
     implementation cannot satisfy all hints.  The implementation may report a
     warning if a hint cannot be satisfied.
 
@@ -298,7 +299,7 @@
 
     ## Expressions
 
-    An expression is a fragment of executable code which is evaluated by
+    An expression is a fragment of executable code which is evaluated by the
     workflow platform to affect the inputs, outputs, or behavior of a process.
     In the generic execution sequence, expressions may be evaluated during step
     5 (process setup), step 6 (execute process), and/or step 7 (capture
@@ -309,7 +310,7 @@
     An implementation must provide the predefined `cwl:JsonPointer` expression
     engine.  This expression engine specifies a [JSON
     Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-    into an expression input object consisting of the **job** and **context**
+    into an expression input object consisting of the `job` and `context`
     fields described below.
 
     An expression engine defined with
@@ -318,8 +319,8 @@
 
       * On standard input, receive a JSON object with the following fields:
 
-        - **engineConfig**: A list of strings from the `engineConfig` field, or
-          `null` if `engineConfig` is not specified.
+        - **engineConfig**: A list of strings from the `engineConfig` field.
+          Null if `engineConfig` is not specified.
 
         - **job**: The input object of the current Process (context dependent).
 
@@ -354,10 +355,10 @@
 
     A workflow describes a set of **steps** and the **dependencies**
     between those processes.  When a process produces output that will be
-    consumed by a second process, the second process is a dependency of the
-    first process.  When there is a dependency, the workflow engine must must
+    consumed by a second process, the first process is a dependency of the
+    second process.  When there is a dependency, the workflow engine must
     execute the producer process first and wait for it to successfully complete
-    and produce output before the executing the dependent second process that
+    and produce output before executing the dependent second process that
     will consume the output.  If two processes are defined in the workflow
     graph that are not directly or indirectly dependent, these processes are
     **independent**, and may execute in any order or execute concurrently.  A
@@ -369,16 +370,16 @@
     `permanentFailure` states.  An implementation may choose to retry a process
     execution which resulted in `temporaryFailure`.  An implementation may
     choose to either continue running other steps of a workflow, or terminate
-    immediately upon permanentFailure.
+    immediately upon `permanentFailure`.
 
-    * If any step of a workflow execution results in `permanentFailure`, the
+    * If any step of a workflow execution results in `permanentFailure`, then the
     workflow status is `permanentFailure`.
 
     * If one or more steps result in `temporaryFailure` and all other steps
     complete `success` or are not executed, then the workflow status is
     `temporaryFailure`.
 
-    * If all workflow steps are executed and complete with `success` then the workflow
+    * If all workflow steps are executed and complete with `success`, then the workflow
     status is `success`.
 
     ## Executing CWL documents as scripts
@@ -386,7 +387,7 @@
     By convention, a CWL document may begin with `#!/usr/bin/env cwl-runner`
     and be marked as executable (the POSIX "+x" permission bits) to enable it
     to be executed directly.  A workflow platform may support this mode of
-    operation, if so, it must provide `cwl-runner` as an alias for the
+    operation; if so, it must provide `cwl-runner` as an alias for the
     platform's CWL implementation.
 
     # Sample CWL workflow
@@ -444,7 +445,7 @@
     # This example is similar to the previous one, with an additional input
     # parameter called "reverse".  It is a boolean parameter, which is
     # intepreted as a command line flag.  The value of "prefix" is used for
-    # flag to put on the command line if "reverse" is true, if "reverse" is
+    # flag to put on the command line if "reverse" is true.  If "reverse" is
     # false, no flag is added.
     #
     # This example also introduced the "position" field.  This indicates the
@@ -501,7 +502,7 @@
       - id: "#reverse_sort"
         type: boolean
         default: true
-        description: "If true, reverse (decending) sort"
+        description: "If true, reverse (descending) sort"
 
     # The "outputs" array defines the structure of the output object that describes
     # the outputs of the workflow.
@@ -520,7 +521,7 @@
     #
     # In the first step, the "inputs" field of the step connects the upstream
     # parameter "#input" of the workflow to the input parameter of the tool
-    # "revtool.cwl#input"
+    # "revtool.cwl#input".
     #
     # In the second step, the "inputs" field of the step connects the output
     # parameter "#reversed" from the first step to the input parameter of the
@@ -617,7 +618,7 @@
    * **float**: single precision (32-bit) IEEE 754 floating-point number
    * **double**: double precision (64-bit) IEEE 754 floating-point number
    * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
-   * **string**: unicode character sequence
+   * **string**: Unicode character sequence
 
    ## Complex types
 
@@ -850,10 +851,10 @@
         Only applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
 
-        If the value is Expression, the context of the expression is the input
+        If the value is an expression, the context of the expression is the input
         or output File parameter to which this binding applies.
 
-        Where the value is a string, it specifies that the following pattern
+        If the value is a string, it specifies that the following pattern
         should be applied to the primary file:
 
           1. If string begins with one or more caret `^` characters, for each
@@ -914,7 +915,7 @@
   name: "FileDef"
   docParent: CreateFileRequirement
   doc: |
-    Define a file that must be placed by in the designated output directory
+    Define a file that must be placed in the designated output directory
     prior to executing the command line tool.  May be the result of executing
     an expression, such as building a configuration file from a template.
   fields:
@@ -924,16 +925,16 @@
     - name: "fileContent"
       type: ["string", "Expression"]
       doc: |
-        If the value is a string literal or an expression which evalutes to a
+        If the value is a string literal or an expression which evaluates to a
         string, a new file must be created with the string as the file contents.
 
         If the value is an expression that evaluates to a File object, this
         indicates the referenced file should be added to the designated output
         directory prior to executing the tool.
 
-        Files added in this way may be read-only, and may be implemented
-        through bind mounts or file system links in such a way as to avoid
-        unecessary copying of the input file.
+        Files added in this way may be read-only, and may be provided
+        by bind mounts or file system links to avoid
+        unnecessary copying of the input file.
 
 
 - type: record
@@ -967,7 +968,7 @@
   docAfter: ExpressionTool
   abstract: true
   doc: |
-    A process requirement declares a prerequisite that may or must be fufilled
+    A process requirement declares a prerequisite that may or must be fulfilled
     before executing a process.  See [`Process.hints`](#process) and
     [`Process.requirements`](#process).
 
@@ -1005,8 +1006,8 @@
       doc: |
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
-        values.  Input parameters include a schema for each parameter and is
-        used to validate the input object, it may also be used build a user
+        values.  Input parameters include a schema for each parameter which is
+        used to validate the input object.  It may also be used build a user
         interface for constructing the input object.
     - name: outputs
       type:
@@ -1097,7 +1098,7 @@
     - name: "separate"
       type: ["null", boolean]
       doc: |
-        If true (default) then the prefix and value must be added as separate
+        If true (default), then the prefix and value must be added as separate
         command line arguments; if false, prefix and value must be concatenated
         into a single command line argument.
     - name: "itemSeparator"
@@ -1148,11 +1149,11 @@
           items: string
       doc: |
         Find files relative to the output directory, using POSIX glob(3)
-        pathname matching.  If provided an array, match all patterns in the
-        array.  If provided an expression, the expression must return a string
-        or an array of strings, which will then be evaluated as a glob pattern.
-        Only files which actually exist will be matched and returned.
-
+        pathname matching.  If provided an array, find files that match any
+        pattern in the array.  If provided an expression, the expression must
+        return a string or an array of strings, which will then be evaluated as
+        one or more glob patterns.  Only files which actually exist will be
+        matched and returned.
     - name: outputEval
       type:
         - "null"
@@ -1160,7 +1161,7 @@
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
         specified, the script `context` will be an array containing any files that were
-        matched.  Additionally, if `loadContents` is `true`, the file objects
+        matched.  Additionally, if `loadContents` is `true`, the File objects
         will include up to the first 64 KiB of file contents in the `contents` field.
 
 
@@ -1224,12 +1225,12 @@
   doc: |
 
     A CommandLineTool process is a process implementation for executing a
-    non-interactive application in a POSIX environment.  To help accomodate of
+    non-interactive application in a POSIX environment.  To accommodate
     the enormous variety in syntax and semantics for input, runtime
     environment, invocation, and output of arbitrary programs, CommandLineTool
-    provides the concept of "input binding" to describe how to translate input
-    parameters to an actual program invocation, and "output binding" to
-    describe how generate output parameters from program output.
+    uses an "input binding" that describes how to translate input
+    parameters to an actual program invocation, and an "output binding" that
+    describes how to generate output parameters from program output.
 
     # Input binding
 
@@ -1239,12 +1240,12 @@
     separately using the `arguments` field of the CommandLineTool.
 
     The algorithm to build the command line is as follows.  In this algorithm,
-    the sort key is a list consisting of one or more numeric and string
+    the sort key is a list consisting of one or more numeric or string
     elements.  Strings are sorted lexicographically based on UTF-8 encoding.
 
       1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
       key `[position, i]` where `position` is
-      [`CommandLineBinding.position`](#commandlinebinding) and the `i`
+      [`CommandLineBinding.position`](#commandlinebinding) and `i`
       is the index in the `arguments` list.
 
       2. Collect `CommandLineBinding` objects from the `inputs` schema and
@@ -1254,7 +1255,7 @@
       values from the input object.
 
       3. Assign a sorting key for each leaf binding object by appending nested
-      `position` fields together with the array index, or map key of the data
+      `position` fields together with the array index or map key of the data
       at each nesting level.  If two bindings have the same position, the tie
       must be broken using the lexographic ordering of the field or parameter
       name immediately containing the binding.
@@ -1307,7 +1308,7 @@
 
     [DockerRequirement](#dockerrequirement),
     [CreateFileRequirement](#createfilerequirement), and
-    [EnvVarRequirement](#envvarrequirement), are available as standard
+    [EnvVarRequirement](#envvarrequirement) are available as standard
     extensions to core command line tool semantics for defining the runtime
     environment.
 
@@ -1335,7 +1336,7 @@
 
     # Output binding
 
-    If the output directory contains a file called "cwl.output.json", that file
+    If the output directory contains a file named "cwl.output.json", that file
     must be loaded and used as the output object.  Otherwise, the output object
     must be generated by walking the parameters listed in `outputs` and
     applying output bindings to the tool output.  Output bindings are
@@ -1356,7 +1357,8 @@
         bindings.  If the program includes a path separator character it must
         be an absolute path, otherwise it is an error.  If the program does not
         include a path separator, search the `$PATH` variable in the runtime
-        environment find the absolute path of the executable.
+        environment of the workflow runner find the absolute path of the
+        executable.
       type:
         - string
         - type: array
@@ -1441,7 +1443,7 @@
 - name: LinkMergeMethod
   type: enum
   docParent: WorkflowStepInput
-  doc: The input link merge method, described in [WorkflowStepInput](#workflowstepinput)
+  doc: The input link merge method, described in [WorkflowStepInput](#workflowstepinput).
   symbols:
     - merge_nested
     - merge_flattened
@@ -1472,7 +1474,7 @@
       type: ["null", LinkMergeMethod]
       doc: |
         The method to use to merge multiple inbound links into a single array.
-        If not specified, the default method is **merge_nested**:
+        If not specified, the default method is "merge_nested".
 
 
 - type: record
@@ -1483,25 +1485,35 @@
     workflow inputs, or the outputs of other workflows steps) with the input
     parameters of the underlying process.
 
+    ## Input object
+
+    A WorkflowStepInput object must contain an `id` field in the form
+    `#fieldname` or `#stepname.fieldname`.  When the `id` field contains a
+    period `.` the field name consists of the characters following the final
+    period.  This defines a field of the workflow step input object with the
+    value of the `source` parameter(s).
+
+    ## Merging
+
     If the sink parameter is an array, or named in a [workflow
     scatter](#workflowstep) operation, there may be multiple inbound data links
     listed in the `connect` field.  The values from the input links are merged
     depending on the method specified in the `linkMerge` field.  If not
-    specified, the default method is **merge_nested**:
+    specified, the default method is "merge_nested".
 
     * **merge_nested**
 
-      The input shall be an array consisting of exactly one entry for each
-      input link.  If merge_nested is specified with a single link, the value
-      from the link is wrapped in a single-item list.
+      The input must be an array consisting of exactly one entry for each
+      input link.  If "merge_nested" is specified with a single link, the value
+      from the link must be wrapped in a single-item list.
 
     * **merge_flattened**
 
       1. The source and sink parameters must be compatible types, or the source
          type must be compatible with single element from the "items" type of
          the destination array parameter.
-      2. Source parameters which are arrays are concatenated;
-         source parameters which are single element types are appended as
+      2. Source parameters which are arrays are concatenated.
+         Source parameters which are single element types are appended as
          single elements.
 
   fields:
@@ -1525,7 +1537,7 @@
       type: ["null", LinkMergeMethod]
       doc: |
         The method to use to merge multiple inbound links into a single array.
-        If not specified, the default method is **merge_nested**:
+        If not specified, the default method is "merge_nested".
     - name: default
       type: ["null", Any]
       doc: |
@@ -1587,22 +1599,22 @@
     time it appears in the `scatter` field.  As a result, upstream parameters
     which are connected to scattered parameters may be arrays.
 
-    All output parameters types are also implicitly wrapped in arrays; each job
+    All output parameter types are also implicitly wrapped in arrays.  Each job
     in the scatter results in an entry in the output array.
 
     If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
 
-      * **dotproduct** specifies that each the input arrays are aligned and one
+      * **dotproduct** specifies that each of the input arrays are aligned and one
           element taken from each array to construct each job.  It is an error
           if all input arrays are not the same length.
 
-      * **nested_crossproduct** specifies the cartesian product of the inputs,
+      * **nested_crossproduct** specifies the Cartesian product of the inputs,
           producing a job for every combination of the scattered inputs.  The
           output must be nested arrays for each level of scattering, in the
           order that the input arrays are listed in the `scatter` field.
 
-      * **flat_crossproduct** specifies the cartesian product of the inputs,
+      * **flat_crossproduct** specifies the Cartesian product of the inputs,
           producing a job for every combination of the scattered inputs.  The
           output arrays must be flattened to a single level, but otherwise listed in the
           order that the input arrays are listed in the `scatter` field.
@@ -1625,8 +1637,8 @@
       doc: |
         Defines the input parameters of the workflow step.  The process is ready to
         run when all required input parameters are associated with concrete
-        values.  Input parameters include a schema for each parameter and is
-        used to validate the input object, it may also be used build a user
+        values.  Input parameters include a schema for each parameter which is
+        used to validate the input object.  It may also be used build a user
         interface for constructing the input object.
     - name: outputs
       type:
@@ -1731,7 +1743,7 @@
       type: string
     - name: steps
       doc: |
-        The individual steps that make up the workflow.  Steps are executed when all
+        The individual steps that make up the workflow.  Each step is executed when all of its
         input data links are fufilled.  An implementation may choose to execute
         the steps in a different order than listed and/or execute steps
         concurrently, provided that dependencies between steps are met.
@@ -1748,15 +1760,15 @@
     [Docker](http://docker.com) container, and specifies how to fetch or build
     the image.
 
-    If a CommandLineTool lists [`DockerRequirement`](#dockerrequirement) under
+    If a CommandLineTool lists `DockerRequirement` under
     `hints` or `requirements`, it may (or must) be run in the specified Docker
     container.
 
-    The platform must first acquire or install the correct Docker image, as
-    described by [`DockerRequirement`](#dockerrequirement).
+    The platform must first acquire or install the correct Docker image as
+    specified by `dockerPull`, `dockerLoad` or `dockerFile`.
 
     The platform must execute the tool in the container using `docker run` with
-    the appropriate Docker image and the tool command line.
+    the appropriate Docker image and tool command line.
 
     The workflow platform may provide input files and the designated output
     directory through the use of volume bind mounts.  The platform may rewrite
@@ -1769,23 +1781,30 @@
     generated command line represents a valid command within the runtime
     environment of the container.
 
+    ## Interaction with other requirements
+
+    If [EnvVarRequirement](#envvarrequirement) is specified alongside a
+    DockerRequirement, the environment variables must be provided to Docker
+    using `--env` or `--env-file` and interact with the container's preexisting
+    environment as defined by Docker.
+
   fields:
     - name: dockerPull
       type: ["null", "string"]
-      doc: "Get a Docker image using `docker pull`."
+      doc: "Specify a Docker image to retrieve using `docker pull`."
     - name: "dockerLoad"
       type: ["null", "string"]
       doc: "Specify a HTTP URL from which to download a Docker image using `docker load`."
     - name: dockerFile
       type: ["null", "string"]
-      doc: "Supply the contents of a Dockerfile which will be build using `docker build`."
+      doc: "Supply the contents of a Dockerfile which will be built using `docker build`."
     - name: dockerImageId
       type: ["null", "string"]
       doc: |
         The image id that will be used for `docker run`.  May be a
         human-readable image name or the image identifier hash.  May be skipped
         if `dockerPull` is specified, in which case the `dockerPull` image id
-        will be used.
+        must be used.
     - name: dockerOutputDirectory
       type: ["null", "string"]
       doc: |
@@ -1805,7 +1824,7 @@
   type: record
   extends: ProcessRequirement
   doc: |
-    Define a list of files that must be created and placed by the workflow
+    Define a list of files that must be created by the workflow
     platform in the designated output directory prior to executing the command
     line tool.  See `FileDef` for details.
   fields:
@@ -1813,7 +1832,7 @@
       type:
         type: "array"
         items: "FileDef"
-      doc: The list of files
+      doc: The list of files.
 
 
 - name: EnvVarRequirement
@@ -1835,7 +1854,7 @@
   extends: ProcessRequirement
   doc: |
     Indicates that the workflow platform must support the `scatter` and
-    `scatterMethod` fields of (WorkflowStep)(#workflowstep).
+    `scatterMethod` fields of [WorkflowStep](#workflowstep).
 
 
 - name: SchemaDefRequirement
@@ -1876,7 +1895,7 @@
           items: ProcessRequirement
       doc: |
         Requirements to run this expression engine, such as DockerRequirement
-        for specifying a container with the engine.
+        for specifying a container to run the engine.
     - name: engineCommand
       type:
         - "null"
