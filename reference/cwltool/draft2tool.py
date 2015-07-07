@@ -442,7 +442,7 @@ class CommandLineTool(Tool):
                         r["secondaryFiles"].append(sfpath)
 
                 for sf in r["secondaryFiles"]:
-                    if not os.path.exists(sf["path"]):
+                    if not builder.fs_access.exists(sf["path"]):
                         raise WorkflowException("Missing secondary file of '%s' of primary file '%s'" % (sf["path"], r["path"]))
 
 
