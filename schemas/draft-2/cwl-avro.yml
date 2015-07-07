@@ -1,6 +1,8 @@
 - name: "Common Workflow Language, Draft 2"
   type: doc
   doc: |
+    7 July 2015
+
     Authors:
 
     * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
@@ -232,9 +234,10 @@
     making input data available, invoking the tool process, and collecting output.
 
     It is intended that the workflow platform has broad leeway outside of this
-    specification to optimize use of computing resources and enforce policies not
-    covered by this specifcation.  Some of areas are out of scope for CWL that may
-    be handled by a specific workflow platform are:
+    specification to optimize use of computing resources and enforce policies
+    not covered by this specifcation.  Some areas that are currently out of
+    scope for CWL specification but may be handled by a specific workflow
+    platform include:
 
     * Data security and permissions.
     * Scheduling tool invocations on remote cluster or cloud compute nodes.
@@ -353,14 +356,13 @@
 
     ## Workflow graph
 
-    A workflow describes a set of **steps** and the **dependencies**
-    between those processes.  When a process produces output that will be
-    consumed by a second process, the first process is a dependency of the
-    second process.  When there is a dependency, the workflow engine must
-    execute the producer process first and wait for it to successfully complete
-    and produce output before executing the dependent second process that
-    will consume the output.  If two processes are defined in the workflow
-    graph that are not directly or indirectly dependent, these processes are
+    A workflow describes a set of **steps** and the **dependencies** between
+    those processes.  When a process produces output that will be consumed by a
+    second process, the first process is a dependency of the second process.
+    When there is a dependency, the workflow engine must execute the dependency
+    process and wait for it to successfully produce output before executing the
+    dependent process.  If two processes are defined in the workflow graph that
+    are not directly or indirectly dependent, these processes are
     **independent**, and may execute in any order or execute concurrently.  A
     workflow is complete when all steps have been executed.
 
@@ -1080,8 +1082,8 @@
 
       - **array**: If `itemSeparator` is specified, add `prefix` and the join
           the array into a single string with `itemSeparator` separating the
-          items.  Otherwise add `prefix` and recursively add individual
-          elements.
+          items.  Otherwise first add `prefix`, then recursively process
+          individual elements.
 
       - **object**: Add `prefix` only, and recursively add object fields for
           which `inputBinding` is specified.
@@ -1254,11 +1256,13 @@
       collecting nested `CommandLineBinding` objects and associating them with
       values from the input object.
 
-      3. Assign a sorting key for each leaf binding object by appending nested
-      `position` fields together with the array index or map key of the data
-      at each nesting level.  If two bindings have the same position, the tie
-      must be broken using the lexographic ordering of the field or parameter
-      name immediately containing the binding.
+      3. Create a sorting key by taking the value of the `position` field at
+      each level leading to each leaf binding object.  If `position` is not
+      specified, it is not added to the sorting key.  For bindings on arrays
+      and maps, the sorting key must include the array index or map key
+      following the position.  If and only if two bindings have the same sort
+      key, the tie must be broken using the ordering of the field or parameter
+      name immediately containing the leaf binding.
 
       4. Sort elements using the assigned sorting keys.  Numeric entries sort
       before strings.

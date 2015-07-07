@@ -16,17 +16,17 @@ Bioinformatics, Chemistry, Physics, and Astronomy.
 
 ## Current specification
 
-http://common-workflow-language.github.io/draft-2/
+The current stable specification is draft 2:
 
-Please be aware that Common Workflow Language is still under development.  The
-current draft is draft 2.  This draft is not final.
+http://common-workflow-language.github.io/draft-2/
 
 ## Implementations
 
-Current work-in-progress implementations of the common workflow language:
+Implementations capable of running the Common Workflow Language:
 
 * [Reference implementation (Python)](https://github.com/common-workflow-language/common-workflow-language/tree/master/reference/)
-* [Rabix (Python)](https://github.com/rabix/rabix)
+* [Rabix](https://github.com/rabix/rabix)
+* [Arvados](https://arvados.org)
 
 ## Examples
 
