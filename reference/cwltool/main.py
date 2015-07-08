@@ -42,6 +42,9 @@ def arg_parser():
                         default=True, help="Do not delete Docker container used by jobs after they exit",
                         dest="rm_container")
 
+    parser.add_argument("--tmpdir-prefix", type=str, default='tmp',
+                        help="Temp directory prefix for each task or job being executed")
+
     parser.add_argument("--rm-tmpdir", action="store_true", default=True,
                         help="Delete intermediate temporary directories (default)",
                         dest="rm_tmpdir")
@@ -236,20 +239,23 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Input object required")
         return 1
 
+    out = executor(t, loader.resolve_ref(args.job_order),
+                   input_basedir, args,
+                   conformance_test=args.conformance_test,
+                   dry_run=args.dry_run,
+                   outdir=args.outdir,
+                   use_container=args.use_container,
+                   pull_image=args.enable_pull,
+                   rm_container=args.rm_container,
+                   tmpdir_prefix=args.tmpdir_prefix,
+                   rm_tmpdir=args.rm_tmpdir,
+                   makeTool=makeTool,
+                   move_outputs=args.move_outputs
+                   )
     try:
-        out = executor(t, loader.resolve_ref(args.job_order),
-                       input_basedir, args,
-                       conformance_test=args.conformance_test,
-                       dry_run=args.dry_run,
-                       outdir=args.outdir,
-                       use_container=args.use_container,
-                       pull_image=args.enable_pull,
-                       rm_container=args.rm_container,
-                       rm_tmpdir=args.rm_tmpdir,
-                       makeTool=makeTool,
-                       move_outputs=args.move_outputs)
-        print json.dumps(out, indent=4)
+        pass
     except (validate.ValidationException) as e:
+        print json.dumps(out, indent=4)
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:
             _logger.exception("")
