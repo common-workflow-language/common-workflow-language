@@ -157,7 +157,8 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     loader.idx["cwl:JsonPointer"] = {}
 
     if args.print_jsonld_context:
-        print json.dumps(ctx, indent=4, sort_keys=True)
+        j = {"@context": ctx}
+        print json.dumps(j, indent=4, sort_keys=True)
         return 0
 
     if args.print_rdfs:
