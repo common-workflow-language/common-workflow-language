@@ -46,6 +46,7 @@ class CommandLineJob(object):
                 raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
         if docker_req and kwargs.get("use_container") is not False:
+            env = os.environ
             img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             runtime = ["docker", "run", "-i"]
             for src in self.pathmapper.files():
@@ -106,7 +107,6 @@ class CommandLineJob(object):
                 stdout = open(absout, "wb")
             else:
                 stdout = sys.stderr
-
             sp = subprocess.Popen(runtime + self.command_line,
                                   shell=False,
                                   close_fds=True,
