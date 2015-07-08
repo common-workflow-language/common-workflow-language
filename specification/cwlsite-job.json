@@ -11,5 +11,6 @@
         "path": "../schemas/draft-2/cwl-avro.yml"
     },
     "cwl_schema_target": "draft-2/index.html",
-    "cwl_context_target": "draft-2/cwl-context.jsonld"
+    "cwl_context_target": "draft-2/cwl-context.jsonld",
+    "cwl_rdfs_target": "draft-2/cwl.ttl"
 }
