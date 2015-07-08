@@ -46,7 +46,11 @@ class CommandLineJob(object):
                 raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
         if docker_req and kwargs.get("use_container") is not False:
-            img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
+            try:
+                img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
+            except OSError, err:
+                _logger.error(err, exc_info=True)
+                raise WorkflowException("Error getting docker requirement %s" % docker_req.get('dockerImageId'))
             runtime = ["docker", "run", "-i"]
             for src in self.pathmapper.files():
                 vol = self.pathmapper.mapper(src)
