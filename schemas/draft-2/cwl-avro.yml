@@ -148,11 +148,15 @@
 
     An implementation may interpret a CWL document as
     [JSON-LD](http://json-ld.org) and convert a CWL document to a [Resource
-    Description Framework (RDF)](http://www.w3.org/RDF/) using the JSON-LD
-    context extracted from the avro-ld schema.
+    Description Framework (RDF)](http://www.w3.org/RDF/) using the
+    CWL [JSON-LD Context](cwl-context.jsonld) (extracted from the avro-ld schema).
+    The CWL [RDFS schema](cwl.ttl) defines the classes and properties used by
+    CWL as JSON-LD. 
 
     The latest draft-2 schema is defined here:
     https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
+
+
 
     ## Identifiers
 
