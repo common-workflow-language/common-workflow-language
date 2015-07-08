@@ -75,3 +75,7 @@ and send a pull request!
 * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>
+* Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
+* Robin Andeer <robin.andeer@gmail.com>
+* Roman Valls Guimerà <brainstorm@nopcode.org>
+* Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>

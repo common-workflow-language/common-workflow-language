@@ -240,23 +240,23 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Input object required")
         return 1
 
-    out = executor(t, loader.resolve_ref(args.job_order),
-                   input_basedir, args,
-                   conformance_test=args.conformance_test,
-                   dry_run=args.dry_run,
-                   outdir=args.outdir,
-                   use_container=args.use_container,
-                   pull_image=args.enable_pull,
-                   rm_container=args.rm_container,
-                   tmpdir_prefix=args.tmpdir_prefix,
-                   rm_tmpdir=args.rm_tmpdir,
-                   makeTool=makeTool,
-                   move_outputs=args.move_outputs
-                   )
     try:
-        pass
+        out = executor(t, loader.resolve_ref(args.job_order),
+                       input_basedir, args,
+                       conformance_test=args.conformance_test,
+                       dry_run=args.dry_run,
+                       outdir=args.outdir,
+                       use_container=args.use_container,
+                       pull_image=args.enable_pull,
+                       rm_container=args.rm_container,
+                       tmpdir_prefix=args.tmpdir_prefix,
+                       rm_tmpdir=args.rm_tmpdir,
+                       makeTool=makeTool,
+                       move_outputs=args.move_outputs
+                       )
+        # This is the wrokflow output, it needs to be written
+        sys.stdout.write(json.dumps(out, indent=4))
     except (validate.ValidationException) as e:
-        print json.dumps(out, indent=4)
         _logger.error("Input object failed validation:\n%s" % e)
         if args.debug:
             _logger.exception("")
