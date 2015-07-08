@@ -3,6 +3,12 @@
   doc: |
     7 July 2015
 
+    This version:
+      * https://w3id.org/cwl/draft-2/
+
+    Current version:
+      * https://w3id.org/cwl/
+
     Authors:
 
     * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
@@ -149,9 +155,9 @@
     An implementation may interpret a CWL document as
     [JSON-LD](http://json-ld.org) and convert a CWL document to a [Resource
     Description Framework (RDF)](http://www.w3.org/RDF/) using the
-    CWL [JSON-LD Context](cwl-context.jsonld) (extracted from the avro-ld schema).
-    The CWL [RDFS schema](cwl.ttl) defines the classes and properties used by
-    CWL as JSON-LD. 
+    CWL [JSON-LD Context](https://w3id.org/cwl/draft-2/context) (extracted from the avro-ld schema).
+    The CWL [RDFS schema](https://w3id.org/cwl/draft-2/cwl.ttl) defines the classes and properties used by
+    CWL as JSON-LD.
 
     The latest draft-2 schema is defined here:
     https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
@@ -570,8 +576,8 @@
     ```
 
   jsonldPrefixes: {
-    "cwl": "http://github.com/common-workflow-language#",
-    "avro": "http://github.com/common-workflow-language/avro#",
+    "cwl": "https://w3id.org/cwl/cwl#",
+    "avro": "https://w3id.org/cwl/avro#",
     "dct": "http://purl.org/dc/terms/",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
