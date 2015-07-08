@@ -23,6 +23,24 @@
     engine: "cwl:JsonPointer"
     script: "job/makedoc_target"
 
+- id: "#makecontext"
+  class: CommandLineTool
+  inputs:
+    - id: "#makecontext_target"
+      type: string
+  outputs:
+    - id: "#makecontext_out"
+      type: File
+      outputBinding:
+        glob:
+          engine: "cwl:JsonPointer"
+          script: "job/makecontext_target"
+  baseCommand: [python, "-mcwltool", "--print-jsonld-context"]
+  stdout:
+    engine: "cwl:JsonPointer"
+    script: "job/makecontext_target"
+
+
 - id: "#strip_leading_lines"
   class: CommandLineTool
   inputs:
@@ -59,10 +77,14 @@
       type: File
     - id: "#cwl_schema_target"
       type: string
+    - id: "#cwl_context_target"
+      type: string
+
 
   outputs:
     - { id: "#draft2_spec", type: File, source: "#spec.makedoc_out" }
     - { id: "#main_index", type: File, source: "#readme.makedoc_out" }
+    - { id: "#main_context", type: File, source: "#context.makecontext_out" }
 
   hints:
     - class: DockerRequirement
@@ -75,6 +97,13 @@
     outputs:
       - { id: "#spec.makedoc_out" }
     run: {import: "#makedoc"}
+
+  - id: "#context"
+    inputs:
+      - { id: "#context.makecontext_target", source: "#cwl_context_target"}
+    outputs:
+      - { id: "#context.makecontext_out"}
+    run: {import: "#makecontext"}
 
   - id: "#strip_lines"
     inputs:
