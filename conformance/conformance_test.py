@@ -26,8 +26,12 @@ failures = 0
 def compare(a, b):
     try:
         if isinstance(a, dict):
-            if a.get("class") == "File" and not b["path"].endswith("/" + a["path"]):
-                 return False
+            if a.get("class") == "File":
+                if not b["path"].endswith("/" + a["path"]):
+                    return False
+                # ignore empty collections
+                b = {k: v for k, v in b.iteritems()
+                     if not isinstance(v, (list, dict)) or len(v) > 0}
             if len(a) != len(b):
                 return False
             for c in a:
