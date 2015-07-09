@@ -284,8 +284,9 @@ class Workflow(Process):
 
             for a in actual_jobs:
                 if a.outdir:
-                    _logger.info("Removing intermediate output directory %s", a.outdir)
-                    shutil.rmtree(a.outdir, True)
+                    if kwargs.get("rm_tmpdir", True):
+                        _logger.info("Removing intermediate output directory %s", a.outdir)
+                        shutil.rmtree(a.outdir, True)
 
         output_callback(wo, self.processStatus)
 

@@ -70,6 +70,9 @@ class CommandLineJob(object):
             if not os.path.exists(self.tmpdir):
                 os.makedirs(self.tmpdir)
             env["TMPDIR"] = self.tmpdir
+            for key, value in os.environ.items():
+                if key not in env:
+                    env[key] = value
 
         stdin = None
         stdout = None
