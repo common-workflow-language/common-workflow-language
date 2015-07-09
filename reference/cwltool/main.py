@@ -2,7 +2,7 @@
 
 import draft2tool
 import argparse
-from avro_ld.ref_resolver import loader
+from avro_ld.ref_resolver import Loader
 import json
 import os
 import sys
@@ -138,6 +138,15 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
 
         return final_output[0]
 
+def create_loader(ctx):
+    loader = Loader()
+    url_fields = []
+    for c in ctx:
+        if c != "id" and (ctx[c] == "@id") or (isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id"):
+            url_fields.append(c)
+    loader.url_fields = url_fields
+    loader.idx["cwl:JsonPointer"] = {}
+    return loader
 
 def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeTool, parser=None):
     if args is None:
@@ -155,14 +164,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     (j, names) = process.get_schema()
     (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
-
-    url_fields = []
-    for c in ctx:
-        if c != "id" and (ctx[c] == "@id") or (isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id"):
-            url_fields.append(c)
-
-    loader.url_fields = url_fields
-    loader.idx["cwl:JsonPointer"] = {}
+    loader = create_loader(ctx)
 
     if args.print_jsonld_context:
         j = {"@context": ctx}
