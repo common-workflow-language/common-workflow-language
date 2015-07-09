@@ -45,11 +45,11 @@ to your script.
 
 Use with boot2docker
 --------------------
-boot2docker is running docker inside a virtual machine and it only mounts /Users
+boot2docker is running docker inside a virtual machine and it only mounts ``Users``
 on it. The default behavoir of CWL is to create temporary directories under e.g.
-```/Var``` which is not accessible to Docker containers.
+``/Var`` which is not accessible to Docker containers.
 
-To run CWL successfully with boot2docker you need to set the ```--tmpdir-prefix```
-and ```--tmp-outdir-prefix``` to somewhere under ```/Users```.
+To run CWL successfully with boot2docker you need to set the ``--tmpdir-prefix``
+and ``--tmp-outdir-prefix`` to somewhere under ``/Users``::
 
     $ cwl-runner --tmp-outdir-prefix=/Users/username/project --tmpdir-prefix=/Users/username/project wc-tool.cwl wc-job.json
