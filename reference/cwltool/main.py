@@ -42,10 +42,10 @@ def arg_parser():
                         default=True, help="Do not delete Docker container used by jobs after they exit",
                         dest="rm_container")
 
-    parser.add_argument("--tmpdir-prefix", type=str, default='tmp',
+    parser.add_argument("--tmpdir-prefix", type=str,
                         help="Temp directory prefix for each task or job being executed")
 
-    parser.add_argument("--tmp-outdir-prefix", type=str, default='tmp',
+    parser.add_argument("--tmp-outdir-prefix", type=str,
                         help="Temp directory prefix for each task or job output being executed",
                         dest="tmp_outdir_prefix")
 
@@ -244,16 +244,26 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Input object required")
         return 1
 
-    args.tmp_outdir_prefix = os.path.abspath(args.tmp_outdir_prefix)
-    if not os.path.exists(args.tmp_outdir_prefix):
+    if args.tmp_outdir_prefix is None:
+        # Set up unique temp directory for individual job outputs
         args.tmp_outdir_prefix = 'tmp'
-        _logger.warn("Temporary output prefix doesn't exist, reverting to default")
+    else:
+        # Use user defined temp directory (if it exists)
+        args.tmp_outdir_prefix = os.path.abspath(args.tmp_outdir_prefix)
+        if not os.path.exists(args.tmp_outdir_prefix):
+            _logger.warn("Temporary output prefix doesn't exist, reverting to default")
+            args.tmp_outdir_prefix = 'tmp'
 
-    args.tmpdir_prefix = os.path.abspath(args.tmpdir_prefix)
-    if not os.path.exists(args.tmpdir_prefix):
+    if args.tmpdir_prefix is None:
+        # Set up unique prefix for temp directories for individual jobs
         args.tmpdir_prefix = 'tmp'
-        _logger.warn("Temporary prefix doesn't exist, reverting to default")
-        
+    else:
+        # Use user defined prefix (if the folder exists)
+        args.tmpdir_prefix = os.path.abspath(args.tmpdir_prefix)
+        if not os.path.exists(args.tmpdir_prefix):
+            _logger.warn("Temporary prefix doesn't exist, reverting to default")
+            args.tmpdir_prefix = 'tmp'
+
     try:
         out = executor(t, loader.resolve_ref(args.job_order),
                        input_basedir, args,

@@ -57,12 +57,17 @@ def run_test(i, t):
     outdir = None
     try:
         if "output" in t:
-            outdir = tempfile.mkdtemp()
-            test_command = [args.tool,
-                            "--outdir=%s" % outdir,
-                            "--strict",
-                            t["tool"],
-                            t["job"]]
+            test_command = [args.tool]
+            # Add prefixes if running on MacOSX so that boot2docker writes to /Users
+            if 'darwin' in sys.platform:
+                outdir = tempfile.mkdtemp(prefix=os.path.abspath(os.path.curdir))
+                test_command.extend(["--tmp-outdir-prefix={}".format(outdir), "--tmpdir-prefix={}".format(outdir)])
+            else:
+                outdir = tempfile.mkdtemp()
+            test_command.extend(["--outdir={}".format(outdir),
+                                 "--strict",
+                                 t["tool"],
+                                 t["job"]])
             outstr = subprocess.check_output(test_command)
             out = {"output": json.loads(outstr)}
         else:
