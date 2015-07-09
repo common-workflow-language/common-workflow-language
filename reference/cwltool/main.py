@@ -45,6 +45,10 @@ def arg_parser():
     parser.add_argument("--tmpdir-prefix", type=str, default='tmp',
                         help="Temp directory prefix for each task or job being executed")
 
+    parser.add_argument("--tmp-outdir-prefix", type=str, default='tmp',
+                        help="Temp directory prefix for each task or job output being executed",
+                        dest="tmp_outdir_prefix")
+
     parser.add_argument("--rm-tmpdir", action="store_true", default=True,
                         help="Delete intermediate temporary directories (default)",
                         dest="rm_tmpdir")
@@ -240,12 +244,23 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Input object required")
         return 1
 
+    args.tmp_outdir_prefix = os.path.abspath(args.tmp_outdir_prefix)
+    if not os.path.exists(args.tmp_outdir_prefix):
+        args.tmp_outdir_prefix = 'tmp'
+        _logger.warn("Temporary output prefix doesn't exist, reverting to default")
+
+    args.tmpdir_prefix = os.path.abspath(args.tmpdir_prefix)
+    if not os.path.exists(args.tmpdir_prefix):
+        args.tmpdir_prefix = 'tmp'
+        _logger.warn("Temporary prefix doesn't exist, reverting to default")
+        
     try:
         out = executor(t, loader.resolve_ref(args.job_order),
                        input_basedir, args,
                        conformance_test=args.conformance_test,
                        dry_run=args.dry_run,
                        outdir=args.outdir,
+                       tmp_outdir_prefix=args.tmp_outdir_prefix,
                        use_container=args.use_container,
                        pull_image=args.enable_pull,
                        rm_container=args.rm_container,

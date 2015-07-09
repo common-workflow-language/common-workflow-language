@@ -351,7 +351,8 @@ class CommandLineTool(Tool):
 
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and kwargs.get("use_container"):
-            j.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
+            out_prefix = kwargs.get("tmp_outdir_prefix")
+            j.outdir = kwargs.get("outdir") or tempfile.mkdtemp(prefix=out_prefix)
             prefix = kwargs.get('tmpdir_prefix')
             j.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp(prefix=prefix)
         else:
