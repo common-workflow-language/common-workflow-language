@@ -66,6 +66,11 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
                 if rcode != 0:
                     raise Exception("Docker load returned non-zero exit status %i" % (rcode))
                 found = True
+        elif "dockerImport" in dockerRequirement:
+            cmd = ["docker", "import", dockerRequirement["dockerImport"], dockerRequirement["dockerImageId"]]
+            _logger.info(str(cmd))
+            if not dry_run:
+                subprocess.check_call(cmd, stdout=sys.stderr)
 
     return found
 
