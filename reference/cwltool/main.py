@@ -43,11 +43,12 @@ def arg_parser():
                         dest="rm_container")
 
     parser.add_argument("--tmpdir-prefix", type=str,
-                        help="Temp directory prefix for each task or job being executed")
+                        help="Path prefix for temporary directories",
+                        default="tmp")
 
     parser.add_argument("--tmp-outdir-prefix", type=str,
-                        help="Temp directory prefix for each task or job output being executed",
-                        dest="tmp_outdir_prefix")
+                        help="Path prefix for intermediate output directories",
+                        default="tmp")
 
     parser.add_argument("--rm-tmpdir", action="store_true", default=True,
                         help="Delete intermediate temporary directories (default)",
@@ -244,25 +245,19 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Input object required")
         return 1
 
-    if args.tmp_outdir_prefix is None:
-        # Set up unique temp directory for individual job outputs
-        args.tmp_outdir_prefix = 'tmp'
-    else:
+    if args.tmp_outdir_prefix != 'tmp':
         # Use user defined temp directory (if it exists)
         args.tmp_outdir_prefix = os.path.abspath(args.tmp_outdir_prefix)
         if not os.path.exists(args.tmp_outdir_prefix):
-            _logger.warn("Temporary output prefix doesn't exist, reverting to default")
-            args.tmp_outdir_prefix = 'tmp'
+            _logger.error("Intermediate output directory prefix doesn't exist, reverting to default")
+            return 1
 
-    if args.tmpdir_prefix is None:
-        # Set up unique prefix for temp directories for individual jobs
-        args.tmpdir_prefix = 'tmp'
-    else:
+    if args.tmpdir_prefix != 'tmp':
         # Use user defined prefix (if the folder exists)
         args.tmpdir_prefix = os.path.abspath(args.tmpdir_prefix)
         if not os.path.exists(args.tmpdir_prefix):
-            _logger.warn("Temporary prefix doesn't exist, reverting to default")
-            args.tmpdir_prefix = 'tmp'
+            _logger.error("Temporary directory prefix doesn't exist.")
+            return 1
 
     try:
         out = executor(t, loader.resolve_ref(args.job_order),
@@ -279,7 +274,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
                        makeTool=makeTool,
                        move_outputs=args.move_outputs
                        )
-        # This is the wrokflow output, it needs to be written
+        # This is the workflow output, it needs to be written
         sys.stdout.write(json.dumps(out, indent=4))
     except (validate.ValidationException) as e:
         _logger.error("Input object failed validation:\n%s" % e)

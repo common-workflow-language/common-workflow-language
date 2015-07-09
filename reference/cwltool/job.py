@@ -107,6 +107,7 @@ class CommandLineJob(object):
                 stdout = open(absout, "wb")
             else:
                 stdout = sys.stderr
+
             sp = subprocess.Popen(runtime + self.command_line,
                                   shell=False,
                                   close_fds=True,
