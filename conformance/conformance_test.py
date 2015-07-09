@@ -95,6 +95,10 @@ def run_test(i, t):
         print "Returned non-zero"
         failures += 1
         return
+    except yaml.scanner.ScannerError as e:
+        print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
+        print outstr
+        print "Parse error " + str(e)
 
     pwd = os.path.abspath(os.path.dirname(t["job"]))
     # t["args"] = map(lambda x: x.replace("$PWD", pwd), t["args"])

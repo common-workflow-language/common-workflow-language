@@ -64,7 +64,7 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
                     loadproc.stdin.close()
                 rcode = loadproc.wait()
                 if rcode != 0:
-                    raise Exception("Docker load returned non-zero exit status %i" % (rcode))
+                    raise process.WorkflowException("Docker load returned non-zero exit status %i" % (rcode))
                 found = True
 
     return found
@@ -72,10 +72,24 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
 
 def get_from_requirements(r, req, pull_image, dry_run=False):
     if r:
+        errmsg = None
+        try:
+            subprocess.check_output(["docker", "version"])
+        except subprocess.CalledProcessError as e:
+            errmsg = "Cannot communicate with docker daemon: " + str(e)
+        except OSError as e:
+            errmsg = "'docker' executable not found: " + str(e)
+
+        if errmsg:
+            if req:
+                raise process.WorkflowException(errmsg)
+            else:
+                return None
+
         if get_image(r, pull_image, dry_run):
             return r["dockerImageId"]
         else:
             if req:
-                raise Exception("Docker image %s not found" % r["dockerImageId"])
+                raise process.WorkflowException("Docker image %s not found" % r["dockerImageId"])
 
     return None
