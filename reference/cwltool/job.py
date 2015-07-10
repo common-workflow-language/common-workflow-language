@@ -11,8 +11,12 @@ import docker
 from process import WorkflowException, get_feature
 import shutil
 import stat
+import re
+import shellescape
 
 _logger = logging.getLogger("cwltool")
+
+needs_shell_quoting = re.compile(r"""(^$|[\s|&;()<>\'"$@])""").search
 
 def deref_links(outputs):
     if isinstance(outputs, dict):
@@ -76,7 +80,7 @@ class CommandLineJob(object):
 
         _logger.info("outdir is %s", self.outdir)
         _logger.info("%s%s%s",
-                     " ".join(runtime + self.command_line),
+                     " ".join(runtime + [shellescape.quote(arg) if needs_shell_quoting(arg) else arg for arg in self.command_line]),
                      ' < %s' % (self.stdin) if self.stdin else '',
                      ' > %s' % os.path.join(self.outdir, self.stdout) if self.stdout else '')
 

@@ -33,7 +33,8 @@ setup(name='cwltool',
           'avro',
           'rdflib >= 4.2.0',
           'rdflib-jsonld >= 0.3.0',
-          'mistune'
+          'mistune',
+          'shellescape'
         ],
       test_suite='tests',
       tests_require=[],
