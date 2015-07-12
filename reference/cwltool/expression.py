@@ -31,6 +31,7 @@ def exeval(ex, jobinput, requirements, outdir, tmpdir, context, pull_image):
             dr.hints = r.get("hints", [])
 
             (docker_req, docker_is_req) = process.get_feature(dr, "DockerRequirement")
+            img_id = None
             if docker_req:
                 img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
             if img_id:
