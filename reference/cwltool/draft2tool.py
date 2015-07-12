@@ -61,6 +61,8 @@ class Builder(object):
             for t in schema["type"]:
                 if isinstance(t, basestring) and self.names.has_name(t, ""):
                     avsc = self.names.get_name(t, "")
+                elif isinstance(t, dict) and self.names.has_name(t["name"], ""):
+                    avsc = self.names.get_name(t["name"], "")
                 else:
                     avsc = avro.schema.make_avsc_object(t, self.names)
                 if validate.validate(avsc, datum):
@@ -81,6 +83,8 @@ class Builder(object):
                 for f in schema["fields"]:
                     if f["name"] in datum:
                         bindings.extend(self.bind_input(f, datum[f["name"]], lead_pos=lead_pos, tail_pos=f["name"]))
+                    else:
+                        datum[f["name"]] = f.get("default")
 
             if schema["type"] == "map":
                 for n, item in datum.items():
