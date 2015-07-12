@@ -66,6 +66,9 @@ def get_image(dockerRequirement, pull_image, dry_run=False):
                 if rcode != 0:
                     raise process.WorkflowException("Docker load returned non-zero exit status %i" % (rcode))
                 found = True
+        elif dockerRequirement.get("dockerImageId"):
+            raise ValueError("Docker image %s not found locally and no mechanism to pull in DockerRequirement: %s"
+                             % (dockerRequirement["dockerImageId"], dockerRequirement))
 
     return found
 
