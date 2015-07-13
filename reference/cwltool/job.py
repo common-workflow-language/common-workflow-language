@@ -156,7 +156,10 @@ class CommandLineJob(object):
             _logger.exception("Exception while running job")
             processStatus = "permanentFail"
 
-        _logger.info("[job %s] completed %s", id(self), processStatus)
+        if processStatus != "success":
+            _logger.warn("[job %s] completed %s", id(self), processStatus)
+        else:
+            _logger.debug("[job %s] completed %s", id(self), processStatus)
         _logger.debug("[job %s] %s", id(self), json.dumps(outputs, indent=4))
 
         self.output_callback(outputs, processStatus)

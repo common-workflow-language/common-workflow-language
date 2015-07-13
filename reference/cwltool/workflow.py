@@ -197,7 +197,7 @@ class WorkflowJob(object):
             step.completed = True
 
     def run(self, **kwargs):
-        _logger.info("[workflow %s] starting", id(self))
+        _logger.debug("[workflow %s] starting", id(self))
 
     def job(self, joborder, basedir, output_callback, move_outputs=True, **kwargs):
         self.state = {}
@@ -245,10 +245,6 @@ class WorkflowJob(object):
             conflicts = set()
 
             outfiles = findfiles(wo)
-
-            _logger.info("[workflow %s] staging output is %s", id(self), json.dumps(wo, indent=4))
-            _logger.debug("[workflow %s] outfiles is %s", id(self), json.dumps(outfiles, indent=4))
-            _logger.debug("[workflow %s] output_dirs is %s", id(self), json.dumps(list(output_dirs), indent=4))
 
             for f in outfiles:
                 for a in output_dirs:

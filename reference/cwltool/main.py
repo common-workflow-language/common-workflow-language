@@ -17,9 +17,11 @@ import urlparse
 import process
 import job
 from cwlrdf import printrdf, printdot
+import pkg_resources  # part of setuptools
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
+_logger.setLevel(logging.INFO)
 
 def arg_parser():
     parser = argparse.ArgumentParser()
@@ -90,8 +92,10 @@ def arg_parser():
     parser.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
 
-    parser.add_argument("--verbose", action="store_true", help="Print more logging")
+    parser.add_argument("--verbose", action="store_true", help="Default logging")
+    parser.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
     parser.add_argument("--debug", action="store_true", help="Print even more logging")
+    parser.add_argument("--version", action="store_true", help="Print version and exit")
 
     return parser
 
@@ -100,9 +104,9 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
 
     def output_callback(out, processStatus):
         if processStatus == "success":
-            _logger.info("Final job status is %s", processStatus)
+            _logger.info("Final process status is %s", processStatus)
         else:
-            _logger.warn("Final job status is %s", processStatus)
+            _logger.warn("Final process status is %s", processStatus)
         final_output.append(out)
 
     if kwargs.get("outdir"):
@@ -146,8 +150,17 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     args = parser.parse_args(args)
 
-    if args.verbose:
-        logging.getLogger("cwltool").setLevel(logging.INFO)
+
+    pkg = pkg_resources.require("cwltool")
+    if pkg:
+        if args.version:
+            print "%s %s" % (sys.argv[0], pkg[0].version)
+            return 0
+        else:
+            _logger.info("%s %s", sys.argv[0], pkg[0].version)
+
+    if args.quiet:
+        logging.getLogger("cwltool").setLevel(logging.WARN)
     if args.debug:
         logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
