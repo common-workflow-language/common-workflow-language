@@ -26,15 +26,16 @@ http://common-workflow-language.github.io/draft-3/
 
 ## Implementations
 
-Implementations capable of running the Common Workflow Language:
+Implementations working on or currently capable of running the Common Workflow Language:
 
 * [Reference implementation (Python)](https://github.com/common-workflow-language/common-workflow-language/tree/master/reference/)
 * [Rabix](https://github.com/rabix/rabix)
 * [Arvados](https://arvados.org)
+* [Parallel Recipes](https://github.com/yvdriess/precipes)
 
 ## Examples
 
-[Github repository of example workflows.](https://github.com/common-workflow-language/workflows)
+[Github repository of example tools and workflows.](https://github.com/common-workflow-language/workflows)
 
 ## Development and testing
 
@@ -50,28 +51,34 @@ https://ci.curoverse.com/job/common-workflow-language/
 
 Current build status: [![Build Status](https://ci.curoverse.com/buildStatus/icon?job=common-workflow-language)](https://ci.curoverse.com/job/common-workflow-language/)
 
-## Contributing
+## Community and Contributing
 
-If you are interested in contributing ideas or code, please join the [mailing
-list](https://groups.google.com/forum/#!forum/common-workflow-language) or
+If you are interested in learning more or contributing ideas or code,
+[come chat with us on Gitter](https://gitter.im/common-workflow-language/common-workflow-language.github.io),
+check out [#CommonWL on Twitter](https://twitter.com/search?q=%23CommonWL),
+join the [mailing list common-workflow-language on Google Groups](https://groups.google.com/forum/#!forum/common-workflow-language) or
 [fork the repository](https://github.com/common-workflow-language/common-workflow-language)
 and send a pull request!
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language.github.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Participating Organizations
 
 * [Curoverse](http://curoverse.com)
 * [Seven Bridges Genomics](http://sbgenomics.com)
-* [Galaxy](http://galaxyproject.org/)
+* [Galaxy Project](http://galaxyproject.org/)
 * [Institut Pasteur](http://www.pasteur.fr)
-* [BioDatomics](http://www.biodatomics.com/)
-* [Michigan State University](http://ged.msu.edu/)
+* [University of California Davis](http://ucdavis.edu)
+* [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
+* [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
 * [Broad Institute](https://www.broadinstitute.org)
+* [BioDatomics](http://www.biodatomics.com/)
 
 ## Individual Contributors
 
 * Peter Amstutz <peter.amstutz@curoverse.com>
 * John Chilton <jmchilton@gmail.com>
-* Michael R. Crusoe <mcrusoe@msu.edu>
+* Michael R. Crusoe <michael.crusoe@gmail.com>
 * John Kern <kern3020@gmail.com>
 * Hervé Ménager <herve.menager@gmail.com>
 * Maxim Mikheev <mikhmv@biodatomics.com>
@@ -83,3 +90,5 @@ and send a pull request!
 * Robin Andeer <robin.andeer@gmail.com>
 * Roman Valls Guimerà <brainstorm@nopcode.org>
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
+* Brad Chapman <bchapman@hsph.harvard.edu>
+* Josh Randall <joshua.randall@sanger.ac.uk>
