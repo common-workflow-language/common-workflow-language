@@ -1776,7 +1776,7 @@
     container.
 
     The platform must first acquire or install the correct Docker image as
-    specified by `dockerPull`, `dockerLoad` or `dockerFile`.
+    specified by `dockerPull`, `dockerImport`, `dockerLoad` or `dockerFile`.
 
     The platform must execute the tool in the container using `docker run` with
     the appropriate Docker image and tool command line.
@@ -1809,6 +1809,9 @@
     - name: dockerFile
       type: ["null", "string"]
       doc: "Supply the contents of a Dockerfile which will be built using `docker build`."
+    - name: dockerImport
+      type: ["null", "string"]
+      doc: "Provide HTTP URL to download and gunzip a Docker images using `docker import."
     - name: dockerImageId
       type: ["null", "string"]
       doc: |
