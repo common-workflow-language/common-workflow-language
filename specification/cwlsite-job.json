@@ -6,11 +6,25 @@
     "main_index_target": "index.html",
     "main_title": "Common Workflow Language",
 
-    "cwl_schema_in": {
+    "cwl_schema_in": [{
         "class": "File",
         "path": "../schemas/draft-2/cwl-avro.yml"
     },
-    "cwl_schema_target": "draft-2/index.html",
-    "cwl_context_target": "draft-2/cwl-context.jsonld",
-    "cwl_rdfs_target": "draft-2/cwl.ttl"
+    {
+        "class": "File",
+        "path": "../schemas/draft-3/cwl-avro.yml"
+    }],
+
+    "cwl_schema_target": [
+        "draft-2/index.html",
+        "draft-3/index.html"
+    ],
+    "cwl_context_target": [
+        "draft-2/cwl-context.jsonld",
+        "draft-3/cwl-context.jsonld"
+    ],
+    "cwl_rdfs_target": [
+        "draft-2/cwl.ttl",
+        "draft-3/cwl.ttl"
+    ]
 }

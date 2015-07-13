@@ -12,6 +12,7 @@ import avro_ld.schema
 import urlparse
 import pprint
 from pkg_resources import resource_stream
+import stat
 
 _logger = logging.getLogger("cwltool")
 
@@ -107,3 +108,15 @@ class Process(object):
 
     def get_requirement(self, feature):
         return get_feature(self, feature)
+
+def empty_subtree(dirpath):
+    # Test if a directory tree contains any files (does not count empty
+    # subdirectories)
+    for d in os.listdir(dirpath):
+        d = os.path.join(dirpath, d)
+        if stat.S_ISDIR(os.stat(d).st_mode):
+            if empty_subtree(d) is False:
+                return False
+        else:
+            return False
+    return True

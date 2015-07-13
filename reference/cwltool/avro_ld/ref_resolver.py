@@ -144,14 +144,17 @@ class Loader(object):
                 with open(path) as fp:
                     return fp.read().decode("utf-8")
             except (OSError, IOError) as e:
-                raise RuntimeError('Failed for %s: %s' % (url, e))
+                raise RuntimeError('Error reading %s %s' % (url, e))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
     def fetch(self, url):
         if url in self.idx:
             return self.idx[url]
-        result = yaml.load(self.fetch_text(url))
+        try:
+            result = yaml.load(self.fetch_text(url))
+        except yaml.parser.ParserError as e:
+            raise validate.ValidationException("Error loading '%s' %s" % (url, str(e)))
         if isinstance(result, dict):
             if "id" not in result:
                 result["id"] = url

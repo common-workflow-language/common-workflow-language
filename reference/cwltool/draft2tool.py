@@ -1,6 +1,5 @@
 import avro.schema
 import json
-import pprint
 import copy
 from flatten import flatten
 import functools
@@ -317,8 +316,6 @@ class CommandLineTool(Tool):
 
         builder.bindings.sort(key=lambda a: a["position"])
 
-        _logger.debug("Files is %s", builder.files)
-
         reffiles = set((f["path"] for f in builder.files))
 
         j = self.makeJobRunner()
@@ -330,6 +327,13 @@ class CommandLineTool(Tool):
         j.permanentFailCodes = self.tool.get("permanentFailCodes")
         j.requirements = self.requirements
         j.hints = self.hints
+
+        _logger.debug("[job %s] initializing from %s%s",
+                     id(j),
+                     self.tool["id"],
+                     " as part of %s" % kwargs["part_of"] if "part_of" in kwargs else "")
+        _logger.debug("[job %s] %s", id(j), json.dumps(joborder, indent=4))
+
 
         builder.pathmapper = None
 
@@ -350,8 +354,8 @@ class CommandLineTool(Tool):
         for f in builder.files:
             f["path"] = builder.pathmapper.mapper(f["path"])[1]
 
-        _logger.debug("Bindings is %s", pprint.pformat(builder.bindings))
-        _logger.debug("Files is %s", pprint.pformat({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}))
+        _logger.debug("[job %s] command line bindings is %s", id(j), json.dumps(builder.bindings, indent=4))
+        _logger.debug("[job %s] path mappings is %s", id(j), json.dumps({p: builder.pathmapper.mapper(p) for p in builder.pathmapper.files()}, indent=4))
 
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if dockerReq and kwargs.get("use_container"):

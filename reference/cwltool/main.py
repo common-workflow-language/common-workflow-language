@@ -100,9 +100,9 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
 
     def output_callback(out, processStatus):
         if processStatus == "success":
-            _logger.info("Overall job status is %s", processStatus)
+            _logger.info("Final job status is %s", processStatus)
         else:
-            _logger.warn("Overall job status is %s", processStatus)
+            _logger.warn("Final job status is %s", processStatus)
         final_output.append(out)
 
     if kwargs.get("outdir"):
@@ -111,8 +111,6 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
         kwargs["outdir"] = "/tmp"
     else:
         kwargs["outdir"] = tempfile.mkdtemp()
-
-    _logger.info("Output directory is %s", kwargs["outdir"])
 
     jobiter = t.job(job_order,
                     input_basedir,
@@ -193,9 +191,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     try:
         processobj = loader.resolve_ref(args.workflow)
     except (avro_ld.validate.ValidationException, RuntimeError) as e:
-        _logger.error("Tool definition failed validation:\n%s" % e)
-        if args.debug:
-            _logger.exception("")
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
     if args.print_pre:
@@ -205,9 +201,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     try:
         loader.validate_links(processobj)
     except (avro_ld.validate.ValidationException) as e:
-        _logger.error("Tool definition failed validation:\n%s" % e)
-        if args.debug:
-            _logger.exception()
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
     if args.job_order:
@@ -221,12 +215,12 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     try:
         t = makeTool(processobj, strict=args.strict, makeTool=makeTool)
     except (avro_ld.validate.ValidationException) as e:
-        _logger.error("Tool definition failed validation:\n%s" % e)
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         if args.debug:
             _logger.exception("")
         return 1
     except (RuntimeError, workflow.WorkflowException) as e:
-        _logger.error(e)
+        _logger.error("Tool definition failed initialization:\n%s", e, exc_info=(e if args.debug else False))
         if args.debug:
             _logger.exception()
         return 1
@@ -277,14 +271,10 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         # This is the workflow output, it needs to be written
         sys.stdout.write(json.dumps(out, indent=4))
     except (validate.ValidationException) as e:
-        _logger.error("Input object failed validation:\n%s" % e)
-        if args.debug:
-            _logger.exception("")
+        _logger.error("Input object failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
     except workflow.WorkflowException as e:
-        _logger.error("Workflow error:\n  %s" % e)
-        if args.debug:
-            _logger.exception("")
+        _logger.error("Workflow error:\n  %s", e, exc_info=(e if args.debug else False))
         return 1
 
     return 0

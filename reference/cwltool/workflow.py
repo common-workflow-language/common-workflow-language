@@ -1,7 +1,7 @@
 import job
 import draft2tool
 from aslist import aslist
-from process import Process, WorkflowException, get_feature
+from process import Process, WorkflowException, get_feature, empty_subtree
 import copy
 import logging
 import random
@@ -14,6 +14,7 @@ import urlparse
 import pprint
 import tempfile
 import shutil
+import json
 
 _logger = logging.getLogger("cwltool")
 
@@ -30,11 +31,13 @@ def defaultMakeTool(toolpath_object, **kwargs):
 
     raise WorkflowException("Missing or invalid 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
 
-def findfiles(wo, fn=[]):
+def findfiles(wo, fn=None):
+    if fn is None:
+        fn = []
     if isinstance(wo, dict):
         if wo.get("class") == "File":
             fn.append(wo)
-            return findfiles(wo.get("secondaryFiles", None), fn)
+            findfiles(wo.get("secondaryFiles", None), fn)
         else:
             for w in wo.values():
                 findfiles(w, fn)
@@ -43,18 +46,96 @@ def findfiles(wo, fn=[]):
             findfiles(w, fn)
     return fn
 
-class Workflow(Process):
-    def __init__(self, toolpath_object, **kwargs):
-        super(Workflow, self).__init__(toolpath_object, "Workflow", **kwargs)
 
-        kwargs["requirements"] = self.requirements
-        kwargs["hints"] = self.hints
+def match_types(sinktype, src, iid, inputobj, linkMerge):
+    if isinstance(sinktype, list):
+        # Sink is union type
+        for st in sinktype:
+            if match_types(st, src, iid, inputobj, linkMerge):
+                return True
+    elif isinstance(src.parameter["type"], list):
+        # Source is union type
+        # Check that every source type is compatible with the sink.
+        for st in src.parameter["type"]:
+            srccopy = copy.deepcopy(src)
+            srccopy.parameter["type"] = st
+            if not match_types(st, srccopy, iid, inputobj, linkMerge):
+                return False
+        return True
+    else:
+        is_array = isinstance(sinktype, dict) and sinktype["type"] == "array"
+        if is_array and linkMerge:
+            if iid not in inputobj:
+                inputobj[iid] = []
+            if linkMerge == "merge_nested":
+                inputobj[iid].append(src.value)
+            elif linkMerge == "merge_flattened":
+                if isinstance(src.value, list):
+                    inputobj[iid].extend(src.value)
+                else:
+                    inputobj[iid].append(src.value)
+            else:
+                raise WorkflowException("Unrecognized linkMerge enum '%s'" % linkMerge)
+            return True
+        elif src.parameter["type"] == sinktype:
+            # simply assign the value from state to input
+            inputobj[iid] = copy.deepcopy(src.value)
+            return True
+    return False
 
-        makeTool = kwargs.get("makeTool")
-        self.steps = [WorkflowStep(step, **kwargs) for step in self.tool.get("steps", [])]
+
+def object_from_state(state, parms, frag_only):
+    inputobj = {}
+    for inp in parms:
+        iid = inp["id"]
+        if frag_only:
+            (_, iid) = urlparse.urldefrag(iid)
+            iid = iid.split(".")[-1]
+        if "source" in inp:
+            connections = aslist(inp["source"])
+            for src in connections:
+                if src in state and state[src] is not None:
+                    if not match_types(inp["type"], state[src], iid, inputobj,
+                                            inp.get("linkMerge", ("merge_nested" if len(connections) > 1 else None))):
+                        raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, state[src].parameter["type"], inp["id"], inp["type"]))
+                elif src not in state:
+                    raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
+                else:
+                    return None
+        elif "default" in inp:
+            inputobj[iid] = inp["default"]
+        else:
+            raise WorkflowException("Value for %s not specified" % (inp["id"]))
+    return inputobj
+
+
+class WorkflowJobStep(object):
+    def __init__(self, step):
+        self.step = step
+        self.tool = step.tool
+        self.id = step.id
+        self.submitted = False
+        self.completed = False
+
+    def job(self, joborder, basedir, output_callback, **kwargs):
+        kwargs["part_of"] = "step %s" % id(self)
+        for j in self.step.job(joborder, basedir, output_callback, **kwargs):
+            yield j
+
+class WorkflowJob(object):
+    def __init__(self, workflow, **kwargs):
+        self.tool = workflow.tool
+        self.steps = [WorkflowJobStep(s) for s in workflow.steps]
+        self.id = workflow.tool["id"]
+        if "outdir" in kwargs:
+            self.outdir = kwargs["outdir"]
+        else:
+            self.outdir = tempfile.mkdtemp()
+
+        _logger.debug("[workflow %s] initialized from %s", id(self), self.tool["id"])
 
     def receive_output(self, step, outputparms, jobout, processStatus):
-        _logger.debug("WorkflowStep completed with %s", jobout)
+        _logger.debug("[workflow %s] step %s completed", id(self), id(step))
         for i in outputparms:
             if "id" in i:
                 if i["id"] in jobout:
@@ -74,110 +155,24 @@ class Workflow(Process):
 
         step.completed = True
 
-    def match_types(self, sinktype, src, iid, inputobj, linkMerge):
-        if isinstance(sinktype, list):
-            # Sink is union type
-            for st in sinktype:
-                if self.match_types(st, src, iid, inputobj, linkMerge):
-                    return True
-        elif isinstance(src.parameter["type"], list):
-            # Source is union type
-            # Check that every source type is compatible with the sink.
-            for st in src.parameter["type"]:
-                srccopy = copy.deepcopy(src)
-                srccopy.parameter["type"] = st
-                if not self.match_types(st, srccopy, iid, inputobj, linkMerge):
-                    return False
-            return True
-        else:
-            is_array = isinstance(sinktype, dict) and sinktype["type"] == "array"
-            if is_array and linkMerge:
-                if iid not in inputobj:
-                    inputobj[iid] = []
-                if linkMerge == "merge_nested":
-                    inputobj[iid].append(src.value)
-                elif linkMerge == "merge_flattened":
-                    if isinstance(src.value, list):
-                        inputobj[iid].extend(src.value)
-                    else:
-                        inputobj[iid].append(src.value)
-                else:
-                    raise WorkflowException("Unrecognized linkMerge enum '%s'" % linkMerge)
-                return True
-            elif src.parameter["type"] == sinktype:
-                # simply assign the value from state to input
-                inputobj[iid] = copy.deepcopy(src.value)
-                return True
-        return False
-
-    def object_from_state(self, parms, frag_only):
-        inputobj = {}
-        for inp in parms:
-            iid = inp["id"]
-            if frag_only:
-                (_, iid) = urlparse.urldefrag(iid)
-                iid = iid.split(".")[-1]
-            if "source" in inp:
-                connections = aslist(inp["source"])
-                for src in connections:
-                    if src in self.state and self.state[src] is not None:
-                        if not self.match_types(inp["type"], self.state[src], iid, inputobj,
-                                                inp.get("linkMerge", ("merge_nested" if len(connections) > 1 else None))):
-                            raise WorkflowException("Type mismatch between source '%s' (%s) and sink '%s' (%s)" % (src, self.state[src].parameter["type"], inp["id"], inp["type"]))
-                    elif src not in self.state:
-                        raise WorkflowException("Connect source '%s' on parameter '%s' does not exist" % (src, inp["id"]))
-                    else:
-                        return None
-            elif "default" in inp:
-                inputobj[iid] = inp["default"]
-            else:
-                raise WorkflowException("Value for %s not specified" % (inp["id"]))
-        return inputobj
-
-    def adjust_for_scatter(self, steps):
-        (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
-        for step in steps:
-            if scatterSpec and "scatter" in step.tool:
-                inputparms = copy.deepcopy(step.tool["inputs"])
-                outputparms = copy.deepcopy(step.tool["outputs"])
-                scatter = aslist(step.tool["scatter"])
-
-                inp_map = {i["id"]: i for i in inputparms}
-                for s in scatter:
-                    if s not in inp_map:
-                        raise WorkflowException("Invalid Scatter parameter '%s'" % s)
-
-                    inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
-
-                if step.tool.get("scatterMethod") == "nested_crossproduct":
-                    nesting = len(scatter)
-                else:
-                    nesting = 1
-
-                for r in xrange(0, nesting):
-                    for i in outputparms:
-                        i["type"] = {"type": "array", "items": i["type"]}
-                step.tool["inputs"] = inputparms
-                step.tool["outputs"] = outputparms
-
     def try_make_job(self, step, basedir, **kwargs):
-        _logger.debug("Try to make job %s", step.id)
-
         inputparms = step.tool["inputs"]
         outputparms = step.tool["outputs"]
 
         try:
-            inputobj = self.object_from_state(inputparms, False)
+            inputobj = object_from_state(self.state, inputparms, False)
             if inputobj is None:
+                _logger.debug("[workflow %s] job step %s not ready", id(self), step.id)
                 return
+
+            _logger.debug("[step %s] starting job step %s of workflow %s", id(step), step.id, id(self))
 
             if step.submitted:
                 return
 
             callback = functools.partial(self.receive_output, step, outputparms)
 
-            (scatterSpec, _) = self.get_requirement("ScatterFeatureRequirement")
-            if scatterSpec and "scatter" in step.tool:
+            if "scatter" in step.tool:
                 scatter = aslist(step.tool["scatter"])
                 method = step.tool.get("scatterMethod")
                 if method is None and len(scatter) != 1:
@@ -197,21 +192,20 @@ class Workflow(Process):
             for j in jobs:
                 yield j
         except Exception as e:
-            _logger.error(e)
+            _logger.exception("Unhandled exception")
             self.processStatus = "permanentFail"
             step.completed = True
 
+    def run(self, **kwargs):
+        _logger.info("[workflow %s] starting", id(self))
 
-    def job(self, joborder, basedir, output_callback, **kwargs):
-        # Validate job order
-        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
-
-        self.adjust_for_scatter(self.steps)
-
-        random.shuffle(self.steps)
-
+    def job(self, joborder, basedir, output_callback, move_outputs=True, **kwargs):
         self.state = {}
         self.processStatus = "success"
+
+        if "outdir" in kwargs:
+            del kwargs["outdir"]
+
         for i in self.tool["inputs"]:
             (_, iid) = urlparse.urldefrag(i["id"])
             if iid in joborder:
@@ -224,16 +218,8 @@ class Workflow(Process):
         for s in self.steps:
             for out in s.tool["outputs"]:
                 self.state[out["id"]] = None
-            s.submitted = False
-            s.completed = False
 
-        if "outdir" in kwargs:
-            outdir = kwargs["outdir"]
-            del kwargs["outdir"]
-        else:
-            outdir = tempfile.mkdtemp()
-
-        actual_jobs = []
+        output_dirs = set()
 
         completed = 0
         while completed < len(self.steps) and self.processStatus == "success":
@@ -246,51 +232,87 @@ class Workflow(Process):
                     for newjob in self.try_make_job(step, basedir, **kwargs):
                         if newjob:
                             made_progress = True
-                            actual_jobs.append(newjob)
+                            if newjob.outdir:
+                                output_dirs.add(newjob.outdir)
                         yield newjob
             if not made_progress and completed < len(self.steps):
                 yield None
 
-        wo = self.object_from_state(self.tool["outputs"], True)
+        wo = object_from_state(self.state, self.tool["outputs"], True)
 
-        if kwargs.get("move_outputs", True):
+        if move_outputs:
             targets = set()
             conflicts = set()
 
-            for f in findfiles(wo):
-                for a in actual_jobs:
-                    if a.outdir and f["path"].startswith(a.outdir):
+            outfiles = findfiles(wo)
+
+            _logger.info("[workflow %s] staging output is %s", id(self), json.dumps(wo, indent=4))
+            _logger.debug("[workflow %s] outfiles is %s", id(self), json.dumps(outfiles, indent=4))
+            _logger.debug("[workflow %s] output_dirs is %s", id(self), json.dumps(list(output_dirs), indent=4))
+
+            for f in outfiles:
+                for a in output_dirs:
+                    if f["path"].startswith(a):
                         src = f["path"]
-                        dst = os.path.join(outdir, src[len(a.outdir)+1:])
+                        dst = os.path.join(self.outdir, src[len(a)+1:])
                         if dst in targets:
                             conflicts.add(dst)
                         else:
                             targets.add(dst)
 
-            for f in findfiles(wo):
-                for a in actual_jobs:
-                    if a.outdir and f["path"].startswith(a.outdir):
+            for f in outfiles:
+                for a in output_dirs:
+                    if f["path"].startswith(a):
                         src = f["path"]
-                        dst = os.path.join(outdir, src[len(a.outdir)+1:])
+                        dst = os.path.join(self.outdir, src[len(a)+1:])
                         if dst in conflicts:
                             sp = os.path.splitext(dst)
                             dst = "%s-%s%s" % (sp[0], str(random.randint(1, 1000000000)), sp[1])
                         dirname = os.path.dirname(dst)
                         if not os.path.exists(dirname):
                             os.makedirs(dirname)
-                        _logger.info("Moving '%s' to '%s'", src, dst)
+                        _logger.debug("[workflow %s] Moving '%s' to '%s'", id(self), src, dst)
                         shutil.move(src, dst)
                         f["path"] = dst
 
-            for a in actual_jobs:
-                if a.outdir:
-                    _logger.info("Removing intermediate output directory %s", a.outdir)
-                    shutil.rmtree(a.outdir, True)
+            for a in output_dirs:
+                if os.path.exists(a) and empty_subtree(a):
+                    _logger.debug("[workflow %s] Removing intermediate output directory %s", id(self), a)
+                    shutil.rmtree(a, True)
+
+        _logger.info("[workflow %s] outdir is %s", id(self), self.outdir)
 
         output_callback(wo, self.processStatus)
 
-class WorkflowStep(Process):
+
+class Workflow(Process):
     def __init__(self, toolpath_object, **kwargs):
+        super(Workflow, self).__init__(toolpath_object, "Workflow", **kwargs)
+
+        kwargs["requirements"] = self.requirements
+        kwargs["hints"] = self.hints
+
+        makeTool = kwargs.get("makeTool")
+        self.steps = [WorkflowStep(step, n, **kwargs) for n,step in enumerate(self.tool.get("steps", []))]
+        random.shuffle(self.steps)
+
+        # TODO: statically validate data links instead of doing it at runtime.
+
+    def job(self, joborder, basedir, output_callback, **kwargs):
+        # Validate job order
+        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+
+        kwargs["part_of"] = "workflow %s" % (id(self))
+        wj = WorkflowJob(self, **kwargs)
+
+        yield wj
+
+        for w in wj.job(joborder, basedir, output_callback, **kwargs):
+            yield w
+
+
+class WorkflowStep(Process):
+    def __init__(self, toolpath_object, pos, **kwargs):
         try:
             makeTool = kwargs.get("makeTool")
             self.embedded_tool = makeTool(toolpath_object["run"], **kwargs)
@@ -300,7 +322,7 @@ class WorkflowStep(Process):
         if "id" in toolpath_object:
             self.id = toolpath_object["id"]
         else:
-            self.id = "#step_" + str(random.randint(1, 1000000000))
+            self.id = "#step" + str(pos)
 
         for field in ("inputs", "outputs"):
             for i in toolpath_object[field]:
@@ -324,8 +346,39 @@ class WorkflowStep(Process):
             if not feature:
                 raise WorkflowException("Workflow contains embedded workflow but SubworkflowFeatureRequirement not declared")
 
+        if "scatter" in self.tool:
+            (feature, _) = self.get_requirement("ScatterFeatureRequirement")
+            if not feature:
+                raise WorkflowException("Workflow contains scatter but ScatterFeatureRequirement not declared")
+
+            inputparms = copy.deepcopy(self.tool["inputs"])
+            outputparms = copy.deepcopy(self.tool["outputs"])
+            scatter = aslist(self.tool["scatter"])
+
+            method = self.tool.get("scatterMethod")
+            if method is None and len(scatter) != 1:
+                raise WorkflowException("Must specify scatterMethod when scattering over multiple inputs")
+
+            inp_map = {i["id"]: i for i in inputparms}
+            for s in scatter:
+                if s not in inp_map:
+                    raise WorkflowException("Invalid Scatter parameter '%s'" % s)
+
+                inp_map[s]["type"] = {"type": "array", "items": inp_map[s]["type"]}
+
+            if self.tool.get("scatterMethod") == "nested_crossproduct":
+                nesting = len(scatter)
+            else:
+                nesting = 1
+
+            for r in xrange(0, nesting):
+                for i in outputparms:
+                    i["type"] = {"type": "array", "items": i["type"]}
+            self.tool["inputs"] = inputparms
+            self.tool["outputs"] = outputparms
+
     def receive_output(self, output_callback, jobout, processStatus):
-        _logger.debug("WorkflowStep output from run is %s", jobout)
+        #_logger.debug("WorkflowStep output from run is %s", jobout)
         output = {}
         for i in self.tool["outputs"]:
             (_, d) = urlparse.urldefrag(i["id"])
@@ -346,8 +399,6 @@ class WorkflowStep(Process):
 
         kwargs["requirements"] = kwargs.get("requirements", []) + self.tool.get("requirements", [])
         kwargs["hints"] = kwargs.get("hints", []) + self.tool.get("hints", [])
-
-        _logger.info("Creating workflow step %s with input\n%s", self.id, pprint.pformat(joborder))
 
         for t in self.embedded_tool.job(joborder, basedir, functools.partial(self.receive_output, output_callback), **kwargs):
             yield t

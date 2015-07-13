@@ -8,7 +8,7 @@ import logging
 import sys
 import requests
 import docker
-from process import WorkflowException, get_feature
+from process import WorkflowException, get_feature, empty_subtree
 import shutil
 import stat
 
@@ -28,7 +28,8 @@ def deref_links(outputs):
             deref_links(v)
 
 class CommandLineJob(object):
-    def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, **kwargs):
+    def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, move_outputs=True, **kwargs):
+        #_logger.info("[job %s] starting with outdir %s", id(self), self.outdir)
 
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
@@ -45,9 +46,15 @@ class CommandLineJob(object):
             if not os.path.exists(self.pathmapper.mapper(f)[0]):
                 raise WorkflowException("Required input file %s not found" % self.pathmapper.mapper(f)[0])
 
+        img_id = None
         if docker_req and kwargs.get("use_container") is not False:
             env = os.environ
             img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
+
+        if docker_is_req and img_id is None:
+            raise WorkflowException("Docker is required for running this tool.")
+
+        if img_id:
             runtime = ["docker", "run", "-i"]
             for src in self.pathmapper.files():
                 vol = self.pathmapper.mapper(src)
@@ -75,8 +82,8 @@ class CommandLineJob(object):
         stdin = None
         stdout = None
 
-        _logger.info("outdir is %s", self.outdir)
-        _logger.info("%s%s%s",
+        _logger.info("[job %s] exec %s%s%s",
+                     id(self),
                      " ".join(runtime + self.command_line),
                      ' < %s' % (self.stdin) if self.stdin else '',
                      ' > %s' % os.path.join(self.outdir, self.stdout) if self.stdout else '')
@@ -149,8 +156,15 @@ class CommandLineJob(object):
             _logger.exception("Exception while running job")
             processStatus = "permanentFail"
 
+        _logger.info("[job %s] completed %s", id(self), processStatus)
+        _logger.debug("[job %s] %s", id(self), json.dumps(outputs, indent=4))
+
         self.output_callback(outputs, processStatus)
 
         if rm_tmpdir:
-            _logger.info("Removing temporary directory %s", self.tmpdir)
+            _logger.debug("[job %s] Removing temporary directory %s", id(self), self.tmpdir)
             shutil.rmtree(self.tmpdir, True)
+
+        if move_outputs and empty_subtree(self.outdir):
+            _logger.debug("[job %s] Removing empty output directory %s", id(self), self.tmpdir)
+            shutil.rmtree(self.outdir, True)

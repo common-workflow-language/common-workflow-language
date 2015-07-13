@@ -1,82 +1,5 @@
 #!/usr/bin/env cwl-runner
 
-- id: "#makedoc"
-  class: CommandLineTool
-  inputs:
-    - id: "#makedoc_source"
-      type: File
-      inputBinding: {position: 1}
-    - id: "#makedoc_title"
-      type: ["null", string]
-      inputBinding: {position: 2}
-    - id: "#makedoc_target"
-      type: string
-  outputs:
-    - id: "#makedoc_out"
-      type: File
-      outputBinding:
-        glob:
-          engine: "cwl:JsonPointer"
-          script: "job/makedoc_target"
-  baseCommand: [python, "-mcwltool.avro_ld.makedoc"]
-  stdout:
-    engine: "cwl:JsonPointer"
-    script: "job/makedoc_target"
-
-- id: "#makecontext"
-  class: CommandLineTool
-  inputs:
-    - id: "#makecontext_target"
-      type: string
-  outputs:
-    - id: "#makecontext_out"
-      type: File
-      outputBinding:
-        glob:
-          engine: "cwl:JsonPointer"
-          script: "job/makecontext_target"
-  baseCommand: [python, "-mcwltool", "--print-jsonld-context"]
-  stdout:
-    engine: "cwl:JsonPointer"
-    script: "job/makecontext_target"
-
-- id: "#makerdfs"
-  class: CommandLineTool
-  inputs:
-    - id: "#makerdfs_target"
-      type: string
-  outputs:
-    - id: "#makerdfs_out"
-      type: File
-      outputBinding:
-        glob:
-          engine: "cwl:JsonPointer"
-          script: "job/makerdfs_target"
-  baseCommand: [python, "-mcwltool", "--print-rdfs"]
-  stdout:
-    engine: "cwl:JsonPointer"
-    script: "job/makerdfs_target"
-
-
-- id: "#strip_leading_lines"
-  class: CommandLineTool
-  inputs:
-    - id: "#strip_leading_lines_in"
-      type: File
-      inputBinding: {}
-    - id: "#strip_leading_lines_count"
-      type: int
-      inputBinding:
-        prefix: "-n+"
-        separate: false
-  outputs:
-    - id: "#strip_leading_lines_out"
-      type: File
-      outputBinding:
-        glob: "_tail_tmp.txt"
-  baseCommand: ["tail", "-n+3"]
-  stdout: "_tail_tmp.txt"
-
 - id: "#main"
   class: Workflow
   inputs:
@@ -88,63 +11,75 @@
       type: string
     - id: "#main_index_strip_lines"
       type: int
-      default: 4
+      default: 3
 
     - id: "#cwl_schema_in"
-      type: File
+      type: { type: array, items: File }
     - id: "#cwl_schema_target"
-      type: string
+      type: { type: array, items: string }
     - id: "#cwl_context_target"
-      type: string
+      type: { type: array, items: string }
     - id: "#cwl_rdfs_target"
-      type: string
-
+      type: { type: array, items: string }
 
   outputs:
-    - { id: "#draft2_spec", type: File, source: "#spec.makedoc_out" }
-    - { id: "#main_index", type: File, source: "#readme.makedoc_out" }
-    - { id: "#main_context", type: File, source: "#context.makecontext_out" }
-    - { id: "#main_rdfs", type: File, source: "#context.makerdfs_out" }
+    - id: "#main_index"
+      type: File
+      source: "#readme.makedoc_out"
+    - id: "#spec_index"
+      type: { type: array, items: File }
+      source: "#spec.index_out"
+    - id: "#spec_context"
+      type: { type: array, items: File }
+      source: "#spec.context_out"
+    - id: "#spec_rdfs"
+      type: { type: array, items: File }
+      source: "#spec.rdfs_out"
+
+  requirements:
+    - class: ScatterFeatureRequirement
+    - class: SubworkflowFeatureRequirement
 
   hints:
     - class: DockerRequirement
       dockerPull: commonworkflowlanguage/cwltool_module
+
   steps:
-  - id: "#spec"
-    inputs:
-      - { id: "#spec.makedoc_source", source: "#cwl_schema_in" }
-      - { id: "#spec.makedoc_target", source: "#cwl_schema_target" }
-    outputs:
-      - { id: "#spec.makedoc_out" }
-    run: {import: "#makedoc"}
+    - id: "#spec"
+      inputs:
+        - {id: "#spec.schema_in", source: "#cwl_schema_in" }
+        - {id: "#spec.schema_target", source: "#cwl_schema_target" }
+        - {id: "#spec.context_target", source: "#cwl_context_target" }
+        - {id: "#spec.rdfs_target", source: "#cwl_rdfs_target" }
 
-  - id: "#context"
-    inputs:
-      - { id: "#context.makecontext_target", source: "#cwl_context_target"}
-    outputs:
-      - { id: "#context.makecontext_out"}
-    run: {import: "#makecontext"}
+      outputs:
+        - { id: "#spec.index_out" }
+        - { id: "#spec.context_out" }
+        - { id: "#spec.rdfs_out" }
 
-  - id: "#rdfs"
-    inputs:
-      - { id: "#context.makerdfs_target", source: "#cwl_rdfs_target"}
-    outputs:
-      - { id: "#context.makerdfs_out"}
-    run: {import: "#makerdfs"}
+      scatter:
+        - "#spec.schema_in"
+        - "#spec.schema_target"
+        - "#spec.context_target"
+        - "#spec.rdfs_target"
 
-  - id: "#strip_lines"
-    inputs:
-      - { id: "#strip_lines.strip_leading_lines_in", source: "#main_index_in" }
-      - { id: "#strip_lines.strip_leading_lines_count", source: "#main_index_strip_lines" }
-    outputs:
-      - { id: "#strip_lines.strip_leading_lines_out" }
-    run:  {import: "#strip_leading_lines"}
+      scatterMethod: dotproduct
 
-  - id: "#readme"
-    inputs:
-      - { id: "#readme.makedoc_source", source: "#strip_lines.strip_leading_lines_out" }
-      - { id: "#readme.makedoc_target", source: "#main_index_target" }
-      - { id: "#readme.makedoc_title", source: "#main_title" }
-    outputs:
-      - { id: "#readme.makedoc_out" }
-    run:  {import: "#makedoc"}
+      run: {import: "makespec.cwl"}
+
+    - id: "#strip_lines"
+      inputs:
+        - { id: "#strip_lines.strip_leading_lines_in", source: "#main_index_in" }
+        - { id: "#strip_lines.strip_leading_lines_count", source: "#main_index_strip_lines" }
+      outputs:
+        - { id: "#strip_lines.strip_leading_lines_out" }
+      run:  {import: "strip.cwl"}
+
+    - id: "#readme"
+      inputs:
+        - { id: "#readme.makedoc_source", source: "#strip_lines.strip_leading_lines_out" }
+        - { id: "#readme.makedoc_target", source: "#main_index_target" }
+        - { id: "#readme.makedoc_title", source: "#main_title" }
+      outputs:
+        - { id: "#readme.makedoc_out" }
+      run:  {import: "makedoc.cwl"}
