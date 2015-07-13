@@ -150,6 +150,10 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     args = parser.parse_args(args)
 
+    if args.quiet:
+        _logger.setLevel(logging.WARN)
+    if args.debug:
+        _logger.setLevel(logging.DEBUG)
 
     pkg = pkg_resources.require("cwltool")
     if pkg:
@@ -158,11 +162,6 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             return 0
         else:
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
-
-    if args.quiet:
-        logging.getLogger("cwltool").setLevel(logging.WARN)
-    if args.debug:
-        logging.getLogger("cwltool").setLevel(logging.DEBUG)
 
     (j, names) = process.get_schema()
     (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)

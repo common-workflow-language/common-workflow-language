@@ -65,7 +65,7 @@ def run_test(i, t):
             else:
                 outdir = tempfile.mkdtemp()
             test_command.extend(["--outdir={}".format(outdir),
-                                 "--strict",
+                                 "--quiet",
                                  t["tool"],
                                  t["job"]])
             outstr = subprocess.check_output(test_command)
@@ -75,16 +75,11 @@ def run_test(i, t):
                             "--conformance-test",
                             "--basedir=" + args.basedir,
                             "--no-container",
-                            "--strict",
+                            "--quiet",
                             t["tool"],
                             t["job"]]
 
-            outstr = subprocess.check_output([args.tool,
-                                              "--conformance-test",
-                                              "--basedir=" + args.basedir,
-                                              "--no-container",
-                                              t["tool"],
-                                              t["job"]])
+            outstr = subprocess.check_output(test_command)
             out = yaml.load(outstr)
     except ValueError as v:
         print v

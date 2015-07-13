@@ -330,7 +330,7 @@ class CommandLineTool(Tool):
 
         _logger.debug("[job %s] initializing from %s%s",
                      id(j),
-                     self.tool["id"],
+                     self.tool.get("id", ""),
                      " as part of %s" % kwargs["part_of"] if "part_of" in kwargs else "")
         _logger.debug("[job %s] %s", id(j), json.dumps(joborder, indent=4))
 
