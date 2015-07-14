@@ -44,7 +44,7 @@ runtest() {
     echo "--- Running conformance test $DRAFT on $1 ---"
 
     runs=$((runs+1))
-    ./conformance_test.py --test conformance_test_$DRAFT.yaml $TEST_N --basedir $DRAFT $1
+    ../reference/cwltool/cwltest.py --tool $1 --test=conformance_test_$DRAFT.yaml $TEST_N --basedir $DRAFT
     checkexit
 }
 

@@ -39,7 +39,7 @@ setup(name='cwltool',
       test_suite='tests',
       tests_require=[],
       entry_points={
-          'console_scripts': [ "cwltool=cwltool.main:main" ]
+          'console_scripts': [ "cwltool=cwltool.main:main", "cwltest=cwltool.cwltest:main" ]
       },
       zip_safe=True,
       cmdclass={'egg_info': tagger},

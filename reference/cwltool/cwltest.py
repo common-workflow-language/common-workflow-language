@@ -9,19 +9,11 @@ import shutil
 import tempfile
 import yaml
 import pipes
+import logging
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--test", type=str)
-parser.add_argument("--basedir", type=str)
-parser.add_argument("-n", type=int, default=None)
-parser.add_argument("tool", type=str)
-args = parser.parse_args()
-
-module_dir = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(module_dir, args.test)) as f:
-    tests = yaml.load(f)
-
-failures = 0
+_logger = logging.getLogger("cwltool")
+_logger.addHandler(logging.StreamHandler())
+_logger.setLevel(logging.INFO)
 
 def compare(a, b):
     try:
@@ -53,10 +45,7 @@ def compare(a, b):
     except:
         return False
 
-def run_test(i, t):
-    global failures
-    sys.stdout.write("\rTest [%i/%i] " % (i+1, len(tests)))
-    sys.stdout.flush()
+def run_test(args, i, t):
     out = {}
     outdir = None
     try:
@@ -86,18 +75,17 @@ def run_test(i, t):
             outstr = subprocess.check_output(test_command)
             out = yaml.load(outstr)
     except ValueError as v:
-        print v
-        print outstr
+        _logger.error(v)
+        _logger.error(outstr)
     except subprocess.CalledProcessError:
-        print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
-        print t.get("doc")
-        print "Returned non-zero"
-        failures += 1
-        return
+        _logger.error("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
+        _logger.error(t.get("doc"))
+        _logger.error("Returned non-zero")
+        return 1
     except yaml.scanner.ScannerError as e:
-        print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
-        print outstr
-        print "Parse error " + str(e)
+        _logger.error("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
+        _logger.error(outstr)
+        _logger.error("Parse error %s", str(e))
 
     pwd = os.path.abspath(os.path.dirname(t["job"]))
     # t["args"] = map(lambda x: x.replace("$PWD", pwd), t["args"])
@@ -113,26 +101,54 @@ def run_test(i, t):
     for key in checkkeys:
         if not compare(t.get(key), out.get(key)):
             if not failed:
-                print """Test failed: %s""" % " ".join([pipes.quote(tc) for tc in test_command])
-                print t.get("doc")
+                _logger.warn("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
+                _logger.warn(t.get("doc"))
                 failed = True
-            print "%s expected %s\n%s      got %s" % (key, t.get(key), " " * len(key), out.get(key))
-    if failed:
-        failures += 1
+            _logger.warn("%s expected %s\n%s      got %s", (key, t.get(key), " " * len(key), out.get(key)))
 
     if outdir:
         shutil.rmtree(outdir)
 
-if __name__ == "__main__":
+    if failed:
+        return 1
+    else:
+        return 0
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--test", type=str, help="YAML file describing test cases", required=True)
+    parser.add_argument("--basedir", type=str, help="Basedir to use for tests", default=".")
+    parser.add_argument("-n", type=int, default=None, help="Run a specific test")
+    parser.add_argument("--tool", type=str, default="cwl-runner",
+                        help="CWL runner executable to use (default 'cwl-runner'")
+    args = parser.parse_args()
+
+    if not args.test:
+        parser.print_help()
+        return 1
+
+    with open(args.test) as f:
+        tests = yaml.load(f)
+
+    failures = 0
+
     if args.n is not None:
-        run_test(args.n-1, tests[args.n-1])
+        sys.stderr.write("\rTest [%i/%i] " % (args.n, len(tests)))
+        failures += run_test(args, args.n-1, tests[args.n-1])
     else:
         for i, t in enumerate(tests):
-            run_test(i, t)
+            sys.stderr.write("\rTest [%i/%i] " % (i+1, len(tests)))
+            sys.stderr.flush()
+            failures += run_test(args, i, t)
 
     if failures == 0:
-        print "All tests passed"
-        sys.exit(0)
+         _logger.info("All tests passed")
+         return 0
     else:
-        print "%i failures" % failures
-        sys.exit(1)
+        _logger.warn("%i failures", failures)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
