@@ -60,7 +60,7 @@ class Builder(object):
             for t in schema["type"]:
                 if isinstance(t, basestring) and self.names.has_name(t, ""):
                     avsc = self.names.get_name(t, "")
-                elif isinstance(t, dict) and self.names.has_name(t["name"], ""):
+                elif isinstance(t, dict) and "name" in t and self.names.has_name(t["name"], ""):
                     avsc = self.names.get_name(t["name"], "")
                 else:
                     avsc = avro.schema.make_avsc_object(t, self.names)
