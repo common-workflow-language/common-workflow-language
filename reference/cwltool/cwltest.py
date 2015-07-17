@@ -104,7 +104,10 @@ def run_test(args, i, t):
                 _logger.warn("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
                 _logger.warn(t.get("doc"))
                 failed = True
-            _logger.warn("%s expected %s\n%s      got %s", (key, t.get(key), " " * len(key), out.get(key)))
+            _logger.warn("%s expected %s\n%s      got %s", key,
+                                                            t.get(key),
+                                                            " " * len(key),
+                                                            out.get(key))
 
     if outdir:
         shutil.rmtree(outdir)
