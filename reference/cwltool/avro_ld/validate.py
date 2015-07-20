@@ -139,8 +139,13 @@ def validate_ex(expected_schema, datum, strict=False):
 
         errors = []
         for f in expected_schema.fields:
+            if f.name in datum:
+                fieldval = datum[f.name]
+            else:
+                fieldval = f.default
+
             try:
-                validate_ex(f.type, datum.get(f.name), strict=strict)
+                validate_ex(f.type, fieldval, strict=strict)
             except ValidationException as v:
                 if f.name not in datum:
                     errors.append("missing required field `%s`" % f.name)
