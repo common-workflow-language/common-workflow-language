@@ -69,9 +69,14 @@ class CommandLineJob(object):
             euid = os.geteuid()
             try:
                 # If running under boot2docker, use the user's uid inside the vm
-                docker_uid = subprocess.check_output(["boot2docker","ssh", "id", "-u"]).strip()
-                if len(docker_uid) > 0: euid = docker_uid
-            except:
+                docker_uid = subprocess.check_output(["boot2docker","ssh", "id", "-u"])
+                if len(docker_uid) > 0:
+                    euid = str(int(docker_uid))
+            except (OSError, subprocess.CalledProcessError, TypeError, ValueError):
+                # OSError is raised if boot2docker doesn't exist
+                # CalledProcessError is raised if boot2docker returns nonzero
+                # TypeError is raised if docker_uid has no len()
+                # ValueError is raised if str/int conversion fails
                 pass
 
             runtime.append("--user=%s" % (euid))
