@@ -25,8 +25,6 @@ _logger.setLevel(logging.INFO)
 
 def arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("workflow", type=str, nargs="?", default=None)
-    parser.add_argument("job_order", type=str, nargs="?", default=None)
     parser.add_argument("--conformance-test", action="store_true")
     parser.add_argument("--basedir", type=str)
     parser.add_argument("--outdir", type=str, default=os.path.abspath('.'),
@@ -103,6 +101,9 @@ def arg_parser():
     exgroup.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
     exgroup.add_argument("--debug", action="store_true", help="Print even more logging")
 
+    parser.add_argument("workflow", type=str, nargs="?", default=None)
+    parser.add_argument("job_order", nargs=argparse.REMAINDER)
+
     return parser
 
 def single_job_executor(t, job_order, input_basedir, args, **kwargs):
@@ -138,11 +139,14 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
             a["createfiles"] = job.generatefiles
         return a
     else:
-        for r in jobiter:
-            if r:
-                r.run(**kwargs)
-            else:
-                raise workflow.WorkflowException("Workflow cannot make any more progress.")
+        try:
+            for r in jobiter:
+                if r:
+                    r.run(**kwargs)
+                else:
+                    raise workflow.WorkflowException("Workflow cannot make any more progress.")
+        except Exception as e:
+            raise workflow.WorkflowException("%s" % e)
 
         return final_output[0]
 
@@ -155,6 +159,24 @@ def create_loader(ctx):
     loader.url_fields = url_fields
     loader.idx["cwl:JsonPointer"] = {}
     return loader
+
+class FileAction(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(FileAction, self).__init__(option_strings, dest, **kwargs)
+    def __call__(self, parser, namespace, values, option_string=None):
+        #print '%r %r %r' % (namespace, values, option_string)
+        setattr(namespace, self.dest, {"class": "File", "path": values})
+
+def generate_parser(toolparser, tool):
+    for inp in tool.tool["inputs"]:
+        (_, name) = urlparse.urldefrag(inp["id"])
+        if inp["type"] == "File":
+            toolparser.add_argument("--" + name, action=FileAction)
+        else:
+            toolparser.add_argument("--" + name)
+    return toolparser
 
 def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeTool, parser=None):
     if args is None:
@@ -224,11 +246,6 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
-    if args.job_order:
-        input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(args.job_order))
-    else:
-        input_basedir = args.basedir
-
     if isinstance(processobj, list):
         processobj = loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
@@ -253,12 +270,6 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         printdot(args.workflow, processobj, ctx, args.rdf_serializer)
         return 0
 
-    if not args.job_order:
-        parser.print_help()
-        _logger.error("")
-        _logger.error("Input object required")
-        return 1
-
     if args.tmp_outdir_prefix != 'tmp':
         # Use user defined temp directory (if it exists)
         args.tmp_outdir_prefix = os.path.abspath(args.tmp_outdir_prefix)
@@ -273,8 +284,34 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             _logger.error("Temporary directory prefix doesn't exist.")
             return 1
 
+    if len(args.job_order) == 1 and args.job_order[0] != "-":
+        job_order_file = args.job_order[0]
+    else:
+        job_order_file = None
+
+    if job_order_file:
+        input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(job_order_file))
+        job_order_object = loader.resolve_ref(job_order_file)
+        toolparser = None
+    else:
+        input_basedir = args.basedir if args.basedir else "."
+        toolparser = generate_parser(argparse.ArgumentParser(), t)
+        job_order_object = vars(toolparser.parse_args(args.job_order))
+        print job_order_object
+
+
+
+    if not job_order_object:
+        parser.print_help()
+        if toolparser:
+            print "\nOptions for %s " % args.workflow
+            toolparser.print_help()
+        _logger.error("")
+        _logger.error("Input object required")
+        return 1
+
     try:
-        out = executor(t, loader.resolve_ref(args.job_order),
+        out = executor(t, job_order_object,
                        input_basedir, args,
                        conformance_test=args.conformance_test,
                        dry_run=args.dry_run,
