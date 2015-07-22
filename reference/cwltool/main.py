@@ -36,11 +36,12 @@ def arg_parser():
                         help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool",
                         dest="use_container")
 
-    parser.add_argument("--rm-container", action="store_true", default=True,
+    exgroup = parser.add_mutually_exclusive_group()
+    exgroup.add_argument("--rm-container", action="store_true", default=True,
                         help="Delete Docker container used by jobs after they exit (default)",
                         dest="rm_container")
 
-    parser.add_argument("--leave-container", action="store_false",
+    exgroup.add_argument("--leave-container", action="store_false",
                         default=True, help="Do not delete Docker container used by jobs after they exit",
                         dest="rm_container")
 
@@ -52,50 +53,55 @@ def arg_parser():
                         help="Path prefix for intermediate output directories",
                         default="tmp")
 
-    parser.add_argument("--rm-tmpdir", action="store_true", default=True,
+    exgroup = parser.add_mutually_exclusive_group()
+    exgroup.add_argument("--rm-tmpdir", action="store_true", default=True,
                         help="Delete intermediate temporary directories (default)",
                         dest="rm_tmpdir")
 
-    parser.add_argument("--leave-tmpdir", action="store_false",
+    exgroup.add_argument("--leave-tmpdir", action="store_false",
                         default=True, help="Do not delete intermediate temporary directories",
                         dest="rm_tmpdir")
 
-    parser.add_argument("--move-outputs", action="store_true", default=True,
+    exgroup = parser.add_mutually_exclusive_group()
+    exgroup.add_argument("--move-outputs", action="store_true", default=True,
                         help="Move output files to the workflow output directory and delete intermediate output directories (default).",
                         dest="move_outputs")
 
-    parser.add_argument("--leave-outputs", action="store_false", default=True,
+    exgroup.add_argument("--leave-outputs", action="store_false", default=True,
                         help="Leave output files in intermediate output directories.",
                         dest="move_outputs")
 
-    parser.add_argument("--enable-pull", default=True, action="store_true",
+    exgroup = parser.add_mutually_exclusive_group()
+    exgroup.add_argument("--enable-pull", default=True, action="store_true",
                         help="Try to pull Docker images", dest="enable_pull")
 
-    parser.add_argument("--disable-pull", default=True, action="store_false",
+    exgroup.add_argument("--disable-pull", default=True, action="store_false",
                         help="Do not try to pull Docker images", dest="enable_pull")
 
     parser.add_argument("--dry-run", action="store_true",
                         help="Load and validate but do not execute")
 
-    parser.add_argument("--print-rdf", action="store_true",
-                        help="Print corresponding RDF graph for workflow and exit")
-
     parser.add_argument("--rdf-serializer",
                         help="Output RDF serialization format used by --print-rdf (one of turtle (default), n3, nt, xml)",
                         default="turtle")
 
-    parser.add_argument("--print-spec", action="store_true", help="Print HTML specification document and exit")
-    parser.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file and exit")
-    parser.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file and exit")
-    parser.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
-    parser.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
-    parser.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
+    exgroup = parser.add_mutually_exclusive_group()
+    parser.add_argument("--print-rdf", action="store_true",
+                        help="Print corresponding RDF graph for workflow and exit")
+    exgroup.add_argument("--print-spec", action="store_true", help="Print HTML specification document and exit")
+    exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file and exit")
+    exgroup.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file and exit")
+    exgroup.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
+    exgroup.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
+    exgroup.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
+    exgroup.add_argument("--version", action="store_true", help="Print version and exit")
+
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
 
-    parser.add_argument("--verbose", action="store_true", help="Default logging")
-    parser.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
-    parser.add_argument("--debug", action="store_true", help="Print even more logging")
-    parser.add_argument("--version", action="store_true", help="Print version and exit")
+    exgroup = parser.add_mutually_exclusive_group()
+    exgroup.add_argument("--verbose", action="store_true", help="Default logging")
+    exgroup.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
+    exgroup.add_argument("--debug", action="store_true", help="Print even more logging")
 
     return parser
 
