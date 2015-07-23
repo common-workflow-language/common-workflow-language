@@ -1,0 +1,159 @@
+- name: "Schema Annotations for Linked Avro Data"
+  type: doc
+  doc: |
+    Work in progress.
+  jsonldPrefixes: {
+    "salad": "https://w3id.org/cwl/salad#",
+    "avro": "https://w3id.org/cwl/avro#",
+    "dct": "http://purl.org/dc/terms/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  }
+  jsonldVocab: salad
+
+- name: Datatype
+  type: enum
+  symbols:
+    - "null"
+    - boolean
+    - int
+    - long
+    - float
+    - double
+    - bytes
+    - string
+    - record
+    - enum
+    - array
+    - map
+    - doc
+    - Any
+  jsonldPrefix: avro
+  jsonldPredicate:
+    - symbol: Any
+      predicate: "cwl:Any"
+  doc: |
+   Salad data types are based on Avro schema declarations.  Refer to the [Avro
+   schema declaration
+   documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
+   detailed information.
+
+   ## Primitive types
+
+   * **null**: no value
+   * **boolean**: a binary value
+   * **int**: 32-bit signed integer
+   * **long**: 64-bit signed integer
+   * **float**: single precision (32-bit) IEEE 754 floating-point number
+   * **double**: double precision (64-bit) IEEE 754 floating-point number
+   * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
+   * **string**: Unicode character sequence
+
+   ## Complex types
+
+   * **record**: An object with one or more fields defined by name and type
+   * **enum**: A value from a finite set of symbolic values
+   * **array**: An ordered sequence of values
+   * **map**: An unordered collection of key/value pairs
+
+   ## Any type
+
+   See [Any](#any) below.
+
+
+- name: Any
+  type: enum
+  docParent: Datatype
+  symbols: ["Any"]
+  doc: |
+    The **Any** type validates for any non-null value.
+
+
+- name: Schema
+  type: record
+  doc: "A schema defines an object type."
+  fields:
+    - name: name
+      type: string
+
+    - name: type
+      doc: "The data type of this object."
+      type:
+        - "Datatype"
+        - "Schema"
+        - "string"
+        - type: "array"
+          items: [ "Datatype", "Schema", "string" ]
+      jsonldPredicate:
+        "@id": "avro:type"
+        "@type": "@vocab"
+
+    - name: fields
+      type:
+        - "null"
+        - type: "array"
+          items: "Schema"
+      jsonldPredicate:
+        "@id": "avro:fields"
+        "@container": "@list"
+      doc: "When `type` is `record`, defines the fields of the record."
+
+    - name: "symbols"
+      type:
+        - "null"
+        - type: "array"
+          items: "string"
+      jsonldPredicate:
+        "@id": "avro:symbols"
+        "@container": "@list"
+      doc: "When `type` is `enum`, defines the set of valid symbols."
+
+    - name: items
+      type:
+        - "null"
+        - "Datatype"
+        - "Schema"
+        - "string"
+        - type: "array"
+          items: [ "Datatype", "Schema", "string" ]
+      jsonldPredicate:
+        "@id": "avro:items"
+        "@container": "@list"
+      doc: "When `type` is `array`, defines the type of the array elements."
+
+    - name: values
+      type:
+        - "null"
+        - Datatype
+        - Schema
+        - string
+        - type: array
+          items: [ Datatype, Schema, string ]
+      jsonldPredicate:
+        "@id": "avro:values"
+        "@container": "@list"
+      doc: "When `type` is `map`, defines the value type for the key/value pairs."
+
+    - name: doc
+      type: ["null", string]
+
+    - name: docParent
+      type: ["null", string]
+
+    - name: docAfter
+      type: ["null", string]
+
+    - name: jsonldPrefixes
+      type: ["null", map]
+
+    - name: jsonldVocab
+      type: ["null", string]
+
+    - name: jsonldPredicate
+      type: ["null", Any]
+
+    - name: extends
+      type: ["null", string]
+
+    - name: specialize
+      type: ["null", map]
