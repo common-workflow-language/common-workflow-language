@@ -156,6 +156,15 @@ class CommandLineJob(object):
 
             outputs = self.collect_outputs(self.outdir)
 
+        except OSError as e:
+            if e.errno == 2:
+                if runtime:
+                    _logger.error("'%s' not found", runtime[0])
+                else:
+                    _logger.error("'%s' not found", self.command_line[0])
+            else:
+                _logger.exception("Exception while running job")
+            processStatus = "permanentFail"
         except Exception as e:
             _logger.exception("Exception while running job")
             processStatus = "permanentFail"

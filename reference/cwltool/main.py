@@ -101,6 +101,8 @@ def arg_parser():
     exgroup.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
     exgroup.add_argument("--debug", action="store_true", help="Print even more logging")
 
+    parser.add_argument("--tool-help", action="store_true", help="Print command line help for tool")
+
     parser.add_argument("workflow", type=str, nargs="?", default=None)
     parser.add_argument("job_order", nargs=argparse.REMAINDER)
 
@@ -166,16 +168,72 @@ class FileAction(argparse.Action):
             raise ValueError("nargs not allowed")
         super(FileAction, self).__init__(option_strings, dest, **kwargs)
     def __call__(self, parser, namespace, values, option_string=None):
-        #print '%r %r %r' % (namespace, values, option_string)
         setattr(namespace, self.dest, {"class": "File", "path": values})
 
-def generate_parser(toolparser, tool):
+class FileAppendAction(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(FileAppendAction, self).__init__(option_strings, dest, **kwargs)
+    def __call__(self, parser, namespace, values, option_string=None):
+        g = getattr(namespace, self.dest)
+        if not g:
+            g = []
+            setattr(namespace, self.dest, g)
+        g.append({"class": "File", "path": values})
+
+def generate_parser(toolparser, tool, namemap):
     for inp in tool.tool["inputs"]:
         (_, name) = urlparse.urldefrag(inp["id"])
-        if inp["type"] == "File":
-            toolparser.add_argument("--" + name, action=FileAction)
+        if len(name) == 1:
+            flag = "-"
         else:
-            toolparser.add_argument("--" + name)
+            flag = "--"
+
+        namemap[name.replace("-", "_")] = name
+
+        inptype = inp["type"]
+
+        required = True
+        if isinstance(inptype, list):
+            if inptype[0] == "null":
+                required = False
+                if len(inptype) == 2:
+                    inptype = inptype[1]
+                else:
+                    _logger.debug("Can't make command line argument from %s", inptype)
+                    return None
+
+        help = inp.get("description", "").replace("%", "%%")
+        kwargs = {}
+
+        if inptype == "File":
+            kwargs["action"] = FileAction
+        elif isinstance(inptype, dict) and inptype["type"] == "array":
+            if inptype["items"] == "File":
+                kwargs["action"] = FileAppendAction
+            else:
+                kwargs["action"] = "append"
+
+        if inptype == "string":
+            kwargs["type"] = str
+        elif inptype == "int":
+            kwargs["type"] = int
+        elif inptype == "float":
+            kwargs["type"] = float
+        elif inptype == "boolean":
+            kwargs["action"] = "store_true"
+
+        if "default" in inp:
+            kwargs["default"] = inp["default"]
+            required = False
+
+        if "type" not in kwargs and "action" not in kwargs:
+            _logger.debug("Can't make command line argument from %s", inptype)
+            return None
+
+        toolparser.add_argument(flag + name, required=required, help=help, **kwargs)
+
     return toolparser
 
 def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeTool, parser=None):
@@ -284,7 +342,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             _logger.error("Temporary directory prefix doesn't exist.")
             return 1
 
-    if len(args.job_order) == 1 and args.job_order[0] != "-":
+    if len(args.job_order) == 1 and args.job_order[0][0] != "-":
         job_order_file = args.job_order[0]
     else:
         job_order_file = None
@@ -295,11 +353,17 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         toolparser = None
     else:
         input_basedir = args.basedir if args.basedir else "."
-        toolparser = generate_parser(argparse.ArgumentParser(), t)
-        job_order_object = vars(toolparser.parse_args(args.job_order))
-        print job_order_object
-
-
+        namemap = {}
+        toolparser = generate_parser(argparse.ArgumentParser(prog=args.workflow), t, namemap)
+        if toolparser:
+            if args.tool_help:
+                toolparser.print_help()
+                return 0
+            job_order_object = vars(toolparser.parse_args(args.job_order))
+            job_order_object = {namemap[k]: v for k,v in job_order_object.items()}
+            _logger.debug("Parsed job order from command line: %s", job_order_object)
+        else:
+            job_order_object = None
 
     if not job_order_object:
         parser.print_help()
