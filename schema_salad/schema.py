@@ -3,6 +3,18 @@ import copy
 from  makedoc import add_dictlist
 import sys
 import pprint
+from pkg_resources import resource_stream
+import yaml
+import avro.schema
+import validate
+
+def get_metaschema():
+    f = resource_stream(__name__, 'metaschema.yml')
+    j = yaml.load(f)
+    sch = schema(j)
+    for item in j:
+        validate.validate_ex(sch.get_name("Schema", ""), item, strict=True)
+    return (j, sch)
 
 def replace_type(items, spec):
     if isinstance(items, dict):

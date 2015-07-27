@@ -2,13 +2,12 @@
   type: doc
   doc: |
     Work in progress.
-  jsonldPrefixes: {
-    "salad": "https://w3id.org/cwl/salad#",
-    "avro": "https://w3id.org/cwl/avro#",
-    "dct": "http://purl.org/dc/terms/",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
-  }
+  jsonldPrefixes:
+    - { prefix: salad, namespace: "https://w3id.org/cwl/salad#" }
+    - { prefix: avro,  namespace: "https://w3id.org/cwl/avro#" }
+    - { prefix: dct,   namespace: "http://purl.org/dc/terms/" }
+    - { prefix: rdf,   namespace: "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
+    - { prefix: rdfs,  namespace: "http://www.w3.org/2000/01/rdf-schema#" }
   jsonldVocab: salad
 
 - name: Datatype
@@ -25,7 +24,6 @@
     - record
     - enum
     - array
-    - map
     - doc
     - Any
   jsonldPrefix: avro
@@ -54,7 +52,6 @@
    * **record**: An object with one or more fields defined by name and type
    * **enum**: A value from a finite set of symbolic values
    * **array**: An ordered sequence of values
-   * **map**: An unordered collection of key/value pairs
 
    ## Any type
 
@@ -69,12 +66,20 @@
     The **Any** type validates for any non-null value.
 
 
+- name: JsonldPrefix
+  type: record
+  fields:
+    - name: prefix
+      type: string
+    - name: namespace
+      type: string
+
 - name: Schema
   type: record
   doc: "A schema defines an object type."
   fields:
     - name: name
-      type: string
+      type: ["null", string]
 
     - name: type
       doc: "The data type of this object."
@@ -121,19 +126,6 @@
         "@container": "@list"
       doc: "When `type` is `array`, defines the type of the array elements."
 
-    - name: values
-      type:
-        - "null"
-        - Datatype
-        - Schema
-        - string
-        - type: array
-          items: [ Datatype, Schema, string ]
-      jsonldPredicate:
-        "@id": "avro:values"
-        "@container": "@list"
-      doc: "When `type` is `map`, defines the value type for the key/value pairs."
-
     - name: doc
       type: ["null", string]
 
@@ -143,8 +135,14 @@
     - name: docAfter
       type: ["null", string]
 
+    - name: jsonldPrefix
+      type: ["null", string]
+
     - name: jsonldPrefixes
-      type: ["null", map]
+      type:
+        - "null"
+        - type: array
+          items: JsonldPrefix
 
     - name: jsonldVocab
       type: ["null", string]
@@ -156,4 +154,4 @@
       type: ["null", string]
 
     - name: specialize
-      type: ["null", map]
+      type: ["null"]

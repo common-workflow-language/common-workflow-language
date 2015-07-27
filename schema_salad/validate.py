@@ -1,5 +1,6 @@
 import pprint
 import avro.schema
+import yaml
 
 class ValidationException(Exception):
     pass

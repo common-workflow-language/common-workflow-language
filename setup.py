@@ -26,6 +26,7 @@ setup(name='schema-salad',
       download_url="https://github.com/common-workflow-language/common-workflow-language",
       license='Apache 2.0',
       packages=["schema_salad"],
+      package_data={'schema_salad': ['metaschema.yml']},
       install_requires=[
           'requests',
           'PyYAML',
