@@ -84,11 +84,11 @@ def arg_parser():
                         default="turtle")
 
     exgroup = parser.add_mutually_exclusive_group()
-    parser.add_argument("--print-rdf", action="store_true",
+    exgroup.add_argument("--print-rdf", action="store_true",
                         help="Print corresponding RDF graph for workflow and exit")
     exgroup.add_argument("--print-spec", action="store_true", help="Print HTML specification document and exit")
-    exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for CWL file and exit")
-    exgroup.add_argument("--print-rdfs", action="store_true", help="Print JSON-LD context for CWL file and exit")
+    exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print CWL JSON-LD context and exit")
+    exgroup.add_argument("--print-rdfs", action="store_true", help="Print CWL RDF schema and exit")
     exgroup.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
     exgroup.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
     exgroup.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
@@ -183,6 +183,9 @@ class FileAppendAction(argparse.Action):
         g.append({"class": "File", "path": values})
 
 def generate_parser(toolparser, tool, namemap):
+    toolparser.add_argument("job_order", nargs="?", help="Job input json file")
+    namemap["job_order"] = "job_order"
+
     for inp in tool.tool["inputs"]:
         (_, name) = urlparse.urldefrag(inp["id"])
         if len(name) == 1:
@@ -349,7 +352,11 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     if job_order_file:
         input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(job_order_file))
-        job_order_object = loader.resolve_ref(job_order_file)
+        try:
+            job_order_object = loader.resolve_ref(job_order_file)
+        except Exception as e:
+            _logger.error(e)
+            return 1
         toolparser = None
     else:
         input_basedir = args.basedir if args.basedir else "."
@@ -359,8 +366,21 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             if args.tool_help:
                 toolparser.print_help()
                 return 0
-            job_order_object = vars(toolparser.parse_args(args.job_order))
-            job_order_object = {namemap[k]: v for k,v in job_order_object.items()}
+            if not args.job_order:
+                print "Must provide input in the form of a json file or command line parameters."
+            cmd_line = vars(toolparser.parse_args(args.job_order))
+
+            if cmd_line["job_order"]:
+                try:
+                    input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(cmd_line["job_order"]))
+                    job_order_object = loader.resolve_ref(cmd_line["job_order"])
+                except Exception as e:
+                    _logger.error(e)
+                    return 1
+            else:
+                job_order_object = {}
+
+            job_order_object.update({namemap[k]: v for k,v in cmd_line.items()})
             _logger.debug("Parsed job order from command line: %s", job_order_object)
         else:
             job_order_object = None
