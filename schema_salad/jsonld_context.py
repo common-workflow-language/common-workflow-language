@@ -46,8 +46,8 @@ def avrold_to_jsonld_context(j):
     for t in j:
         if "jsonldVocab" in t:
             for prefix in t["jsonldPrefixes"]:
-                context[prefix] = t["jsonldPrefixes"][prefix]
-                namespaces[prefix] = rdflib.namespace.Namespace(t["jsonldPrefixes"][prefix])
+                context[prefix["prefix"]] = prefix["namespace"]
+                namespaces[prefix["prefix"]] = rdflib.namespace.Namespace(prefix["namespace"])
         if "jsonldVocab" in t:
             defaultPrefix = t["jsonldVocab"]
 
@@ -56,7 +56,7 @@ def avrold_to_jsonld_context(j):
 
     for t in j:
         if t["type"] == "record":
-            classnode = namespaces["cwl"][t["name"]]
+            classnode = namespaces["salad"][t["name"]]
             g.add((classnode, RDF.type, RDFS.Class))
 
             if "jsonldPrefix" in t:

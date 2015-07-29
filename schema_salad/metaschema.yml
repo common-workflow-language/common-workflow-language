@@ -29,7 +29,9 @@
   jsonldPrefix: avro
   jsonldPredicate:
     - symbol: Any
-      predicate: "cwl:Any"
+      predicate: "salad:Any"
+    - symbol: doc
+      predicate: "salad:doc"
   doc: |
    Salad data types are based on Avro schema declarations.  Refer to the [Avro
    schema declaration
