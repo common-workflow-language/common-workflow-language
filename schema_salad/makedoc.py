@@ -142,7 +142,7 @@ class RenderType(object):
             if t.get("docAfter"):
                 add_dictlist(self.docAfter, t["docAfter"], t["name"])
 
-        alltypes = schema.extend_avro(j)
+        alltypes = schema.extend_and_specialize(j)
 
         self.typemap = {}
         self.uses = {}

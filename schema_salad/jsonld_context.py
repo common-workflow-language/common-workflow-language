@@ -11,6 +11,7 @@ import rdflib
 from rdflib import Graph
 import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
+import urlparse
 
 def pred(datatype, field, name, context, defaultPrefix):
     v = None
@@ -37,7 +38,7 @@ def pred(datatype, field, name, context, defaultPrefix):
 
     return v
 
-def avrold_to_jsonld_context(j):
+def salad_to_jsonld_context(j):
     context = {}
     namespaces = {}
     g = Graph()
@@ -56,21 +57,24 @@ def avrold_to_jsonld_context(j):
 
     for t in j:
         if t["type"] == "record":
-            classnode = namespaces["salad"][t["name"]]
+            _, recordname = urlparse.urldefrag(t["name"])
+
+            classnode = namespaces[defaultPrefix][recordname]
             g.add((classnode, RDF.type, RDFS.Class))
 
             if "jsonldPrefix" in t:
-                predicate = "%s:%s" % (t["jsonldPrefix"], t["name"])
+                predicate = "%s:%s" % (t["jsonldPrefix"], recordname)
             else:
-                predicate = "%s:%s" % (defaultPrefix, t["name"])
+                predicate = "%s:%s" % (defaultPrefix, recordname)
 
-            if context.get(t["name"], predicate) != predicate:
-                raise Exception("Predicate collision on '%s', '%s' != '%s'" % (t["name"], context[t["name"]], predicate))
+            if context.get(recordname, predicate) != predicate:
+                raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[t["name"]], predicate))
 
-            context[t["name"]] = predicate
+            context[recordname] = predicate
 
             for i in t.get("fields", []):
-                v = pred(t, i, i["name"], context, defaultPrefix)
+                _, fieldname = urlparse.urldefrag(i["name"])
+                v = pred(t, i, fieldname, context, defaultPrefix)
 
                 if isinstance(v, basestring):
                     v = v if v[0] != "@" else None
@@ -79,6 +83,7 @@ def avrold_to_jsonld_context(j):
 
                 if v:
                     (ns, ln) = rdflib.namespace.split_uri(unicode(v))
+                    print ns, ln
                     propnode = namespaces[ns[0:-1]][ln]
                     g.add((propnode, RDF.type, RDF.Property))
                     g.add((propnode, RDFS.domain, classnode))
@@ -89,12 +94,13 @@ def avrold_to_jsonld_context(j):
                 g.add((classnode, RDFS.subClassOf, namespaces["cwl"][t["extends"]]))
         elif t["type"] == "enum":
             for i in t["symbols"]:
-                pred(t, None, i, context, defaultPrefix)
+                _, symname = urlparse.urldefrag(i)
+                pred(t, None, symname, context, defaultPrefix)
 
     return (context, g)
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         j = yaml.load(f)
-        (ctx, g) = avrold_to_jsonld_context(j)
+        (ctx, g) = salad_to_jsonld_context(j)
         print json.dumps(ctx, indent=4, sort_keys=True)

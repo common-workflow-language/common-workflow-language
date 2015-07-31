@@ -26,12 +26,16 @@ def printrdf(workflow, wf, ctx, sr):
 
 def create_loader(ctx):
     loader = Loader()
-    url_fields = []
+    loader.url_fields = []
+    loader.identifiers = []
     for c in ctx:
-        if c != "id" and (ctx[c] == "@id") or (isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id"):
-            url_fields.append(c)
-    loader.url_fields = url_fields
-    loader.idx["cwl:JsonPointer"] = {}
+        if ctx[c] == "@id":
+            loader.identifiers.append(c)
+        elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id":
+            loader.url_fields.append(c)
+    loader.checked_urls = loader.url_fields
+    loader.checked_urls.remove("symbols")
+    _logger.debug("url_fields is %s", loader.url_fields)
     return loader
 
 
@@ -80,7 +84,7 @@ def main(args=None):
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
 
     (j, names) = schema.get_metaschema()
-    (ctx, g) = jsonld_context.avrold_to_jsonld_context(j)
+    (ctx, g) = jsonld_context.salad_to_jsonld_context(j)
     loader = create_loader(ctx)
 
     if args.print_jsonld_context:
@@ -121,8 +125,9 @@ def main(args=None):
 
     try:
         loader.validate_links(document)
-    except (avro_ld.validate.ValidationException) as e:
+    except (validate.ValidationException) as e:
         _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
         return 1
 
     # Validate

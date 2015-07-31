@@ -1,41 +1,34 @@
-- name: "Schema Annotations for Linked Avro Data"
+- name: "#Schema_Annotations_for_Linked_Avro_Data"
   type: doc
   doc: |
     Work in progress.
   jsonldPrefixes:
-    - { prefix: salad, namespace: "https://w3id.org/cwl/salad#" }
+    - { prefix: sld, namespace: "https://w3id.org/cwl/salad#" }
     - { prefix: avro,  namespace: "https://w3id.org/cwl/avro#" }
     - { prefix: dct,   namespace: "http://purl.org/dc/terms/" }
     - { prefix: rdf,   namespace: "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
     - { prefix: rdfs,  namespace: "http://www.w3.org/2000/01/rdf-schema#" }
-  jsonldVocab: salad
+  jsonldVocab: sld
 
-- name: Datatype
+- name: "#Datatype"
   type: enum
   symbols:
-    - "null"
-    - boolean
-    - int
-    - long
-    - float
-    - double
-    - bytes
-    - string
-    - record
-    - enum
-    - array
-    - doc
-    - Any
-  jsonldPrefix: avro
-  jsonldPredicate:
-    - symbol: Any
-      predicate: "salad:Any"
-    - symbol: doc
-      predicate: "salad:doc"
+    - "#null"
+    - "#boolean"
+    - "#int"
+    - "#long"
+    - "#float"
+    - "#double"
+    - "#bytes"
+    - "#string"
+    - "#record"
+    - "#enum"
+    - "#array"
+    - "#doc"
+    - "#Any"
   doc: |
-   Salad data types are based on Avro schema declarations.  Refer to the [Avro
-   schema declaration
-   documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
+   Salad data types are based on Avro schema declarations.  Refer to the
+   [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
    detailed information.
 
    ## Primitive types
@@ -57,103 +50,104 @@
 
    ## Any type
 
-   See [Any](#any) below.
+    The **Any** type validates for any non-null value.
 
 
-- name: Any
+- name: "#Any"
   type: enum
-  docParent: Datatype
-  symbols: ["Any"]
+  docParent: "#Datatype"
+  symbols: ["#Any"]
   doc: |
     The **Any** type validates for any non-null value.
 
 
-- name: JsonldPrefix
+- name: "#JsonldPrefix"
   type: record
   fields:
-    - name: prefix
+    - name: "#prefix"
       type: string
-    - name: namespace
+    - name: "#namespace"
       type: string
 
-- name: Schema
+
+- name: "#Schema"
   type: record
   doc: "A schema defines an object type."
   fields:
-    - name: name
+    - name: "#name"
       type: ["null", string]
+      jsonldPredicate: "@id"
 
-    - name: type
+    - name: "#type"
       doc: "The data type of this object."
       type:
-        - "Datatype"
-        - "Schema"
+        - "#Datatype"
+        - "#Schema"
         - "string"
         - type: "array"
-          items: [ "Datatype", "Schema", "string" ]
+          items: [ "#Datatype", "#Schema", "string" ]
       jsonldPredicate:
         "@id": "avro:type"
         "@type": "@vocab"
 
-    - name: fields
+    - name: "#fields"
       type:
         - "null"
         - type: "array"
-          items: "Schema"
+          items: "#Schema"
       jsonldPredicate:
         "@id": "avro:fields"
-        "@container": "@list"
       doc: "When `type` is `record`, defines the fields of the record."
 
-    - name: "symbols"
+    - name: "#symbols"
       type:
         - "null"
         - type: "array"
           items: "string"
       jsonldPredicate:
-        "@id": "avro:symbols"
-        "@container": "@list"
+        "@id": "sld:symbols"
+        "@type": "@id"
       doc: "When `type` is `enum`, defines the set of valid symbols."
 
-    - name: items
+    - name: "#items"
       type:
         - "null"
-        - "Datatype"
-        - "Schema"
+        - "#Datatype"
+        - "#Schema"
         - "string"
         - type: "array"
-          items: [ "Datatype", "Schema", "string" ]
+          items: [ "#Datatype", "#Schema", "string" ]
       jsonldPredicate:
         "@id": "avro:items"
-        "@container": "@list"
+        "@type": "@vocab"
       doc: "When `type` is `array`, defines the type of the array elements."
 
-    - name: doc
+    - name: "#doc"
       type: ["null", string]
 
-    - name: docParent
+    - name: "#docParent"
       type: ["null", string]
 
-    - name: docAfter
+    - name: "#docAfter"
       type: ["null", string]
 
-    - name: jsonldPrefix
+    - name: "#jsonldPrefix"
       type: ["null", string]
 
-    - name: jsonldPrefixes
+    - name: "#jsonldPrefixes"
       type:
         - "null"
         - type: array
-          items: JsonldPrefix
+          items: "#JsonldPrefix"
 
-    - name: jsonldVocab
+    - name: "#jsonldVocab"
       type: ["null", string]
 
-    - name: jsonldPredicate
-      type: ["null", Any]
+#    - name: "#jsonldPredicate"
+#      type: ["null", "Any"]
 
-    - name: extends
+    - name: "#extends"
       type: ["null", string]
 
-    - name: specialize
-      type: ["null"]
+    - name: "#specialize"
+      type: ["null", string]

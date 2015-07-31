@@ -7,13 +7,24 @@ from pkg_resources import resource_stream
 import yaml
 import avro.schema
 import validate
+import json
+import urlparse
+import ref_resolver
 
 def get_metaschema():
     f = resource_stream(__name__, 'metaschema.yml')
+
+    loader = ref_resolver.Loader()
+    loader.url_fields = ["type", "items", "symbols"]
+    loader.identifiers = ["name"]
     j = yaml.load(f)
-    sch = schema(j)
+    j = loader.resolve_all(j, "metaschema.yml")
+
+    sch = make_avro_schema(j)
+
     for item in j:
         validate.validate_ex(sch.get_name("Schema", ""), item, strict=True)
+
     return (j, sch)
 
 def replace_type(items, spec):
@@ -32,27 +43,37 @@ def replace_type(items, spec):
             return spec[items]
     return items
 
-def first_def(items, found):
+def make_valid_avro(items, found, union=False):
+    items = copy.deepcopy(items)
     if isinstance(items, dict):
+        if "name" in items:
+            doc_url, frg = urlparse.urldefrag(items["name"])
+            if frg:
+                items["name"] = frg
+
         if "type" in items and items["type"] in ("record", "enum"):
             if items.get("abstract"):
                 return items
-            if items["name"] in found:
-                return items["name"]
+            if items["name"][1:] in found:
+                return items["name"][1:]
             else:
                 found.add(items["name"])
-        for n in ("type", "items", "values", "fields"):
+        for n in ("type", "items", "values", "fields", "symbols"):
             if n in items:
-                items[n] = first_def(items[n], found)
+                items[n] = make_valid_avro(items[n], found, union=True)
         return items
     if isinstance(items, list):
         n = []
         for i in items:
-            n.append(first_def(i, found))
+            n.append(make_valid_avro(i, found, union=union))
         return n
+    if union and isinstance(items, basestring):
+        doc_url, frg = urlparse.urldefrag(items)
+        if frg:
+            items = frg
     return items
 
-def extend_avro(items):
+def extend_and_specialize(items):
     types = {t["name"]: t for t in items}
     n = []
 
@@ -81,6 +102,7 @@ def extend_avro(items):
             r["doc"] = t.get("doc", "")
             types[t["name"]] = r
             t = r
+
         n.append(t)
 
     ex_types = {t["name"]: t for t in n}
@@ -98,11 +120,13 @@ def extend_avro(items):
 
     return n
 
-def schema(j):
+def make_avro_schema(j):
     names = avro.schema.Names()
-    j = extend_avro(j)
-    j = first_def(j, set())
-    for t in j:
+    j = extend_and_specialize(j)
+
+    j2 = make_valid_avro(j, set())
+
+    for t in j2:
         if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "doc":
             avro.schema.make_avsc_object(t, names)
 
