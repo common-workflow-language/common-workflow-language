@@ -66,7 +66,20 @@ class CommandLineJob(object):
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.outdir), "/tmp/job_output"))
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.tmpdir), "/tmp/job_tmp"))
             runtime.append("--workdir=%s" % ("/tmp/job_output"))
-            runtime.append("--user=%s" % (os.geteuid()))
+            euid = os.geteuid()
+            try:
+                # If running under boot2docker, use the user's uid inside the vm
+                docker_uid = subprocess.check_output(["boot2docker","ssh", "id", "-u"])
+                if len(docker_uid) > 0:
+                    euid = str(int(docker_uid))
+            except (OSError, subprocess.CalledProcessError, TypeError, ValueError):
+                # OSError is raised if boot2docker doesn't exist
+                # CalledProcessError is raised if boot2docker returns nonzero
+                # TypeError is raised if docker_uid has no len()
+                # ValueError is raised if str/int conversion fails
+                pass
+
+            runtime.append("--user=%s" % (euid))
 
             if rm_container:
                 runtime.append("--rm")
