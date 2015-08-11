@@ -250,3 +250,14 @@
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles
     on input and output.
+
+- job: draft-2/rename-job.json
+  output:
+    outfile:
+      class: File
+      checksum: sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376
+      path: fish.txt
+      size: 1111
+  tool: draft-2/rename.cwl
+  doc: |
+    Test CreateFileRequirement with expression in filename.
