@@ -130,8 +130,7 @@ class WorkflowJob(object):
         if "outdir" in kwargs:
             self.outdir = kwargs["outdir"]
         elif "tmp_outdir_prefix" in kwargs:
-            tmp_outdir_prefix = kwargs.get("tmp_outdir_prefix")
-            self.outdir = tempfile.mkdtemp(prefix=tmp_outdir_prefix)
+            self.outdir = tempfile.mkdtemp(prefix=kwargs["tmp_outdir_prefix"])
         else:
             # tmp_outdir_prefix defaults to tmp, so this is unlikely to be used
             self.outdir = tempfile.mkdtemp()
