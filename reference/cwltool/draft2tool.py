@@ -434,7 +434,7 @@ class CommandLineTool(Tool):
 
             if schema["type"] == "File":
                 if not r:
-                    raise WorkflowException("No matches for output file with glob: {}.".format(binding["glob"]))
+                    raise WorkflowException("No matches for output file with glob: '{}'".format(bg))
                 if len(r) > 1:
                     raise WorkflowException("Multiple matches for output item that is a single file.")
                 r = r[0]

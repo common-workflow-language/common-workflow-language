@@ -359,15 +359,13 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
             return 1
         toolparser = None
     else:
-        input_basedir = args.basedir if args.basedir else "."
+        input_basedir = args.basedir if args.basedir else os.getcwd()
         namemap = {}
         toolparser = generate_parser(argparse.ArgumentParser(prog=args.workflow), t, namemap)
         if toolparser:
             if args.tool_help:
                 toolparser.print_help()
                 return 0
-            if not args.job_order:
-                print "Must provide input in the form of a json file or command line parameters."
             cmd_line = vars(toolparser.parse_args(args.job_order))
 
             if cmd_line["job_order"]:

@@ -33,8 +33,6 @@ def deref_links(outputs):
 
 class CommandLineJob(object):
     def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, move_outputs=True, **kwargs):
-        #_logger.info("[job %s] starting with outdir %s", id(self), self.outdir)
-
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
 
@@ -86,8 +84,9 @@ class CommandLineJob(object):
         stdin = None
         stdout = None
 
-        _logger.info("[job %s] exec %s%s%s",
+        _logger.info("[job %s] %s$ %s%s%s",
                      id(self),
+                     self.outdir,
                      " ".join([shellescape.quote(arg) if needs_shell_quoting(arg) else arg for arg in (runtime + self.command_line)]),
                      ' < %s' % (self.stdin) if self.stdin else '',
                      ' > %s' % os.path.join(self.outdir, self.stdout) if self.stdout else '')
@@ -164,6 +163,9 @@ class CommandLineJob(object):
                     _logger.error("'%s' not found", self.command_line[0])
             else:
                 _logger.exception("Exception while running job")
+            processStatus = "permanentFail"
+        except WorkflowException as e:
+            _logger.error("Error while running job: %s" % e)
             processStatus = "permanentFail"
         except Exception as e:
             _logger.exception("Exception while running job")
