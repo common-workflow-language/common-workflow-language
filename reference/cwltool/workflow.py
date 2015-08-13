@@ -129,7 +129,11 @@ class WorkflowJob(object):
         self.id = workflow.tool["id"]
         if "outdir" in kwargs:
             self.outdir = kwargs["outdir"]
+        elif "tmp_outdir_prefix" in kwargs:
+            tmp_outdir_prefix = kwargs.get("tmp_outdir_prefix")
+            self.outdir = tempfile.mkdtemp(prefix=tmp_outdir_prefix)
         else:
+            # tmp_outdir_prefix defaults to tmp, so this is unlikely to be used
             self.outdir = tempfile.mkdtemp()
 
         _logger.debug("[workflow %s] initialized from %s", id(self), self.tool["id"])
