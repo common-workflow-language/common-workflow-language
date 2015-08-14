@@ -13,6 +13,7 @@ import shutil
 import stat
 import re
 import shellescape
+from docker_uid import docker_vm_uid
 
 _logger = logging.getLogger("cwltool")
 
@@ -64,7 +65,8 @@ class CommandLineJob(object):
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.outdir), "/tmp/job_output"))
             runtime.append("--volume=%s:%s:rw" % (os.path.abspath(self.tmpdir), "/tmp/job_tmp"))
             runtime.append("--workdir=%s" % ("/tmp/job_output"))
-            runtime.append("--user=%s" % (os.geteuid()))
+            euid = docker_vm_uid() or os.geteuid()
+            runtime.append("--user=%s" % (euid))
 
             if rm_container:
                 runtime.append("--rm")
