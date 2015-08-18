@@ -27,10 +27,27 @@ class NormDict(dict):
     def __contains__(self, key):
         return super(NormDict, self).__contains__(self.normalize(key))
 
-def expand_url(url, base_url):
-    split = urlparse.urlparse(url)
+
+def expand_url(url, base_url, scoped=False, vocab=None):
+    if vocab and ":" in url:
+        prefix = url.split(":")[0]
+        if prefix in vocab:
+            return vocab[prefix] + url[len(prefix)+1:]
+
+    split = urlparse.urlsplit(url)
+
     if split.scheme:
         return url
+    elif scoped and not split.fragment:
+        splitbase = urlparse.urlsplit(base_url)
+        frg = ""
+        if splitbase.fragment:
+            frg = splitbase.fragment + "/" + split.path
+        else:
+            frg = split.path
+        return urlparse.urlunsplit((splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
+    elif vocab and url in vocab:
+        return vocab[url]
     else:
         return urlparse.urljoin(base_url, url)
 
@@ -39,7 +56,10 @@ class Loader(object):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         self.idx = NormDict(normalize)
         self.url_fields = []
+        self.checked_urls = []
+        self.vocab_fields = []
         self.identifiers = []
+        self.vocab = {}
 
     def resolve_ref(self, ref, base_url=None):
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
@@ -72,7 +92,7 @@ class Loader(object):
         if not isinstance(ref, basestring):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = expand_url(ref, base_url)
+        url = expand_url(ref, base_url, scoped=(obj is not None))
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -118,11 +138,12 @@ class Loader(object):
                 return document
 
             for d in self.url_fields:
+                vocab = self.vocab if d in self.vocab_fields else None
                 if d in document:
                     if isinstance(document[d], basestring):
-                        document[d] = expand_url(document[d], base_url)
+                        document[d] = expand_url(document[d], base_url, False, vocab)
                     elif isinstance(document[d], list):
-                        document[d] = [expand_url(url, base_url) if isinstance(url, basestring) else url for url in document[d] ]
+                        document[d] = [expand_url(url, base_url, False, vocab) if isinstance(url, basestring) else url for url in document[d] ]
             iterator = document.iteritems()
         else:
             return document
@@ -175,17 +196,21 @@ class Loader(object):
         return result
 
     def validate_links(self, document):
+        rvocab = set()
+        for k,v in self.vocab.items():
+            rvocab.add(expand_url(v, "", scoped=False, vocab=self.vocab))
+
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
             for d in self.checked_urls:
                 if d in document:
                     if isinstance(document[d], basestring):
-                        if document[d] not in self.idx:
+                        if document[d] not in self.idx and document[d] not in rvocab:
                             raise validate.ValidationException("Invalid link `%s` in field `%s`" % (document[d], d))
                     elif isinstance(document[d], list):
                         for i in document[d]:
-                            if isinstance(i, basestring) and i not in self.idx:
+                            if isinstance(i, basestring) and i not in self.idx and i not in rvocab:
                                 raise validate.ValidationException("Invalid link `%s` in field `%s`" % (i, d))
             iterator = document.iteritems()
         else:

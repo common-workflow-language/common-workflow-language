@@ -8,6 +8,8 @@ import makedoc
 import json
 from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
+import yaml
+import os
 
 from ref_resolver import Loader
 import validate
@@ -26,17 +28,44 @@ def printrdf(workflow, wf, ctx, sr):
 
 def create_loader(ctx):
     loader = Loader()
-    loader.url_fields = []
-    loader.identifiers = []
     for c in ctx:
         if ctx[c] == "@id":
             loader.identifiers.append(c)
         elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id":
             loader.url_fields.append(c)
-    loader.checked_urls = loader.url_fields
-    loader.checked_urls.remove("symbols")
+            if ctx[c].get("checkedURI", True):
+                loader.checked_urls(c)
+        elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@vocab":
+            loader.url_fields.append(c)
+            loader.vocab_fields.append(c)
+
+        if isinstance(ctx[c], dict) and "@id" in ctx[c]:
+            loader.vocab[c] = ctx[c]["@id"]
+        elif isinstance(ctx[c], basestring):
+            loader.vocab[c] = ctx[c]
+
+    _logger.debug("identifiers is %s", loader.identifiers)
     _logger.debug("url_fields is %s", loader.url_fields)
+    _logger.debug("checked_urls is %s", loader.checked_urls)
+    _logger.debug("vocab_fields is %s", loader.vocab_fields)
+    _logger.debug("vocab is %s", loader.vocab)
+
+
     return loader
+
+def validate_doc(schema_names, validate_doc, strict):
+    for item in validate_doc:
+        for r in schema_names.names.values():
+            if r.get_prop("validationRoot"):
+                errors = []
+                try:
+                    validate.validate_ex(r, item, strict)
+                    break
+                except validate.ValidationException as e:
+                    errors.append(str(e))
+                _logger.error("Document failed validation:\n%s", "\n".join(errors))
+                return False
+    return True
 
 
 def main(args=None):
@@ -83,55 +112,95 @@ def main(args=None):
         else:
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
 
-    (j, names) = schema.get_metaschema()
-    (ctx, g) = jsonld_context.salad_to_jsonld_context(j)
-    loader = create_loader(ctx)
+    # Get the metaschema to validate the schema
+    metaschema_names, metaschema_doc, metaschema_loader = schema.get_metaschema()
 
+    # Load schema document and resolve refs
+    schema_doc = metaschema_loader.resolve_ref("file://" + os.path.abspath(args.schema))
+
+    # Optionally print the schema after ref resolution
+    if not args.document and args.print_pre:
+        print json.dumps(schema_doc, indent=4)
+        return 0
+
+    # Validate links in the schema document
+    try:
+        metaschema_loader.validate_links(schema_doc)
+    except (validate.ValidationException) as e:
+        _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        #_logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
+        return 1
+
+    # Validate the schema document against the metaschema
+    try:
+        validate_doc(metaschema_names, schema_doc, args.strict)
+    except Exception as e:
+        _logger.error(e)
+        return 1
+
+    # Get the json-ld context and RDFS representation from the schema
+    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc)
+
+    # Create the loader that will be used to load the target document.
+    document_loader = create_loader(schema_ctx)
+
+    # Make the Avro validation that will be used to validate the target document
+    (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc)
+
+    # Optionally print the json-ld context from the schema
     if args.print_jsonld_context:
-        j = {"@context": ctx}
+        j = {"@context": schema_ctx}
         print json.dumps(j, indent=4, sort_keys=True)
         return 0
 
+    # Optionally print the RDFS graph from the schema
     if args.print_rdfs:
         print(g.serialize(format=args.rdf_serializer))
         return 0
 
+    # Optionally create documentation page from the schema
     if args.print_doc:
-        makedoc.avrold_doc(j, sys.stdout)
+        makedoc.avrold_doc(schema_doc, sys.stdout)
         return 0
 
+    # Optionally print Avro-compatible schema from schema
     if args.print_avro:
-        print "["
-        print ", ".join([json.dumps(names.names[n].to_json(), indent=4, sort_keys=True) for n in names.names])
-        print "]"
+        print json.dumps(avsc_obj, indent=4)
         return 0
 
+    # If no document specified, all done.
     if not args.document:
-        parser.print_help()
-        _logger.error("")
-        _logger.error("Document required")
-        return 1
+        print "Schema is valid"
+        return 0
 
-    idx = {}
+    # Load target document and resolve refs
     try:
-        document = loader.resolve_ref(args.document)
+        document = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
+    # Optionally print the document after ref resolution
     if args.print_pre:
         print json.dumps(document, indent=4)
         return 0
 
+    # Validate links in the target document
     try:
-        loader.validate_links(document)
+        document_loader.validate_links(document)
     except (validate.ValidationException) as e:
         _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        _logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
+        #_logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
         return 1
 
-    # Validate
+    # Validate the schema document against the metaschema
+    try:
+        validate_doc(avsc_names, document, args.strict)
+    except Exception as e:
+        _logger.error(e)
+        return 1
 
+    # Optionally convert the document to RDF
     if args.print_rdf:
         printrdf(args.document, document, ctx, args.rdf_serializer)
         return 0

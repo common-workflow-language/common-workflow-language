@@ -1,4 +1,4 @@
-- name: "#Schema_Annotations_for_Linked_Avro_Data"
+- name: "Schema_Annotations_for_Linked_Avro_Data"
   type: doc
   doc: |
     Work in progress.
@@ -10,7 +10,7 @@
     - { prefix: rdfs,  namespace: "http://www.w3.org/2000/01/rdf-schema#" }
   jsonldVocab: sld
 
-- name: "#Datatype"
+- name: "Datatype"
   type: enum
   symbols:
     - "#null"
@@ -53,7 +53,7 @@
     The **Any** type validates for any non-null value.
 
 
-- name: "#Any"
+- name: "Any"
   type: enum
   docParent: "#Datatype"
   symbols: ["#Any"]
@@ -61,24 +61,25 @@
     The **Any** type validates for any non-null value.
 
 
-- name: "#JsonldPrefix"
+- name: "JsonldPrefix"
   type: record
   fields:
-    - name: "#prefix"
-      type: string
-    - name: "#namespace"
-      type: string
+    - name: "prefix"
+      type: "string"
+    - name: "namespace"
+      type: "string"
 
 
-- name: "#Schema"
+- name: "Schema"
   type: record
   doc: "A schema defines an object type."
+  validationRoot: true
   fields:
-    - name: "#name"
+    - name: "name"
       type: ["null", string]
       jsonldPredicate: "@id"
 
-    - name: "#type"
+    - name: "type"
       doc: "The data type of this object."
       type:
         - "#Datatype"
@@ -90,7 +91,7 @@
         "@id": "avro:type"
         "@type": "@vocab"
 
-    - name: "#fields"
+    - name: "fields"
       type:
         - "null"
         - type: "array"
@@ -99,7 +100,7 @@
         "@id": "avro:fields"
       doc: "When `type` is `record`, defines the fields of the record."
 
-    - name: "#symbols"
+    - name: "symbols"
       type:
         - "null"
         - type: "array"
@@ -107,9 +108,10 @@
       jsonldPredicate:
         "@id": "sld:symbols"
         "@type": "@id"
+        checkedURI: false
       doc: "When `type` is `enum`, defines the set of valid symbols."
 
-    - name: "#items"
+    - name: "items"
       type:
         - "null"
         - "#Datatype"
@@ -122,32 +124,35 @@
         "@type": "@vocab"
       doc: "When `type` is `array`, defines the type of the array elements."
 
-    - name: "#doc"
+    - name: "doc"
       type: ["null", string]
 
-    - name: "#docParent"
+    - name: "docParent"
       type: ["null", string]
 
-    - name: "#docAfter"
+    - name: "docAfter"
       type: ["null", string]
 
-    - name: "#jsonldPrefix"
+    - name: "jsonldPrefix"
       type: ["null", string]
 
-    - name: "#jsonldPrefixes"
+    - name: "jsonldPrefixes"
       type:
         - "null"
         - type: array
           items: "#JsonldPrefix"
 
-    - name: "#jsonldVocab"
+    - name: "jsonldVocab"
       type: ["null", string]
 
-#    - name: "#jsonldPredicate"
-#      type: ["null", "Any"]
+    - name: "jsonldPredicate"
+      type: ["null", "Any"]
 
-    - name: "#extends"
+    - name: "extends"
       type: ["null", string]
 
-    - name: "#specialize"
+    - name: "specialize"
       type: ["null", string]
+
+    - name: "validationRoot"
+      type: ["null", boolean]
