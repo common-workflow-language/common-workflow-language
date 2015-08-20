@@ -8,7 +8,7 @@ import urlparse
 import yaml
 import validate
 
-log = logging.getLogger("cwltool")
+_logger = logging.getLogger("salad")
 
 class NormDict(dict):
     def __init__(self, normalize=unicode):
@@ -52,14 +52,45 @@ def expand_url(url, base_url, scoped=False, vocab=None):
         return urlparse.urljoin(base_url, url)
 
 class Loader(object):
-    def __init__(self):
+    def __init__(self, ctx):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         self.idx = NormDict(normalize)
+        self.ctx = {}
+        self.add_context(ctx)
+
+    def add_context(self, newcontext):
         self.url_fields = []
         self.checked_urls = []
         self.vocab_fields = []
         self.identifiers = []
         self.vocab = {}
+
+        self.ctx.update(newcontext)
+
+        _logger.debug("ctx is %s", self.ctx)
+
+        for c in self.ctx:
+            if self.ctx[c] == "@id":
+                self.identifiers.append(c)
+            elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
+                self.url_fields.append(c)
+                if self.ctx[c].get("checkedURI", True):
+                    self.checked_urls.append(c)
+            elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
+                self.url_fields.append(c)
+                self.vocab_fields.append(c)
+
+            if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
+                self.vocab[c] = self.ctx[c]["@id"]
+            elif isinstance(self.ctx[c], basestring):
+                self.vocab[c] = self.ctx[c]
+
+        _logger.debug("identifiers is %s", self.identifiers)
+        _logger.debug("url_fields is %s", self.url_fields)
+        _logger.debug("checked_urls is %s", self.checked_urls)
+        _logger.debug("vocab_fields is %s", self.vocab_fields)
+        _logger.debug("vocab is %s", self.vocab)
+
 
     def resolve_ref(self, ref, base_url=None):
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
@@ -114,18 +145,19 @@ class Loader(object):
             obj = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        self.resolve_all(obj, url)
+        obj = self.resolve_all(obj, url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
         if self.idx.get(url) is not None:
-            return self.idx[url]
+            #return self.idx[url]
+            return obj
         else:
             raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
     def resolve_all(self, document, base_url):
-        if isinstance(document, list):
-            iterator = enumerate(document)
-        elif isinstance(document, dict):
+        loader = self
+
+        if isinstance(document, dict):
             inc = 'include' in document
             if  'import' in document or 'include' in document:
                 document = self.resolve_ref(document, base_url)
@@ -137,20 +169,36 @@ class Loader(object):
             if inc:
                 return document
 
-            for d in self.url_fields:
-                vocab = self.vocab if d in self.vocab_fields else None
+            if "@context" in document:
+                loader = Loader(self.ctx)
+                loader.idx = self.idx
+                loader.add_context(document["@context"])
+                if "@base" in loader.ctx:
+                    base_url = loader.ctx["@base"]
+                if "@graph" in document:
+                    document = document["@graph"]
+        elif isinstance(document, list):
+            pass
+        else:
+            return document
+
+        if isinstance(document, dict):
+            for d in loader.url_fields:
+                vocab = loader.vocab if d in loader.vocab_fields else None
                 if d in document:
                     if isinstance(document[d], basestring):
                         document[d] = expand_url(document[d], base_url, False, vocab)
                     elif isinstance(document[d], list):
                         document[d] = [expand_url(url, base_url, False, vocab) if isinstance(url, basestring) else url for url in document[d] ]
             iterator = document.iteritems()
+        elif isinstance(document, list):
+            iterator = enumerate(document)
         else:
             return document
 
         for key, val in iterator:
             try:
-                document[key] = self.resolve_all(val, base_url)
+                document[key] = loader.resolve_all(val, base_url)
             except validate.ValidationException as v:
                 if isinstance(key, basestring):
                     raise validate.ValidationException("Validation error in field %s:\n%s" % (key, validate.indent(str(v))))
@@ -247,5 +295,3 @@ def resolve_json_pointer(document, pointer, default=POINTER_DEFAULT):
             else:
                 raise ValueError('Unresolvable JSON pointer: %r' % pointer)
     return document
-
-loader = Loader()

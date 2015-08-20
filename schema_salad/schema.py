@@ -14,26 +14,61 @@ import ref_resolver
 def get_metaschema():
     f = resource_stream(__name__, 'metaschema.yml')
 
-    loader = ref_resolver.Loader()
-    loader.url_fields = ["type", "items", "symbols"]
-    loader.vocab_fields = ["type", "items"]
-    loader.checked_urls = ["type", "items"]
-    loader.vocab = {
-        "null": "https://w3id.org/cwl/salad#null",
-        "boolean": "https://w3id.org/cwl/salad#boolean",
-        "int": "https://w3id.org/cwl/salad#int",
-        "long": "https://w3id.org/cwl/salad#long",
-        "float": "https://w3id.org/cwl/salad#float",
-        "double": "https://w3id.org/cwl/salad#double",
-        "bytes": "https://w3id.org/cwl/salad#bytes",
-        "string": "https://w3id.org/cwl/salad#string",
-        "record": "https://w3id.org/cwl/salad#record",
-        "enum": "https://w3id.org/cwl/salad#enum",
-        "array": "https://w3id.org/cwl/salad#array",
-        "doc": "https://w3id.org/cwl/salad#doc",
-        "Any": "https://w3id.org/cwl/salad#Any"
-    }
-    loader.identifiers = ["name"]
+    loader = ref_resolver.Loader({
+        "Any": "https://w3id.org/cwl/salad#Any",
+        "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
+        "Schema": "https://w3id.org/cwl/salad#Schema",
+        "_id": {
+            "@id": "sld:_id",
+            "@type": "@id"
+        },
+        "_type": "https://w3id.org/cwl/salad#JsonldPredicate/_type",
+        "array": "https://w3id.org/cwl/avro#array",
+        "avro": "https://w3id.org/cwl/avro#",
+        "boolean": "https://w3id.org/cwl/avro#boolean",
+        "bytes": "https://w3id.org/cwl/avro#bytes",
+        "checkedURI": "https://w3id.org/cwl/salad#JsonldPredicate/checkedURI",
+        "dct": "http://purl.org/dc/terms/",
+        "doc": "https://w3id.org/cwl/salad#Schema/doc",
+        "docAfter": "https://w3id.org/cwl/salad#Schema/docAfter",
+        "docParent": "https://w3id.org/cwl/salad#Schema/docParent",
+        "documentation": "https://w3id.org/cwl/salad#documentation",
+        "double": "https://w3id.org/cwl/avro#double",
+        "enum": "https://w3id.org/cwl/avro#enum",
+        "extends": {
+            "@id": "sld:extends",
+            "@type": "@id"
+        },
+        "fields": "avro:fields",
+        "float": "https://w3id.org/cwl/avro#float",
+        "int": "https://w3id.org/cwl/avro#int",
+        "items": {
+            "@id": "avro:items",
+            "@type": "@vocab"
+        },
+        "jsonldPredicate": "https://w3id.org/cwl/salad#Schema/jsonldPredicate",
+        "jsonldPrefix": "https://w3id.org/cwl/salad#Schema/jsonldPrefix",
+        "long": "https://w3id.org/cwl/avro#long",
+        "name": "@id",
+        "null": "https://w3id.org/cwl/avro#null",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "record": "https://w3id.org/cwl/avro#record",
+        "sld": "https://w3id.org/cwl/salad#",
+        "specialize": "https://w3id.org/cwl/salad#Schema/specialize",
+        "string": "https://w3id.org/cwl/avro#string",
+        "symbols": {
+            "@id": "avro:symbols",
+            "@type": "@id"
+        },
+        "type": {
+            "@id": "avro:type",
+            "@type": "@vocab"
+        },
+        "validationRoot": "https://w3id.org/cwl/salad#Schema/validationRoot"
+    })
+    loader.checked_urls.remove("symbols")
+    loader.checked_urls.remove("_id")
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
@@ -171,7 +206,7 @@ def make_avro_schema(j):
 
     j2 = make_valid_avro(j, set())
 
-    j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "doc"]
+    j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
 
     # avsc = {
     #     "name": "Container",

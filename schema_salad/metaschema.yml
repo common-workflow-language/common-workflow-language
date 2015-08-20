@@ -1,31 +1,33 @@
+"@context":
+  "@base": "https://w3id.org/cwl/salad#"
+  "sld": "https://w3id.org/cwl/salad#"
+  "avro": "https://w3id.org/cwl/avro#"
+  "dct": "http://purl.org/dc/terms/"
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+
+"@graph":
 - name: "Schema_Annotations_for_Linked_Avro_Data"
-  type: doc
+  type: documentation
   doc: |
     Work in progress.
-  jsonldPrefixes:
-    - { prefix: sld, namespace: "https://w3id.org/cwl/salad#" }
-    - { prefix: avro,  namespace: "https://w3id.org/cwl/avro#" }
-    - { prefix: dct,   namespace: "http://purl.org/dc/terms/" }
-    - { prefix: rdf,   namespace: "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
-    - { prefix: rdfs,  namespace: "http://www.w3.org/2000/01/rdf-schema#" }
-  jsonldVocab: sld
 
 - name: "Datatype"
   type: enum
   symbols:
-    - "#null"
-    - "#boolean"
-    - "#int"
-    - "#long"
-    - "#float"
-    - "#double"
-    - "#bytes"
-    - "#string"
-    - "#record"
-    - "#enum"
-    - "#array"
-    - "#doc"
-    - "#Any"
+    - "avro:null"
+    - "avro:boolean"
+    - "avro:int"
+    - "avro:long"
+    - "avro:float"
+    - "avro:double"
+    - "avro:bytes"
+    - "avro:string"
+    - "avro:record"
+    - "avro:enum"
+    - "avro:array"
+    - "sld:documentation"
+    - "sld:Any"
   doc: |
    Salad data types are based on Avro schema declarations.  Refer to the
    [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
@@ -61,21 +63,27 @@
     The **Any** type validates for any non-null value.
 
 
-- name: "JsonldPrefix"
+- name: JsonldPredicate
   type: record
   fields:
-    - name: "prefix"
-      type: "string"
-    - name: "namespace"
-      type: "string"
+    - name: _id
+      type: ["null", string]
+      jsonldPredicate:
+        _id: sld:_id
+        _type: "@id"
+        checkedURI: false
+    - name: _type
+      type: ["null", string]
+    - name: checkedURI
+      type: ["null", boolean]
 
 
-- name: "Schema"
+- name: Schema
   type: record
   doc: "A schema defines an object type."
   validationRoot: true
   fields:
-    - name: "name"
+    - name: name
       type: ["null", string]
       jsonldPredicate: "@id"
 
@@ -88,16 +96,15 @@
         - type: "array"
           items: [ "#Datatype", "#Schema", "string" ]
       jsonldPredicate:
-        "@id": "avro:type"
-        "@type": "@vocab"
+        _id: "avro:type"
+        _type: "@vocab"
 
     - name: "fields"
       type:
         - "null"
         - type: "array"
           items: "#Schema"
-      jsonldPredicate:
-        "@id": "avro:fields"
+      jsonldPredicate: "avro:fields"
       doc: "When `type` is `record`, defines the fields of the record."
 
     - name: "symbols"
@@ -106,53 +113,50 @@
         - type: "array"
           items: "string"
       jsonldPredicate:
-        "@id": "sld:symbols"
-        "@type": "@id"
+        _id: "avro:symbols"
+        _type: "@id"
         checkedURI: false
       doc: "When `type` is `enum`, defines the set of valid symbols."
 
-    - name: "items"
+    - name: items
       type:
         - "null"
         - "#Datatype"
         - "#Schema"
-        - "string"
-        - type: "array"
-          items: [ "#Datatype", "#Schema", "string" ]
+        - string
+        - type: array
+          items: [ "#Datatype", "#Schema", string ]
       jsonldPredicate:
-        "@id": "avro:items"
-        "@type": "@vocab"
+        _id: "avro:items"
+        _type: "@vocab"
       doc: "When `type` is `array`, defines the type of the array elements."
 
-    - name: "doc"
+    - name: doc
       type: ["null", string]
 
-    - name: "docParent"
+    - name: docParent
       type: ["null", string]
 
-    - name: "docAfter"
+    - name: docAfter
       type: ["null", string]
 
-    - name: "jsonldPrefix"
+    - name: jsonldPrefix
       type: ["null", string]
 
-    - name: "jsonldPrefixes"
+    - name: jsonldPredicate
       type:
         - "null"
-        - type: array
-          items: "#JsonldPrefix"
+        - string
+        - "#JsonldPredicate"
 
-    - name: "jsonldVocab"
+    - name: extends
+      type: ["null", string]
+      jsonldPredicate:
+        _id: "sld:extends"
+        _type: "@id"
+
+    - name: specialize
       type: ["null", string]
 
-    - name: "jsonldPredicate"
-      type: ["null", "Any"]
-
-    - name: "extends"
-      type: ["null", string]
-
-    - name: "specialize"
-      type: ["null", string]
-
-    - name: "validationRoot"
+    - name: validationRoot
       type: ["null", boolean]

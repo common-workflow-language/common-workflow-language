@@ -12,64 +12,73 @@ from rdflib import Graph, URIRef
 import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
 import urlparse
+import logging
 
-def pred(datatype, field, name, context, defaultPrefix, namespaces):
+_logger = logging.getLogger("salad")
+
+def pred(datatype, field, name, context, defaultBase, namespaces):
     split = urlparse.urlsplit(name)
+
+    v = None
 
     if split.scheme:
         v = name
         (ns, ln) = rdflib.namespace.split_uri(unicode(v))
         name = ln
-        #print ns, ln, namespaces
         if ns[0:-1] in namespaces:
-            v = namespaces[ns[0:-1]][ln]
-    else:
-        v = None
-        if field and "jsonldPredicate" in field:
-            v = field["jsonldPredicate"]
-        elif "jsonldPredicate" in datatype:
-            for d in datatype["jsonldPredicate"]:
-                if d["symbol"] == name:
-                    v = d["predicate"]
-        if not v:
-            if field and "jsonldPrefix" in field:
-                defaultPrefix = field["jsonldPrefix"]
-            elif "jsonldPrefix" in datatype:
-                defaultPrefix = datatype["jsonldPrefix"]
+            v = unicode(namespaces[ns[0:-1]][ln])
+        _logger.debug("name, v %s %s", name, v)
 
-        if not v:
-            v = "%s:%s" % (defaultPrefix, name)
+    if field and "jsonldPredicate" in field:
+        if isinstance(field["jsonldPredicate"], dict):
+            v = {"@"+k[1:]: v for k,v in field["jsonldPredicate"].items() if k.startswith("_")}
+        else:
+            v = field["jsonldPredicate"]
+    elif "jsonldPredicate" in datatype:
+        for d in datatype["jsonldPredicate"]:
+            if d["symbol"] == name:
+                v = d["predicate"]
+    if not v:
+        if field and "jsonldPrefix" in field:
+            defaultBase = field["jsonldPrefix"]
+        elif "jsonldPrefix" in datatype:
+            defaultBase = datatype["jsonldPrefix"]
+
+    if not v:
+        v = defaultBase + name
 
     if name in context:
         if context[name] != v:
-            raise Exception("Predicate collision on %s, %s != %s" % (name, context[name], v))
+            raise Exception("Predicate collision on %s, '%s' != '%s'" % (name, context[name], v))
     else:
+        _logger.debug("Adding to context '%s' %s (%s)", name, v, type(v))
         context[name] = v
 
     return v
 
-def salad_to_jsonld_context(j):
+def salad_to_jsonld_context(j, schema_ctx):
     context = {}
     namespaces = {}
     g = Graph()
     defaultPrefix = ""
 
-    for t in j:
-        if "jsonldVocab" in t:
-            for prefix in t["jsonldPrefixes"]:
-                context[prefix["prefix"]] = prefix["namespace"]
-                namespaces[prefix["prefix"]] = rdflib.namespace.Namespace(prefix["namespace"])
-        if "jsonldVocab" in t:
-            defaultPrefix = t["jsonldVocab"]
+    for k,v in schema_ctx.items():
+        context[k] = v
+        namespaces[k] = rdflib.namespace.Namespace(v)
+
+    defaultBase = context["@base"]
+    del context["@base"]
 
     for k,v in namespaces.items():
         g.bind(k, v)
 
     for t in j:
-        if t["type"] == "https://w3id.org/cwl/salad#record":
+        if t["type"] == "https://w3id.org/cwl/avro#record":
             recordname = t["name"]
 
-            classnode = namespaces[defaultPrefix][recordname]
+            _logger.debug("Processing record %s\n", t)
+
+            classnode = URIRef(recordname)
             g.add((classnode, RDF.type, RDFS.Class))
 
             split = urlparse.urlsplit(recordname)
@@ -88,23 +97,23 @@ def salad_to_jsonld_context(j):
             if not recordname:
                 raise Exception()
 
+            _logger.debug("Adding to context '%s' %s (%s)", recordname, predicate, type(predicate))
             context[recordname] = predicate
 
             for i in t.get("fields", []):
                 fieldname = i["name"]
 
-                v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
+                _logger.debug("Processing field %s", i)
 
-                #print t, i, fieldname, context, defaultPrefix, v
+                v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
 
                 if isinstance(v, basestring):
                     v = v if v[0] != "@" else None
                 else:
-                    v = v["@id"] if v.get("@id", "@")[0] != "@" else None
+                    v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
 
                 if v:
                     (ns, ln) = rdflib.namespace.split_uri(unicode(v))
-                    #print ns, ln
                     if ns[0:-1] in namespaces:
                         propnode = namespaces[ns[0:-1]][ln]
                     else:
@@ -117,10 +126,11 @@ def salad_to_jsonld_context(j):
 
             if "extends" in t:
                 g.add((classnode, RDFS.subClassOf, namespaces["cwl"][t["extends"]]))
-        elif t["type"] == "https://w3id.org/cwl/salad#enum":
+        elif t["type"] == "https://w3id.org/cwl/avro#enum":
+            _logger.debug("Processing enum %s", t["name"])
+
             for i in t["symbols"]:
-                _, symname = urlparse.urldefrag(i)
-                pred(t, None, symname, context, defaultPrefix, namespaces)
+                pred(t, None, i, context, defaultBase, namespaces)
 
     return (context, g)
 

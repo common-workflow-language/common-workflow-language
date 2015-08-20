@@ -26,33 +26,6 @@ def printrdf(workflow, wf, ctx, sr):
     g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow, context=ctx)
     print(g.serialize(format=sr))
 
-def create_loader(ctx):
-    loader = Loader()
-    for c in ctx:
-        if ctx[c] == "@id":
-            loader.identifiers.append(c)
-        elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id":
-            loader.url_fields.append(c)
-            if ctx[c].get("checkedURI", True):
-                loader.checked_urls(c)
-        elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@vocab":
-            loader.url_fields.append(c)
-            loader.vocab_fields.append(c)
-
-        if isinstance(ctx[c], dict) and "@id" in ctx[c]:
-            loader.vocab[c] = ctx[c]["@id"]
-        elif isinstance(ctx[c], basestring):
-            loader.vocab[c] = ctx[c]
-
-    _logger.debug("identifiers is %s", loader.identifiers)
-    _logger.debug("url_fields is %s", loader.url_fields)
-    _logger.debug("checked_urls is %s", loader.checked_urls)
-    _logger.debug("vocab_fields is %s", loader.vocab_fields)
-    _logger.debug("vocab is %s", loader.vocab)
-
-
-    return loader
-
 def validate_doc(schema_names, validate_doc, strict):
     for item in validate_doc:
         for r in schema_names.names.values():
@@ -66,7 +39,6 @@ def validate_doc(schema_names, validate_doc, strict):
                 _logger.error("Document failed validation:\n%s", "\n".join(errors))
                 return False
     return True
-
 
 def main(args=None):
     if args is None:
@@ -116,7 +88,10 @@ def main(args=None):
     metaschema_names, metaschema_doc, metaschema_loader = schema.get_metaschema()
 
     # Load schema document and resolve refs
-    schema_doc = metaschema_loader.resolve_ref("file://" + os.path.abspath(args.schema))
+    #print "metaschema_loader.ctx", metaschema_loader.ctx
+    schema_uri = "file://" + os.path.abspath(args.schema)
+    schema_raw_doc = metaschema_loader.fetch(schema_uri)
+    schema_doc = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
 
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:
@@ -139,10 +114,12 @@ def main(args=None):
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
-    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc)
+    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, schema_raw_doc["@context"])
+
+    #print "CTX IS", json.dumps(schema_ctx, indent=4)
 
     # Create the loader that will be used to load the target document.
-    document_loader = create_loader(schema_ctx)
+    document_loader = Loader(schema_ctx)
 
     # Make the Avro validation that will be used to validate the target document
     (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc)
