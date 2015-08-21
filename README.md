@@ -67,6 +67,7 @@ and send a pull request!
 * [Curoverse](http://curoverse.com)
 * [Seven Bridges Genomics](http://sbgenomics.com)
 * [Galaxy Project](http://galaxyproject.org/)
+* [Taverna Project](http://www.taverna.org.uk/)
 * [Institut Pasteur](http://www.pasteur.fr)
 * [University of California Davis](http://ucdavis.edu)
 * [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
