@@ -125,7 +125,7 @@ def salad_to_jsonld_context(j, schema_ctx):
                     # TODO generate range from datatype.
 
             if "extends" in t:
-                g.add((classnode, RDFS.subClassOf, namespaces["cwl"][t["extends"]]))
+                g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
         elif t["type"] == "https://w3id.org/cwl/avro#enum":
             _logger.debug("Processing enum %s", t["name"])
 

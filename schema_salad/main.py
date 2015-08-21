@@ -26,20 +26,6 @@ def printrdf(workflow, wf, ctx, sr):
     g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow, context=ctx)
     print(g.serialize(format=sr))
 
-def validate_doc(schema_names, validate_doc, strict):
-    for item in validate_doc:
-        for r in schema_names.names.values():
-            if r.get_prop("validationRoot"):
-                errors = []
-                try:
-                    validate.validate_ex(r, item, strict)
-                    break
-                except validate.ValidationException as e:
-                    errors.append(str(e))
-                _logger.error("Document failed validation:\n%s", "\n".join(errors))
-                return False
-    return True
-
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
@@ -108,7 +94,7 @@ def main(args=None):
 
     # Validate the schema document against the metaschema
     try:
-        validate_doc(metaschema_names, schema_doc, args.strict)
+        schema.validate_doc(metaschema_names, schema_doc, args.strict)
     except Exception as e:
         _logger.error(e)
         return 1
@@ -167,12 +153,12 @@ def main(args=None):
         document_loader.validate_links(document)
     except (validate.ValidationException) as e:
         _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        #_logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
+        _logger.debug("Index is %s", json.dumps(document_loader.idx.keys(), indent=4))
         return 1
 
     # Validate the schema document against the metaschema
     try:
-        validate_doc(avsc_names, document, args.strict)
+        schema.validate_doc(avsc_names, document, args.strict)
     except Exception as e:
         _logger.error(e)
         return 1

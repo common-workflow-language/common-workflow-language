@@ -81,7 +81,7 @@
 - name: Schema
   type: record
   doc: "A schema defines an object type."
-  validationRoot: true
+  abstract: true
   fields:
     - name: name
       type: ["null", string]
@@ -99,43 +99,14 @@
         _id: "avro:type"
         _type: "@vocab"
 
-    - name: "fields"
-      type:
-        - "null"
-        - type: "array"
-          items: "#Schema"
-      jsonldPredicate: "avro:fields"
-      doc: "When `type` is `record`, defines the fields of the record."
-
-    - name: "symbols"
-      type:
-        - "null"
-        - type: "array"
-          items: "string"
-      jsonldPredicate:
-        _id: "avro:symbols"
-        _type: "@id"
-        checkedURI: false
-      doc: "When `type` is `enum`, defines the set of valid symbols."
-
-    - name: items
-      type:
-        - "null"
-        - "#Datatype"
-        - "#Schema"
-        - string
-        - type: array
-          items: [ "#Datatype", "#Schema", string ]
-      jsonldPredicate:
-        _id: "avro:items"
-        _type: "@vocab"
-      doc: "When `type` is `array`, defines the type of the array elements."
-
     - name: doc
       type: ["null", string]
 
     - name: docParent
       type: ["null", string]
+      jsonldPredicate:
+        _id: "sld:docParent"
+        _type: "@id"
 
     - name: docAfter
       type: ["null", string]
@@ -149,6 +120,21 @@
         - string
         - "#JsonldPredicate"
 
+    - name: validationRoot
+      type: ["null", boolean]
+
+
+- name: RecordSchema
+  type: record
+  extends: "#Schema"
+  validationRoot: true
+  fields:
+    - name: "fields"
+      type:
+        - type: "array"
+          items: "#Schema"
+      jsonldPredicate: "avro:fields"
+      doc: "When `type` is `record`, defines the fields of the record."
     - name: extends
       type: ["null", string]
       jsonldPredicate:
@@ -158,5 +144,36 @@
     - name: specialize
       type: ["null", string]
 
-    - name: validationRoot
-      type: ["null", boolean]
+
+- name: EnumSchema
+  type: record
+  validationRoot: true
+  extends: "#Schema"
+  fields:
+    - name: "symbols"
+      type:
+        - type: "array"
+          items: "string"
+      jsonldPredicate:
+        _id: "avro:symbols"
+        _type: "@id"
+        checkedURI: false
+      doc: "When `type` is `enum`, defines the set of valid symbols."
+
+
+- name: ArraySchema
+  type: record
+  validationRoot: true
+  extends: "#Schema"
+  fields:
+    - name: items
+      type:
+        - "#Datatype"
+        - "#Schema"
+        - string
+        - type: array
+          items: [ "#Datatype", "#Schema", string ]
+      jsonldPredicate:
+        _id: "avro:items"
+        _type: "@vocab"
+      doc: "When `type` is `array`, defines the type of the array elements."

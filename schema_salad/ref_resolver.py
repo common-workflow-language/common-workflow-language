@@ -28,7 +28,10 @@ class NormDict(dict):
         return super(NormDict, self).__contains__(self.normalize(key))
 
 
-def expand_url(url, base_url, scoped=False, vocab=None):
+def expand_url(url, base_url, scoped=False, vocab=None, vocab_term=False):
+    if vocab_term and vocab and url in vocab:
+        return vocab[url]
+
     if vocab and ":" in url:
         prefix = url.split(":")[0]
         if prefix in vocab:
@@ -46,8 +49,6 @@ def expand_url(url, base_url, scoped=False, vocab=None):
         else:
             frg = split.path
         return urlparse.urlunsplit((splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
-    elif vocab and url in vocab:
-        return vocab[url]
     else:
         return urlparse.urljoin(base_url, url)
 
@@ -123,7 +124,7 @@ class Loader(object):
         if not isinstance(ref, basestring):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = expand_url(ref, base_url, scoped=(obj is not None))
+        url = expand_url(ref, base_url, scoped=(obj is not None), vocab=self.vocab)
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -148,8 +149,7 @@ class Loader(object):
         obj = self.resolve_all(obj, url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
-        if self.idx.get(url) is not None:
-            #return self.idx[url]
+        if url in self.idx:
             return obj
         else:
             raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
@@ -164,8 +164,9 @@ class Loader(object):
             else:
                 for identifer in self.identifiers:
                     if identifer in document:
-                        document = self.resolve_ref(document, base_url)
-                        break
+                        if isinstance(document[identifer], basestring):
+                            document[identifer] = expand_url(document[identifer], base_url, scoped=True, vocab=self.vocab)
+                            self.idx[document[identifer]] = document
             if inc:
                 return document
 
@@ -184,12 +185,11 @@ class Loader(object):
 
         if isinstance(document, dict):
             for d in loader.url_fields:
-                vocab = loader.vocab if d in loader.vocab_fields else None
                 if d in document:
                     if isinstance(document[d], basestring):
-                        document[d] = expand_url(document[d], base_url, False, vocab)
+                        document[d] = expand_url(document[d], base_url, scoped=False, vocab=loader.vocab, vocab_term=(d in loader.vocab_fields))
                     elif isinstance(document[d], list):
-                        document[d] = [expand_url(url, base_url, False, vocab) if isinstance(url, basestring) else url for url in document[d] ]
+                        document[d] = [expand_url(url, base_url, scoped=False, vocab=loader.vocab, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
             iterator = document.iteritems()
         elif isinstance(document, list):
             iterator = enumerate(document)

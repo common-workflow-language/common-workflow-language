@@ -10,44 +10,51 @@ import validate
 import json
 import urlparse
 import ref_resolver
+from flatten import flatten
 
 def get_metaschema():
     f = resource_stream(__name__, 'metaschema.yml')
 
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
+        "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
+        "EnumSchema": "https://w3id.org/cwl/salad#EnumSchema",
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
+        "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
         "Schema": "https://w3id.org/cwl/salad#Schema",
         "_id": {
-            "@id": "sld:_id",
+            "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id"
         },
-        "_type": "https://w3id.org/cwl/salad#JsonldPredicate/_type",
+        "_type": "https://w3id.org/cwl/salad#_type",
         "array": "https://w3id.org/cwl/avro#array",
         "avro": "https://w3id.org/cwl/avro#",
         "boolean": "https://w3id.org/cwl/avro#boolean",
         "bytes": "https://w3id.org/cwl/avro#bytes",
-        "checkedURI": "https://w3id.org/cwl/salad#JsonldPredicate/checkedURI",
+        "checkedURI": "https://w3id.org/cwl/salad#checkedURI",
         "dct": "http://purl.org/dc/terms/",
-        "doc": "https://w3id.org/cwl/salad#Schema/doc",
-        "docAfter": "https://w3id.org/cwl/salad#Schema/docAfter",
-        "docParent": "https://w3id.org/cwl/salad#Schema/docParent",
+        "doc": "https://w3id.org/cwl/salad#doc",
+        "docAfter": "https://w3id.org/cwl/salad#docAfter",
+        "docParent": {
+            "@id": "https://w3id.org/cwl/salad#docParent",
+            "@type": "@id"
+        },
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "https://w3id.org/cwl/avro#double",
         "enum": "https://w3id.org/cwl/avro#enum",
         "extends": {
-            "@id": "sld:extends",
+            "@id": "https://w3id.org/cwl/salad#extends",
             "@type": "@id"
         },
         "fields": "avro:fields",
         "float": "https://w3id.org/cwl/avro#float",
         "int": "https://w3id.org/cwl/avro#int",
         "items": {
-            "@id": "avro:items",
+            "@id": "https://w3id.org/cwl/avro#items",
             "@type": "@vocab"
         },
-        "jsonldPredicate": "https://w3id.org/cwl/salad#Schema/jsonldPredicate",
-        "jsonldPrefix": "https://w3id.org/cwl/salad#Schema/jsonldPrefix",
+        "jsonldPredicate": "https://w3id.org/cwl/salad#jsonldPredicate",
+        "jsonldPrefix": "https://w3id.org/cwl/salad#jsonldPrefix",
         "long": "https://w3id.org/cwl/avro#long",
         "name": "@id",
         "null": "https://w3id.org/cwl/avro#null",
@@ -55,17 +62,17 @@ def get_metaschema():
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "record": "https://w3id.org/cwl/avro#record",
         "sld": "https://w3id.org/cwl/salad#",
-        "specialize": "https://w3id.org/cwl/salad#Schema/specialize",
+        "specialize": "https://w3id.org/cwl/salad#specialize",
         "string": "https://w3id.org/cwl/avro#string",
         "symbols": {
-            "@id": "avro:symbols",
+            "@id": "https://w3id.org/cwl/avro#symbols",
             "@type": "@id"
         },
         "type": {
-            "@id": "avro:type",
+            "@id": "https://w3id.org/cwl/avro#type",
             "@type": "@vocab"
         },
-        "validationRoot": "https://w3id.org/cwl/salad#Schema/validationRoot"
+        "validationRoot": "https://w3id.org/cwl/salad#validationRoot"
     })
     loader.checked_urls.remove("symbols")
     loader.checked_urls.remove("_id")
@@ -74,10 +81,23 @@ def get_metaschema():
 
     (sch_names, sch_obj) = make_avro_schema(j)
 
-    for item in j:
-        validate.validate_ex(sch_names.get_name("Schema", ""), item, strict=True)
+    validate_doc(sch_names, j, strict=True)
 
     return (sch_names, j, loader)
+
+def validate_doc(schema_names, validate_doc, strict):
+    for item in validate_doc:
+        for r in schema_names.names.values():
+            if r.get_prop("validationRoot"):
+                errors = []
+                try:
+                    validate.validate_ex(r, item, strict)
+                    break
+                except validate.ValidationException as e:
+                    errors.append(str(e))
+                _logger.error("Document failed validation:\n%s", "\n".join(errors))
+                return False
+    return True
 
 
 def create_loader(ctx):
@@ -109,6 +129,8 @@ def replace_type(items, spec):
         for n in ("type", "items", "values"):
             if n in items:
                 items[n] = replace_type(items[n], spec)
+                if isinstance(items[n], list):
+                    items[n] = flatten(items[n])
         return items
     if isinstance(items, list):
         n = []
@@ -131,7 +153,7 @@ def make_valid_avro(items, found, union=False):
                 else:
                     items["name"] = frg
 
-        if "type" in items and items["type"] in ("record", "enum"):
+        if "type" in items and items["type"] in ("record", "enum", "https://w3id.org/cwl/avro#record", "https://w3id.org/cwl/avro#enum"):
             if items.get("abstract"):
                 return items
             if items["name"] in found:
@@ -207,17 +229,6 @@ def make_avro_schema(j):
     j2 = make_valid_avro(j, set())
 
     j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
-
-    # avsc = {
-    #     "name": "Container",
-    #     "type": "record",
-    #     "fields": []
-    # }
-    # for t in j3:
-    #     avsc["fields"].append({
-    #         "name": t["name"],
-    #         "type": t
-    #         })
 
     avro.schema.make_avsc_object(j3, names)
 
