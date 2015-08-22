@@ -24,7 +24,6 @@
     - "avro:double"
     - "avro:bytes"
     - "avro:string"
-    - "sld:documentation"
   doc: |
    Salad data types are based on Avro schema declarations.  Refer to the
    [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
@@ -102,31 +101,61 @@
       type: ["null", boolean]
 
 
+- name: RecordField
+  type: record
+  fields:
+    - name: name
+      type: string
+      jsonldPredicate: "@id"
+
+    - name: doc
+      type: ["null", string]
+
+    - name: type
+      type:
+        - "#PrimitiveType"
+        - "#ComplexType"
+        - "#Any"
+        - type: array
+          items:
+            - "#PrimitiveType"
+            - "#ComplexType"
+            - "#Any"
+      jsonldPredicate:
+        _id: "avro:type"
+        _type: "@vocab"
+
+    - name: jsonldPrefix
+      type: ["null", string]
+
+    - name: jsonldPredicate
+      type:
+        - "null"
+        - string
+        - "#JsonldPredicate"
+
+
 - name: RecordSchema
   type: record
   extends: "#ComplexType"
   validationRoot: true
   fields:
-    - name: "type"
+    - name: type
       doc: "Must be `record`"
       type:
         name: Record_symbol
         type: enum
         symbols:
           - "avro:record"
+      jsonldPredicate:
+        _id: "avro:type"
+        _type: "@vocab"
+
 
     - name: "fields"
       type:
         type: "array"
-        items:
-          - "#PrimitiveType"
-          - "#ComplexType"
-          - "string"
-          - type: "array"
-            items: [ "#PrimitiveType", "#ComplexType", "string" ]
-        jsonldPredicate:
-          _id: "avro:type"
-          _type: "@vocab"
+        items: "#RecordField"
 
       jsonldPredicate: "avro:fields"
       doc: "Defines the fields of the record."
@@ -146,13 +175,16 @@
   extends: "#ComplexType"
   validationRoot: true
   fields:
-    - name: "type"
+    - name: type
       doc: "Must be `enum`"
       type:
         name: Enum_symbol
         type: enum
         symbols:
           - "avro:enum"
+      jsonldPredicate:
+        _id: "avro:type"
+        _type: "@vocab"
 
     - name: "symbols"
       type:
@@ -175,6 +207,10 @@
         type: enum
         symbols:
           - "avro:array"
+      jsonldPredicate:
+        _id: "avro:type"
+        _type: "@vocab"
+
 
     - name: items
       type:
@@ -187,3 +223,32 @@
         _id: "avro:items"
         _type: "@vocab"
       doc: "When `type` is `array`, defines the type of the array elements."
+
+
+- name: Documentation
+  type: record
+  validationRoot: true
+  fields:
+    - name: type
+      doc: "Must be `documentation`"
+      type:
+        name: Documentation_symbol
+        type: enum
+        symbols:
+          - "sld:documentation"
+      jsonldPredicate:
+        _id: "avro:type"
+        _type: "@vocab"
+
+
+    - name: doc
+      type: string
+
+    - name: docParent
+      type: ["null", string]
+      jsonldPredicate:
+        _id: "sld:docParent"
+        _type: "@id"
+
+    - name: docAfter
+      type: ["null", string]

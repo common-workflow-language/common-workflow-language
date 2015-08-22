@@ -100,7 +100,7 @@ def main(args=None):
     # Validate the schema document against the metaschema
     try:
         schema.validate_doc(metaschema_names, schema_doc, args.strict)
-    except Exception as e:
+    except validate.ValidationException as e:
         _logger.error(e)
         return 1
 
@@ -168,7 +168,7 @@ def main(args=None):
     # Validate the schema document against the metaschema
     try:
         schema.validate_doc(avsc_names, document, args.strict)
-    except Exception as e:
+    except validate.ValidationException as e:
         _logger.error(e)
         return 1
 

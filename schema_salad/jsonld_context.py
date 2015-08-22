@@ -108,6 +108,9 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
                 # TODO generate range from datatype.
 
+            if isinstance(i["type"], dict) and "name" in i["type"]:
+                process_type(i["type"], g, context, defaultBase, namespaces, defaultPrefix)
+
         if "extends" in t:
             g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
     elif t["type"] == "https://w3id.org/cwl/avro#enum":

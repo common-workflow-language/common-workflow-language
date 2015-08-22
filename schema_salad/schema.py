@@ -22,21 +22,19 @@ def get_metaschema():
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
         "ComplexType": "https://w3id.org/cwl/salad#ComplexType",
-        "EnumoSchema": "https://w3id.org/cwl/salad#EnumSchema",
+        "EnumSchema": "https://w3id.org/cwl/salad#EnumSchema",
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
+        "RecordField": "https://w3id.org/cwl/salad#RecordField",
         "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
-        "record": "https://w3id.org/cwl/avro#record",
-        "enum": "https://w3id.org/cwl/avro#enum",
-        "array": "https://w3id.org/cwl/avro#array",
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id"
         },
         "_type": "https://w3id.org/cwl/salad#_type",
+        "array": "https://w3id.org/cwl/avro#array",
         "avro": "https://w3id.org/cwl/avro#",
         "boolean": "https://w3id.org/cwl/avro#boolean",
         "bytes": "https://w3id.org/cwl/avro#bytes",
-        "checkedURI": "https://w3id.org/cwl/salad#checkedURI",
         "dct": "http://purl.org/dc/terms/",
         "doc": "https://w3id.org/cwl/salad#doc",
         "docAfter": "https://w3id.org/cwl/salad#docAfter",
@@ -46,12 +44,14 @@ def get_metaschema():
         },
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "https://w3id.org/cwl/avro#double",
+        "enum": "https://w3id.org/cwl/avro#enum",
         "extends": {
             "@id": "https://w3id.org/cwl/salad#extends",
             "@type": "@id"
         },
         "fields": "avro:fields",
         "float": "https://w3id.org/cwl/avro#float",
+        "identifier": "https://w3id.org/cwl/salad#identifier",
         "int": "https://w3id.org/cwl/avro#int",
         "items": {
             "@id": "https://w3id.org/cwl/avro#items",
@@ -64,6 +64,7 @@ def get_metaschema():
         "null": "https://w3id.org/cwl/avro#null",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "record": "https://w3id.org/cwl/avro#record",
         "sld": "https://w3id.org/cwl/salad#",
         "specialize": "https://w3id.org/cwl/salad#specialize",
         "string": "https://w3id.org/cwl/avro#string",
@@ -72,34 +73,37 @@ def get_metaschema():
             "@type": "@id"
         },
         "type": {
-            "@id": "https://w3id.org/cwl/salad#type",
+            "@id": "https://w3id.org/cwl/avro#type",
             "@type": "@vocab"
         },
         "validationRoot": "https://w3id.org/cwl/salad#validationRoot"
+
     })
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
+    pprint.pprint(j)
+
     (sch_names, sch_obj) = make_avro_schema(j)
-
-    if not validate_doc(sch_names, j, strict=True):
-        raise Exception("Invalid metaschema")
-
+    validate_doc(sch_names, j, strict=True)
     return (sch_names, j, loader)
+
 
 def validate_doc(schema_names, validate_doc, strict):
     for item in validate_doc:
+        errors = []
+        success = False
         for r in schema_names.names.values():
             if r.get_prop("validationRoot"):
-                errors = []
                 try:
                     validate.validate_ex(r, item, strict)
+                    success = True
                     break
                 except validate.ValidationException as e:
-                    errors.append(str(e))
-                _logger.error("Document failed validation:\n%s", "\n".join(errors))
-                return False
-    return True
+                    errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
+        if not success:
+            raise validate.ValidationException("Failed validation:\n- %s" % ("\n\n- ".join(errors)))
+
 
 
 def create_loader(ctx):
@@ -155,7 +159,7 @@ def make_valid_avro(items, found, union=False):
                 else:
                     items["name"] = frg
 
-        if "type" in items and items["type"] in ("record", "enum", "https://w3id.org/cwl/avro#record", "https://w3id.org/cwl/avro#enum"):
+        if "type" in items and items["type"] in ("https://w3id.org/cwl/avro#record", "https://w3id.org/cwl/avro#enum"):
             if items.get("abstract"):
                 return items
             if "name" not in items:
@@ -200,14 +204,15 @@ def extend_and_specialize(items):
 
             r["fields"].extend(t.get("fields", []))
 
-            for y in [x for x in r["fields"] if x["name"] == "class"]:
-                y["type"] = {"type": "enum",
-                             "symbols": [r["name"]],
-                             "name": r["name"]+"_class",
-                }
-                y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
+            # for y in [x for x in r["fields"] if x["name"] == "class"]:
+            #     y["type"] = {"type": "enum",
+            #                  "symbols": [r["name"]],
+            #                  "name": r["name"]+"_class",
+            #     }
+            #     y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
             r["extends"] = t["extends"]
+            r["validationRoot"] = t["validationRoot"]
             r["abstract"] = t.get("abstract", False)
             r["doc"] = t.get("doc", "")
             types[t["name"]] = r
@@ -232,7 +237,12 @@ def extend_and_specialize(items):
 
 def make_avro_schema(j):
     names = avro.schema.Names()
+
+    #pprint.pprint(j)
+
     j = extend_and_specialize(j)
+
+    #pprint.pprint(j)
 
     j2 = make_valid_avro(j, set())
 
