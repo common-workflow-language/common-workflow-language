@@ -11,6 +11,9 @@ import json
 import urlparse
 import ref_resolver
 from flatten import flatten
+import logging
+
+_logger = logging.getLogger("salad")
 
 def get_metaschema():
     f = resource_stream(__name__, 'metaschema.yml')
@@ -18,16 +21,18 @@ def get_metaschema():
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
-        "EnumSchema": "https://w3id.org/cwl/salad#EnumSchema",
+        "ComplexType": "https://w3id.org/cwl/salad#ComplexType",
+        "EnumoSchema": "https://w3id.org/cwl/salad#EnumSchema",
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
         "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
-        "Schema": "https://w3id.org/cwl/salad#Schema",
+        "record": "https://w3id.org/cwl/avro#record",
+        "enum": "https://w3id.org/cwl/avro#enum",
+        "array": "https://w3id.org/cwl/avro#array",
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id"
         },
         "_type": "https://w3id.org/cwl/salad#_type",
-        "array": "https://w3id.org/cwl/avro#array",
         "avro": "https://w3id.org/cwl/avro#",
         "boolean": "https://w3id.org/cwl/avro#boolean",
         "bytes": "https://w3id.org/cwl/avro#bytes",
@@ -41,7 +46,6 @@ def get_metaschema():
         },
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "https://w3id.org/cwl/avro#double",
-        "enum": "https://w3id.org/cwl/avro#enum",
         "extends": {
             "@id": "https://w3id.org/cwl/salad#extends",
             "@type": "@id"
@@ -60,7 +64,6 @@ def get_metaschema():
         "null": "https://w3id.org/cwl/avro#null",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "record": "https://w3id.org/cwl/avro#record",
         "sld": "https://w3id.org/cwl/salad#",
         "specialize": "https://w3id.org/cwl/salad#specialize",
         "string": "https://w3id.org/cwl/avro#string",
@@ -69,19 +72,18 @@ def get_metaschema():
             "@type": "@id"
         },
         "type": {
-            "@id": "https://w3id.org/cwl/avro#type",
+            "@id": "https://w3id.org/cwl/salad#type",
             "@type": "@vocab"
         },
         "validationRoot": "https://w3id.org/cwl/salad#validationRoot"
     })
-    loader.checked_urls.remove("symbols")
-    loader.checked_urls.remove("_id")
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
     (sch_names, sch_obj) = make_avro_schema(j)
 
-    validate_doc(sch_names, j, strict=True)
+    if not validate_doc(sch_names, j, strict=True):
+        raise Exception("Invalid metaschema")
 
     return (sch_names, j, loader)
 
@@ -126,7 +128,7 @@ def load_schema(f):
 
 def replace_type(items, spec):
     if isinstance(items, dict):
-        for n in ("type", "items", "values"):
+        for n in ("type", "items"):
             if n in items:
                 items[n] = replace_type(items[n], spec)
                 if isinstance(items[n], list):
@@ -156,6 +158,8 @@ def make_valid_avro(items, found, union=False):
         if "type" in items and items["type"] in ("record", "enum", "https://w3id.org/cwl/avro#record", "https://w3id.org/cwl/avro#enum"):
             if items.get("abstract"):
                 return items
+            if "name" not in items:
+                raise Exception("Named schemas must have a non-empty name: %s" % items)
             if items["name"] in found:
                 return items["name"]
             else:
@@ -181,7 +185,11 @@ def extend_and_specialize(items):
 
     for t in items:
         if "extends" in t:
+            if t["extends"] not in types:
+                raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
+
             r = copy.deepcopy(types[t["extends"]])
+
             r["name"] = t["name"]
             if "specialize" in t:
                 r["fields"] = replace_type(r["fields"], t["specialize"])

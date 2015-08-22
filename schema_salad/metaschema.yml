@@ -7,12 +7,13 @@
   "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
 
 "@graph":
-- name: "Schema_Annotations_for_Linked_Avro_Data"
+- name: "Semantic_Annotations_for_Linked_Avro_Data"
   type: documentation
   doc: |
     Work in progress.
 
-- name: "Datatype"
+
+- name: PrimitiveType
   type: enum
   symbols:
     - "avro:null"
@@ -23,17 +24,13 @@
     - "avro:double"
     - "avro:bytes"
     - "avro:string"
-    - "avro:record"
-    - "avro:enum"
-    - "avro:array"
     - "sld:documentation"
-    - "sld:Any"
   doc: |
    Salad data types are based on Avro schema declarations.  Refer to the
    [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
    detailed information.
 
-   ## Primitive types
+   ## Simple types
 
    * **null**: no value
    * **boolean**: a binary value
@@ -44,20 +41,9 @@
    * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
    * **string**: Unicode character sequence
 
-   ## Complex types
-
-   * **record**: An object with one or more fields defined by name and type
-   * **enum**: A value from a finite set of symbolic values
-   * **array**: An ordered sequence of values
-
-   ## Any type
-
-    The **Any** type validates for any non-null value.
-
 
 - name: "Any"
   type: enum
-  docParent: "#Datatype"
   symbols: ["#Any"]
   doc: |
     The **Any** type validates for any non-null value.
@@ -71,33 +57,25 @@
       jsonldPredicate:
         _id: sld:_id
         _type: "@id"
-        checkedURI: false
+        identifier: true
     - name: _type
       type: ["null", string]
-    - name: checkedURI
+    - name: identifier
       type: ["null", boolean]
 
 
-- name: Schema
+- name: ComplexType
   type: record
-  doc: "A schema defines an object type."
+  doc: |
+   * **record**: An object with one or more fields defined by name and type
+   * **enum**: A value from a finite set of symbolic values
+   * **array**: An ordered sequence of values
+
   abstract: true
   fields:
     - name: name
-      type: ["null", string]
+      type: string
       jsonldPredicate: "@id"
-
-    - name: "type"
-      doc: "The data type of this object."
-      type:
-        - "#Datatype"
-        - "#Schema"
-        - "string"
-        - type: "array"
-          items: [ "#Datatype", "#Schema", "string" ]
-      jsonldPredicate:
-        _id: "avro:type"
-        _type: "@vocab"
 
     - name: doc
       type: ["null", string]
@@ -126,15 +104,33 @@
 
 - name: RecordSchema
   type: record
-  extends: "#Schema"
+  extends: "#ComplexType"
   validationRoot: true
   fields:
+    - name: "type"
+      doc: "Must be `record`"
+      type:
+        name: Record_symbol
+        type: enum
+        symbols:
+          - "avro:record"
+
     - name: "fields"
       type:
-        - type: "array"
-          items: "#Schema"
+        type: "array"
+        items:
+          - "#PrimitiveType"
+          - "#ComplexType"
+          - "string"
+          - type: "array"
+            items: [ "#PrimitiveType", "#ComplexType", "string" ]
+        jsonldPredicate:
+          _id: "avro:type"
+          _type: "@vocab"
+
       jsonldPredicate: "avro:fields"
-      doc: "When `type` is `record`, defines the fields of the record."
+      doc: "Defines the fields of the record."
+
     - name: extends
       type: ["null", string]
       jsonldPredicate:
@@ -147,9 +143,17 @@
 
 - name: EnumSchema
   type: record
+  extends: "#ComplexType"
   validationRoot: true
-  extends: "#Schema"
   fields:
+    - name: "type"
+      doc: "Must be `enum`"
+      type:
+        name: Enum_symbol
+        type: enum
+        symbols:
+          - "avro:enum"
+
     - name: "symbols"
       type:
         - type: "array"
@@ -157,22 +161,28 @@
       jsonldPredicate:
         _id: "avro:symbols"
         _type: "@id"
-        checkedURI: false
+        identifier: true
       doc: "When `type` is `enum`, defines the set of valid symbols."
 
 
 - name: ArraySchema
   type: record
-  validationRoot: true
-  extends: "#Schema"
   fields:
+    - name: type
+      doc: "Must be `array`"
+      type:
+        name: Array_symbol
+        type: enum
+        symbols:
+          - "avro:array"
+
     - name: items
       type:
-        - "#Datatype"
-        - "#Schema"
+        - "#PrimitiveType"
+        - "#ComplexType"
         - string
         - type: array
-          items: [ "#Datatype", "#Schema", string ]
+          items: [ "#PrimitiveType", "#ComplexType", string ]
       jsonldPredicate:
         _id: "avro:items"
         _type: "@vocab"

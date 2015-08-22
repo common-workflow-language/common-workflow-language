@@ -56,6 +56,67 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
 
     return v
 
+def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
+    if t["type"] == "https://w3id.org/cwl/avro#record":
+        recordname = t["name"]
+
+        _logger.debug("Processing record %s\n", t)
+
+        classnode = URIRef(recordname)
+        g.add((classnode, RDF.type, RDFS.Class))
+
+        split = urlparse.urlsplit(recordname)
+        if "jsonldPrefix" in t:
+            predicate = "%s:%s" % (t["jsonldPrefix"], recordname)
+        elif split.scheme:
+            (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
+            predicate = recordname
+            recordname = ln
+        else:
+            predicate = "%s:%s" % (defaultPrefix, recordname)
+
+        if context.get(recordname, predicate) != predicate:
+            raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[t["name"]], predicate))
+
+        if not recordname:
+            raise Exception()
+
+        _logger.debug("Adding to context '%s' %s (%s)", recordname, predicate, type(predicate))
+        context[recordname] = predicate
+
+        for i in t.get("fields", []):
+            fieldname = i["name"]
+
+            _logger.debug("Processing field %s", i)
+
+            v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
+
+            if isinstance(v, basestring):
+                v = v if v[0] != "@" else None
+            else:
+                v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
+
+            if v:
+                (ns, ln) = rdflib.namespace.split_uri(unicode(v))
+                if ns[0:-1] in namespaces:
+                    propnode = namespaces[ns[0:-1]][ln]
+                else:
+                    propnode = URIRef(v)
+
+                g.add((propnode, RDF.type, RDF.Property))
+                g.add((propnode, RDFS.domain, classnode))
+
+                # TODO generate range from datatype.
+
+        if "extends" in t:
+            g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
+    elif t["type"] == "https://w3id.org/cwl/avro#enum":
+        _logger.debug("Processing enum %s", t["name"])
+
+        for i in t["symbols"]:
+            pred(t, None, i, context, defaultBase, namespaces)
+
+
 def salad_to_jsonld_context(j, schema_ctx):
     context = {}
     namespaces = {}
@@ -73,64 +134,7 @@ def salad_to_jsonld_context(j, schema_ctx):
         g.bind(k, v)
 
     for t in j:
-        if t["type"] == "https://w3id.org/cwl/avro#record":
-            recordname = t["name"]
-
-            _logger.debug("Processing record %s\n", t)
-
-            classnode = URIRef(recordname)
-            g.add((classnode, RDF.type, RDFS.Class))
-
-            split = urlparse.urlsplit(recordname)
-            if "jsonldPrefix" in t:
-                predicate = "%s:%s" % (t["jsonldPrefix"], recordname)
-            elif split.scheme:
-                (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
-                predicate = recordname
-                recordname = ln
-            else:
-                predicate = "%s:%s" % (defaultPrefix, recordname)
-
-            if context.get(recordname, predicate) != predicate:
-                raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[t["name"]], predicate))
-
-            if not recordname:
-                raise Exception()
-
-            _logger.debug("Adding to context '%s' %s (%s)", recordname, predicate, type(predicate))
-            context[recordname] = predicate
-
-            for i in t.get("fields", []):
-                fieldname = i["name"]
-
-                _logger.debug("Processing field %s", i)
-
-                v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
-
-                if isinstance(v, basestring):
-                    v = v if v[0] != "@" else None
-                else:
-                    v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
-
-                if v:
-                    (ns, ln) = rdflib.namespace.split_uri(unicode(v))
-                    if ns[0:-1] in namespaces:
-                        propnode = namespaces[ns[0:-1]][ln]
-                    else:
-                        propnode = URIRef(v)
-
-                    g.add((propnode, RDF.type, RDF.Property))
-                    g.add((propnode, RDFS.domain, classnode))
-
-                    # TODO generate range from datatype.
-
-            if "extends" in t:
-                g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
-        elif t["type"] == "https://w3id.org/cwl/avro#enum":
-            _logger.debug("Processing enum %s", t["name"])
-
-            for i in t["symbols"]:
-                pred(t, None, i, context, defaultBase, namespaces)
+        process_type(t, g, context, defaultBase, namespaces, defaultPrefix)
 
     return (context, g)
 

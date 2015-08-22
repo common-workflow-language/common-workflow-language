@@ -43,6 +43,7 @@ def main(args=None):
 
     exgroup.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for document")
     exgroup.add_argument("--print-pre", action="store_true", help="Print document after preprocessing")
+    exgroup.add_argument("--print-index", action="store_true", help="Print node index")
     exgroup.add_argument("--version", action="store_true", help="Print version")
 
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
@@ -82,6 +83,10 @@ def main(args=None):
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:
         print json.dumps(schema_doc, indent=4)
+        return 0
+
+    if not args.document and args.print_index:
+        print json.dumps(metaschema_loader.idx.keys(), indent=4)
         return 0
 
     # Validate links in the schema document
@@ -146,6 +151,10 @@ def main(args=None):
     # Optionally print the document after ref resolution
     if args.print_pre:
         print json.dumps(document, indent=4)
+        return 0
+
+    if args.print_index:
+        print json.dumps(document_loader.idx.keys(), indent=4)
         return 0
 
     # Validate links in the target document

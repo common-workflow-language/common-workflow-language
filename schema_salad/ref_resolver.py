@@ -75,8 +75,8 @@ class Loader(object):
                 self.identifiers.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
                 self.url_fields.append(c)
-                if self.ctx[c].get("checkedURI", True):
-                    self.checked_urls.append(c)
+                if self.ctx[c].get("identifier", True):
+                    self.identifiers.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
                 self.url_fields.append(c)
                 self.vocab_fields.append(c)
