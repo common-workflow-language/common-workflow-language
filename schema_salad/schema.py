@@ -22,6 +22,7 @@ def get_metaschema():
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
         "ComplexType": "https://w3id.org/cwl/salad#ComplexType",
+        "Documentation": "https://w3id.org/cwl/salad#Documentation",
         "EnumSchema": "https://w3id.org/cwl/salad#EnumSchema",
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
         "RecordField": "https://w3id.org/cwl/salad#RecordField",
@@ -31,6 +32,7 @@ def get_metaschema():
             "@type": "@id"
         },
         "_type": "https://w3id.org/cwl/salad#_type",
+        "abstract": "https://w3id.org/cwl/salad#abstract",
         "array": "https://w3id.org/cwl/avro#array",
         "avro": "https://w3id.org/cwl/avro#",
         "boolean": "https://w3id.org/cwl/avro#boolean",
@@ -77,7 +79,6 @@ def get_metaschema():
             "@type": "@vocab"
         },
         "validationRoot": "https://w3id.org/cwl/salad#validationRoot"
-
     })
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
