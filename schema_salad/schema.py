@@ -188,6 +188,12 @@ def make_valid_avro(items, found, union=False):
             items = frg
     return items
 
+def aslist(l):
+    if isinstance(l, list):
+        return l
+    else:
+        return [l]
+
 def extend_and_specialize(items):
     types = {t["name"]: t for t in items}
     n = []
@@ -201,6 +207,7 @@ def extend_and_specialize(items):
 
             r["name"] = t["name"]
             if "specialize" in t:
+                spec = {sp["specializeFrom"]: sp["specializeFrom"] for sp in aslist(t["specialize"])}
                 r["fields"] = replace_type(r["fields"], t["specialize"])
 
             for f in r["fields"]:
@@ -217,7 +224,7 @@ def extend_and_specialize(items):
                 y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
             r["extends"] = t["extends"]
-            r["validationRoot"] = t["validationRoot"]
+            r["validationRoot"] = t.get("validationRoot")
             r["abstract"] = t.get("abstract", False)
             r["doc"] = t.get("doc", "")
             types[t["name"]] = r

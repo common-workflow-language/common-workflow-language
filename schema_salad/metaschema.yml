@@ -59,8 +59,26 @@
         identifier: true
     - name: _type
       type: ["null", string]
+    - name: _container
+      type: ["null", string]
     - name: identifier
       type: ["null", boolean]
+
+
+- name: SpecializeDef
+  type: record
+  fields:
+    - name: specializeFrom
+      type: string
+      jsonldPredicate:
+        _id: "sld:specializeFrom"
+        _type: "@id"
+
+    - name: specializeTo
+      type: string
+      jsonldPredicate:
+        _id: "sld:specializeTo"
+        _type: "@id"
 
 
 - name: ComplexType
@@ -158,8 +176,9 @@
 
     - name: "fields"
       type:
-        type: "array"
-        items: "#RecordField"
+        - "null"
+        - type: "array"
+          items: "#RecordField"
 
       jsonldPredicate: "avro:fields"
       doc: "Defines the fields of the record."
@@ -171,7 +190,11 @@
         _type: "@id"
 
     - name: specialize
-      type: ["null", string]
+      type:
+        - "null"
+        - "#SpecializeDef"
+        - type: array
+          items: "#SpecializeDef"
 
 
 - name: EnumSchema
