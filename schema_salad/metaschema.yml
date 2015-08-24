@@ -116,11 +116,13 @@
         - "#PrimitiveType"
         - "#ComplexType"
         - "#Any"
+        - string
         - type: array
           items:
             - "#PrimitiveType"
             - "#ComplexType"
             - "#Any"
+            - string
       jsonldPredicate:
         _id: "avro:type"
         _type: "@vocab"
@@ -151,6 +153,8 @@
         _id: "avro:type"
         _type: "@vocab"
 
+    - name: abstract
+      type: ["null", boolean]
 
     - name: "fields"
       type:
@@ -229,6 +233,10 @@
   type: record
   validationRoot: true
   fields:
+    - name: name
+      type: string
+      jsonldPredicate: "@id"
+
     - name: type
       doc: "Must be `documentation`"
       type:

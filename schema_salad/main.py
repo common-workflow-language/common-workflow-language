@@ -75,7 +75,6 @@ def main(args=None):
     metaschema_names, metaschema_doc, metaschema_loader = schema.get_metaschema()
 
     # Load schema document and resolve refs
-    #print "metaschema_loader.ctx", metaschema_loader.ctx
     schema_uri = "file://" + os.path.abspath(args.schema)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
     schema_doc = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)

@@ -82,7 +82,7 @@ def get_metaschema():
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
-    pprint.pprint(j)
+    #pprint.pprint(j)
 
     (sch_names, sch_obj) = make_avro_schema(j)
     validate_doc(sch_names, j, strict=True)
@@ -148,18 +148,22 @@ def replace_type(items, spec):
             return spec[items]
     return items
 
+def avro_name(url):
+    doc_url, frg = urlparse.urldefrag(url)
+    if frg:
+        if '/' in frg:
+            return frg[frg.rindex('/')+1:]
+        else:
+            return frg
+    return url
+
 def make_valid_avro(items, found, union=False):
     items = copy.deepcopy(items)
     if isinstance(items, dict):
         if "name" in items:
-            doc_url, frg = urlparse.urldefrag(items["name"])
-            if frg:
-                if '/' in frg:
-                    items["name"] = frg[frg.rindex('/')+1:]
-                else:
-                    items["name"] = frg
+            items["name"] = avro_name(items["name"])
 
-        if "type" in items and items["type"] in ("https://w3id.org/cwl/avro#record", "https://w3id.org/cwl/avro#enum"):
+        if "type" in items and items["type"] in ("record", "enum"):
             if items.get("abstract"):
                 return items
             if "name" not in items:
@@ -204,12 +208,12 @@ def extend_and_specialize(items):
 
             r["fields"].extend(t.get("fields", []))
 
-            # for y in [x for x in r["fields"] if x["name"] == "class"]:
-            #     y["type"] = {"type": "enum",
-            #                  "symbols": [r["name"]],
-            #                  "name": r["name"]+"_class",
-            #     }
-            #     y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
+            for y in [x for x in r["fields"] if x["name"] == "class"]:
+                y["type"] = {"type": "enum",
+                             "symbols": [r["name"]],
+                             "name": r["name"]+"_class",
+                }
+                y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
             r["extends"] = t["extends"]
             r["validationRoot"] = t["validationRoot"]
@@ -226,6 +230,7 @@ def extend_and_specialize(items):
     for t in n:
         if "extends" in t and ex_types[t["extends"]].get("abstract"):
             add_dictlist(extended_by, t["extends"], ex_types[t["name"]])
+            add_dictlist(extended_by, avro_name(t["extends"]), ex_types[t["name"]])
 
     for t in n:
         if "fields" in t:

@@ -57,7 +57,7 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
     return v
 
 def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
-    if t["type"] == "https://w3id.org/cwl/avro#record":
+    if t["type"] == "record":
         recordname = t["name"]
 
         _logger.debug("Processing record %s\n", t)
@@ -113,7 +113,7 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
         if "extends" in t:
             g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
-    elif t["type"] == "https://w3id.org/cwl/avro#enum":
+    elif t["type"] == "enum":
         _logger.debug("Processing enum %s", t["name"])
 
         for i in t["symbols"]:

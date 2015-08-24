@@ -27,31 +27,6 @@ class NormDict(dict):
     def __contains__(self, key):
         return super(NormDict, self).__contains__(self.normalize(key))
 
-
-def expand_url(url, base_url, scoped=False, vocab=None, vocab_term=False):
-    if vocab_term and vocab and url in vocab:
-        return vocab[url]
-
-    if vocab and ":" in url:
-        prefix = url.split(":")[0]
-        if prefix in vocab:
-            return vocab[prefix] + url[len(prefix)+1:]
-
-    split = urlparse.urlsplit(url)
-
-    if split.scheme:
-        return url
-    elif scoped and not split.fragment:
-        splitbase = urlparse.urlsplit(base_url)
-        frg = ""
-        if splitbase.fragment:
-            frg = splitbase.fragment + "/" + split.path
-        else:
-            frg = split.path
-        return urlparse.urlunsplit((splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
-    else:
-        return urlparse.urljoin(base_url, url)
-
 class Loader(object):
     def __init__(self, ctx):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
@@ -59,12 +34,43 @@ class Loader(object):
         self.ctx = {}
         self.add_context(ctx)
 
+    def expand_url(self, url, base_url, scoped=False, vocab_term=False):
+        if vocab_term and url in self.vocab:
+            return url
+
+        if self.vocab and ":" in url:
+            prefix = url.split(":")[0]
+            if prefix in self.vocab:
+                url = self.vocab[prefix] + url[len(prefix)+1:]
+
+        split = urlparse.urlsplit(url)
+
+        if split.scheme:
+            pass
+        elif scoped and not split.fragment:
+            splitbase = urlparse.urlsplit(base_url)
+            frg = ""
+            if splitbase.fragment:
+                frg = splitbase.fragment + "/" + split.path
+            else:
+                frg = split.path
+            url = urlparse.urlunsplit((splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
+        else:
+            url = urlparse.urljoin(base_url, url)
+
+        if vocab_term and url in self.rvocab:
+            return self.rvocab[url]
+        else:
+            return url
+
+
     def add_context(self, newcontext):
         self.url_fields = []
         self.checked_urls = []
         self.vocab_fields = []
         self.identifiers = []
         self.vocab = {}
+        self.rvocab = {}
 
         self.ctx.update(newcontext)
 
@@ -85,6 +91,9 @@ class Loader(object):
                 self.vocab[c] = self.ctx[c]["@id"]
             elif isinstance(self.ctx[c], basestring):
                 self.vocab[c] = self.ctx[c]
+
+        for k,v in self.vocab.items():
+            self.rvocab[self.expand_url(v, "", scoped=False)] = k
 
         _logger.debug("identifiers is %s", self.identifiers)
         _logger.debug("url_fields is %s", self.url_fields)
@@ -124,7 +133,7 @@ class Loader(object):
         if not isinstance(ref, basestring):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = expand_url(ref, base_url, scoped=(obj is not None), vocab=self.vocab)
+        url = self.expand_url(ref, base_url, scoped=(obj is not None))
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -165,7 +174,7 @@ class Loader(object):
                 for identifer in self.identifiers:
                     if identifer in document:
                         if isinstance(document[identifer], basestring):
-                            document[identifer] = expand_url(document[identifer], base_url, scoped=True, vocab=self.vocab)
+                            document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
                             self.idx[document[identifer]] = document
             if inc:
                 return document
@@ -187,9 +196,9 @@ class Loader(object):
             for d in loader.url_fields:
                 if d in document:
                     if isinstance(document[d], basestring):
-                        document[d] = expand_url(document[d], base_url, scoped=False, vocab=loader.vocab, vocab_term=(d in loader.vocab_fields))
+                        document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
                     elif isinstance(document[d], list):
-                        document[d] = [expand_url(url, base_url, scoped=False, vocab=loader.vocab, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
+                        document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
             iterator = document.iteritems()
         elif isinstance(document, list):
             iterator = enumerate(document)
@@ -238,27 +247,23 @@ class Loader(object):
             for identifier in self.identifiers:
                 if identifier not in result:
                     result[identifier] = url
-                self.idx[expand_url(result[identifier], url)] = result
+                self.idx[self.expand_url(result[identifier], url)] = result
         else:
             self.idx[url] = result
         return result
 
     def validate_links(self, document):
-        rvocab = set()
-        for k,v in self.vocab.items():
-            rvocab.add(expand_url(v, "", scoped=False, vocab=self.vocab))
-
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
             for d in self.checked_urls:
                 if d in document:
                     if isinstance(document[d], basestring):
-                        if document[d] not in self.idx and document[d] not in rvocab:
+                        if (document[d] not in self.idx) or (d in self.vocab_fields and document[d] not in self.vocab):
                             raise validate.ValidationException("Invalid link `%s` in field `%s`" % (document[d], d))
                     elif isinstance(document[d], list):
                         for i in document[d]:
-                            if isinstance(i, basestring) and i not in self.idx and i not in rvocab:
+                            if isinstance(i, basestring) and (i not in self.idx) or (d in self.vocab_fields and i not in self.vocab):
                                 raise validate.ValidationException("Invalid link `%s` in field `%s`" % (i, d))
             iterator = document.iteritems()
         else:
