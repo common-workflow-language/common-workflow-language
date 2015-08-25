@@ -93,7 +93,8 @@ def main(args=None):
         metaschema_loader.validate_links(schema_doc)
     except (validate.ValidationException) as e:
         _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        #_logger.debug("Index is %s", json.dumps(loader.idx, indent=4))
+        _logger.debug("Index is %s", metaschema_loader.idx.keys())
+        _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
         return 1
 
     # Validate the schema document against the metaschema
@@ -105,8 +106,6 @@ def main(args=None):
 
     # Get the json-ld context and RDFS representation from the schema
     (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, schema_raw_doc["@context"])
-
-    #print "CTX IS", json.dumps(schema_ctx, indent=4)
 
     # Create the loader that will be used to load the target document.
     document_loader = Loader(schema_ctx)

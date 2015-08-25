@@ -66,7 +66,6 @@ class Loader(object):
 
     def add_context(self, newcontext):
         self.url_fields = []
-        self.checked_urls = []
         self.vocab_fields = []
         self.identifiers = []
         self.vocab = {}
@@ -81,7 +80,7 @@ class Loader(object):
                 self.identifiers.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
                 self.url_fields.append(c)
-                if self.ctx[c].get("identifier", True):
+                if self.ctx[c].get("identifier", False):
                     self.identifiers.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
                 self.url_fields.append(c)
@@ -97,7 +96,6 @@ class Loader(object):
 
         _logger.debug("identifiers is %s", self.identifiers)
         _logger.debug("url_fields is %s", self.url_fields)
-        _logger.debug("checked_urls is %s", self.checked_urls)
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
 
@@ -252,19 +250,27 @@ class Loader(object):
             self.idx[url] = result
         return result
 
+    def validate_link(self, field, link):
+        if isinstance(link, basestring):
+            if field in self.vocab_fields:
+                if link not in self.vocab and link not in self.idx:
+                    raise validate.ValidationException("Invalid link `%s` in field `%s`" % (link, field))
+            elif link not in self.idx:
+                raise validate.ValidationException("Invalid link `%s` in field `%s`" % (link, field))
+        elif isinstance(link, list):
+            for i in link:
+                self.validate_link(field, i)
+        elif isinstance(link, dict):
+            self.validate_links(link)
+        return True
+
     def validate_links(self, document):
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
-            for d in self.checked_urls:
-                if d in document:
-                    if isinstance(document[d], basestring):
-                        if (document[d] not in self.idx) or (d in self.vocab_fields and document[d] not in self.vocab):
-                            raise validate.ValidationException("Invalid link `%s` in field `%s`" % (document[d], d))
-                    elif isinstance(document[d], list):
-                        for i in document[d]:
-                            if isinstance(i, basestring) and (i not in self.idx) or (d in self.vocab_fields and i not in self.vocab):
-                                raise validate.ValidationException("Invalid link `%s` in field `%s`" % (i, d))
+            for d in self.url_fields:
+                if d not in self.identifiers and d in document:
+                    self.validate_link(d, document[d])
             iterator = document.iteritems()
         else:
             return

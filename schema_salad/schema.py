@@ -29,7 +29,8 @@ def get_metaschema():
         "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
-            "@type": "@id"
+            "@type": "@id",
+            "identifier": True
         },
         "_type": "https://w3id.org/cwl/salad#_type",
         "abstract": "https://w3id.org/cwl/salad#abstract",
@@ -72,7 +73,8 @@ def get_metaschema():
         "string": "https://w3id.org/cwl/avro#string",
         "symbols": {
             "@id": "https://w3id.org/cwl/avro#symbols",
-            "@type": "@id"
+            "@type": "@id",
+            "identifier": True
         },
         "type": {
             "@id": "https://w3id.org/cwl/avro#type",
@@ -104,31 +106,6 @@ def validate_doc(schema_names, validate_doc, strict):
                     errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
         if not success:
             raise validate.ValidationException("Failed validation:\n- %s" % ("\n\n- ".join(errors)))
-
-
-
-def create_loader(ctx):
-    loader = Loader()
-    loader.url_fields = []
-    loader.identifiers = []
-    for c in ctx:
-        if ctx[c] == "@id":
-            loader.identifiers.append(c)
-        elif isinstance(ctx[c], dict) and ctx[c].get("@type") == "@id":
-            loader.url_fields.append(c)
-    loader.checked_urls = loader.url_fields
-    loader.checked_urls.remove("symbols")
-    _logger.debug("url_fields is %s", loader.url_fields)
-    return loader
-
-
-def load_schema(f):
-    _, metaschema = schema.get_metaschema()
-    with open(args.schema) as f:
-        j = yaml.load(f)
-
-    (ctx, g) = jsonld_context.salad_to_jsonld_context(j)
-    loader = create_loader(ctx)
 
 
 def replace_type(items, spec):
