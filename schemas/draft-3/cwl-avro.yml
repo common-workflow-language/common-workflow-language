@@ -589,7 +589,7 @@
 
 - name: Datatype
   type: enum
-  docAfter: ProcessRequirement
+  docAfter: "#ProcessRequirement"
   symbols:
     - "null"
     - avro:boolean
@@ -975,7 +975,7 @@
 
 - type: record
   name: ProcessRequirement
-  docAfter: ExpressionTool
+  docAfter: "#ExpressionTool"
   abstract: true
   doc: |
     A process requirement declares a prerequisite that may or must be fulfilled
@@ -997,8 +997,8 @@
 - type: record
   name: Process
   abstract: true
-  docAfter: ProcessRequirement
-  validationRoot: true
+  docAfter: "#ProcessRequirement"
+  documentRoot: true
   doc: |
 
     The base executable type in CWL is the `Process` object defined by the
