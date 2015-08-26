@@ -32,7 +32,7 @@ def get_metaschema():
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id",
-            "identifier": True
+            "identity": True
         },
         "_type": "https://w3id.org/cwl/salad#_type",
         "abstract": "https://w3id.org/cwl/salad#abstract",
@@ -60,7 +60,7 @@ def get_metaschema():
         },
         "fields": "avro:fields",
         "float": "https://w3id.org/cwl/avro#float",
-        "identifier": "https://w3id.org/cwl/salad#identifier",
+        "identity": "https://w3id.org/cwl/salad#identity",
         "int": "https://w3id.org/cwl/avro#int",
         "items": {
             "@id": "https://w3id.org/cwl/avro#items",
@@ -87,7 +87,8 @@ def get_metaschema():
         "string": "https://w3id.org/cwl/avro#string",
         "symbols": {
             "@id": "https://w3id.org/cwl/avro#symbols",
-            "@type": "@id"
+            "@type": "@id",
+            "identity": True
         },
         "type": {
             "@id": "https://w3id.org/cwl/avro#type",
@@ -133,7 +134,7 @@ def validate_doc(schema_names, validate_doc, strict):
                 except validate.ValidationException as e:
                     errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
         if not success:
-            raise validate.ValidationException("Failed validation:\n- %s" % ("\n\n- ".join(errors)))
+            raise validate.ValidationException("- %s" % ("\n\n- ".join(errors)))
 
 
 def replace_type(items, spec):

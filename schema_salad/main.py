@@ -101,7 +101,7 @@ def main(args=None):
     try:
         schema.validate_doc(metaschema_names, schema_doc, args.strict)
     except validate.ValidationException as e:
-        _logger.error("While validating schema " + str(e))
+        _logger.error("While validating schema `%s`:\n%s" % (args.schema, str(e)))
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
@@ -159,7 +159,7 @@ def main(args=None):
     try:
         document_loader.validate_links(document)
     except (validate.ValidationException) as e:
-        _logger.error("Document failed link checking:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.error("Document `%s` failed link checking:\n%s", args.document, e, exc_info=(e if args.debug else False))
         _logger.debug("Index is %s", json.dumps(document_loader.idx.keys(), indent=4))
         return 1
 
@@ -167,7 +167,7 @@ def main(args=None):
     try:
         schema.validate_doc(avsc_names, document, args.strict)
     except validate.ValidationException as e:
-        _logger.error(e)
+        _logger.error("While validating document `%s`:\n%s" % (args.document, str(e)))
         return 1
 
     # Optionally convert the document to RDF
@@ -175,7 +175,7 @@ def main(args=None):
         printrdf(args.document, document, ctx, args.rdf_serializer)
         return 0
 
-    print "Document is valid"
+    print "Document `%s` is valid" % args.document
 
     return 0
 

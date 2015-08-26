@@ -31,7 +31,8 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
 
     if field and "jsonldPredicate" in field:
         if isinstance(field["jsonldPredicate"], dict):
-            v = {"@"+k[1:]: v for k,v in field["jsonldPredicate"].items() if k.startswith("_")}
+            v = {("@"+k[1:] if k.startswith("_") else k): v
+                 for k,v in field["jsonldPredicate"].items() }
         else:
             v = field["jsonldPredicate"]
     elif "jsonldPredicate" in datatype:

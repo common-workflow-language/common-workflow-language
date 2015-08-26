@@ -56,12 +56,12 @@
       jsonldPredicate:
         _id: sld:_id
         _type: "@id"
-        identifier: true
+        identity: true
     - name: _type
       type: ["null", string]
     - name: _container
       type: ["null", string]
-    - name: identifier
+    - name: identity
       type: ["null", boolean]
 
 
@@ -223,7 +223,7 @@
       jsonldPredicate:
         _id: "avro:symbols"
         _type: "@id"
-        identifier: true
+        identity: true
       doc: "When `type` is `enum`, defines the set of valid symbols."
 
 

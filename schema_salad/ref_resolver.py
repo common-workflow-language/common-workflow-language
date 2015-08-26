@@ -68,6 +68,8 @@ class Loader(object):
         self.url_fields = []
         self.vocab_fields = []
         self.identifiers = []
+        self.identity_links = []
+        self.standalone = []
         self.vocab = {}
         self.rvocab = {}
 
@@ -78,10 +80,11 @@ class Loader(object):
         for c in self.ctx:
             if self.ctx[c] == "@id":
                 self.identifiers.append(c)
+                self.identity_links.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
                 self.url_fields.append(c)
-                if self.ctx[c].get("identifier", False):
-                    self.identifiers.append(c)
+                if self.ctx[c].get("identity", False):
+                    self.identity_links.append(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
                 self.url_fields.append(c)
                 self.vocab_fields.append(c)
@@ -95,6 +98,7 @@ class Loader(object):
             self.rvocab[self.expand_url(v, "", scoped=False)] = k
 
         _logger.debug("identifiers is %s", self.identifiers)
+        _logger.debug("identity_links is %s", self.identity_links)
         _logger.debug("url_fields is %s", self.url_fields)
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
@@ -169,11 +173,15 @@ class Loader(object):
             if  'import' in document or 'include' in document:
                 document = self.resolve_ref(document, base_url)
             else:
-                for identifer in self.identifiers:
+                for identifer in self.identity_links:
                     if identifer in document:
                         if isinstance(document[identifer], basestring):
                             document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
                             self.idx[document[identifer]] = document
+                        elif isinstance(document[identifer], list):
+                            for n, v in enumerate(document[identifer]):
+                                document[identifer][n] = self.expand_url(document[identifer][n], base_url, scoped=True)
+                                self.idx[document[identifer][n]] = document[identifer][n]
             if inc:
                 return document
 
@@ -253,13 +261,19 @@ class Loader(object):
     def validate_link(self, field, link):
         if isinstance(link, basestring):
             if field in self.vocab_fields:
-                if link not in self.vocab and link not in self.idx:
+                if link not in self.vocab and link not in self.idx and link not in self.rvocab:
                     raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
-            elif link not in self.idx:
+            elif link not in self.idx and link not in self.rvocab:
                 raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):
+            errors = []
             for i in link:
-                self.validate_link(field, i)
+                try:
+                    self.validate_link(field, i)
+                except validate.ValidationException as v:
+                    errors.append(v)
+            if errors:
+                raise validate.ValidationException("\n".join([str(e) for e in errors]))
         elif isinstance(link, dict):
             self.validate_links(link)
         return True
@@ -283,7 +297,7 @@ class Loader(object):
         elif isinstance(document, dict):
             try:
                 for d in self.url_fields:
-                    if d not in self.identifiers and d in document:
+                    if d not in self.identity_links and d in document:
                         self.validate_link(d, document[d])
             except validate.ValidationException as v:
                 errors.append(v)
