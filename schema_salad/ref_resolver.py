@@ -254,9 +254,9 @@ class Loader(object):
         if isinstance(link, basestring):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx:
-                    raise validate.ValidationException("Invalid link `%s` in field `%s`" % (link, field))
+                    raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx:
-                raise validate.ValidationException("Invalid link `%s` in field `%s`" % (link, field))
+                raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):
             for i in link:
                 self.validate_link(field, i)
@@ -264,26 +264,51 @@ class Loader(object):
             self.validate_links(link)
         return True
 
+    def getid(self, d):
+        if isinstance(d, dict):
+            for i in self.identifiers:
+                if i in d:
+                    if isinstance(d[i], basestring):
+                        return d[i]
+        return None
+
     def validate_links(self, document):
+        docid = self.getid(document)
+        if docid is None:
+            docid = ""
+
+        errors = []
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
-            for d in self.url_fields:
-                if d not in self.identifiers and d in document:
-                    self.validate_link(d, document[d])
+            try:
+                for d in self.url_fields:
+                    if d not in self.identifiers and d in document:
+                        self.validate_link(d, document[d])
+            except validate.ValidationException as v:
+                errors.append(v)
             iterator = document.iteritems()
         else:
             return
 
-        try:
-            for key, val in iterator:
+        for key, val in iterator:
+            try:
                 self.validate_links(val)
-        except validate.ValidationException as v:
-            if isinstance(key, basestring):
-                raise validate.ValidationException("At field `%s`\n%s" % (key, validate.indent(str(v))))
-            else:
-                raise validate.ValidationException("At position %s\n%s" % (key, validate.indent(str(v))))
+            except validate.ValidationException as v:
+                docid = self.getid(val)
+                if docid:
+                    errors.append(validate.ValidationException("While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
+                else:
+                    if isinstance(key, basestring):
+                        errors.append(validate.ValidationException("While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
+                    else:
+                        errors.append(validate.ValidationException("While checking position %s\n%s" % (key, validate.indent(str(v)))))
 
+        if errors:
+            if len(errors) > 1:
+                raise validate.ValidationException("\n".join([str(e) for e in errors]))
+            else:
+                raise errors[0]
         return
 
 

@@ -105,6 +105,9 @@
 
     - name: docAfter
       type: ["null", string]
+      jsonldPredicate:
+        _id: "sld:docAfter"
+        _type: "@id"
 
     - name: jsonldPrefix
       type: ["null", string]
@@ -115,7 +118,7 @@
         - string
         - "#JsonldPredicate"
 
-    - name: validationRoot
+    - name: documentRoot
       type: ["null", boolean]
 
 
@@ -158,7 +161,7 @@
 - name: RecordSchema
   type: record
   extends: "#ComplexType"
-  validationRoot: true
+  documentRoot: true
   fields:
     - name: type
       doc: "Must be `record`"
@@ -200,7 +203,7 @@
 - name: EnumSchema
   type: record
   extends: "#ComplexType"
-  validationRoot: true
+  documentRoot: true
   fields:
     - name: type
       doc: "Must be `enum`"
@@ -254,7 +257,7 @@
 
 - name: Documentation
   type: record
-  validationRoot: true
+  documentRoot: true
   fields:
     - name: name
       type: string
@@ -280,6 +283,3 @@
       jsonldPredicate:
         _id: "sld:docParent"
         _type: "@id"
-
-    - name: docAfter
-      type: ["null", string]

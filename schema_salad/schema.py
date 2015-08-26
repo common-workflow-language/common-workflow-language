@@ -27,6 +27,8 @@ def get_metaschema():
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
         "RecordField": "https://w3id.org/cwl/salad#RecordField",
         "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
+        "SpecializeDef": "https://w3id.org/cwl/salad#SpecializeDef",
+        "_container": "https://w3id.org/cwl/salad#_container",
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id",
@@ -40,11 +42,15 @@ def get_metaschema():
         "bytes": "https://w3id.org/cwl/avro#bytes",
         "dct": "http://purl.org/dc/terms/",
         "doc": "https://w3id.org/cwl/salad#doc",
-        "docAfter": "https://w3id.org/cwl/salad#docAfter",
+        "docAfter": {
+            "@id": "https://w3id.org/cwl/salad#docAfter",
+            "@type": "@id"
+        },
         "docParent": {
             "@id": "https://w3id.org/cwl/salad#docParent",
             "@type": "@id"
         },
+        "documentRoot": "https://w3id.org/cwl/salad#documentRoot",
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "https://w3id.org/cwl/avro#double",
         "enum": "https://w3id.org/cwl/avro#enum",
@@ -70,17 +76,23 @@ def get_metaschema():
         "record": "https://w3id.org/cwl/avro#record",
         "sld": "https://w3id.org/cwl/salad#",
         "specialize": "https://w3id.org/cwl/salad#specialize",
+        "specializeFrom": {
+            "@id": "https://w3id.org/cwl/salad#specializeFrom",
+            "@type": "@id"
+        },
+        "specializeTo": {
+            "@id": "https://w3id.org/cwl/salad#specializeTo",
+            "@type": "@id"
+        },
         "string": "https://w3id.org/cwl/avro#string",
         "symbols": {
             "@id": "https://w3id.org/cwl/avro#symbols",
-            "@type": "@id",
-            "identifier": True
+            "@type": "@id"
         },
         "type": {
             "@id": "https://w3id.org/cwl/avro#type",
             "@type": "@vocab"
-        },
-        "validationRoot": "https://w3id.org/cwl/salad#validationRoot"
+        }
     })
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
@@ -93,16 +105,33 @@ def get_metaschema():
 
 
 def validate_doc(schema_names, validate_doc, strict):
+    has_root = False
+    for r in schema_names.names.values():
+        if r.get_prop("documentRoot"):
+            has_root = True
+            break
+
+    if not has_root:
+        raise validate.ValidationException("No document roots defined in the schema")
+
+    if isinstance(validate_doc, list):
+        pass
+    elif isinstance(validate_doc, dict):
+        validate_doc = [validate_doc]
+    else:
+        raise validate.ValidationException("Document must be dict or list")
+
     for item in validate_doc:
         errors = []
         success = False
         for r in schema_names.names.values():
-            if r.get_prop("validationRoot"):
+            if r.get_prop("documentRoot"):
                 try:
                     validate.validate_ex(r, item, strict)
                     success = True
                     break
                 except validate.ValidationException as e:
+                    #_logger.debug("Error site was", exc_info=e)
                     errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
         if not success:
             raise validate.ValidationException("Failed validation:\n- %s" % ("\n\n- ".join(errors)))
@@ -201,7 +230,7 @@ def extend_and_specialize(items):
                 y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
             r["extends"] = t["extends"]
-            r["validationRoot"] = t.get("validationRoot")
+            r["documentRoot"] = t.get("documentRoot", r.get("documentRoot"))
             r["abstract"] = t.get("abstract", False)
             r["doc"] = t.get("doc", "")
             types[t["name"]] = r

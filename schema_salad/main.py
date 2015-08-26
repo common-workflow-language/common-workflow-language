@@ -92,7 +92,7 @@ def main(args=None):
     try:
         metaschema_loader.validate_links(schema_doc)
     except (validate.ValidationException) as e:
-        _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.error("Schema `%s` failed link checking:\n%s", args.schema, e, exc_info=(e if args.debug else False))
         _logger.debug("Index is %s", metaschema_loader.idx.keys())
         _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
         return 1
@@ -101,7 +101,7 @@ def main(args=None):
     try:
         schema.validate_doc(metaschema_names, schema_doc, args.strict)
     except validate.ValidationException as e:
-        _logger.error(e)
+        _logger.error("While validating schema " + str(e))
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
@@ -143,7 +143,7 @@ def main(args=None):
     try:
         document = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
     except (validate.ValidationException, RuntimeError) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.error("Document `%s` failed validation:\n%s", args.document, e, exc_info=(e if args.debug else False))
         return 1
 
     # Optionally print the document after ref resolution
@@ -159,7 +159,7 @@ def main(args=None):
     try:
         document_loader.validate_links(document)
     except (validate.ValidationException) as e:
-        _logger.error("Document failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.error("Document failed link checking:\n%s", e, exc_info=(e if args.debug else False))
         _logger.debug("Index is %s", json.dumps(document_loader.idx.keys(), indent=4))
         return 1
 
