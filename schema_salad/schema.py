@@ -131,7 +131,6 @@ def validate_doc(schema_names, validate_doc, strict):
                     success = True
                     break
                 except validate.ValidationException as e:
-                    #_logger.debug("Error site was", exc_info=e)
                     errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
         if not success:
             raise validate.ValidationException("Failed validation:\n- %s" % ("\n\n- ".join(errors)))
