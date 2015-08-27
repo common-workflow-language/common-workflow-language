@@ -213,8 +213,8 @@ def extend_and_specialize(items):
 
             r["name"] = t["name"]
             if "specialize" in t:
-                spec = {sp["specializeFrom"]: sp["specializeFrom"] for sp in aslist(t["specialize"])}
-                r["fields"] = replace_type(r["fields"], t["specialize"])
+                spec = {sp["specializeFrom"]: sp["specializeTo"] for sp in aslist(t["specialize"])}
+                r["fields"] = replace_type(r["fields"], spec)
 
             for f in r["fields"]:
                 if "inherited_from" not in f:

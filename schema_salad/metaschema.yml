@@ -63,6 +63,8 @@
       type: ["null", string]
     - name: identity
       type: ["null", boolean]
+    - name: noLinkCheck
+      type: ["null", boolean]
 
 
 - name: SpecializeDef

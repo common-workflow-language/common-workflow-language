@@ -70,6 +70,7 @@ class Loader(object):
         self.identifiers = []
         self.identity_links = []
         self.standalone = []
+        self.nolinkcheck = []
         self.vocab = {}
         self.rvocab = {}
 
@@ -88,6 +89,9 @@ class Loader(object):
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
                 self.url_fields.append(c)
                 self.vocab_fields.append(c)
+
+            if isinstance(self.ctx[c], dict) and self.ctx[c].get("noLinkCheck"):
+                self.nolinkcheck.append(c)
 
             if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
                 self.vocab[c] = self.ctx[c]["@id"]
@@ -259,6 +263,8 @@ class Loader(object):
         return result
 
     def validate_link(self, field, link):
+        if field in self.nolinkcheck:
+            return True
         if isinstance(link, basestring):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
@@ -309,14 +315,15 @@ class Loader(object):
             try:
                 self.validate_links(val)
             except validate.ValidationException as v:
-                docid = self.getid(val)
-                if docid:
-                    errors.append(validate.ValidationException("While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
-                else:
-                    if isinstance(key, basestring):
-                        errors.append(validate.ValidationException("While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
+                if key not in self.nolinkcheck:
+                    docid = self.getid(val)
+                    if docid:
+                        errors.append(validate.ValidationException("While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
                     else:
-                        errors.append(validate.ValidationException("While checking position %s\n%s" % (key, validate.indent(str(v)))))
+                        if isinstance(key, basestring):
+                            errors.append(validate.ValidationException("While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
+                        else:
+                            errors.append(validate.ValidationException("While checking position %s\n%s" % (key, validate.indent(str(v)))))
 
         if errors:
             if len(errors) > 1:
