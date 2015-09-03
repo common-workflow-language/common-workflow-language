@@ -10,7 +10,7 @@
 - name: "Semantic_Annotations_for_Linked_Avro_Data"
   type: documentation
   doc: |
-    # Semantic Annotations for Linked Avro Data (SALAD).
+    # Semantic Annotations for Linked Avro Data (SALAD)
 
     Author:
 
@@ -306,6 +306,7 @@
         ]
       }
     }
+    ```
 
     ### Link resolution
 
@@ -411,6 +412,7 @@
         ]
       }
     }
+    ```
 
     ### Field name resolution
 
@@ -462,6 +464,7 @@
       },
       "http://example.com/acid#extension": "two"
     }
+    ```
 
     ### Import
 
@@ -523,7 +526,7 @@
         }
       }
     }
-
+    ```
 
     ### Include
 
@@ -574,6 +577,7 @@
         "bar": "hello world"
       }
     }
+    ```
 
 - name: "Link_Validation"
   type: documentation

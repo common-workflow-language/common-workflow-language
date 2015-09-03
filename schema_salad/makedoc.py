@@ -7,6 +7,10 @@ import copy
 import re
 import sys
 import StringIO
+import logging
+import urlparse
+
+_logger = logging.getLogger("salad")
 
 def has_types(items):
     r = []
@@ -23,6 +27,10 @@ def has_types(items):
         return [items]
     return []
 
+def linkto(item):
+    _, frg = urlparse.urldefrag(item)
+    return "[%s](#%s)" % (frg, to_id(frg))
+
 class MyRenderer(mistune.Renderer):
     def header(self, text, level, raw=None):
         return """<h1 id="%s">%s</h1>""" % (to_id(text), text)
@@ -34,7 +42,7 @@ def to_id(text):
             textid = text[text.index(" ")+1:]
         except ValueError:
             pass
-    textid = textid.lower().replace(" ", "_")
+    textid = textid.replace(" ", "_")
     return textid
 
 class ToC(object):
@@ -87,14 +95,18 @@ def typefmt(tp, nbsp=False):
         if tp["type"] == "array":
             return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
         if tp["type"] in ("record", "enum"):
-            return """<a href="#%s">%s</a>""" % (to_id(str(tp["name"])), str(tp["name"]))
+            _, frg = urlparse.urldefrag(tp["name"])
+            return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
         if isinstance(tp["type"], dict):
             return typefmt(tp["type"])
     else:
         if str(tp) in ("null", "boolean", "int", "long", "float", "double", "bytes", "string", "record", "enum", "array", "map"):
             return """<a href="#datatype">%s</a>""" % str(tp)
         else:
-            return """<a href="#%s">%s</a>""" % (to_id(str(tp)), str(tp))
+            _, frg = urlparse.urldefrag(tp)
+            if frg:
+                tp = frg
+            return """<a href="#%s">%s</a>""" % (to_id(tp), tp)
 
 def add_dictlist(di, key, val):
     if key not in di:
@@ -155,7 +167,9 @@ class RenderType(object):
                         if tp not in self.uses:
                             self.uses[tp] = []
                         if (t["name"], f["name"]) not in self.uses[tp]:
-                            self.uses[tp].append((t["name"], f["name"]))
+                            _, frg1 = urlparse.urldefrag(t["name"])
+                            _, frg2 = urlparse.urldefrag(f["name"])
+                            self.uses[tp].append((frg1, frg2))
 
         for f in alltypes:
             if ("extends" not in f) and ("docParent" not in f) and ("docAfter" not in f):
@@ -177,7 +191,7 @@ class RenderType(object):
                 if "doc" not in field:
                     field["doc"] = ""
 
-        if f["type"] != "doc":
+        if f["type"] != "documentation":
             lines = []
             for l in f["doc"].splitlines():
                 if len(l) > 0 and l[0] == "#":
@@ -185,17 +199,20 @@ class RenderType(object):
                 lines.append(l)
             f["doc"] = "\n".join(lines)
 
-        num = self.toc.add_entry(depth, f["name"])
-        doc = "## %s %s\n" % (num, f["name"])
+            _, frg = urlparse.urldefrag(f["name"])
+            num = self.toc.add_entry(depth, frg)
+            doc = "## %s %s\n" % (num, frg)
+        else:
+            doc = ""
 
-        if f["type"] == "doc":
+        if f["type"] == "documentation":
             f["doc"] = number_headings(self.toc, f["doc"])
 
         if "extends" in f:
-            doc += "\n\nExtends [%s](#%s)" % (f["extends"], to_id(f["extends"]))
+            doc += "\n\nExtends %s" % (linkto(f["extends"]))
         if f["name"] in self.subs:
             doc += "\n\nExtended by"
-            doc += ", ".join([" [%s](#%s)" % (s, to_id(s)) for s in self.subs[f["name"]]])
+            doc += ", ".join([" %s" % linkto(s) for s in self.subs[f["name"]]])
 
         if f["name"] in self.uses:
             doc += "\n\nReferenced by"
@@ -219,8 +236,10 @@ class RenderType(object):
 
                 desc = i["doc"]
                 if "inherited_from" in i:
-                    desc = "%s _Inherited from [%s](#%s)_" % (desc, i["inherited_from"], to_id(i["inherited_from"]))
-                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (i["name"], typefmt(tp), opt, mistune.markdown(desc))
+                    desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
+
+                _, frg = urlparse.urldefrag(i["name"])
+                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp), opt, mistune.markdown(desc))
                 doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
@@ -271,7 +290,7 @@ def avrold_doc(j, outdoc):
       padding: 0px;
     }
 
-    ol > li > ol {
+    ol {
       list-style-type: none;
     }
     ol > li > ol > li {
@@ -341,7 +360,7 @@ if __name__ == "__main__":
             j = yaml.load(f)
         else:
             j = [{"name": sys.argv[2],
-                  "type": "doc",
+                  "type": "documentation",
                   "doc": f.read().decode("utf-8")
               }]
         avrold_doc(j, sys.stdout)
