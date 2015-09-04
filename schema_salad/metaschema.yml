@@ -645,7 +645,9 @@
     links.  The link validation traversal may visit fields which the schema
     designates as link fields and check that each URI references an existing
     object in the current document, an imported document, file system, or
-    network resource.  Failure to validate links may be a fatal error.
+    network resource.  Failure to validate links may be a fatal error.  Link
+    validation behavior for individual fields may be modified by `identity` and
+    `noLinkCheck` in the `jsonldPredicate` section of the field schema.
 
 
 - name: "Schema_validation"
@@ -700,8 +702,8 @@
 - name: JsonldPredicate
   type: record
   doc: |
-    Attached to a record field and efine how a record field is handled during
-    preprocessing URI resolution and JSON-LD context generation.
+    Attached to a record field to define how the parent record field is handled for
+    URI resolution and JSON-LD context generation.
   fields:
     - name: _id
       type: ["null", string]
@@ -733,9 +735,10 @@
       type: ["null", boolean]
       doc: |
         If true and `_type` is `@id` this indicates that the parent field must
-        be resolved according to identity resolution rules instead of the link
+        be resolved according to identity resolution rules instead of link
         resolution rules.  In addition, the field value is considered an
-        assertion that the linked value exists and absence
+        assertion that the linked value exists; absence of an object in the loaded document
+        with the URI is not an error.
     - name: noLinkCheck
       type: ["null", boolean]
       doc: |
@@ -743,17 +746,20 @@
         this field.  This field (it is is a URI) or any fields under it (if it
         is an object or array) are not subject to link checking.
 
+
 - name: SpecializeDef
   type: record
   fields:
     - name: specializeFrom
       type: string
+      doc: "The data type to be replaced"
       jsonldPredicate:
         _id: "sld:specializeFrom"
         _type: "@id"
 
     - name: specializeTo
       type: string
+      doc: "The new data type to replace with"
       jsonldPredicate:
         _id: "sld:specializeTo"
         _type: "@id"
@@ -763,54 +769,72 @@
   type: record
   docParent: "#Schema_validation"
   doc: |
-   * **record**: An object with one or more fields defined by name and type
-   * **enum**: A value from a finite set of symbolic values
-   * **array**: An ordered sequence of values
+    Abstract base for schema-defined types.
+
+    * **record**: An object with one or more fields defined by name and type
+    * **enum**: A value from a finite set of symbolic values
+    * **array**: An ordered sequence of values
 
   abstract: true
   fields:
     - name: name
       type: string
       jsonldPredicate: "@id"
+      doc: "The identifier for this type"
 
     - name: doc
       type: ["null", string]
+      doc: "A documentation string for this type."
 
     - name: docParent
       type: ["null", string]
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for this type should appear in a subsection under `docParent`.
       jsonldPredicate:
         _id: "sld:docParent"
         _type: "@id"
 
     - name: docAfter
       type: ["null", string]
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for this type should appear after the `docAfter` section at the same
+        level.
       jsonldPredicate:
         _id: "sld:docAfter"
         _type: "@id"
-
-    - name: jsonldPrefix
-      type: ["null", string]
 
     - name: jsonldPredicate
       type:
         - "null"
         - string
         - "#JsonldPredicate"
+      doc: |
+        Annotate this type with linked data context.
 
     - name: documentRoot
       type: ["null", boolean]
+      doc: |
+        If true, indicates that the type is a valid at the document root.  At
+        least one type in a schema must be tagged with `documentRoot: true`.
 
 
 - name: RecordField
   type: record
-  docParent: "#Schema_validation"
+  docParent: "#RecordSchema"
+  doc: "A field of a record."
   fields:
     - name: name
       type: string
       jsonldPredicate: "@id"
+      doc: |
+        The name of the field
 
     - name: doc
       type: ["null", string]
+      doc: |
+        A documentation string for this field
 
     - name: type
       type:
@@ -827,15 +851,16 @@
       jsonldPredicate:
         _id: "avro:type"
         _type: "@vocab"
-
-    - name: jsonldPrefix
-      type: ["null", string]
+      doc: |
+        The field type
 
     - name: jsonldPredicate
       type:
         - "null"
         - string
         - "#JsonldPredicate"
+      doc: |
+        Annotate this type with linked data context.
 
 
 - name: RecordSchema
@@ -856,6 +881,9 @@
 
     - name: abstract
       type: ["null", boolean]
+      doc: |
+        If true, this record is abstract and may be used as a base for other
+        records, but is not valid on its own.
 
     - name: "fields"
       type:
@@ -871,6 +899,8 @@
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
+      doc: |
+        Indicates that this record inherits fields from the base record.
 
     - name: specialize
       type:
@@ -878,12 +908,19 @@
         - "#SpecializeDef"
         - type: array
           items: "#SpecializeDef"
+      doc: |
+        Only applies if `extends` is true.  Apply type specialization using the
+        base record as a template.  For each field inherited from the base
+        record, replace any instance of the type `specializeFrom` with
+        `specializeTo`.
 
 
 - name: EnumSchema
   type: record
   extends: "#ComplexType"
   documentRoot: true
+  doc: |
+    Define an enumerated type.
   fields:
     - name: type
       doc: "Must be `enum`"
@@ -904,12 +941,11 @@
         _id: "avro:symbols"
         _type: "@id"
         identity: true
-      doc: "When `type` is `enum`, defines the set of valid symbols."
+      doc: "Defines the set of valid symbols."
 
 
 - name: ArraySchema
   type: record
-  docParent: "#Schema_validation"
   fields:
     - name: type
       doc: "Must be `array`"
@@ -933,17 +969,22 @@
       jsonldPredicate:
         _id: "avro:items"
         _type: "@vocab"
-      doc: "When `type` is `array`, defines the type of the array elements."
+      doc: "Defines the type of the array elements."
 
 
 - name: Documentation
   type: record
   docParent: "#Schema_validation"
   documentRoot: true
+  doc: |
+    A documentation section.  This type exists to faciliate self-documenting
+    schemas but has no role in formal validation.
   fields:
     - name: name
       type: string
       jsonldPredicate: "@id"
+      doc: |
+        Identify the documentation section.
 
     - name: type
       doc: "Must be `documentation`"
@@ -956,12 +997,26 @@
         _id: "avro:type"
         _type: "@vocab"
 
-
     - name: doc
       type: string
+      doc: |
+        The actual documentation content.
 
     - name: docParent
       type: ["null", string]
       jsonldPredicate:
         _id: "sld:docParent"
+        _type: "@id"
+      doc: |
+        Hint to indicate that during documentation generation, this documentation
+        section should appear in a subsection under `docParent`.
+
+    - name: docAfter
+      type: ["null", string]
+      doc: |
+        Hint to indicate that during documentation generation, this documentation
+        section should appear after the `docAfter` section at the same
+        level.
+      jsonldPredicate:
+        _id: "sld:docAfter"
         _type: "@id"

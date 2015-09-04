@@ -33,7 +33,7 @@ def linkto(item):
 
 class MyRenderer(mistune.Renderer):
     def header(self, text, level, raw=None):
-        return """<h1 id="%s">%s</h1>""" % (to_id(text), text)
+        return """<h%i id="%s">%s</h1>""" % (level, to_id(text), text)
 
 def to_id(text):
     textid = text

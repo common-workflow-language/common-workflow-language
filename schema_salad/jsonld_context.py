@@ -39,11 +39,11 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
         for d in datatype["jsonldPredicate"]:
             if d["symbol"] == name:
                 v = d["predicate"]
-    if not v:
-        if field and "jsonldPrefix" in field:
-            defaultBase = field["jsonldPrefix"]
-        elif "jsonldPrefix" in datatype:
-            defaultBase = datatype["jsonldPrefix"]
+    # if not v:
+    #     if field and "jsonldPrefix" in field:
+    #         defaultBase = field["jsonldPrefix"]
+    #     elif "jsonldPrefix" in datatype:
+    #         defaultBase = datatype["jsonldPrefix"]
 
     if not v:
         v = defaultBase + name

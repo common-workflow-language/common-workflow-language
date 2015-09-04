@@ -121,7 +121,7 @@ def main(args=None):
 
     # Optionally print the RDFS graph from the schema
     if args.print_rdfs:
-        print(g.serialize(format=args.rdf_serializer))
+        print(rdfs.serialize(format=args.rdf_serializer))
         return 0
 
     # Optionally create documentation page from the schema
@@ -172,7 +172,7 @@ def main(args=None):
 
     # Optionally convert the document to RDF
     if args.print_rdf:
-        printrdf(args.document, document, ctx, args.rdf_serializer)
+        printrdf(args.document, document, schema_ctx, args.rdf_serializer)
         return 0
 
     print "Document `%s` is valid" % args.document
