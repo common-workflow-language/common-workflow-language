@@ -109,4 +109,4 @@ def docker_machine_uid():
 
 
 if __name__ == '__main__':
-    print get_docker_vm_uid()
+    print docker_vm_uid()
