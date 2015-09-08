@@ -1,10 +1,10 @@
 "@context":
   "@base": "https://w3id.org/cwl/salad#"
-  "sld": "https://w3id.org/cwl/salad#"
-  "avro": "https://w3id.org/cwl/avro#"
-  "dct": "http://purl.org/dc/terms/"
-  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  "sld":  "https://w3id.org/cwl/salad#"
+  "dct":  "http://purl.org/dc/terms/"
+  "rdf":  "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  "xsd":  "http://www.w3.org/2001/XMLSchema#"
 
 "@graph":
 - name: "Semantic_Annotations_for_Linked_Avro_Data"
@@ -693,14 +693,13 @@
   docParent: "#Schema_validation"
   type: enum
   symbols:
-    - "avro:null"
-    - "avro:boolean"
-    - "avro:int"
-    - "avro:long"
-    - "avro:float"
-    - "avro:double"
-    - "avro:bytes"
-    - "avro:string"
+    - "sld:null"
+    - "xsd:boolean"
+    - "xsd:int"
+    - "xsd:long"
+    - "xsd:float"
+    - "xsd:double"
+    - "xsd:string"
   doc: |
    Salad data types are based on Avro schema declarations.  Refer to the
    [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
@@ -714,7 +713,6 @@
    * **long**: 64-bit signed integer
    * **float**: single precision (32-bit) IEEE 754 floating-point number
    * **double**: double precision (64-bit) IEEE 754 floating-point number
-   * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
    * **string**: Unicode character sequence
 
 
@@ -875,7 +873,7 @@
             - "#Any"
             - string
       jsonldPredicate:
-        _id: "avro:type"
+        _id: "sld:type"
         _type: "@vocab"
       doc: |
         The field type
@@ -900,9 +898,9 @@
         name: Record_symbol
         type: enum
         symbols:
-          - "avro:record"
+          - "sld:record"
       jsonldPredicate:
-        _id: "avro:type"
+        _id: "sld:type"
         _type: "@vocab"
 
     - name: abstract
@@ -917,7 +915,7 @@
         - type: "array"
           items: "#RecordField"
 
-      jsonldPredicate: "avro:fields"
+      jsonldPredicate: "sld:fields"
       doc: "Defines the fields of the record."
 
     - name: extends
@@ -954,9 +952,9 @@
         name: Enum_symbol
         type: enum
         symbols:
-          - "avro:enum"
+          - "sld:enum"
       jsonldPredicate:
-        _id: "avro:type"
+        _id: "sld:type"
         _type: "@vocab"
 
     - name: "symbols"
@@ -964,7 +962,7 @@
         - type: "array"
           items: "string"
       jsonldPredicate:
-        _id: "avro:symbols"
+        _id: "sld:symbols"
         _type: "@id"
         identity: true
       doc: "Defines the set of valid symbols."
@@ -979,9 +977,9 @@
         name: Array_symbol
         type: enum
         symbols:
-          - "avro:array"
+          - "sld:array"
       jsonldPredicate:
-        _id: "avro:type"
+        _id: "sld:type"
         _type: "@vocab"
 
 
@@ -993,7 +991,7 @@
         - type: array
           items: [ "#PrimitiveType", "#ComplexType", string ]
       jsonldPredicate:
-        _id: "avro:items"
+        _id: "sld:items"
         _type: "@vocab"
       doc: "Defines the type of the array elements."
 
@@ -1020,7 +1018,7 @@
         symbols:
           - "sld:documentation"
       jsonldPredicate:
-        _id: "avro:type"
+        _id: "sld:type"
         _type: "@vocab"
 
     - name: doc
