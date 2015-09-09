@@ -1,0 +1,1 @@
+../draft-2/count-lines6-wf.cwl

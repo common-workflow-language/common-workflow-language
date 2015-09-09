@@ -586,60 +586,18 @@
   type: documentation
   doc: This section specifies the core object types that make up a CWL document.
 
-
-- name: Datatype
-  type: enum
-  docAfter: "#ProcessRequirement"
-  symbols:
-    - "null"
-    - avro:boolean
-    - avro:int
-    - avro:long
-    - avro:float
-    - avro:double
-    - avro:bytes
-    - avro:string
-    - avro:record
-    - avro:enum
-    - avro:array
-    - cwl:File
-    - sld:Any
-  doc: |
-   CWL data types are based on Avro schema declarations.  Refer to the [Avro
-   schema declaration
-   documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
-   detailed information.  In addition, CWL defines [`File`](#file)
-   as a special record type.
-
-   ## Primitive types
-
-   * **null**: no value
-   * **boolean**: a binary value
-   * **int**: 32-bit signed integer
-   * **long**: 64-bit signed integer
-   * **float**: single precision (32-bit) IEEE 754 floating-point number
-   * **double**: double precision (64-bit) IEEE 754 floating-point number
-   * **bytes**: sequence of uninterpreted 8-bit unsigned bytes
-   * **string**: Unicode character sequence
-
-   ## Complex types
-
-   * **record**: An object with one or more fields defined by name and type
-   * **enum**: A value from a finite set of symbolic values
-   * **array**: An ordered sequence of values
-   * **map**: An unordered collection of key/value pairs
-
-   ## File type
-
-   See [File](#file) below.
-
-   ## Any type
-
-   See [Any](#any) below.
+- "@import": "https://w3id.org/cwl/salad#PrimitiveType"
+- "@import": "https://w3id.org/cwl/salad#SpecializeDef"
+- "@import": "https://w3id.org/cwl/salad#Any"
+- "@import": "https://w3id.org/cwl/salad#JsonldPredicate"
+- "@import": "https://w3id.org/cwl/salad#RecordField"
+- "@import": "https://w3id.org/cwl/salad#ComplexType"
+- "@import": "https://w3id.org/cwl/salad#RecordSchema"
+- "@import": "https://w3id.org/cwl/salad#EnumSchema"
+- "@import": "https://w3id.org/cwl/salad#ArraySchema"
 
 - name: File
   type: record
-  docParent: "#Datatype"
   doc: |
     Represents a file (or group of files if `secondaryFiles` is specified) that
     must be accessible by tools using standard POSIX file system call API such as
@@ -680,74 +638,6 @@
         rules apply.
 
 
-- name: Any
-  type: enum
-  docParent: "#Datatype"
-  symbols: ["sld:Any"]
-  doc: |
-    The **Any** type validates for any non-null value.
-
-
-- name: Schema
-  type: record
-  doc: "A schema defines a parameter type."
-  docParent: "#Parameter"
-  fields:
-    - name: type
-      doc: "The data type of this parameter."
-      type:
-        - "#Datatype"
-        - "#Schema"
-        - "string"
-        - type: "array"
-          items: [ "#Datatype", "#Schema", "string" ]
-      jsonldPredicate:
-        "_id": "avro:type"
-        "_type": "@vocab"
-    - name: fields
-      type:
-        - "null"
-        - type: "array"
-          items: "#Schema"
-      jsonldPredicate:
-        "_id": "avro:fields"
-        "_container": "@list"
-      doc: "When `type` is `record`, defines the fields of the record."
-    - name: "symbols"
-      type:
-        - "null"
-        - type: "array"
-          items: "string"
-      jsonldPredicate:
-        "_id": "avro:symbols"
-        "_container": "@list"
-      doc: "When `type` is `enum`, defines the set of valid symbols."
-    - name: items
-      type:
-        - "null"
-        - "#Datatype"
-        - "#Schema"
-        - "string"
-        - type: "array"
-          items: [ "#Datatype", "#Schema", "string" ]
-      jsonldPredicate:
-        "_id": "avro:items"
-        "_container": "@list"
-      doc: "When `type` is `array`, defines the type of the array elements."
-    - name: "values"
-      type:
-        - "null"
-        - "#Datatype"
-        - "#Schema"
-        - "string"
-        - type: "array"
-          items: [ "#Datatype", "#Schema", "string" ]
-      jsonldPredicate:
-        "_id": "avro:values"
-        "_container": "@list"
-      doc: "When `type` is `map`, defines the value type for the key/value pairs."
-
-
 - name: Parameter
   type: record
   docParent: "#Process"
@@ -759,16 +649,20 @@
     - name: type
       type:
         - "null"
-        - "#Datatype"
-        - "#Schema"
+        - "sld:PrimitiveType"
+        - "sld:RecordSchema"
+        - "sld:EnumSchema"
+        - "sld:ArraySchema"
         - string
         - type: array
           items:
-            - "#Datatype"
-            - "#Schema"
+            - "sld:PrimitiveType"
+            - "sld:RecordSchema"
+            - "sld:EnumSchema"
+            - "sld:ArraySchema"
             - string
       jsonldPredicate:
-        "_id": "avro:type"
+        "_id": "sld:type"
         "_type": "@vocab"
       doc: |
         Specify valid types of data that may be assigned to this parameter.
@@ -792,7 +686,7 @@
         seeking.  An implementation may use this flag to indicate whether it is
         valid to stream file contents using a named pipe.  Default: `false`.
     - name: default
-      type: ["null", Any]
+      type: ["null", "Any"]
       doc: |
         The default value for this parameter if not provided in the input
         object.
@@ -865,28 +759,86 @@
           2. Append the remainder of the string to the end of the file path.
 
 
-- name: InputSchema
+- name: InputRecordSchema
   type: record
-  extends: "#Schema"
+  extends: "sld:RecordSchema"
   docParent: "#InputParameter"
   specialize:
-    specializeFrom: "#Schema"
-    specializeTo: "#InputSchema"
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#InputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#InputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#InputArraySchema"
   fields:
     - name: inputBinding
       type: [ "null", "#Binding" ]
-      doc: |
-        Describes how to handle a value in the input object convert it
-        into a concrete form for execution, such as command line parameters.
 
 
-- name: OutputSchema
+- name: InputEnumSchema
   type: record
-  extends: "#Schema"
+  extends: "sld:EnumSchema"
+  docParent: "#InputParameter"
+  fields:
+    - name: inputBinding
+      type: [ "null", "#Binding" ]
+
+
+- name: InputArraySchema
+  type: record
+  extends: "sld:ArraySchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#InputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#InputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#InputArraySchema"
+  fields:
+    - name: inputBinding
+      type: [ "null", "#Binding" ]
+
+
+- name: OutputRecordSchema
+  type: record
+  extends: "sld:RecordSchema"
   docParent: "#OutputParameter"
   specialize:
-    specializeFrom: "#Schema"
-    specializeTo: "#OutputSchema"
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#OutputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#OutputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#OutputArraySchema"
+  fields:
+    - name: outputBinding
+      type: [ "null", "#Binding" ]
+
+
+- name: OutputEnumSchema
+  type: record
+  extends: "sld:EnumSchema"
+  docParent: "#OutputParameter"
+  fields:
+    - name: outputBinding
+      type: [ "null", "#Binding" ]
+
+
+- name: OutputArraySchema
+  type: record
+  extends: "sld:ArraySchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#OutputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#OutputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#OutputArraySchema"
+  fields:
+    - name: outputBinding
+      type: [ "null", "#Binding" ]
 
 
 - name: InputParameter
@@ -894,8 +846,12 @@
   extends: "#Parameter"
   docAfter: "#Parameter"
   specialize:
-    specializeFrom: "#Schema"
-    specializeTo: "#InputSchema"
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#InputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#InputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#InputArraySchema"
   fields:
     - name: id
       type: string
@@ -907,22 +863,31 @@
         Describes how to handle the inputs of a process and convert them
         into a concrete form for execution, such as command line parameters.
 
+
 - name: OutputParameter
   type: record
   extends: "#Parameter"
   docAfter: "#Parameter"
   specialize:
-    specializeFrom: "#Schema"
-    specializeTo: "#OutputSchema"
+    - specializeFrom: "sld:RecordSchema"
+      specializeTo: "#OutputRecordSchema"
+    - specializeFrom: "sld:EnumSchema"
+      specializeTo: "#OutputEnumSchema"
+    - specializeFrom: "sld:ArraySchema"
+      specializeTo: "#OutputArraySchema"
   fields:
     - name: id
       type: string
       jsonldPredicate: "@id"
       doc: "The unique identifier for this parameter object."
+    - name: "outputBinding"
+      type: [ "null", "#Binding" ]
+      doc: |
+        Describes how to handle the outputs of a process.
 
 
 - type: record
-  name: "FileDef"
+  name: FileDef
   docParent: "#CreateFileRequirement"
   doc: |
     Define a file that must be placed in the designated output directory
@@ -961,16 +926,6 @@
     - name: "envValue"
       type: ["string", "#Expression"]
       doc: The environment variable value
-
-
-- type: record
-  name: SchemaDef
-  extends: "#Schema"
-  docParent: "#SchemaDefRequirement"
-  fields:
-    - name: name
-      type: string
-      doc: "The type name being defined."
 
 
 - type: record
@@ -1043,7 +998,7 @@
       type:
         - "null"
         - type: array
-          items: "#Any"
+          items: Any
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
@@ -1064,6 +1019,7 @@
         - string
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
+
 
 - type: record
   name: CommandLineBinding
@@ -1180,40 +1136,11 @@
 
 
 - type: record
-  name: CommandInputSchema
-  extends: "#InputSchema"
-  docParent: "#CommandInputParameter"
-  specialize:
-    - specializeFrom: "#InputSchema"
-      specializeTo: "#CommandInputSchema"
-    - specializeFrom: "#Binding"
-      specializeTo: "#CommandLineBinding"
-
-
-- type: record
-  name: CommandOutputSchema
-  extends: "#OutputSchema"
-  docParent: "#CommandOutputParameter"
-  specialize:
-    specializeFrom: "#OutputSchema"
-    specializeTo: "#CommandOutputSchema"
-  fields:
-    - name: "outputBinding"
-      type: [ "null", "#CommandOutputBinding" ]
-      doc: |
-        Describes how to handle the concrete outputs of a process step (such as
-        files created by a program) and describe them in the process output
-        parameter.
-
-
-- type: record
   name: CommandInputParameter
   extends: "#InputParameter"
   docParent: "#CommandLineTool"
   doc: An input parameter for a CommandLineTool.
   specialize:
-    - specializeFrom: "#InputSchema"
-      specializeTo: "#CommandInputSchema"
     - specializeFrom: "#Binding"
       specializeTo: "#CommandLineBinding"
 
@@ -1224,15 +1151,8 @@
   docParent: "#CommandLineTool"
   doc: An output parameter for a CommandLineTool.
   specialize:
-    specializeFrom: "#OutputSchema"
-    specializeTo: "#CommandOutputSchema"
-  fields:
-    - name: "outputBinding"
-      type: [ "null", "#CommandOutputBinding" ]
-      doc: |
-        Describes how to handle the concrete outputs of a process step (such as
-        files created by a program) and describe them in the process output
-        parameter.
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
 
 
 - type: record
@@ -1687,7 +1607,7 @@
       type:
         - "null"
         - type: array
-          items: "#Any"
+          items: "Any"
       doc: >
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this workflow step.  It is
@@ -1904,7 +1824,10 @@
     - name: types
       type:
         type: array
-        items: "#SchemaDef"
+        items:
+          - "#InputRecordSchema"
+          - "#InputEnumSchema"
+          - "#InputArraySchema"
       doc: The list of type definitions.
 
 

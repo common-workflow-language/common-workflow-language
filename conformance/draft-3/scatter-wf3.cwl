@@ -1,0 +1,1 @@
+../draft-2/scatter-wf3.cwl
