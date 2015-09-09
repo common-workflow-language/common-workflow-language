@@ -205,6 +205,7 @@ def extend_and_specialize(items):
     n = []
 
     for t in items:
+        t = copy.deepcopy(t)
         if "extends" in t:
             if t["extends"] not in types:
                 raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
@@ -221,6 +222,14 @@ def extend_and_specialize(items):
                     f["inherited_from"] = t["extends"]
 
             r["fields"].extend(t.get("fields", []))
+
+            fieldnames = set()
+            for field in r["fields"]:
+                if field["name"] in fieldnames:
+                    print json.dumps(t["fields"], indent=4)
+                    raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], r["name"]))
+                else:
+                    fieldnames.add(field["name"])
 
             for y in [x for x in r["fields"] if x["name"] == "class"]:
                 y["type"] = {"type": "enum",
@@ -267,6 +276,9 @@ def make_avro_schema(j):
 
     j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
 
-    avro.schema.make_avsc_object(j3, names)
+    try:
+        avro.schema.make_avsc_object(j3, names)
+    except avro.schema.SchemaParseException as e:
+        names = e
 
     return (names, j3)

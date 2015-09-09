@@ -116,17 +116,17 @@ class Loader(object):
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
             obj = ref
-            if "import" in ref:
+            if "@import" in ref:
                 if len(obj) == 1:
-                    ref = obj["import"]
+                    ref = obj["@import"]
                     obj = None
                 else:
-                    raise ValueError("'import' must be the only field in %s" % (str(obj)))
-            elif "include" in obj:
+                    raise ValueError("'@import' must be the only field in %s" % (str(obj)))
+            elif "@include" in obj:
                 if len(obj) == 1:
-                    ref = obj["include"]
+                    ref = obj["@include"]
                 else:
-                    raise ValueError("'include' must be the only field in %s" % (str(obj)))
+                    raise ValueError("'@include' must be the only field in %s" % (str(obj)))
             else:
                 ref = None
                 for identifier in self.identifiers:
@@ -145,8 +145,8 @@ class Loader(object):
         if url in self.idx:
             return self.idx[url]
 
-        # "include" directive means load raw text
-        if obj and "include" in obj:
+        # "@include" directive means load raw text
+        if obj and "@include" in obj:
             return self.fetch_text(url)
 
         if obj:
@@ -173,8 +173,8 @@ class Loader(object):
         loader = self
 
         if isinstance(document, dict):
-            inc = 'include' in document
-            if  'import' in document or 'include' in document:
+            inc = '@include' in document
+            if  '@import' in document or '@include' in document:
                 document = self.resolve_ref(document, base_url)
             else:
                 for identifer in self.identity_links:

@@ -113,6 +113,17 @@ def main(args=None):
     # Make the Avro validation that will be used to validate the target document
     (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc)
 
+    if isinstance(avsc_names, Exception):
+        _logger.error("Schema `%s` error:\n%s", args.schema, avsc_names, exc_info=(avsc_names if args.debug else False))
+        if args.print_avro:
+            print json.dumps(avsc_obj, indent=4)
+        return 1
+
+    # Optionally print Avro-compatible schema from schema
+    if args.print_avro:
+        print json.dumps(avsc_obj, indent=4)
+        return 0
+
     # Optionally print the json-ld context from the schema
     if args.print_jsonld_context:
         j = {"@context": schema_ctx}
@@ -129,14 +140,9 @@ def main(args=None):
         makedoc.avrold_doc(schema_doc, sys.stdout)
         return 0
 
-    # Optionally print Avro-compatible schema from schema
-    if args.print_avro:
-        print json.dumps(avsc_obj, indent=4)
-        return 0
-
     # If no document specified, all done.
     if not args.document:
-        print "Schema is valid"
+        print "Schema `%s` is valid" % args.schema
         return 0
 
     # Load target document and resolve refs
