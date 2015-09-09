@@ -100,7 +100,10 @@ def get_metaschema():
 
     #pprint.pprint(j)
 
-    (sch_names, sch_obj) = make_avro_schema(j)
+    (sch_names, sch_obj) = make_avro_schema(j, loader)
+    if isinstance(sch_names, Exception):
+        _logger.error("Metaschema error, avro was:\n%s", json.dumps(sch_obj, indent=4))
+        raise sch_names
     validate_doc(sch_names, j, strict=True)
     return (sch_names, j, loader)
 
@@ -137,21 +140,23 @@ def validate_doc(schema_names, validate_doc, strict):
             raise validate.ValidationException("- %s" % ("\n\n- ".join(errors)))
 
 
-def replace_type(items, spec):
+def replace_type(items, spec, loader):
     if isinstance(items, dict):
         for n in ("type", "items"):
             if n in items:
-                items[n] = replace_type(items[n], spec)
+                items[n] = replace_type(items[n], spec, loader)
                 if isinstance(items[n], list):
                     items[n] = flatten(items[n])
         return items
     if isinstance(items, list):
         n = []
         for i in items:
-            n.append(replace_type(i, spec))
+            n.append(replace_type(i, spec, loader))
         return n
     if isinstance(items, basestring):
-        if items in spec:
+        if items in loader.vocab and loader.vocab[items] in spec:
+            return spec[loader.vocab[items]]
+        elif items in spec:
             return spec[items]
     return items
 
@@ -200,50 +205,51 @@ def aslist(l):
     else:
         return [l]
 
-def extend_and_specialize(items):
+def extend_and_specialize(items, loader):
     types = {t["name"]: t for t in items}
     n = []
 
     for t in items:
         t = copy.deepcopy(t)
         if "extends" in t:
-            if t["extends"] not in types:
-                raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
-
-            r = copy.deepcopy(types[t["extends"]])
-
-            r["name"] = t["name"]
             if "specialize" in t:
                 spec = {sp["specializeFrom"]: sp["specializeTo"] for sp in aslist(t["specialize"])}
-                r["fields"] = replace_type(r["fields"], spec)
+            else:
+                spec = {}
 
-            for f in r["fields"]:
-                if "inherited_from" not in f:
-                    f["inherited_from"] = t["extends"]
+            exfields = []
+            for ex in aslist(t["extends"]):
+                if ex not in types:
+                    raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
 
-            r["fields"].extend(t.get("fields", []))
+                basetype = copy.deepcopy(types[ex])
+                if spec:
+                    basetype["fields"] = replace_type(basetype["fields"], spec, loader)
+
+                for f in basetype["fields"]:
+                    if "inherited_from" not in f:
+                        f["inherited_from"] = ex
+
+                exfields.extend(basetype.get("fields", []))
+
+            exfields.extend(t.get("fields", []))
+            t["fields"] = exfields
 
             fieldnames = set()
-            for field in r["fields"]:
+            for field in t["fields"]:
                 if field["name"] in fieldnames:
-                    print json.dumps(t["fields"], indent=4)
-                    raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], r["name"]))
+                    raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
                 else:
                     fieldnames.add(field["name"])
 
-            for y in [x for x in r["fields"] if x["name"] == "class"]:
+            for y in [x for x in t["fields"] if x["name"] == "class"]:
                 y["type"] = {"type": "enum",
                              "symbols": [r["name"]],
                              "name": r["name"]+"_class",
                 }
                 y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
 
-            r["extends"] = t["extends"]
-            r["documentRoot"] = t.get("documentRoot", r.get("documentRoot"))
-            r["abstract"] = t.get("abstract", False)
-            r["doc"] = t.get("doc", "")
-            types[t["name"]] = r
-            t = r
+            types[t["name"]] = t
 
         n.append(t)
 
@@ -257,18 +263,18 @@ def extend_and_specialize(items):
 
     for t in n:
         if "fields" in t:
-            t["fields"] = replace_type(t["fields"], extended_by)
+            t["fields"] = replace_type(t["fields"], extended_by, loader)
 
-    n = replace_type(n, ex_types)
+    n = replace_type(n, ex_types, loader)
 
     return n
 
-def make_avro_schema(j):
+def make_avro_schema(j, loader):
     names = avro.schema.Names()
 
     #pprint.pprint(j)
 
-    j = extend_and_specialize(j)
+    j = extend_and_specialize(j, loader)
 
     #pprint.pprint(j)
 

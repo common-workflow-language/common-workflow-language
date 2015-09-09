@@ -111,7 +111,7 @@ def main(args=None):
     document_loader = Loader(schema_ctx)
 
     # Make the Avro validation that will be used to validate the target document
-    (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc)
+    (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc, document_loader)
 
     if isinstance(avsc_names, Exception):
         _logger.error("Schema `%s` error:\n%s", args.schema, avsc_names, exc_info=(avsc_names if args.debug else False))

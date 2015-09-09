@@ -984,7 +984,6 @@
         _id: "sld:type"
         _type: "@vocab"
 
-
     - name: items
       type:
         - "#PrimitiveType"
