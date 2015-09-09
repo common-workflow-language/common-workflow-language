@@ -70,7 +70,7 @@ class Process(object):
             if "type" not in c:
                 raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
 
-            if "default" in c and (isinstance(c["type"], basestring) and (isinstance(c["type"], list) and "null" not in c["type"])):
+            if "default" in c and "null" not in aslist(c["type"]):
                 c["type"] = ["null"] + aslist(c["type"])
             else:
                 c["type"] = c["type"]
