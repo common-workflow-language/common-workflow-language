@@ -93,3 +93,4 @@ and send a pull request!
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
 * Brad Chapman <bchapman@hsph.harvard.edu>
 * Josh Randall <joshua.randall@sanger.ac.uk>
+* Andrey Kartashov <porter@porter.st>
