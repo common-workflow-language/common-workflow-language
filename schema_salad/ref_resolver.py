@@ -189,7 +189,7 @@ class Loader(object):
             if inc:
                 return document
 
-            if "@context" in document:
+            if isinstance(document, dict) and "@context" in document:
                 loader = Loader(self.ctx)
                 loader.idx = self.idx
                 loader.add_context(document["@context"])
@@ -203,6 +203,12 @@ class Loader(object):
             return document
 
         if isinstance(document, dict):
+            for d in document:
+                d2 = self.expand_url(d, "", scoped=False, vocab_term=True)
+                if d != d2:
+                    document[d2] = document[d]
+                    del document[d]
+
             for d in loader.url_fields:
                 if d in document:
                     if isinstance(document[d], basestring):

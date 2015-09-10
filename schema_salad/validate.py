@@ -1,13 +1,14 @@
 import pprint
 import avro.schema
 import yaml
+import urlparse
 
 class ValidationException(Exception):
     pass
 
-def validate(expected_schema, datum, strict=False):
+def validate(expected_schema, datum, identifiers, strict=False):
     try:
-        return validate_ex(expected_schema, datum, strict=strict)
+        return validate_ex(expected_schema, datum, identifiers, strict=strict)
     except ValidationException:
         return False
 
@@ -46,7 +47,7 @@ def vpformat(datum):
         a = a[0:80] + "[...]"
     return a
 
-def validate_ex(expected_schema, datum, strict=False):
+def validate_ex(expected_schema, datum, identifiers, strict=False):
     """Determine if a python datum is an instance of a schema."""
 
     schema_type = expected_schema.type
@@ -108,7 +109,7 @@ def validate_ex(expected_schema, datum, strict=False):
         if isinstance(datum, list):
             for i, d in enumerate(datum):
                 try:
-                    validate_ex(expected_schema.items, d, strict=strict)
+                    validate_ex(expected_schema.items, d, identifiers, strict=strict)
                 except ValidationException as v:
                     raise ValidationException("At position %i\n%s" % (i, indent(str(v))))
             return True
@@ -122,13 +123,13 @@ def validate_ex(expected_schema, datum, strict=False):
         else:
             raise ValidationException("`%s` is not a valid map value, expected\n %s" % (vpformat(datum), vpformat(expected_schema.values)))
     elif schema_type in ['union', 'error_union']:
-        if True in [validate(s, datum, strict=strict) for s in expected_schema.schemas]:
+        if True in [validate(s, datum, identifiers, strict=strict) for s in expected_schema.schemas]:
             return True
         else:
             errors = []
             for s in expected_schema.schemas:
                 try:
-                    validate_ex(s, datum, strict=strict)
+                    validate_ex(s, datum, identifiers, strict=strict)
                 except ValidationException as e:
                     errors.append(str(e))
             raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'),
@@ -146,7 +147,7 @@ def validate_ex(expected_schema, datum, strict=False):
                 fieldval = f.default
 
             try:
-                validate_ex(f.type, fieldval, strict=strict)
+                validate_ex(f.type, fieldval, identifiers, strict=strict)
             except ValidationException as v:
                 if f.name not in datum:
                     errors.append("missing required field `%s`" % f.name)
@@ -159,7 +160,9 @@ def validate_ex(expected_schema, datum, strict=False):
                     if d == f.name:
                         found = True
                 if not found:
-                    errors.append("could not validate field `%s` because it is not recognized and strict is True" % d)
+                    split = urlparse.urlsplit(d)
+                    if not split.scheme and d not in identifiers:
+                        errors.append("could not validate field `%s` because it is not recognized and strict is True" % d)
         if errors:
             raise ValidationException("\n".join(errors))
         else:

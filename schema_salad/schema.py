@@ -104,11 +104,11 @@ def get_metaschema():
     if isinstance(sch_names, Exception):
         _logger.error("Metaschema error, avro was:\n%s", json.dumps(sch_obj, indent=4))
         raise sch_names
-    validate_doc(sch_names, j, strict=True)
+    validate_doc(sch_names, j, loader, strict=True)
     return (sch_names, j, loader)
 
 
-def validate_doc(schema_names, validate_doc, strict):
+def validate_doc(schema_names, validate_doc, loader, strict):
     has_root = False
     for r in schema_names.names.values():
         if r.get_prop("documentRoot"):
@@ -131,7 +131,7 @@ def validate_doc(schema_names, validate_doc, strict):
         for r in schema_names.names.values():
             if r.get_prop("documentRoot"):
                 try:
-                    validate.validate_ex(r, item, strict)
+                    validate.validate_ex(r, item, loader.identifiers, strict)
                     success = True
                     break
                 except validate.ValidationException as e:
