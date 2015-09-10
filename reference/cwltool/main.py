@@ -34,6 +34,10 @@ def arg_parser():
                         help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool",
                         dest="use_container")
 
+    parser.add_argument("--preserve-environment", action="store_true", default=False,
+                        help="Preserve environment variables when running CommandLineTools",
+                        dest="preserve_environment")
+
     exgroup = parser.add_mutually_exclusive_group()
     exgroup.add_argument("--rm-container", action="store_true", default=True,
                         help="Delete Docker container used by jobs after they exit (default)",
@@ -400,6 +404,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
                        outdir=args.outdir,
                        tmp_outdir_prefix=args.tmp_outdir_prefix,
                        use_container=args.use_container,
+                       preserve_environment=args.preserve_environment,
                        pull_image=args.enable_pull,
                        rm_container=args.rm_container,
                        tmpdir_prefix=args.tmpdir_prefix,
