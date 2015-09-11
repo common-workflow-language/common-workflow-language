@@ -949,7 +949,7 @@
         _id: "sld:extends"
         _type: "@id"
       doc: |
-        Indicates that this record inherits fields from the base record.
+        Indicates that this record inherits fields from one or more base records.
 
     - name: specialize
       type:
@@ -997,6 +997,18 @@
   documentRoot: true
   doc: |
     Define an enumerated type.
+  fields:
+    - name: extends
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        _id: "sld:extends"
+        _type: "@id"
+      doc: |
+        Indicates that this enum inherits symbols from a base enum.
 
 
 - name: ArraySchema

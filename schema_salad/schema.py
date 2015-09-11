@@ -247,36 +247,45 @@ def extend_and_specialize(items, loader):
                 spec = {}
 
             exfields = []
+            exsym = []
             for ex in aslist(t["extends"]):
                 if ex not in types:
                     raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
 
                 basetype = copy.deepcopy(types[ex])
-                if spec:
-                    basetype["fields"] = replace_type(basetype["fields"], spec, loader, set())
 
-                for f in basetype["fields"]:
-                    if "inherited_from" not in f:
-                        f["inherited_from"] = ex
+                if t["type"] == "record":
+                    if spec:
+                        basetype["fields"] = replace_type(basetype["fields"], spec, loader, set())
 
-                exfields.extend(basetype.get("fields", []))
+                    for f in basetype["fields"]:
+                        if "inherited_from" not in f:
+                            f["inherited_from"] = ex
 
-            exfields.extend(t.get("fields", []))
-            t["fields"] = exfields
+                    exfields.extend(basetype.get("fields", []))
+                elif t["type"] == "enum":
+                    exsym.extend(basetype.get("symbols", []))
 
-            fieldnames = set()
-            for field in t["fields"]:
-                if field["name"] in fieldnames:
-                    raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
-                else:
-                    fieldnames.add(field["name"])
+            if t["type"] == "record":
+                exfields.extend(t.get("fields", []))
+                t["fields"] = exfields
 
-            for y in [x for x in t["fields"] if x["name"] == "class"]:
-                y["type"] = {"type": "enum",
-                             "symbols": [r["name"]],
-                             "name": r["name"]+"_class",
-                }
-                y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
+                fieldnames = set()
+                for field in t["fields"]:
+                    if field["name"] in fieldnames:
+                        raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
+                    else:
+                        fieldnames.add(field["name"])
+
+                for y in [x for x in t["fields"] if x["name"] == "class"]:
+                    y["type"] = {"type": "enum",
+                                 "symbols": [r["name"]],
+                                 "name": r["name"]+"_class",
+                    }
+                    y["doc"] = "Must be `%s` to indicate this is a %s object." % (r["name"], r["name"])
+            elif t["type"] == "enum":
+                exsym.extend(t.get("symbols", []))
+                t["symbol"] = exsym
 
             types[t["name"]] = t
 
