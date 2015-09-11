@@ -9,6 +9,7 @@ import sys
 import StringIO
 import logging
 import urlparse
+from aslist import aslist
 
 _logger = logging.getLogger("salad")
 
@@ -209,7 +210,8 @@ class RenderType(object):
             f["doc"] = number_headings(self.toc, f["doc"])
 
         if "extends" in f:
-            doc += "\n\nExtends %s" % (linkto(f["extends"]))
+            doc += "\n\nExtends "
+            doc += ", ".join([" %s" % linkto(s) for ex in aslist(f["extends"])])
         if f["name"] in self.subs:
             doc += "\n\nExtended by"
             doc += ", ".join([" %s" % linkto(s) for s in self.subs[f["name"]]])

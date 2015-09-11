@@ -104,7 +104,7 @@ def validate_ex(expected_schema, datum, identifiers, strict=False):
         if datum in expected_schema.symbols:
             return True
         else:
-            raise ValidationException("the value `%s`\n is not a valid enum symbol, expected one of %s" % (vpformat(datum), ", ".join(expected_schema.symbols)))
+            raise ValidationException("the value `%s`\n is not a valid symbol in enum %s, expected one of %s" % (vpformat(datum), expected_schema.name, "'" + "', '".join(expected_schema.symbols) + "'"))
     elif schema_type == 'array':
         if isinstance(datum, list):
             for i, d in enumerate(datum):

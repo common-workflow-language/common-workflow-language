@@ -12,6 +12,7 @@ import urlparse
 import ref_resolver
 from flatten import flatten
 import logging
+from aslist import aslist
 
 _logger = logging.getLogger("salad")
 
@@ -21,12 +22,17 @@ def get_metaschema():
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
-        "ComplexType": "https://w3id.org/cwl/salad#ComplexType",
+        "DocType": "https://w3id.org/cwl/salad#DocType",
         "Documentation": "https://w3id.org/cwl/salad#Documentation",
         "EnumSchema": "https://w3id.org/cwl/salad#EnumSchema",
         "JsonldPredicate": "https://w3id.org/cwl/salad#JsonldPredicate",
+        "NamedType": "https://w3id.org/cwl/salad#NamedType",
         "RecordField": "https://w3id.org/cwl/salad#RecordField",
         "RecordSchema": "https://w3id.org/cwl/salad#RecordSchema",
+        "SaladEnumSchema": "https://w3id.org/cwl/salad#SaladEnumSchema",
+        "SaladRecordField": "https://w3id.org/cwl/salad#SaladRecordField",
+        "SaladRecordSchema": "https://w3id.org/cwl/salad#SaladRecordSchema",
+        "SchemaDefinedType": "https://w3id.org/cwl/salad#SchemaDefinedType",
         "SpecializeDef": "https://w3id.org/cwl/salad#SpecializeDef",
         "_container": "https://w3id.org/cwl/salad#_container",
         "_id": {
@@ -36,10 +42,8 @@ def get_metaschema():
         },
         "_type": "https://w3id.org/cwl/salad#_type",
         "abstract": "https://w3id.org/cwl/salad#abstract",
-        "array": "https://w3id.org/cwl/avro#array",
-        "avro": "https://w3id.org/cwl/avro#",
-        "boolean": "https://w3id.org/cwl/avro#boolean",
-        "bytes": "https://w3id.org/cwl/avro#bytes",
+        "array": "https://w3id.org/cwl/salad#array",
+        "boolean": "http://www.w3.org/2001/XMLSchema#boolean",
         "dct": "http://purl.org/dc/terms/",
         "doc": "https://w3id.org/cwl/salad#doc",
         "docAfter": {
@@ -52,28 +56,28 @@ def get_metaschema():
         },
         "documentRoot": "https://w3id.org/cwl/salad#documentRoot",
         "documentation": "https://w3id.org/cwl/salad#documentation",
-        "double": "https://w3id.org/cwl/avro#double",
-        "enum": "https://w3id.org/cwl/avro#enum",
+        "double": "http://www.w3.org/2001/XMLSchema#double",
+        "enum": "https://w3id.org/cwl/salad#enum",
         "extends": {
             "@id": "https://w3id.org/cwl/salad#extends",
             "@type": "@id"
         },
-        "fields": "avro:fields",
-        "float": "https://w3id.org/cwl/avro#float",
+        "fields": "sld:fields",
+        "float": "http://www.w3.org/2001/XMLSchema#float",
         "identity": "https://w3id.org/cwl/salad#identity",
-        "int": "https://w3id.org/cwl/avro#int",
+        "int": "http://www.w3.org/2001/XMLSchema#int",
         "items": {
-            "@id": "https://w3id.org/cwl/avro#items",
+            "@id": "https://w3id.org/cwl/salad#items",
             "@type": "@vocab"
         },
         "jsonldPredicate": "https://w3id.org/cwl/salad#jsonldPredicate",
-        "jsonldPrefix": "https://w3id.org/cwl/salad#jsonldPrefix",
-        "long": "https://w3id.org/cwl/avro#long",
+        "long": "http://www.w3.org/2001/XMLSchema#long",
         "name": "@id",
-        "null": "https://w3id.org/cwl/avro#null",
+        "noLinkCheck": "https://w3id.org/cwl/salad#noLinkCheck",
+        "null": "https://w3id.org/cwl/salad#null",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "record": "https://w3id.org/cwl/avro#record",
+        "record": "https://w3id.org/cwl/salad#record",
         "sld": "https://w3id.org/cwl/salad#",
         "specialize": "https://w3id.org/cwl/salad#specialize",
         "specializeFrom": {
@@ -84,16 +88,17 @@ def get_metaschema():
             "@id": "https://w3id.org/cwl/salad#specializeTo",
             "@type": "@id"
         },
-        "string": "https://w3id.org/cwl/avro#string",
+        "string": "http://www.w3.org/2001/XMLSchema#string",
         "symbols": {
-            "@id": "https://w3id.org/cwl/avro#symbols",
+            "@id": "https://w3id.org/cwl/salad#symbols",
             "@type": "@id",
             "identity": True
         },
         "type": {
-            "@id": "https://w3id.org/cwl/avro#type",
+            "@id": "https://w3id.org/cwl/salad#type",
             "@type": "@vocab"
-        }
+        },
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
     })
     j = yaml.load(f)
     j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
@@ -125,7 +130,8 @@ def validate_doc(schema_names, validate_doc, loader, strict):
     else:
         raise validate.ValidationException("Document must be dict or list")
 
-    for item in validate_doc:
+    anyerrors = []
+    for pos, item in enumerate(validate_doc):
         errors = []
         success = False
         for r in schema_names.names.values():
@@ -135,29 +141,53 @@ def validate_doc(schema_names, validate_doc, loader, strict):
                     success = True
                     break
                 except validate.ValidationException as e:
-                    errors.append("Could not validate as %s because %s" % (r.get_prop("name"), str(e)))
+                    errors.append("Could not validate as `%s` because\n%s" % (r.get_prop("name"), validate.indent(str(e), nolead=False)))
         if not success:
-            raise validate.ValidationException("- %s" % ("\n\n- ".join(errors)))
+            objerr = "Validation error at position %i" % pos
+            for ident in loader.identifiers:
+                if ident in item:
+                    objerr = "Validation error in object %s" % (item[ident])
+                    break
+            anyerrors.append("%s\n%s" % (objerr, validate.indent("\n".join(errors))))
+    if anyerrors:
+        raise validate.ValidationException("\n".join(anyerrors))
 
 
-def replace_type(items, spec, loader):
+def replace_type(items, spec, loader, found):
+    """ Go through and replace types in the 'spec' mapping"""
+
+    items = copy.deepcopy(items)
     if isinstance(items, dict):
-        for n in ("type", "items"):
+        # recursively check these fields for types to replace
+        if "type" in items and items["type"] in ("record", "enum"):
+            if items.get("name"):
+                if items["name"] in found:
+                    return items["name"]
+                else:
+                    found.add(items["name"])
+
+        for n in ("type", "items", "fields"):
             if n in items:
-                items[n] = replace_type(items[n], spec, loader)
+                items[n] = replace_type(items[n], spec, loader, found)
                 if isinstance(items[n], list):
                     items[n] = flatten(items[n])
         return items
-    if isinstance(items, list):
-        n = []
-        for i in items:
-            n.append(replace_type(i, spec, loader))
-        return n
-    if isinstance(items, basestring):
-        if items in loader.vocab and loader.vocab[items] in spec:
-            return spec[loader.vocab[items]]
-        elif items in spec:
-            return spec[items]
+    elif isinstance(items, list):
+        # recursively transform list
+        return [replace_type(i, spec, loader, found) for i in items]
+    elif isinstance(items, basestring):
+        # found a string which is a symbol corresponding to a type.
+        replace_with = None
+        if items in loader.vocab:
+            # If it's a vocabulary term, first expand it to its fully qualified URI
+            items = loader.vocab[items]
+
+        if items in spec:
+            # Look up in specialization map
+            replace_with = spec[items]
+
+        if replace_with:
+            return replace_type(replace_with, spec, loader, found)
     return items
 
 def avro_name(url):
@@ -172,14 +202,15 @@ def avro_name(url):
 def make_valid_avro(items, found, union=False):
     items = copy.deepcopy(items)
     if isinstance(items, dict):
-        if "name" in items:
+        if items.get("name"):
             items["name"] = avro_name(items["name"])
 
-        if "type" in items and items["type"] in ("record", "enum"):
+        if "type" in items and items["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
             if items.get("abstract"):
                 return items
-            if "name" not in items:
+            if not items.get("name"):
                 raise Exception("Named schemas must have a non-empty name: %s" % items)
+
             if items["name"] in found:
                 return items["name"]
             else:
@@ -199,13 +230,11 @@ def make_valid_avro(items, found, union=False):
             items = frg
     return items
 
-def aslist(l):
-    if isinstance(l, list):
-        return l
-    else:
-        return [l]
 
 def extend_and_specialize(items, loader):
+    """Apply 'extend' and 'specialize' to fully materialize derived record
+    types."""
+
     types = {t["name"]: t for t in items}
     n = []
 
@@ -224,7 +253,7 @@ def extend_and_specialize(items, loader):
 
                 basetype = copy.deepcopy(types[ex])
                 if spec:
-                    basetype["fields"] = replace_type(basetype["fields"], spec, loader)
+                    basetype["fields"] = replace_type(basetype["fields"], spec, loader, set())
 
                 for f in basetype["fields"]:
                     if "inherited_from" not in f:
@@ -257,15 +286,17 @@ def extend_and_specialize(items, loader):
 
     extended_by = {}
     for t in n:
-        if "extends" in t and ex_types[t["extends"]].get("abstract"):
-            add_dictlist(extended_by, t["extends"], ex_types[t["name"]])
-            add_dictlist(extended_by, avro_name(t["extends"]), ex_types[t["name"]])
+        if "extends" in t:
+            for ex in aslist(t["extends"]):
+                if ex_types[ex].get("abstract"):
+                    add_dictlist(extended_by, ex, ex_types[t["name"]])
+                    add_dictlist(extended_by, avro_name(ex), ex_types[ex])
 
     for t in n:
         if "fields" in t:
-            t["fields"] = replace_type(t["fields"], extended_by, loader)
+            t["fields"] = replace_type(t["fields"], extended_by, loader, set())
 
-    n = replace_type(n, ex_types, loader)
+    n = replace_type(n, ex_types, loader, set())
 
     return n
 

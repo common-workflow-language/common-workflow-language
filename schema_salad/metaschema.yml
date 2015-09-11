@@ -692,7 +692,6 @@
 
 
 - name: PrimitiveType
-  docParent: "#Schema_validation"
   type: enum
   symbols:
     - "sld:null"
@@ -718,7 +717,7 @@
    * **string**: Unicode character sequence
 
 
-- name: "Any"
+- name: "AnyType"
   type: enum
   symbols: ["#Any"]
   doc: |
@@ -791,16 +790,8 @@
         _type: "@id"
 
 
-- name: ComplexType
+- name: NamedType
   type: record
-  docParent: "#Schema_validation"
-  doc: |
-    Abstract base for schema-defined types.
-
-    * **record**: An object with one or more fields defined by name and type
-    * **enum**: A value from a finite set of symbolic values
-    * **array**: An ordered sequence of values
-
   abstract: true
   fields:
     - name: name
@@ -808,6 +799,11 @@
       jsonldPredicate: "@id"
       doc: "The identifier for this type"
 
+
+- name: DocType
+  type: record
+  abstract: true
+  fields:
     - name: doc
       type: ["null", string]
       doc: "A documentation string for this type."
@@ -831,6 +827,15 @@
         _id: "sld:docAfter"
         _type: "@id"
 
+
+- name: SchemaDefinedType
+  type: record
+  extends: "#DocType"
+  doc: |
+    Abstract base for schema-defined types.
+  abstract: true
+  fields:
+
     - name: jsonldPredicate
       type:
         - "null"
@@ -848,7 +853,6 @@
 
 - name: RecordField
   type: record
-  docParent: "#RecordSchema"
   doc: "A field of a record."
   fields:
     - name: name
@@ -865,14 +869,18 @@
     - name: type
       type:
         - "#PrimitiveType"
-        - "#ComplexType"
-        - "#Any"
+        - "#AnyType"
+        - "#RecordSchema"
+        - "#EnumSchema"
+        - "#ArraySchema"
         - string
         - type: array
           items:
             - "#PrimitiveType"
-            - "#ComplexType"
-            - "#Any"
+            - "#AnyType"
+            - "#RecordSchema"
+            - "#EnumSchema"
+            - "#ArraySchema"
             - string
       jsonldPredicate:
         _id: "sld:type"
@@ -880,6 +888,12 @@
       doc: |
         The field type
 
+
+- name: SaladRecordField
+  type: record
+  extends: "#RecordField"
+  doc: "A field of a record."
+  fields:
     - name: jsonldPredicate
       type:
         - "null"
@@ -891,8 +905,6 @@
 
 - name: RecordSchema
   type: record
-  extends: "#ComplexType"
-  documentRoot: true
   fields:
     - name: type
       doc: "Must be `record`"
@@ -905,12 +917,6 @@
         _id: "sld:type"
         _type: "@vocab"
 
-    - name: abstract
-      type: ["null", boolean]
-      doc: |
-        If true, this record is abstract and may be used as a base for other
-        records, but is not valid on its own.
-
     - name: "fields"
       type:
         - "null"
@@ -920,8 +926,27 @@
       jsonldPredicate: "sld:fields"
       doc: "Defines the fields of the record."
 
+
+- name: SaladRecordSchema
+  type: record
+  extends: ["#NamedType", "#RecordSchema", "#SchemaDefinedType"]
+  documentRoot: true
+  specialize:
+    specializeFrom: "#RecordField"
+    specializeTo: "#SaladRecordField"
+  fields:
+    - name: abstract
+      type: ["null", boolean]
+      doc: |
+        If true, this record is abstract and may be used as a base for other
+        records, but is not valid on its own.
+
     - name: extends
-      type: ["null", string]
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
@@ -935,7 +960,7 @@
         - type: array
           items: "#SpecializeDef"
       doc: |
-        Only applies if `extends` is true.  Apply type specialization using the
+        Only applies if `extends` is declared.  Apply type specialization using the
         base record as a template.  For each field inherited from the base
         record, replace any instance of the type `specializeFrom` with
         `specializeTo`.
@@ -943,8 +968,6 @@
 
 - name: EnumSchema
   type: record
-  extends: "#ComplexType"
-  documentRoot: true
   doc: |
     Define an enumerated type.
   fields:
@@ -970,6 +993,14 @@
       doc: "Defines the set of valid symbols."
 
 
+- name: SaladEnumSchema
+  type: record
+  extends: ["#EnumSchema", "#SchemaDefinedType"]
+  documentRoot: true
+  doc: |
+    Define an enumerated type.
+
+
 - name: ArraySchema
   type: record
   fields:
@@ -987,10 +1018,19 @@
     - name: items
       type:
         - "#PrimitiveType"
-        - "#ComplexType"
+        - "#AnyType"
+        - "#RecordSchema"
+        - "#EnumSchema"
+        - "#ArraySchema"
         - string
         - type: array
-          items: [ "#PrimitiveType", "#ComplexType", string ]
+          items:
+            - "#PrimitiveType"
+            - "#AnyType"
+            - "#RecordSchema"
+            - "#EnumSchema"
+            - "#ArraySchema"
+            - string
       jsonldPredicate:
         _id: "sld:items"
         _type: "@vocab"
@@ -999,18 +1039,12 @@
 
 - name: Documentation
   type: record
-  docParent: "#Schema_validation"
+  extends: ["#NamedType", "#DocType"]
   documentRoot: true
   doc: |
     A documentation section.  This type exists to faciliate self-documenting
     schemas but has no role in formal validation.
   fields:
-    - name: name
-      type: string
-      jsonldPredicate: "@id"
-      doc: |
-        Identify the documentation section.
-
     - name: type
       doc: "Must be `documentation`"
       type:
@@ -1021,27 +1055,3 @@
       jsonldPredicate:
         _id: "sld:type"
         _type: "@vocab"
-
-    - name: doc
-      type: string
-      doc: |
-        The actual documentation content.
-
-    - name: docParent
-      type: ["null", string]
-      jsonldPredicate:
-        _id: "sld:docParent"
-        _type: "@id"
-      doc: |
-        Hint to indicate that during documentation generation, this documentation
-        section should appear in a subsection under `docParent`.
-
-    - name: docAfter
-      type: ["null", string]
-      doc: |
-        Hint to indicate that during documentation generation, this documentation
-        section should appear after the `docAfter` section at the same
-        level.
-      jsonldPredicate:
-        _id: "sld:docAfter"
-        _type: "@id"
