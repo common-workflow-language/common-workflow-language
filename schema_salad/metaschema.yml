@@ -717,7 +717,7 @@
    * **string**: Unicode character sequence
 
 
-- name: "AnyType"
+- name: "Any"
   type: enum
   symbols: ["#Any"]
   doc: |
@@ -869,7 +869,6 @@
     - name: type
       type:
         - "#PrimitiveType"
-        - "#AnyType"
         - "#RecordSchema"
         - "#EnumSchema"
         - "#ArraySchema"
@@ -877,7 +876,6 @@
         - type: array
           items:
             - "#PrimitiveType"
-            - "#AnyType"
             - "#RecordSchema"
             - "#EnumSchema"
             - "#ArraySchema"
@@ -1018,7 +1016,6 @@
     - name: items
       type:
         - "#PrimitiveType"
-        - "#AnyType"
         - "#RecordSchema"
         - "#EnumSchema"
         - "#ArraySchema"
@@ -1026,7 +1023,6 @@
         - type: array
           items:
             - "#PrimitiveType"
-            - "#AnyType"
             - "#RecordSchema"
             - "#EnumSchema"
             - "#ArraySchema"

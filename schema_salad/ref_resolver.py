@@ -7,6 +7,7 @@ import requests
 import urlparse
 import yaml
 import validate
+from aslist import aslist
 
 _logger = logging.getLogger("salad")
 
@@ -117,11 +118,8 @@ class Loader(object):
         if isinstance(ref, dict):
             obj = ref
             if "@import" in ref:
-                if len(obj) == 1:
-                    ref = obj["@import"]
-                    obj = None
-                else:
-                    raise ValueError("'@import' must be the only field in %s" % (str(obj)))
+                ref = obj["@import"]
+                obj = None
             elif "@include" in obj:
                 if len(obj) == 1:
                     ref = obj["@include"]
@@ -202,33 +200,43 @@ class Loader(object):
         else:
             return document
 
-        if isinstance(document, dict):
-            for d in document:
-                d2 = self.expand_url(d, "", scoped=False, vocab_term=True)
-                if d != d2:
-                    document[d2] = document[d]
-                    del document[d]
+        try:
+            if isinstance(document, dict):
+                for d in document:
+                    d2 = self.expand_url(d, "", scoped=False, vocab_term=True)
+                    if d != d2:
+                        document[d2] = document[d]
+                        del document[d]
 
-            for d in loader.url_fields:
-                if d in document:
-                    if isinstance(document[d], basestring):
-                        document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
-                    elif isinstance(document[d], list):
-                        document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
-            iterator = document.iteritems()
-        elif isinstance(document, list):
-            iterator = enumerate(document)
-        else:
-            return document
+                for d in loader.url_fields:
+                    if d in document:
+                        if isinstance(document[d], basestring):
+                            document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
+                        elif isinstance(document[d], list):
+                            document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
 
-        for key, val in iterator:
-            try:
-                document[key] = loader.resolve_all(val, base_url)
-            except validate.ValidationException as v:
-                if isinstance(key, basestring):
-                    raise validate.ValidationException("Validation error in field %s:\n%s" % (key, validate.indent(str(v))))
-                else:
-                    raise validate.ValidationException("Validation error in position %i:\n%s" % (key, validate.indent(str(v))))
+                for key, val in document.items():
+                    document[key] = loader.resolve_all(val, base_url)
+
+            elif isinstance(document, list):
+                i = 0
+                while i < len(document):
+                    val = document[i]
+                    if isinstance(val, dict) and "@import" in val and val.get("inline"):
+                        l = loader.resolve_all(val, base_url)
+                        del document[i]
+                        for item in aslist(l):
+                            document.insert(i, item)
+                            i += 1
+                    else:
+                        document[i] = loader.resolve_all(val, base_url)
+                        i += 1
+
+        except validate.ValidationException as v:
+            if isinstance(key, basestring):
+                raise validate.ValidationException("Validation error in field %s:\n%s" % (key, validate.indent(str(v))))
+            else:
+                raise validate.ValidationException("Validation error in position %i:\n%s" % (key, validate.indent(str(v))))
 
         return document
 
