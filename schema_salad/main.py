@@ -78,6 +78,8 @@ def main(args=None):
     schema_uri = "file://" + os.path.abspath(args.schema)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
     schema_doc = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
+    if "@graph" in schema_doc:
+        schema_doc = schema_doc["@graph"]
 
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:
@@ -148,6 +150,8 @@ def main(args=None):
     # Load target document and resolve refs
     try:
         document = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
+        if "@graph" in document:
+            document = document["@graph"]
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s", args.document, e, exc_info=(e if args.debug else False))
         return 1

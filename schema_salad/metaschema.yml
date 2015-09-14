@@ -836,7 +836,6 @@
     Abstract base for schema-defined types.
   abstract: true
   fields:
-
     - name: jsonldPredicate
       type:
         - "null"

@@ -171,6 +171,7 @@ def replace_type(items, spec, loader, found):
                 items[n] = replace_type(items[n], spec, loader, found)
                 if isinstance(items[n], list):
                     items[n] = flatten(items[n])
+
         return items
     elif isinstance(items, list):
         # recursively transform list
@@ -199,13 +200,13 @@ def avro_name(url):
             return frg
     return url
 
-def make_valid_avro(items, found, union=False):
+def make_valid_avro(items, alltypes, found, union=False):
     items = copy.deepcopy(items)
     if isinstance(items, dict):
         if items.get("name"):
             items["name"] = avro_name(items["name"])
 
-        if "type" in items and items["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
+        if "type" in items and items["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum", "record", "enum"):
             if items.get("abstract"):
                 return items
             if not items.get("name"):
@@ -215,19 +216,21 @@ def make_valid_avro(items, found, union=False):
                 return items["name"]
             else:
                 found.add(items["name"])
-        for n in ("type", "items", "values", "fields", "symbols"):
+        for n in ("type", "items", "values", "fields"):
             if n in items:
-                items[n] = make_valid_avro(items[n], found, union=True)
+                items[n] = make_valid_avro(items[n], alltypes, found, union=True)
+        if "symbols" in items:
+            items["symbols"] = [avro_name(sym) for sym in items["symbols"]]
         return items
     if isinstance(items, list):
         n = []
         for i in items:
-            n.append(make_valid_avro(i, found, union=union))
+            n.append(make_valid_avro(i, alltypes, found, union=union))
         return n
     if union and isinstance(items, basestring):
-        doc_url, frg = urlparse.urldefrag(items)
-        if frg:
-            items = frg
+        if items in alltypes and avro_name(items) not in found:
+            return make_valid_avro(alltypes[items], alltypes, found, union=union)
+        items = avro_name(items)
     return items
 
 
@@ -305,8 +308,6 @@ def extend_and_specialize(items, loader):
         if "fields" in t:
             t["fields"] = replace_type(t["fields"], extended_by, loader, set())
 
-    n = replace_type(n, ex_types, loader, set())
-
     return n
 
 def make_avro_schema(j, loader):
@@ -316,9 +317,7 @@ def make_avro_schema(j, loader):
 
     j = extend_and_specialize(j, loader)
 
-    #pprint.pprint(j)
-
-    j2 = make_valid_avro(j, set())
+    j2 = make_valid_avro(j, {t["name"]: t for t in j}, set())
 
     j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
 

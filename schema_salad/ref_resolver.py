@@ -36,6 +36,9 @@ class Loader(object):
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped=False, vocab_term=False):
+        if url in ("@id", "@type"):
+            return url
+
         if vocab_term and url in self.vocab:
             return url
 
