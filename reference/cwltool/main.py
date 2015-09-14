@@ -34,8 +34,9 @@ def arg_parser():
                         help="Do not execute jobs in a Docker container, even when specified by the CommandLineTool",
                         dest="use_container")
 
-    parser.add_argument("--preserve-environment", action="store_true", default=False,
-                        help="Preserve environment variables when running CommandLineTools",
+    parser.add_argument("--preserve-environment", type=str, nargs='+',
+                        help="Preserve specified environment variables when running CommandLineTools",
+                        metavar=("VAR1","VAR2"),
                         dest="preserve_environment")
 
     exgroup = parser.add_mutually_exclusive_group()
