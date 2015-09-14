@@ -7,16 +7,16 @@ import os
 from process import WorkflowException
 import process
 import yaml
-import avro_ld.validate as validate
-import avro_ld.ref_resolver
+import schema_salad.validate as validate
+import schema_salad.ref_resolver
 
 _logger = logging.getLogger("cwltool")
 
 def exeval(ex, jobinput, requirements, outdir, tmpdir, context, pull_image):
-    if ex["engine"] == "cwl:JsonPointer":
+    if ex["engine"] == "https://w3id.org/cwl/cwl#JsonPointer":
         try:
             obj = {"job": jobinput, "context": context, "outdir": outdir, "tmpdir": tmpdir}
-            return avro_ld.ref_resolver.resolve_json_pointer(obj, ex["script"])
+            return schema_salad.ref_resolver.resolve_json_pointer(obj, ex["script"])
         except ValueError as v:
             raise WorkflowException("%s in %s" % (v,  obj))
 

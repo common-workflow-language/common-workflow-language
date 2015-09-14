@@ -2,16 +2,16 @@
 
 import draft2tool
 import argparse
-from avro_ld.ref_resolver import Loader
+from schema_salad.ref_resolver import Loader
 import json
 import os
 import sys
 import logging
 import workflow
-import avro_ld.validate as validate
+import schema_salad.validate as validate
 import tempfile
-import avro_ld.jsonld_context
-import avro_ld.makedoc
+import schema_salad.jsonld_context
+import schema_salad.makedoc
 import yaml
 import urlparse
 import process
@@ -86,11 +86,6 @@ def arg_parser():
     exgroup = parser.add_mutually_exclusive_group()
     exgroup.add_argument("--print-rdf", action="store_true",
                         help="Print corresponding RDF graph for workflow and exit")
-    exgroup.add_argument("--print-spec", action="store_true", help="Print HTML specification document and exit")
-    exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print CWL JSON-LD context and exit")
-    exgroup.add_argument("--print-rdfs", action="store_true", help="Print CWL RDF schema and exit")
-    exgroup.add_argument("--print-avro", action="store_true", help="Print Avro schema and exit")
-    exgroup.add_argument("--print-pre", action="store_true", help="Print workflow document after preprocessing and exit")
     exgroup.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
     exgroup.add_argument("--version", action="store_true", help="Print version and exit")
 
@@ -261,28 +256,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         else:
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
 
-    (j, names) = process.get_schema()
-    (ctx, g) = avro_ld.jsonld_context.avrold_to_jsonld_context(j)
-    loader = create_loader(ctx)
-
-    if args.print_jsonld_context:
-        j = {"@context": ctx}
-        print json.dumps(j, indent=4, sort_keys=True)
-        return 0
-
-    if args.print_rdfs:
-        print(g.serialize(format=args.rdf_serializer))
-        return 0
-
-    if args.print_spec:
-        avro_ld.makedoc.avrold_doc(j, sys.stdout)
-        return 0
-
-    if args.print_avro:
-        print "["
-        print ", ".join([json.dumps(names.names[n].to_json(), indent=4, sort_keys=True) for n in names.names])
-        print "]"
-        return 0
+    (document_loader, avsc_names, schema_metadata) = process.get_schema()
 
     if not args.workflow:
         parser.print_help()
@@ -292,27 +266,17 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     idx = {}
     try:
-        processobj = loader.resolve_ref(args.workflow)
-    except (avro_ld.validate.ValidationException, RuntimeError) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        return 1
-
-    if args.print_pre:
-        print json.dumps(processobj, indent=4)
-        return 0
-
-    try:
-        loader.validate_links(processobj)
-    except (avro_ld.validate.ValidationException) as e:
+        processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, args.workflow, args.strict)
+    except (schema_salad.validate.ValidationException, RuntimeError) as e:
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
     if isinstance(processobj, list):
-        processobj = loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
+        processobj, _ = document_loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
     try:
         t = makeTool(processobj, strict=args.strict, makeTool=makeTool)
-    except (avro_ld.validate.ValidationException) as e:
+    except (schema_salad.validate.ValidationException) as e:
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         if args.debug:
             _logger.exception("")
@@ -350,12 +314,14 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     else:
         job_order_file = None
 
+    loader = Loader({"id": "@id"})
+
     if job_order_file:
         input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(job_order_file))
         try:
-            job_order_object = loader.resolve_ref(job_order_file)
+            job_order_object, _ = loader.resolve_ref(job_order_file)
         except Exception as e:
-            _logger.error(e)
+            _logger.error(e, exc_info=(e if args.debug else False))
             return 1
         toolparser = None
     else:
@@ -373,7 +339,7 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
                     input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(cmd_line["job_order"]))
                     job_order_object = loader.resolve_ref(cmd_line["job_order"])
                 except Exception as e:
-                    _logger.error(e)
+                    _logger.error(e, exc_info=(e if args.debug else False))
                     return 1
             else:
                 job_order_object = {}

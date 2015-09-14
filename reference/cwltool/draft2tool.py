@@ -13,7 +13,7 @@ import hashlib
 import random
 from process import Process
 from process import WorkflowException
-import avro_ld.validate as validate
+import schema_salad.validate as validate
 from aslist import aslist
 import expression
 import re

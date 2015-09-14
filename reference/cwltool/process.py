@@ -1,14 +1,14 @@
 import avro.schema
 import os
 import json
-import avro_ld.validate as validate
+import schema_salad.validate as validate
 import copy
 import yaml
 import copy
 import logging
 import pprint
 from aslist import aslist
-import avro_ld.schema
+import schema_salad.schema
 import urlparse
 import pprint
 from pkg_resources import resource_stream
@@ -20,9 +20,10 @@ class WorkflowException(Exception):
     pass
 
 def get_schema():
-    f = resource_stream(__name__, 'schemas/draft-2/cwl-avro.yml')
+    f = resource_stream(__name__, 'schemas/draft-3/cwl-avro.yml')
     j = yaml.load(f)
-    return (j, avro_ld.schema.schema(j))
+    j["name"] = "https://w3id.org/cwl/cwl"
+    return schema_salad.schema.load_schema(j)
 
 def get_feature(self, feature):
     for t in reversed(self.requirements):
@@ -35,7 +36,7 @@ def get_feature(self, feature):
 
 class Process(object):
     def __init__(self, toolpath_object, validateAs, do_validate=True, **kwargs):
-        (_, self.names) = get_schema()
+        (_, self.names, _) = get_schema()
         self.tool = toolpath_object
 
         if do_validate:
@@ -55,9 +56,11 @@ class Process(object):
         sd, _ = self.get_requirement("SchemaDefRequirement")
 
         if sd:
-            for i in sd["types"]:
-                avro.schema.make_avsc_object(i, self.names)
+            sdtypes = sd["types"]
+            av = schema_salad.schema.make_valid_avro(sdtypes, {t["name"]: t for t in sdtypes}, set())
+            for i in av:
                 self.schemaDefs[i["name"]] = i
+            avro.schema.make_avsc_object(av, self.names)
 
         # Build record schema from inputs
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
@@ -76,6 +79,7 @@ class Process(object):
                 c["type"] = c["type"]
             self.inputs_record_schema["fields"].append(c)
 
+        self.inputs_record_schema = schema_salad.schema.make_valid_avro(self.inputs_record_schema, {}, set())
         avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
 
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
@@ -94,6 +98,7 @@ class Process(object):
                 c["type"] = c["type"]
             self.outputs_record_schema["fields"].append(c)
 
+        self.outputs_record_schema = schema_salad.schema.make_valid_avro(self.outputs_record_schema, {}, set())
         avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
 
     def validate_hints(self, hints, strict):

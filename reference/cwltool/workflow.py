@@ -9,7 +9,7 @@ import os
 from collections import namedtuple
 import pprint
 import functools
-import avro_ld.validate as validate
+import schema_salad.validate as validate
 import urlparse
 import pprint
 import tempfile
@@ -21,6 +21,8 @@ _logger = logging.getLogger("cwltool")
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
 def defaultMakeTool(toolpath_object, **kwargs):
+    if not isinstance(toolpath_object, dict):
+        raise WorkflowException("Not a dict: `%s`" % toolpath_object)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
             return draft2tool.CommandLineTool(toolpath_object, **kwargs)
