@@ -101,7 +101,7 @@ def get_metaschema():
         "xsd": "http://www.w3.org/2001/XMLSchema#"
     })
     j = yaml.load(f)
-    j = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
+    j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
     #pprint.pprint(j)
 

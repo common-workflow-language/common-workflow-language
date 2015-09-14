@@ -44,6 +44,7 @@ def main(args=None):
     exgroup.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for document")
     exgroup.add_argument("--print-pre", action="store_true", help="Print document after preprocessing")
     exgroup.add_argument("--print-index", action="store_true", help="Print node index")
+    exgroup.add_argument("--print-metadata", action="store_true", help="Print document metadata")
     exgroup.add_argument("--version", action="store_true", help="Print version")
 
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
@@ -77,7 +78,7 @@ def main(args=None):
     # Load schema document and resolve refs
     schema_uri = "file://" + os.path.abspath(args.schema)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
-    schema_doc = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
+    schema_doc, schema_metadata = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
     if "@graph" in schema_doc:
         schema_doc = schema_doc["@graph"]
 
@@ -142,6 +143,10 @@ def main(args=None):
         makedoc.avrold_doc(schema_doc, sys.stdout)
         return 0
 
+    if args.print_metadata and not args.document:
+        print json.dumps(schema_metadata, indent=4)
+        return 0
+
     # If no document specified, all done.
     if not args.document:
         print "Schema `%s` is valid" % args.schema
@@ -149,9 +154,7 @@ def main(args=None):
 
     # Load target document and resolve refs
     try:
-        document = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
-        if "@graph" in document:
-            document = document["@graph"]
+        document, doc_metadata = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s", args.document, e, exc_info=(e if args.debug else False))
         return 1
@@ -183,6 +186,10 @@ def main(args=None):
     # Optionally convert the document to RDF
     if args.print_rdf:
         printrdf(args.document, document, schema_ctx, args.rdf_serializer)
+        return 0
+
+    if args.print_metadata:
+        print json.dumps(doc_metadata, indent=4)
         return 0
 
     print "Document `%s` is valid" % args.document

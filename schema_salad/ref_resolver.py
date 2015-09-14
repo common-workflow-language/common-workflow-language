@@ -144,11 +144,11 @@ class Loader(object):
 
         # Has this reference been loaded already?
         if url in self.idx:
-            return self.idx[url]
+            return self.idx[url], {}
 
         # "@include" directive means load raw text
         if obj and "@include" in obj:
-            return self.fetch_text(url)
+            return self.fetch_text(url), {}
 
         if obj:
             for identifier in self.identifiers:
@@ -162,21 +162,22 @@ class Loader(object):
             obj = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        obj = self.resolve_all(obj, url)
+        obj, metadata = self.resolve_all(obj, url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
         if url in self.idx:
-            return obj
+            return obj, metadata
         else:
             raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
     def resolve_all(self, document, base_url):
         loader = self
+        metadata = {}
 
         if isinstance(document, dict):
             inc = '@include' in document
             if  '@import' in document or '@include' in document:
-                document = self.resolve_ref(document, base_url)
+                document, _ = self.resolve_ref(document, base_url)
             else:
                 for identifer in self.identity_links:
                     if identifer in document:
@@ -189,7 +190,7 @@ class Loader(object):
                                 document[identifer][n] = self.expand_url(document[identifer][n], base_url, scoped=True)
                                 self.idx[document[identifer][n]] = document[identifer][n]
             if inc:
-                return document
+                return document, {}
 
             if isinstance(document, dict) and "@context" in document:
                 loader = Loader(self.ctx)
@@ -197,12 +198,17 @@ class Loader(object):
                 loader.add_context(document["@context"])
                 if "@base" in loader.ctx:
                     base_url = loader.ctx["@base"]
-                if "@graph" in document:
-                    document = document["@graph"]
+
+            if "@graph" in document:
+                metadata = document
+                document = metadata["@graph"]
+                del metadata["@graph"]
+                metadata, _ = self.resolve_all(metadata, base_url)
+
         elif isinstance(document, list):
             pass
         else:
-            return document
+            return document, metadata
 
         try:
             if isinstance(document, dict):
@@ -220,20 +226,20 @@ class Loader(object):
                             document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
 
                 for key, val in document.items():
-                    document[key] = loader.resolve_all(val, base_url)
+                    document[key], _ = loader.resolve_all(val, base_url)
 
             elif isinstance(document, list):
                 i = 0
                 while i < len(document):
                     val = document[i]
                     if isinstance(val, dict) and "@import" in val and val.get("inline"):
-                        l = loader.resolve_all(val, base_url)
+                        l, _ = loader.resolve_all(val, base_url)
                         del document[i]
                         for item in aslist(l):
                             document.insert(i, item)
                             i += 1
                     else:
-                        document[i] = loader.resolve_all(val, base_url)
+                        document[i], _ = loader.resolve_all(val, base_url)
                         i += 1
 
         except validate.ValidationException as v:
@@ -242,7 +248,7 @@ class Loader(object):
             else:
                 raise validate.ValidationException("Validation error in position %i:\n%s" % (key, validate.indent(str(v))))
 
-        return document
+        return document, metadata
 
     def fetch_text(self, url):
         split = urlparse.urlsplit(url)
