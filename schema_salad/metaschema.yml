@@ -807,6 +807,7 @@
     - name: doc
       type: ["null", string]
       doc: "A documentation string for this type."
+      jsonldPredicate: "sld:doc"
 
     - name: docParent
       type: ["null", string]
@@ -843,6 +844,7 @@
         - "#JsonldPredicate"
       doc: |
         Annotate this type with linked data context.
+      jsonldPredicate: "sld:jsonldPredicate"
 
     - name: documentRoot
       type: ["null", boolean]
@@ -865,6 +867,7 @@
       type: ["null", string]
       doc: |
         A documentation string for this field
+      jsonldPredicate: "sld:doc"
 
     - name: type
       type:
@@ -899,7 +902,7 @@
         - "#JsonldPredicate"
       doc: |
         Annotate this type with linked data context.
-
+      jsonldPredicate: "sld:jsonldPredicate"
 
 - name: RecordSchema
   type: record

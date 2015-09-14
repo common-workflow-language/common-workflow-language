@@ -180,6 +180,7 @@ class Loader(object):
                         if isinstance(document[identifer], basestring):
                             document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
                             self.idx[document[identifer]] = document
+                            base_url = document[identifer]
                         elif isinstance(document[identifer], list):
                             for n, v in enumerate(document[identifer]):
                                 document[identifer][n] = self.expand_url(document[identifer][n], base_url, scoped=True)
