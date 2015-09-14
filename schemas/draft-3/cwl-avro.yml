@@ -6,6 +6,12 @@
   "dct": "http://purl.org/dc/terms/"
   "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  "foaf": http://xmlns.com/foaf/0.1/
+
+"dct:creator":
+  "@id": "http://orcid.org/0000-0003-3566-7705"
+  "foaf:name": Peter Amstutz
+  "foaf:mbox": "mailto:peter.amstutz@curoverse.com"
 
 "@graph":
 - name: "Common Workflow Language, Draft 3"
@@ -587,14 +593,17 @@
   doc: This section specifies the core object types that make up a CWL document.
 
 - "@import": "https://w3id.org/cwl/salad#PrimitiveType"
-- "@import": "https://w3id.org/cwl/salad#SpecializeDef"
 - "@import": "https://w3id.org/cwl/salad#Any"
-- "@import": "https://w3id.org/cwl/salad#JsonldPredicate"
 - "@import": "https://w3id.org/cwl/salad#RecordField"
-- "@import": "https://w3id.org/cwl/salad#ComplexType"
 - "@import": "https://w3id.org/cwl/salad#RecordSchema"
 - "@import": "https://w3id.org/cwl/salad#EnumSchema"
 - "@import": "https://w3id.org/cwl/salad#ArraySchema"
+
+- name: CWLType
+  type: enum
+  extends: "sld:PrimitiveType"
+  symbols:
+    - File
 
 - name: File
   type: record
@@ -629,6 +638,7 @@
         - "null"
         - type: array
           items: "#File"
+      jsonldPredicate: "cwl:secondaryFiles"
       doc: |
         A list of additional files that are associated with the primary file
         and must be transferred alongside the primary file.  Examples include
@@ -649,14 +659,14 @@
     - name: type
       type:
         - "null"
-        - "sld:PrimitiveType"
+        - "#CWLType"
         - "sld:RecordSchema"
         - "sld:EnumSchema"
         - "sld:ArraySchema"
         - string
         - type: array
           items:
-            - "sld:PrimitiveType"
+            - "#CWLType"
             - "sld:RecordSchema"
             - "sld:EnumSchema"
             - "sld:ArraySchema"
@@ -687,6 +697,7 @@
         valid to stream file contents using a named pipe.  Default: `false`.
     - name: default
       type: ["null", "Any"]
+      jsonldPredicate: "cwl:default"
       doc: |
         The default value for this parameter if not provided in the input
         object.
@@ -742,6 +753,7 @@
         - "#Expression"
         - type: "array"
           items: ["string", "#Expression"]
+      jsonldPredicate: "cwl:secondaryFiles"
       doc: |
         Only applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
@@ -758,11 +770,9 @@
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
 
-
-- name: InputRecordSchema
+- name: InputRecordField
   type: record
-  extends: "sld:RecordSchema"
-  docParent: "#InputParameter"
+  extends: "sld:RecordField"
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: "#InputRecordSchema"
@@ -773,6 +783,16 @@
   fields:
     - name: inputBinding
       type: [ "null", "#Binding" ]
+      jsonldPredicate: "cwl:inputBinding"
+
+
+- name: InputRecordSchema
+  type: record
+  extends: "sld:RecordSchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "sld:RecordField"
+      specializeTo: "#InputRecordField"
 
 
 - name: InputEnumSchema
@@ -782,7 +802,7 @@
   fields:
     - name: inputBinding
       type: [ "null", "#Binding" ]
-
+      jsonldPredicate: "cwl:inputBinding"
 
 - name: InputArraySchema
   type: record
@@ -798,9 +818,10 @@
   fields:
     - name: inputBinding
       type: [ "null", "#Binding" ]
+      jsonldPredicate: "cwl:inputBinding"
 
 
-- name: OutputRecordSchema
+- name: OutputRecordField
   type: record
   extends: "sld:RecordSchema"
   docParent: "#OutputParameter"
@@ -814,6 +835,16 @@
   fields:
     - name: outputBinding
       type: [ "null", "#Binding" ]
+      jsonldPredicate: "cwl:outputBinding"
+
+
+- name: OutputRecordSchema
+  type: record
+  extends: "sld:RecordSchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "sld:RecordField"
+      specializeTo: "#OutputRecordField"
 
 
 - name: OutputEnumSchema
@@ -823,7 +854,7 @@
   fields:
     - name: outputBinding
       type: [ "null", "#Binding" ]
-
+      jsonldPredicate: "cwl:outputBinding"
 
 - name: OutputArraySchema
   type: record
@@ -839,7 +870,7 @@
   fields:
     - name: outputBinding
       type: [ "null", "#Binding" ]
-
+      jsonldPredicate: "cwl:outputBinding"
 
 - name: InputParameter
   type: record
@@ -859,10 +890,10 @@
       doc: "The unique identifier for this parameter object."
     - name: "inputBinding"
       type: [ "null", "#Binding" ]
+      jsonldPredicate: "cwl:inputBinding"
       doc: |
         Describes how to handle the inputs of a process and convert them
         into a concrete form for execution, such as command line parameters.
-
 
 - name: OutputParameter
   type: record
@@ -882,6 +913,7 @@
       doc: "The unique identifier for this parameter object."
     - name: "outputBinding"
       type: [ "null", "#Binding" ]
+      jsonldPredicate: "cwl:outputBinding"
       doc: |
         Describes how to handle the outputs of a process.
 
@@ -953,7 +985,6 @@
   name: Process
   abstract: true
   docAfter: "#ProcessRequirement"
-  documentRoot: true
   doc: |
 
     The base executable type in CWL is the `Process` object defined by the
@@ -969,6 +1000,7 @@
       type:
         type: array
         items: "#InputParameter"
+      jsonldPredicate: "cwl:inputs"
       doc: |
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -979,6 +1011,7 @@
       type:
         type: array
         items: "#OutputParameter"
+      jsonldPredicate: "cwl:outputs"
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -987,7 +1020,8 @@
         - "null"
         - type: array
           items: "#ProcessRequirement"
-      doc: >
+      jsonldPredicate: "cwl:requirements"
+      doc: |
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this process.  If
         an implementation cannot satisfy all requirements, or a requirement is
@@ -999,7 +1033,8 @@
         - "null"
         - type: array
           items: Any
-      doc: >
+      jsonldPredicate: "cwl:hints"
+      doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
         not an error if an implementation cannot satisfy all hints, however
@@ -1135,12 +1170,119 @@
         will include up to the first 64 KiB of file contents in the `contents` field.
 
 
+- name: CommandInputRecordField
+  type: record
+  extends: "#InputRecordField"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandInputRecordSchema
+  type: record
+  extends: "#InputRecordSchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordField"
+      specializeTo: "#CommandInputRecordField"
+
+
+- name: CommandInputEnumSchema
+  type: record
+  extends: "#InputEnumSchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandInputArraySchema
+  type: record
+  extends: "#InputArraySchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandOutputRecordField
+  type: record
+  extends: "#OutputRecordField"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- name: CommandOutputRecordSchema
+  type: record
+  extends: "#OutputRecordSchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordField"
+      specializeTo: "#CommandOutputRecordField"
+
+
+- name: CommandOutputEnumSchema
+  type: record
+  extends: "#OutputEnumSchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- name: CommandOutputArraySchema
+  type: record
+  extends: "#OutputArraySchema"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
 - type: record
   name: CommandInputParameter
   extends: "#InputParameter"
   docParent: "#CommandLineTool"
   doc: An input parameter for a CommandLineTool.
   specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
     - specializeFrom: "#Binding"
       specializeTo: "#CommandLineBinding"
 
@@ -1151,6 +1293,12 @@
   docParent: "#CommandLineTool"
   doc: An output parameter for a CommandLineTool.
   specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
     - specializeFrom: "#Binding"
       specializeTo: "#CommandOutputBinding"
 
@@ -1159,6 +1307,7 @@
   name: CommandLineTool
   extends: "#Process"
   docAfter: "#Workflow"
+  documentRoot: true
   specialize:
     - specializeFrom: "#InputParameter"
       specializeTo: "#CommandInputParameter"
@@ -1369,6 +1518,7 @@
   name: ExpressionTool
   extends: "#Process"
   docAfter: "#CommandLineTool"
+  documentRoot: true
   doc: |
     Execute an expression as a process step.
   fields:
@@ -1395,17 +1545,22 @@
 
 - name: WorkflowOutputParameter
   type: record
-  extends: "#OutputParameter"
+  extends: ["#OutputParameter", "#Sink"]
   docParent: "#Workflow"
   doc: |
     Describe an output parameter of a workflow.  The parameter must be
     connected to one or more parameters defined in the workflow that will
     provide the value of the output parameter.
+
+
+- name: Sink
+  type: record
+  abstract: true
   fields:
     - name: source
       doc: |
-        Specifies one or more workflow parameters that will provide this output
-        value.
+        Specifies one or more workflow parameters that will provide input to
+        the underlying process parameter.
       jsonldPredicate:
         "_id": "cwl:source"
         "_type": "@id"
@@ -1423,6 +1578,7 @@
 
 - type: record
   name: WorkflowStepInput
+  extends: "#Sink"
   docParent: "#WorkflowStep"
   doc: |
     The input of a workflow step connects an upstream parameter (from the
@@ -1465,29 +1621,12 @@
       type: string
       jsonldPredicate: "@id"
       doc: "A unique identifier for this workflow input parameter."
-    - name: source
-      doc: |
-        Specifies one or more workflow parameters that will provide input to
-        the underlying process parameter.
-      jsonldPredicate:
-        "_id": "cwl:source"
-        "_type": "@id"
-      type:
-        - "null"
-        - string
-        - type: array
-          items: string
-    - name: linkMerge
-      type: ["null", "#LinkMergeMethod"]
-      doc: |
-        The method to use to merge multiple inbound links into a single array.
-        If not specified, the default method is "merge_nested".
     - name: default
       type: ["null", Any]
       doc: |
         The default value for this parameter if there is no `source`
         field.
-
+      jsonldPredicate: "cwl:default"
 
 - type: record
   name: WorkflowStepOutput
@@ -1578,6 +1717,7 @@
       type:
         type: array
         items: "#WorkflowStepInput"
+      jsonldPredicate: "cwl:inputs"
       doc: |
         Defines the input parameters of the workflow step.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -1588,6 +1728,7 @@
       type:
         type: array
         items: "#WorkflowStepOutput"
+      jsonldPredicate: "cwl:outputs"
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -1596,7 +1737,8 @@
         - "null"
         - type: array
           items: "#ProcessRequirement"
-      doc: >
+      jsonldPredicate: "cwl:requirements"
+      doc: |
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this workflow step.  If
         an implementation cannot satisfy all requirements, or a requirement is
@@ -1608,7 +1750,8 @@
         - "null"
         - type: array
           items: "Any"
-      doc: >
+      jsonldPredicate: "cwl:hints"
+      doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this workflow step.  It is
         not an error if an implementation cannot satisfy all hints, however
@@ -1629,7 +1772,10 @@
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
     - name: run
-      type: "#Process"
+      type: ["#Process", string]
+      jsonldPredicate:
+        "_id": "cwl:steps"
+        "_type": "@id"
       doc: |
         Specifies the process to run.
     - name: scatter
@@ -1657,6 +1803,7 @@
   type: record
   docParent: "#Reference"
   extends: "#Process"
+  documentRoot: true
   specialize:
     specializeFrom: "#OutputParameter"
     specializeTo: "#WorkflowOutputParameter"
@@ -1828,6 +1975,9 @@
           - "#InputRecordSchema"
           - "#InputEnumSchema"
           - "#InputArraySchema"
+          - "#CommandInputRecordSchema"
+          - "#CommandInputEnumSchema"
+          - "#CommandInputArraySchema"
       doc: The list of type definitions.
 
 
@@ -1847,6 +1997,7 @@
         - "null"
         - type: array
           items: "#ProcessRequirement"
+      jsonldPredicate: "cwl:requirements"
       doc: |
         Requirements to run this expression engine, such as DockerRequirement
         for specifying a container to run the engine.

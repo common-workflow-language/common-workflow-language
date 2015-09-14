@@ -1,3 +1,5 @@
+cwlVersion: cwl:draft-3
+"@graph":
 - id: index
   class: CommandLineTool
   baseCommand: python
