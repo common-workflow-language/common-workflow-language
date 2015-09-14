@@ -6,7 +6,7 @@ import urlparse
 class ValidationException(Exception):
     pass
 
-def validate(expected_schema, datum, identifiers, strict=False):
+def validate(expected_schema, datum, identifiers=[], strict=False):
     try:
         return validate_ex(expected_schema, datum, identifiers, strict=strict)
     except ValidationException:
@@ -47,7 +47,7 @@ def vpformat(datum):
         a = a[0:80] + "[...]"
     return a
 
-def validate_ex(expected_schema, datum, identifiers, strict=False):
+def validate_ex(expected_schema, datum, identifiers=[], strict=False):
     """Determine if a python datum is an instance of a schema."""
 
     schema_type = expected_schema.type

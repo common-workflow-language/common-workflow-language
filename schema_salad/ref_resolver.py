@@ -116,6 +116,7 @@ class Loader(object):
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
 
         obj = None
+        inc = False
 
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
@@ -126,6 +127,8 @@ class Loader(object):
             elif "@include" in obj:
                 if len(obj) == 1:
                     ref = obj["@include"]
+                    inc = True
+                    obj = None
                 else:
                     raise ValueError("'@include' must be the only field in %s" % (str(obj)))
             else:
@@ -135,7 +138,7 @@ class Loader(object):
                         ref = obj[identifier]
                         break
                 if not ref:
-                    raise ValueError("Object `%s` does not have `id` field" % obj)
+                    raise ValueError("Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
 
         if not isinstance(ref, basestring):
             raise ValueError("Must be string: `%s`" % str(ref))
@@ -147,7 +150,7 @@ class Loader(object):
             return self.idx[url], {}
 
         # "@include" directive means load raw text
-        if obj and "@include" in obj:
+        if inc:
             return self.fetch_text(url), {}
 
         if obj:

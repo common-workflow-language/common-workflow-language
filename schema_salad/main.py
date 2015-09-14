@@ -15,8 +15,6 @@ from ref_resolver import Loader
 import validate
 
 _logger = logging.getLogger("salad")
-_logger.addHandler(logging.StreamHandler())
-_logger.setLevel(logging.INFO)
 
 from rdflib.plugin import register, Parser
 import rdflib_jsonld.parser
@@ -79,8 +77,6 @@ def main(args=None):
     schema_uri = "file://" + os.path.abspath(args.schema)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
     schema_doc, schema_metadata = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
-    if "@graph" in schema_doc:
-        schema_doc = schema_doc["@graph"]
 
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:

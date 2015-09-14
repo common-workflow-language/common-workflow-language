@@ -13,6 +13,8 @@ import ref_resolver
 from flatten import flatten
 import logging
 from aslist import aslist
+import jsonld_context
+import schema_salad.schema
 
 _logger = logging.getLogger("salad")
 
@@ -112,6 +114,25 @@ def get_metaschema():
     validate_doc(sch_names, j, loader, strict=True)
     return (sch_names, j, loader)
 
+def load_schema(schema_ref):
+    metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
+    schema_doc, schema_metadata = metaschema_loader.resolve_ref(schema_ref, "")
+    validate_doc(metaschema_names, schema_doc, metaschema_loader, True)
+    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, schema_metadata.get("@context", {}))
+
+    # Create the loader that will be used to load the target document.
+    document_loader = ref_resolver.Loader(schema_ctx)
+
+    # Make the Avro validation that will be used to validate the target document
+    (avsc_names, avsc_obj) = schema_salad.schema.make_avro_schema(schema_doc, document_loader)
+
+    return document_loader, avsc_names, schema_metadata
+
+def load_and_validate(document_loader, avsc_names, document, strict):
+    data, metadata = document_loader.resolve_ref(document)
+    document_loader.validate_links(data)
+    validate_doc(avsc_names, data, document_loader, strict)
+    return data, metadata
 
 def validate_doc(schema_names, validate_doc, loader, strict):
     has_root = False
