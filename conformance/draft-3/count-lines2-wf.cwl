@@ -1,5 +1,7 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
+cwlVersion: "cwl:draft-3.dev1"
+
 inputs:
     - { id: file1, type: File }
 

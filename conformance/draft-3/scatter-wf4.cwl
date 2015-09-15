@@ -1,5 +1,6 @@
 #!/usr/bin/env cwl-runner
-
+cwlVersion: "cwl:draft-3.dev1"
+"@graph":
 - id: "#echo"
   class: CommandLineTool
   inputs:

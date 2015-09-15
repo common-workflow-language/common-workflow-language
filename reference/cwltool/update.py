@@ -17,6 +17,15 @@ def findId(doc, frg):
                 return f
     return None
 
+def fixType(doc):
+    if isinstance(doc, list):
+        return [fixType(f) for f in doc]
+
+    if isinstance(doc, basestring):
+        if doc not in ("null", "boolean", "int", "long", "float", "double", "string", "File", "record", "enum", "array", "Any"):
+            return "#" + doc
+    return doc
+
 def fixImport(doc, loader, baseuri):
     if isinstance(doc, dict):
         if "import" in doc:
@@ -33,6 +42,10 @@ def fixImport(doc, loader, baseuri):
 
         if "include" in doc:
             return loader.fetch_text(urlparse.urljoin(baseuri, doc["include"]))
+
+        for t in ("type", "items"):
+            if t in doc:
+                doc[t] = fixType(doc[t])
 
         for a in doc:
             doc[a] = fixImport(doc[a], loader, baseuri)

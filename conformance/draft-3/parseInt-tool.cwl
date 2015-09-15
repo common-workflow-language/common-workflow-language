@@ -1,6 +1,7 @@
 #!/usr/bin/env cwl-runner
 
 class: ExpressionTool
+cwlVersion: "cwl:draft-3.dev1"
 
 requirements:
   - "@import": node-engine.cwl

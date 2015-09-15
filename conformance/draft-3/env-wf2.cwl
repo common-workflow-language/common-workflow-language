@@ -1,5 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
+cwlVersion: "cwl:draft-3.dev1"
 
 inputs:
     - { id: "#in", type: string }
