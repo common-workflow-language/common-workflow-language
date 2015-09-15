@@ -94,3 +94,4 @@ and send a pull request!
 * Brad Chapman <bchapman@hsph.harvard.edu>
 * Josh Randall <joshua.randall@sanger.ac.uk>
 * Andrey Kartashov <porter@porter.st>
+* Dan Leehr <dan.leehr@duke.edu>
