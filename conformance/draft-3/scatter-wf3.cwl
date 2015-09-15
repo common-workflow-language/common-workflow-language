@@ -40,7 +40,7 @@
         - { id: "#step1.echo_in2", source: "#inp2" }
       outputs:
         - { id: "#step1.echo_out" }
-      run: "#echo"
+      run: {"@import": "#echo"}
 
   outputs:
     - id: "#out"

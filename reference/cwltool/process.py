@@ -34,6 +34,10 @@ def get_feature(self, feature):
             return (t, False)
     return (None, None)
 
+def shortname(inputid):
+    (_, d) = urlparse.urldefrag(inputid)
+    return d.split("/")[-1].split(".")[-1]
+
 class Process(object):
     def __init__(self, toolpath_object, validateAs, do_validate=True, **kwargs):
         (_, self.names, _) = get_schema()
@@ -66,8 +70,8 @@ class Process(object):
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
         for i in self.tool["inputs"]:
             c = copy.copy(i)
-            doc_url, fragment = urlparse.urldefrag(c['id'])
-            c["name"] = fragment
+            doc_url, _ = urlparse.urldefrag(c['id'])
+            c["name"] = shortname(c["id"])
             del c["id"]
 
             if "type" not in c:
@@ -85,8 +89,8 @@ class Process(object):
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
         for i in self.tool["outputs"]:
             c = copy.copy(i)
-            doc_url, fragment = urlparse.urldefrag(c['id'])
-            c["name"] = fragment
+            doc_url, _ = urlparse.urldefrag(c['id'])
+            c["name"] = shortname(c["id"])
             del c["id"]
 
             if "type" not in c:

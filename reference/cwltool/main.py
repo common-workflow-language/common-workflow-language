@@ -18,6 +18,8 @@ import process
 import job
 from cwlrdf import printrdf, printdot
 import pkg_resources  # part of setuptools
+import update
+from process import shortname
 
 _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
@@ -88,6 +90,7 @@ def arg_parser():
                         help="Print corresponding RDF graph for workflow and exit")
     exgroup.add_argument("--print-dot", action="store_true", help="Print workflow visualization in graphviz format and exit")
     exgroup.add_argument("--version", action="store_true", help="Print version and exit")
+    exgroup.add_argument("--update", action="store_true", help="Update to latest CWL version, print and exit")
 
     parser.add_argument("--strict", action="store_true", help="Strict validation (error on unrecognized fields)")
 
@@ -182,7 +185,7 @@ def generate_parser(toolparser, tool, namemap):
     namemap["job_order"] = "job_order"
 
     for inp in tool.tool["inputs"]:
-        (_, name) = urlparse.urldefrag(inp["id"])
+        name = shortname(inp["id"])
         if len(name) == 1:
             flag = "-"
         else:
@@ -265,8 +268,23 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         return 1
 
     idx = {}
+
+    with open(args.workflow) as f:
+        uri = "file://" + os.path.abspath(args.workflow)
+        workflowobj = document_loader.fetch(uri)
+        if isinstance(workflowobj, list):
+            workflowobj = {"cwlVersion": "https://w3id.org/cwl/cwl#draft-2",
+                           "id": uri,
+                           "@graph": workflowobj}
+        workflowobj = update.update(workflowobj, document_loader, uri)
+        document_loader.idx.clear()
+
+    if args.update:
+        print json.dumps(workflowobj, indent=4)
+        return 0
+
     try:
-        processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, args.workflow, args.strict)
+        processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, workflowobj, args.strict)
     except (schema_salad.validate.ValidationException, RuntimeError) as e:
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1

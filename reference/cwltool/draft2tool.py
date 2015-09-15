@@ -11,8 +11,7 @@ import glob
 import logging
 import hashlib
 import random
-from process import Process
-from process import WorkflowException
+from process import Process, WorkflowException, shortname
 import schema_salad.validate as validate
 from aslist import aslist
 import expression
@@ -191,7 +190,7 @@ class Tool(Process):
         builder.job = copy.deepcopy(joborder)
 
         for i in self.tool["inputs"]:
-            (_, d) = urlparse.urldefrag(i["id"])
+            d = shortname(i["id"])
             if d not in builder.job and "default" in i:
                 builder.job[d] = i["default"]
 
@@ -397,7 +396,7 @@ class CommandLineTool(Tool):
 
             ret = {}
             for port in ports:
-                doc_url, fragment = urlparse.urldefrag(port['id'])
+                fragment = shortname(port["id"])
                 ret[fragment] = self.collect_output(port, builder, outdir)
             validate.validate_ex(self.names.get_name("outputs_record_schema", ""), ret)
             return ret if ret is not None else {}

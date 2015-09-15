@@ -17,7 +17,7 @@
     ],
     "outputs": [
         {
-            "id": "#output.txt",
+            "id": "#output_txt",
             "type": "File",
             "outputBinding": {
               "glob": "output.txt"

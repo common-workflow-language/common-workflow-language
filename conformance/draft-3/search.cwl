@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-3
+cwlVersion: cwl:draft-3.dev1
 "@graph":
 - id: index
   class: CommandLineTool
@@ -12,7 +12,7 @@ cwlVersion: cwl:draft-3
         - filename: input.txt
           fileContent:
             engine: "cwl:JsonPointer"
-            script: job/index_file
+            script: job/file
   inputs:
     - id: file
       type: File
@@ -73,14 +73,14 @@ cwlVersion: cwl:draft-3
 
   steps:
     - id: index
-      run: "#index"
+      run: {"@import": "#index"}
       inputs:
         - { id: file, source: "#main/infile" }
       outputs:
         - id: result
 
     - id: search
-      run: "#search"
+      run: {"@import": "#search"}
       inputs:
         - { id: file, source: "#main/index/result" }
         - { id: term, source: "#main/term" }
