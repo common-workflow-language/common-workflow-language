@@ -68,17 +68,9 @@ steps:
 
     run: {"@import": "makespec.cwl"}
 
-  - id: strip_lines
-    inputs:
-      - { id: strip_leading_lines_in, source: "#index_in" }
-      - { id: strip_leading_lines_count, source: "#index_strip_lines" }
-    outputs:
-      - { id: strip_leading_lines_out }
-    run:  {"@import": "strip.cwl"}
-
   - id: readme
     inputs:
-      - { id: source, source: "#strip_lines/strip_leading_lines_out" }
+      - { id: source, source: "#index_in" }
       - { id: target, source: "#index_target" }
       - { id: title, source: "#title" }
     outputs:
