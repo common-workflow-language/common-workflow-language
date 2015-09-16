@@ -242,6 +242,49 @@ def generate_parser(toolparser, tool, namemap):
 
     return toolparser
 
+def load_tool(argsworkflow, updateonly, strict, makeTool):
+    (document_loader, avsc_names, schema_metadata) = process.get_schema()
+
+    uri = "file://" + os.path.abspath(argsworkflow)
+    fileuri, urifrag = urlparse.urldefrag(uri)
+    workflowobj = document_loader.fetch(fileuri)
+    if isinstance(workflowobj, list):
+        workflowobj = {"cwlVersion": "https://w3id.org/cwl/cwl#draft-2",
+                       "id": fileuri,
+                       "@graph": workflowobj}
+    workflowobj = update.update(workflowobj, document_loader, fileuri)
+    document_loader.idx.clear()
+
+    if updateonly:
+        print json.dumps(workflowobj, indent=4)
+        return 0
+
+    try:
+        processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, workflowobj, strict)
+    except (schema_salad.validate.ValidationException, RuntimeError) as e:
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        return 1
+
+    if urifrag:
+        processobj, _ = document_loader.resolve_ref(uri)
+    elif isinstance(processobj, list):
+        processobj, _ = document_loader.resolve_ref(urlparse.urljoin(argsworkflow, "#main"))
+
+    try:
+        t = makeTool(processobj, strict=strict, makeTool=makeTool)
+    except (schema_salad.validate.ValidationException) as e:
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        if args.debug:
+            _logger.exception("")
+        return 1
+    except (RuntimeError, workflow.WorkflowException) as e:
+        _logger.error("Tool definition failed initialization:\n%s", e, exc_info=(e if args.debug else False))
+        if args.debug:
+            _logger.exception()
+        return 1
+
+    return t
+
 def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeTool, parser=None):
     if args is None:
         args = sys.argv[1:]
@@ -264,53 +307,16 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         else:
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
 
-    (document_loader, avsc_names, schema_metadata) = process.get_schema()
-
     if not args.workflow:
         parser.print_help()
         _logger.error("")
         _logger.error("CWL document required")
         return 1
 
-    idx = {}
+    t = load_tool(args.workflow, args.update, args.strict, makeTool)
 
-    uri = "file://" + os.path.abspath(args.workflow)
-    fileuri, urifrag = urlparse.urldefrag(uri)
-    workflowobj = document_loader.fetch(fileuri)
-    if isinstance(workflowobj, list):
-        workflowobj = {"cwlVersion": "https://w3id.org/cwl/cwl#draft-2",
-                       "id": fileuri,
-                       "@graph": workflowobj}
-    workflowobj = update.update(workflowobj, document_loader, fileuri)
-    document_loader.idx.clear()
-
-    if args.update:
-        print json.dumps(workflowobj, indent=4)
+    if t == 0:
         return 0
-
-    try:
-        processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, workflowobj, args.strict)
-    except (schema_salad.validate.ValidationException, RuntimeError) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        return 1
-
-    if urifrag:
-        processobj, _ = document_loader.resolve_ref(uri)
-    elif isinstance(processobj, list):
-        processobj, _ = document_loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
-
-    try:
-        t = makeTool(processobj, strict=args.strict, makeTool=makeTool)
-    except (schema_salad.validate.ValidationException) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        if args.debug:
-            _logger.exception("")
-        return 1
-    except (RuntimeError, workflow.WorkflowException) as e:
-        _logger.error("Tool definition failed initialization:\n%s", e, exc_info=(e if args.debug else False))
-        if args.debug:
-            _logger.exception()
-        return 1
 
     if args.print_rdf:
         printrdf(args.workflow, processobj, ctx, args.rdf_serializer)
