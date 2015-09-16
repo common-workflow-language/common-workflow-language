@@ -1,21 +1,22 @@
+cwlVersion: "cwl:draft-3.dev1"
 class: CommandLineTool
 inputs:
-  - id: "#makedoc_source"
+  - id: source
     type: File
     inputBinding: {position: 1}
-  - id: "#makedoc_title"
+  - id: title
     type: ["null", string]
     inputBinding: {position: 2}
-  - id: "#makedoc_target"
+  - id: target
     type: string
 outputs:
-  - id: "#makedoc_out"
+  - id: out
     type: File
     outputBinding:
       glob:
         engine: "cwl:JsonPointer"
-        script: "job/makedoc_target"
-baseCommand: [python, "-mcwltool.avro_ld.makedoc"]
+        script: "job/target"
+baseCommand: [python, "-mschema_salad.makedoc"]
 stdout:
   engine: "cwl:JsonPointer"
-  script: "job/makedoc_target"
+  script: "job/target"

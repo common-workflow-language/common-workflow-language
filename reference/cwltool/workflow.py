@@ -415,7 +415,7 @@ class ReceiveScatterOutput(object):
 
         if processStatus != "success":
             if self.processStatus != "permanentFail":
-                self.processStatus = jobout["processStatus"]
+                self.processStatus = processStatus
 
         self.completed += 1
 

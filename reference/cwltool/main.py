@@ -269,15 +269,15 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
 
     idx = {}
 
-    with open(args.workflow) as f:
-        uri = "file://" + os.path.abspath(args.workflow)
-        workflowobj = document_loader.fetch(uri)
-        if isinstance(workflowobj, list):
-            workflowobj = {"cwlVersion": "https://w3id.org/cwl/cwl#draft-2",
-                           "id": uri,
-                           "@graph": workflowobj}
-        workflowobj = update.update(workflowobj, document_loader, uri)
-        document_loader.idx.clear()
+    uri = "file://" + os.path.abspath(args.workflow)
+    fileuri, urifrag = urlparse.urldefrag(uri)
+    workflowobj = document_loader.fetch(fileuri)
+    if isinstance(workflowobj, list):
+        workflowobj = {"cwlVersion": "https://w3id.org/cwl/cwl#draft-2",
+                       "id": fileuri,
+                       "@graph": workflowobj}
+    workflowobj = update.update(workflowobj, document_loader, fileuri)
+    document_loader.idx.clear()
 
     if args.update:
         print json.dumps(workflowobj, indent=4)
@@ -289,7 +289,9 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
         return 1
 
-    if isinstance(processobj, list):
+    if urifrag:
+        processobj, _ = document_loader.resolve_ref(uri)
+    elif isinstance(processobj, list):
         processobj, _ = document_loader.resolve_ref(urlparse.urljoin(args.workflow, "#main"))
 
     try:

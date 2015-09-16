@@ -68,42 +68,40 @@ class Process(object):
 
         # Build record schema from inputs
         self.inputs_record_schema = {"name": "input_record_schema", "type": "record", "fields": []}
-        for i in self.tool["inputs"]:
-            c = copy.copy(i)
-            doc_url, _ = urlparse.urldefrag(c['id'])
-            c["name"] = shortname(c["id"])
-            del c["id"]
-
-            if "type" not in c:
-                raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
-
-            if "default" in c:
-                c["type"] = ["null"] + aslist(c["type"])
-            else:
-                c["type"] = c["type"]
-            self.inputs_record_schema["fields"].append(c)
-
-        self.inputs_record_schema = schema_salad.schema.make_valid_avro(self.inputs_record_schema, {}, set())
-        avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
-
         self.outputs_record_schema = {"name": "outputs_record_schema", "type": "record", "fields": []}
-        for i in self.tool["outputs"]:
-            c = copy.copy(i)
-            doc_url, _ = urlparse.urldefrag(c['id'])
-            c["name"] = shortname(c["id"])
-            del c["id"]
 
-            if "type" not in c:
-                raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
+        for key in ("inputs", "outputs"):
+            for i in self.tool[key]:
+                c = copy.copy(i)
+                doc_url, _ = urlparse.urldefrag(c['id'])
+                c["name"] = shortname(c["id"])
+                del c["id"]
 
-            if "default" in c:
-                c["type"] = ["null"] + aslist(c["type"])
-            else:
-                c["type"] = c["type"]
-            self.outputs_record_schema["fields"].append(c)
+                if "type" not in c:
+                    raise validate.ValidationException("Missing `type` in parameter `%s`" % c["name"])
 
-        self.outputs_record_schema = schema_salad.schema.make_valid_avro(self.outputs_record_schema, {}, set())
-        avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
+                if "default" in c:
+                    c["type"] = ["null"] + aslist(c["type"])
+                else:
+                    c["type"] = c["type"]
+
+                if key == "inputs":
+                    self.inputs_record_schema["fields"].append(c)
+                elif key == "outputs":
+                    self.outputs_record_schema["fields"].append(c)
+
+        try:
+            self.inputs_record_schema = schema_salad.schema.make_valid_avro(self.inputs_record_schema, {}, set())
+            avro.schema.make_avsc_object(self.inputs_record_schema, self.names)
+        except avro.schema.SchemaParseException as e:
+            raise validate.ValidationException("Got error `%s` while prcoessing inputs of %s:\n%s" % (str(e), self.tool["id"], json.dumps(self.inputs_record_schema, indent=4)))
+
+        try:
+            self.outputs_record_schema = schema_salad.schema.make_valid_avro(self.outputs_record_schema, {}, set())
+            avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
+        except avro.schema.SchemaParseException as e:
+            raise validate.ValidationException("Got error `%s` while prcoessing outputs of %s:\n%s" % (str(e), self.tool["id"], json.dumps(self.outputs_record_schema, indent=4)))
+
 
     def validate_hints(self, hints, strict):
         for r in hints:
