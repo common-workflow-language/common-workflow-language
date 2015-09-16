@@ -10,6 +10,7 @@ import StringIO
 import logging
 import urlparse
 from aslist import aslist
+import re
 
 _logger = logging.getLogger("salad")
 
@@ -145,6 +146,9 @@ def number_headings(toc, maindoc):
     maindoc = '\n'.join(mdlines)
     return maindoc
 
+def fix_emails(doc):
+    return "\n".join([re.sub(r"<([^>@]+@[^>]+)>", r"[\1](mailto:\1)", d) for d in doc.splitlines()])
+
 class RenderType(object):
     def __init__(self, toc, j):
         self.typedoc = StringIO.StringIO()
@@ -198,6 +202,9 @@ class RenderType(object):
 
         if "doc" not in f:
             f["doc"] = ""
+
+        f["doc"] = fix_emails(f["doc"])
+
         if f["type"] == "record":
             for field in f["fields"]:
                 if "doc" not in field:
