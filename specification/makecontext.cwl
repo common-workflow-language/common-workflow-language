@@ -1,33 +1,41 @@
-- id: "#makecontext"
+cwlVersion: "cwl:draft-3.dev1"
+"@graph":
+- id: makecontext
   class: CommandLineTool
   inputs:
-    - id: "#makecontext_target"
+    - id: schema
+      type: File
+      inputBinding: {}
+    - id: target
       type: string
   outputs:
-    - id: "#makecontext_out"
+    - id: out
       type: File
       outputBinding:
         glob:
           engine: "cwl:JsonPointer"
-          script: "job/makecontext_target"
-  baseCommand: [python, "-mcwltool", "--print-jsonld-context"]
+          script: "job/target"
+  baseCommand: [python, "-mschema_salad", "--print-jsonld-context"]
   stdout:
     engine: "cwl:JsonPointer"
-    script: "job/makecontext_target"
+    script: "job/target"
 
-- id: "#makerdfs"
+- id: makerdfs
   class: CommandLineTool
   inputs:
-    - id: "#makerdfs_target"
+    - id: schema
+      type: File
+      inputBinding: {}
+    - id: target
       type: string
   outputs:
-    - id: "#makerdfs_out"
+    - id: out
       type: File
       outputBinding:
         glob:
           engine: "cwl:JsonPointer"
-          script: "job/makerdfs_target"
-  baseCommand: [python, "-mcwltool", "--print-rdfs"]
+          script: "job/target"
+  baseCommand: [python, "-mschema_salad", "--print-rdfs"]
   stdout:
     engine: "cwl:JsonPointer"
-    script: "job/makerdfs_target"
+    script: "job/target"

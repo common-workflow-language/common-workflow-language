@@ -1,7 +1,7 @@
 import job
 import draft2tool
 from aslist import aslist
-from process import Process, WorkflowException, get_feature, empty_subtree
+from process import Process, WorkflowException, get_feature, empty_subtree, shortname
 import copy
 import logging
 import random
@@ -9,7 +9,7 @@ import os
 from collections import namedtuple
 import pprint
 import functools
-import avro_ld.validate as validate
+import schema_salad.validate as validate
 import urlparse
 import pprint
 import tempfile
@@ -21,6 +21,8 @@ _logger = logging.getLogger("cwltool")
 WorkflowStateItem = namedtuple('WorkflowStateItem', ['parameter', 'value'])
 
 def defaultMakeTool(toolpath_object, **kwargs):
+    if not isinstance(toolpath_object, dict):
+        raise WorkflowException("Not a dict: `%s`" % toolpath_object)
     if "class" in toolpath_object:
         if toolpath_object["class"] == "CommandLineTool":
             return draft2tool.CommandLineTool(toolpath_object, **kwargs)
@@ -89,8 +91,7 @@ def object_from_state(state, parms, frag_only):
     for inp in parms:
         iid = inp["id"]
         if frag_only:
-            (_, iid) = urlparse.urldefrag(iid)
-            iid = iid.split(".")[-1]
+            iid = shortname(iid)
         if "source" in inp:
             connections = aslist(inp["source"])
             for src in connections:
@@ -210,7 +211,7 @@ class WorkflowJob(object):
             del kwargs["outdir"]
 
         for i in self.tool["inputs"]:
-            (_, iid) = urlparse.urldefrag(i["id"])
+            iid = shortname(i["id"])
             if iid in joborder:
                 self.state[i["id"]] = WorkflowStateItem(i, copy.deepcopy(joborder[iid]))
             elif "default" in i:
@@ -326,16 +327,15 @@ class WorkflowStep(Process):
         for field in ("inputs", "outputs"):
             for i in toolpath_object[field]:
                 inputid = i["id"]
-                (_, d) = urlparse.urldefrag(inputid)
-                frag = d.split(".")[-1]
-                p = urlparse.urljoin(toolpath_object["run"].get("id", self.id), "#" + frag)
+                p = shortname(inputid)
                 found = False
                 for a in self.embedded_tool.tool[field]:
-                    if a["id"] == p:
+                    frag = shortname(a["id"])
+                    if frag == p:
                         i.update(a)
                         found = True
                 if not found:
-                    raise WorkflowException("Did not find %s parameter '%s' in workflow step" % (field, p))
+                    raise WorkflowException("Parameter '%s' of %s in workflow step %s does not correspond to parameter in %s" % (p, field, self.id, self.embedded_tool.tool.get("id")))
                 i["id"] = inputid
 
         super(WorkflowStep, self).__init__(toolpath_object, "Process", do_validate=False, **kwargs)
@@ -380,8 +380,7 @@ class WorkflowStep(Process):
         #_logger.debug("WorkflowStep output from run is %s", jobout)
         output = {}
         for i in self.tool["outputs"]:
-            (_, d) = urlparse.urldefrag(i["id"])
-            field = d.split(".")[-1]
+            field = shortname(i["id"])
             if field in jobout:
                 output[i["id"]] = jobout[field]
             else:
@@ -391,8 +390,7 @@ class WorkflowStep(Process):
     def job(self, joborder, basedir, output_callback, **kwargs):
         for i in self.tool["inputs"]:
             p = i["id"]
-            (_, d) = urlparse.urldefrag(p)
-            field = d.split(".")[-1]
+            field = shortname(p)
             joborder[field] = joborder[i["id"]]
             del joborder[i["id"]]
 
@@ -417,7 +415,7 @@ class ReceiveScatterOutput(object):
 
         if processStatus != "success":
             if self.processStatus != "permanentFail":
-                self.processStatus = jobout["processStatus"]
+                self.processStatus = processStatus
 
         self.completed += 1
 
