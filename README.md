@@ -67,7 +67,7 @@ and send a pull request!
 * [Curoverse](http://curoverse.com)
 * [Seven Bridges Genomics](http://sbgenomics.com)
 * [Galaxy Project](http://galaxyproject.org/)
-* [Taverna Project](http://www.taverna.org.uk/)
+* [Apache Taverna](http://taverna.incubator.apache.org/)
 * [Institut Pasteur](http://www.pasteur.fr)
 * [University of California Davis](http://ucdavis.edu)
 * [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
@@ -93,3 +93,5 @@ and send a pull request!
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
 * Brad Chapman <bchapman@hsph.harvard.edu>
 * Josh Randall <joshua.randall@sanger.ac.uk>
+* Andrey Kartashov <porter@porter.st>
+* Dan Leehr <dan.leehr@duke.edu>
