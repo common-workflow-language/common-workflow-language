@@ -192,13 +192,14 @@ class Loader(object):
                     if identifer in document:
                         if isinstance(document[identifer], basestring):
                             document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
-                            if document[identifer] not in self.idx:
+                            if document[identifer] not in self.idx or isinstance(self.idx[document[identifer]], basestring):
                                 self.idx[document[identifer]] = document
                             base_url = document[identifer]
                         elif isinstance(document[identifer], list):
                             for n, v in enumerate(document[identifer]):
                                 document[identifer][n] = self.expand_url(document[identifer][n], base_url, scoped=True)
-                                self.idx[document[identifer][n]] = document[identifer][n]
+                                if document[identifer][n] not in self.idx:
+                                    self.idx[document[identifer][n]] = document[identifer][n]
             if inc:
                 return document, {}
 
