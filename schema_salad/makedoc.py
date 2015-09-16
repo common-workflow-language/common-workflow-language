@@ -93,16 +93,25 @@ def typefmt(tp, nbsp=False):
         else:
             return " | ".join([typefmt(n) for n in tp])
     if isinstance(tp, dict):
-        if tp["type"] == "array":
+        if tp["type"] == "https://w3id.org/cwl/salad#array":
             return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
-        if tp["type"] in ("record", "enum"):
-            _, frg = urlparse.urldefrag(tp["name"])
+        if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
+            frg = schema.avro_name(tp["name"])
             return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
         if isinstance(tp["type"], dict):
             return typefmt(tp["type"])
     else:
-        if str(tp) in ("null", "boolean", "int", "long", "float", "double", "bytes", "string", "record", "enum", "array", "map"):
-            return """<a href="#datatype">%s</a>""" % str(tp)
+        if str(tp) in ("https://w3id.org/cwl/salad#null",
+                       "http://www.w3.org/2001/XMLSchema#boolean",
+                       "http://www.w3.org/2001/XMLSchema#int",
+                       "http://www.w3.org/2001/XMLSchema#long",
+                       "http://www.w3.org/2001/XMLSchema#float",
+                       "http://www.w3.org/2001/XMLSchema#double",
+                       "http://www.w3.org/2001/XMLSchema#string",
+                       "https://w3id.org/cwl/salad#record",
+                       "https://w3id.org/cwl/salad#enum",
+                       "https://w3id.org/cwl/salad#array"):
+            return """<a href="#CWLType">%s</a>""" % schema.avro_name(str(tp))
         else:
             _, frg = urlparse.urldefrag(tp)
             if frg:
@@ -145,9 +154,10 @@ class RenderType(object):
         self.docAfter = {}
         for t in j:
             if "extends" in t:
-                add_dictlist(self.subs, t["extends"], t["name"])
-                if "docParent" not in t and "docAfter" not in t:
-                    add_dictlist(self.docParent, t["extends"], t["name"])
+                for e in aslist(t["extends"]):
+                    add_dictlist(self.subs, e, t["name"])
+                    if "docParent" not in t and "docAfter" not in t:
+                        add_dictlist(self.docParent, e, t["name"])
 
             if t.get("docParent"):
                 add_dictlist(self.docParent, t["docParent"], t["name"])
@@ -155,13 +165,14 @@ class RenderType(object):
             if t.get("docAfter"):
                 add_dictlist(self.docAfter, t["docAfter"], t["name"])
 
-        alltypes = schema.extend_and_specialize(j)
+        _, _, metaschema_loader = schema.get_metaschema()
+        alltypes = schema.extend_and_specialize(j, metaschema_loader)
 
         self.typemap = {}
         self.uses = {}
         for t in alltypes:
             self.typemap[t["name"]] = t
-            if t["type"] == "record":
+            if t["type"] == "https://w3id.org/cwl/salad#record":
                 for f in t["fields"]:
                     p = has_types(f)
                     for tp in p:
@@ -211,7 +222,7 @@ class RenderType(object):
 
         if "extends" in f:
             doc += "\n\nExtends "
-            doc += ", ".join([" %s" % linkto(s) for ex in aslist(f["extends"])])
+            doc += ", ".join([" %s" % linkto(ex) for ex in aslist(f["extends"])])
         if f["name"] in self.subs:
             doc += "\n\nExtended by"
             doc += ", ".join([" %s" % linkto(s) for s in self.subs[f["name"]]])
@@ -240,7 +251,7 @@ class RenderType(object):
                 if "inherited_from" in i:
                     desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
 
-                _, frg = urlparse.urldefrag(i["name"])
+                frg = schema.avro_name(i["name"])
                 doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp), opt, mistune.markdown(desc))
                 doc += "</tr>"
             doc += """</table>"""
@@ -359,7 +370,9 @@ def avrold_doc(j, outdoc):
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         if sys.argv[1].endswith("yml") or sys.argv[1].endswith("yaml"):
-            j = yaml.load(f)
+            uri = "file://" + os.path.abspath(sys.argv[1])
+            _, _, metaschema_loader = schema.get_metaschema()
+            j, schema_metadata = metaschema_loader.resolve_ref(uri, "")
         else:
             j = [{"name": sys.argv[2],
                   "type": "documentation",

@@ -13,6 +13,7 @@ import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
 import urlparse
 import logging
+from aslist import aslist
 
 _logger = logging.getLogger("salad")
 
@@ -113,7 +114,8 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
                 process_type(i["type"], g, context, defaultBase, namespaces, defaultPrefix)
 
         if "extends" in t:
-            g.add((classnode, RDFS.subClassOf, URIRef(t["extends"])))
+            for e in aslist(t["extends"]):
+                g.add((classnode, RDFS.subClassOf, URIRef(e)))
     elif t["type"] == "enum":
         _logger.debug("Processing enum %s", t["name"])
 
