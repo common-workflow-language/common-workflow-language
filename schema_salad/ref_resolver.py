@@ -7,6 +7,7 @@ import requests
 import urlparse
 import yaml
 import validate
+import pprint
 from aslist import aslist
 
 _logger = logging.getLogger("salad")
@@ -156,7 +157,6 @@ class Loader(object):
         if obj:
             for identifier in self.identifiers:
                 obj[identifier] = url
-            self.idx[url] = obj
         else:
             # Load structured document
             doc_url, frg = urlparse.urldefrag(url)
@@ -169,7 +169,13 @@ class Loader(object):
 
         # Requested reference should be in the index now, otherwise it's a bad reference
         if url in self.idx:
-            return obj, metadata
+            obj = self.idx[url]
+            if "@graph" in obj:
+                metadata = {k: v for k,v in obj.items() if k != "@graph"}
+                obj = obj["@graph"]
+                return obj, metadata
+            else:
+                return obj, metadata
         else:
             raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
@@ -186,7 +192,8 @@ class Loader(object):
                     if identifer in document:
                         if isinstance(document[identifer], basestring):
                             document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
-                            self.idx[document[identifer]] = document
+                            if document[identifer] not in self.idx:
+                                self.idx[document[identifer]] = document
                             base_url = document[identifer]
                         elif isinstance(document[identifer], list):
                             for n, v in enumerate(document[identifer]):
@@ -203,9 +210,8 @@ class Loader(object):
                     base_url = loader.ctx["@base"]
 
             if "@graph" in document:
-                metadata = document
-                document = metadata["@graph"]
-                del metadata["@graph"]
+                metadata = {k: v for k,v in document.items() if k != "@graph"}
+                document = document["@graph"]
                 metadata, _ = self.resolve_all(metadata, base_url)
 
         elif isinstance(document, list):

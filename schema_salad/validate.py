@@ -43,8 +43,8 @@ def multi(v, q=""):
 
 def vpformat(datum):
     a = pprint.pformat(datum)
-    if len(a) > 80:
-        a = a[0:80] + "[...]"
+    if len(a) > 160:
+        a = a[0:160] + "[...]"
     return a
 
 def validate_ex(expected_schema, datum, identifiers=[], strict=False):

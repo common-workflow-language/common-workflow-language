@@ -36,18 +36,18 @@ def get_metaschema():
         "SaladRecordSchema": "https://w3id.org/cwl/salad#SaladRecordSchema",
         "SchemaDefinedType": "https://w3id.org/cwl/salad#SchemaDefinedType",
         "SpecializeDef": "https://w3id.org/cwl/salad#SpecializeDef",
-        "_container": "https://w3id.org/cwl/salad#_container",
+        "_container": "https://w3id.org/cwl/salad#JsonldPredicate/_container",
         "_id": {
             "@id": "https://w3id.org/cwl/salad#_id",
             "@type": "@id",
             "identity": True
         },
-        "_type": "https://w3id.org/cwl/salad#_type",
-        "abstract": "https://w3id.org/cwl/salad#abstract",
+        "_type": "https://w3id.org/cwl/salad#JsonldPredicate/_type",
+        "abstract": "https://w3id.org/cwl/salad#SaladRecordSchema/abstract",
         "array": "https://w3id.org/cwl/salad#array",
         "boolean": "http://www.w3.org/2001/XMLSchema#boolean",
         "dct": "http://purl.org/dc/terms/",
-        "doc": "https://w3id.org/cwl/salad#doc",
+        "doc": "sld:doc",
         "docAfter": {
             "@id": "https://w3id.org/cwl/salad#docAfter",
             "@type": "@id"
@@ -56,7 +56,7 @@ def get_metaschema():
             "@id": "https://w3id.org/cwl/salad#docParent",
             "@type": "@id"
         },
-        "documentRoot": "https://w3id.org/cwl/salad#documentRoot",
+        "documentRoot": "https://w3id.org/cwl/salad#SchemaDefinedType/documentRoot",
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "http://www.w3.org/2001/XMLSchema#double",
         "enum": "https://w3id.org/cwl/salad#enum",
@@ -66,22 +66,22 @@ def get_metaschema():
         },
         "fields": "sld:fields",
         "float": "http://www.w3.org/2001/XMLSchema#float",
-        "identity": "https://w3id.org/cwl/salad#identity",
+        "identity": "https://w3id.org/cwl/salad#JsonldPredicate/identity",
         "int": "http://www.w3.org/2001/XMLSchema#int",
         "items": {
             "@id": "https://w3id.org/cwl/salad#items",
             "@type": "@vocab"
         },
-        "jsonldPredicate": "https://w3id.org/cwl/salad#jsonldPredicate",
+        "jsonldPredicate": "sld:jsonldPredicate",
         "long": "http://www.w3.org/2001/XMLSchema#long",
         "name": "@id",
-        "noLinkCheck": "https://w3id.org/cwl/salad#noLinkCheck",
+        "noLinkCheck": "https://w3id.org/cwl/salad#JsonldPredicate/noLinkCheck",
         "null": "https://w3id.org/cwl/salad#null",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "record": "https://w3id.org/cwl/salad#record",
         "sld": "https://w3id.org/cwl/salad#",
-        "specialize": "https://w3id.org/cwl/salad#specialize",
+        "specialize": "https://w3id.org/cwl/salad#SaladRecordSchema/specialize",
         "specializeFrom": {
             "@id": "https://w3id.org/cwl/salad#specializeFrom",
             "@type": "@id"
@@ -130,7 +130,7 @@ def load_schema(schema_ref):
 
 def load_and_validate(document_loader, avsc_names, document, strict):
     if isinstance(document, dict):
-        data, metadata = document_loader.resolve_all(document)
+        data, metadata = document_loader.resolve_all(document, document["id"])
     else:
         data, metadata = document_loader.resolve_ref(document)
     document_loader.validate_links(data)

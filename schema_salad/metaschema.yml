@@ -719,7 +719,7 @@
 
 - name: "Any"
   type: enum
-  symbols: ["#Any"]
+  symbols: ["#_Any"]
   doc: |
     The **Any** type validates for any non-null value.
 
