@@ -22,7 +22,7 @@ def fixType(doc):
         return [fixType(f) for f in doc]
 
     if isinstance(doc, basestring):
-        if doc not in ("null", "boolean", "int", "long", "float", "double", "string", "File", "record", "enum", "array", "Any"):
+        if doc not in ("null", "boolean", "int", "long", "float", "double", "string", "File", "record", "enum", "array", "Any") and "#" not in doc:
             return "#" + doc
     return doc
 
@@ -38,7 +38,7 @@ def fixImport(doc, loader, baseuri):
             if frag:
                 frag = "#" + frag
                 r = findId(r, frag)
-            return fixImport(r, loader, baseuri)
+            return fixImport(r, loader, imp)
 
         if "include" in doc:
             return loader.fetch_text(urlparse.urljoin(baseuri, doc["include"]))

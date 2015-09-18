@@ -242,7 +242,7 @@ def generate_parser(toolparser, tool, namemap):
 
     return toolparser
 
-def load_tool(argsworkflow, updateonly, strict, makeTool):
+def load_tool(argsworkflow, updateonly, strict, makeTool, debug):
     (document_loader, avsc_names, schema_metadata) = process.get_schema()
 
     uri = "file://" + os.path.abspath(argsworkflow)
@@ -262,7 +262,7 @@ def load_tool(argsworkflow, updateonly, strict, makeTool):
     try:
         processobj, metadata = schema_salad.schema.load_and_validate(document_loader, avsc_names, workflowobj, strict)
     except (schema_salad.validate.ValidationException, RuntimeError) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if debug else False))
         return 1
 
     if urifrag:
@@ -273,14 +273,10 @@ def load_tool(argsworkflow, updateonly, strict, makeTool):
     try:
         t = makeTool(processobj, strict=strict, makeTool=makeTool)
     except (schema_salad.validate.ValidationException) as e:
-        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if args.debug else False))
-        if args.debug:
-            _logger.exception("")
+        _logger.error("Tool definition failed validation:\n%s", e, exc_info=(e if debug else False))
         return 1
     except (RuntimeError, workflow.WorkflowException) as e:
-        _logger.error("Tool definition failed initialization:\n%s", e, exc_info=(e if args.debug else False))
-        if args.debug:
-            _logger.exception()
+        _logger.error("Tool definition failed initialization:\n%s", e, exc_info=(e if debug else False))
         return 1
 
     return t
@@ -313,10 +309,10 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
         _logger.error("CWL document required")
         return 1
 
-    t = load_tool(args.workflow, args.update, args.strict, makeTool)
+    t = load_tool(args.workflow, args.update, args.strict, makeTool, args.debug)
 
-    if t == 0:
-        return 0
+    if type(t) == int:
+        return t
 
     if args.print_rdf:
         printrdf(args.workflow, processobj, ctx, args.rdf_serializer)
