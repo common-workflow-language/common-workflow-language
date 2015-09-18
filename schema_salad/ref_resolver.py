@@ -287,7 +287,7 @@ class Loader(object):
             result = yaml.load(self.fetch_text(url))
         except yaml.parser.ParserError as e:
             raise validate.ValidationException("Error loading '%s' %s" % (url, str(e)))
-        if isinstance(result, dict):
+        if isinstance(result, dict) and self.identifiers:
             for identifier in self.identifiers:
                 if identifier not in result:
                     result[identifier] = url
