@@ -63,7 +63,6 @@ class CommandLineTool(Process):
         else:
             return PathMapper(reffiles, input_basedir)
 
-
     def job(self, joborder, input_basedir, output_callback, **kwargs):
         builder = self._init_job(joborder, input_basedir, **kwargs)
 

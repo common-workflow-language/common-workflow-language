@@ -16,6 +16,7 @@ import stat
 from builder import Builder
 import tempfile
 import glob
+from errors import WorkflowException
 
 _logger = logging.getLogger("cwltool")
 

@@ -300,15 +300,14 @@ class Workflow(Process):
         # TODO: statically validate data links instead of doing it at runtime.
 
     def job(self, joborder, basedir, output_callback, **kwargs):
-        # Validate job order
-        validate.validate_ex(self.names.get_name("input_record_schema", ""), joborder)
+        builder = self._init_job(joborder, basedir, **kwargs)
 
         kwargs["part_of"] = "workflow %s" % (id(self))
         wj = WorkflowJob(self, **kwargs)
 
         yield wj
 
-        for w in wj.job(joborder, basedir, output_callback, **kwargs):
+        for w in wj.job(builder.job, basedir, output_callback, **kwargs):
             yield w
 
 
