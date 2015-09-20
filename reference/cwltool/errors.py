@@ -1,0 +1,2 @@
+class WorkflowException(Exception):
+    pass

@@ -13,11 +13,19 @@ import urlparse
 import pprint
 from pkg_resources import resource_stream
 import stat
+from builder import Builder
+import tempfile
+import glob
 
 _logger = logging.getLogger("cwltool")
 
-class WorkflowException(Exception):
-    pass
+supportedProcessRequirements = ["DockerRequirement",
+                                "ExpressionEngineRequirement",
+                                "SchemaDefRequirement",
+                                "EnvVarRequirement",
+                                "CreateFileRequirement",
+                                "ScatterFeatureRequirement",
+                                "SubworkflowFeatureRequirement"]
 
 def get_schema():
     f = resource_stream(__name__, 'schemas/draft-3/cwl-avro.yml')
@@ -37,6 +45,25 @@ def get_feature(self, feature):
 def shortname(inputid):
     (_, d) = urlparse.urldefrag(inputid)
     return d.split("/")[-1].split(".")[-1]
+
+class StdFsAccess(object):
+    def __init__(self, basedir):
+        self.basedir = basedir
+
+    def _abs(self, p):
+        if os.path.isabs(p):
+            return p
+        else:
+            return os.path.join(self.basedir, p)
+
+    def glob(self, pattern):
+        return glob.glob(self._abs(pattern))
+
+    def open(self, fn, mode):
+        return open(self._abs(fn), mode)
+
+    def exists(self, fn):
+        return os.path.exists(self._abs(fn))
 
 class Process(object):
     def __init__(self, toolpath_object, validateAs, do_validate=True, **kwargs):
@@ -101,6 +128,46 @@ class Process(object):
             avro.schema.make_avsc_object(self.outputs_record_schema, self.names)
         except avro.schema.SchemaParseException as e:
             raise validate.ValidationException("Got error `%s` while prcoessing outputs of %s:\n%s" % (str(e), self.tool["id"], json.dumps(self.outputs_record_schema, indent=4)))
+
+
+    def _init_job(self, joborder, input_basedir, **kwargs):
+        builder = Builder()
+        builder.job = copy.deepcopy(joborder)
+
+        for i in self.tool["inputs"]:
+            d = shortname(i["id"])
+            if d not in builder.job and "default" in i:
+                builder.job[d] = i["default"]
+
+        # Validate job order
+        try:
+            validate.validate_ex(self.names.get_name("input_record_schema", ""), builder.job)
+        except validate.ValidationException as e:
+            raise WorkflowException("Error validating input record, " + str(e))
+
+        for r in self.requirements:
+            if r["class"] not in supportedProcessRequirements:
+                raise WorkflowException("Unsupported process requirement %s" % (r["class"]))
+
+        builder.files = []
+        builder.bindings = []
+        builder.schemaDefs = self.schemaDefs
+        builder.names = self.names
+        builder.requirements = self.requirements
+
+        dockerReq, _ = self.get_requirement("DockerRequirement")
+        if dockerReq and kwargs.get("use_container"):
+            builder.outdir = kwargs.get("docker_outdir") or "/tmp/job_output"
+            builder.tmpdir = kwargs.get("docker_tmpdir") or "/tmp/job_tmp"
+        else:
+            builder.outdir = kwargs.get("outdir") or tempfile.mkdtemp()
+            builder.tmpdir = kwargs.get("tmpdir") or tempfile.mkdtemp()
+
+        builder.fs_access = kwargs.get("fs_access") or StdFsAccess(input_basedir)
+
+        builder.bindings.extend(builder.bind_input(self.inputs_record_schema, builder.job))
+
+        return builder
 
 
     def validate_hints(self, hints, strict):

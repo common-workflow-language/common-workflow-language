@@ -8,7 +8,8 @@ import logging
 import sys
 import requests
 import docker
-from process import WorkflowException, get_feature, empty_subtree
+from process import get_feature, empty_subtree
+from errors import WorkflowException
 import shutil
 import stat
 import re

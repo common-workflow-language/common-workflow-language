@@ -113,8 +113,10 @@ def arg_parser():
 
 def single_job_executor(t, job_order, input_basedir, args, **kwargs):
     final_output = []
+    final_status = []
 
     def output_callback(out, processStatus):
+        final_status.append(processStatus)
         if processStatus == "success":
             _logger.info("Final process status is %s", processStatus)
         else:
@@ -152,6 +154,9 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
                     raise workflow.WorkflowException("Workflow cannot make any more progress.")
         except Exception as e:
             raise workflow.WorkflowException("%s" % e)
+
+        if final_status[0] != "success":
+            raise workflow.WorkflowException("Process status is %s" % (final_status))
 
         return final_output[0]
 

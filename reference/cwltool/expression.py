@@ -4,7 +4,7 @@ import json
 from aslist import aslist
 import logging
 import os
-from process import WorkflowException
+from errors import WorkflowException
 import process
 import yaml
 import schema_salad.validate as validate

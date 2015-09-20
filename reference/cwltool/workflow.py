@@ -1,7 +1,8 @@
 import job
 import draft2tool
 from aslist import aslist
-from process import Process, WorkflowException, get_feature, empty_subtree, shortname
+from process import Process, get_feature, empty_subtree, shortname
+from errors import WorkflowException
 import copy
 import logging
 import random
@@ -31,7 +32,7 @@ def defaultMakeTool(toolpath_object, **kwargs):
         elif toolpath_object["class"] == "Workflow":
             return Workflow(toolpath_object, **kwargs)
 
-    raise WorkflowException("Missing or invalid 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool" % toolpath_object["id"])
+    raise WorkflowException("Missing or invalid 'class' field in %s, expecting one of: CommandLineTool, ExpressionTool, Workflow" % toolpath_object["id"])
 
 def findfiles(wo, fn=None):
     if fn is None:
