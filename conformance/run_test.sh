@@ -49,7 +49,11 @@ runtest() {
 }
 
 # Add your tool test here.
-for t in "$CWLTOOL/cwltool/main.py" "$RABIX/rabix/cliche/main.py" "$ARVADOS/sdk/python/bin/cwl-runner" ; do
+for t in "$CWLTOOL/cwltool/main.py" \
+             "$RABIX/rabix/cliche/main.py" \
+             "$ARVADOS/sdk/python/bin/cwl-runner" \
+             "$TOIL/src/toil/cwl/cwltoil.py" \
+         ; do
     if [[ -x "$t" ]]; then
         runtest "$t"
     fi
