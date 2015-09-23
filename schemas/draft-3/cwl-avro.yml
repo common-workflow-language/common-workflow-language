@@ -1710,7 +1710,7 @@
 
   fields:
     - name: id
-      type: ["null", string]
+      type: string
       jsonldPredicate: "@id"
       doc: "The unique identifier for this workflow step."
     - name: inputs

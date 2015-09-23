@@ -26,7 +26,7 @@ def fixType(doc):
             return "#" + doc
     return doc
 
-def fixImport(doc, loader, baseuri):
+def _draft2toDraft3(doc, loader, baseuri):
     if isinstance(doc, dict):
         if "import" in doc:
             imp = urlparse.urljoin(baseuri, doc["import"])
@@ -38,7 +38,7 @@ def fixImport(doc, loader, baseuri):
             if frag:
                 frag = "#" + frag
                 r = findId(r, frag)
-            return fixImport(r, loader, imp)
+            return _draft2toDraft3(r, loader, imp)
 
         if "include" in doc:
             return loader.fetch_text(urlparse.urljoin(baseuri, doc["include"]))
@@ -47,16 +47,21 @@ def fixImport(doc, loader, baseuri):
             if t in doc:
                 doc[t] = fixType(doc[t])
 
+        if "steps" in doc:
+            for i, s in enumerate(doc["steps"]):
+                if "id" not in s:
+                    s["id"] = "step%i" % i
+
         for a in doc:
-            doc[a] = fixImport(doc[a], loader, baseuri)
+            doc[a] = _draft2toDraft3(doc[a], loader, baseuri)
 
     if isinstance(doc, list):
-        return [fixImport(a, loader, baseuri) for a in doc]
+        return [_draft2toDraft3(a, loader, baseuri) for a in doc]
 
     return doc
 
 def draft2toDraft3(doc, loader, baseuri):
-    return (fixImport(doc, loader, baseuri), "https://w3id.org/cwl/cwl#draft-3.dev1")
+    return (_draft2toDraft3(doc, loader, baseuri), "https://w3id.org/cwl/cwl#draft-3.dev1")
 
 def update(doc, loader, baseuri):
     updates = {
