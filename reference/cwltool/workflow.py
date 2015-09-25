@@ -87,13 +87,15 @@ def match_types(sinktype, src, iid, inputobj, linkMerge):
     return False
 
 
-def object_from_state(state, parms, frag_only):
+def object_from_state(state, parms, frag_only, supportsMultipleInput):
     inputobj = {}
     for inp in parms:
         iid = inp["id"]
         if frag_only:
             iid = shortname(iid)
         if "source" in inp:
+            if isinstance(inp["source"], list) and not supportsMultipleInput:
+                raise WorkflowException("Workflow contains multiple inbound links to a single parameter but MultipleInputFeatureRequirement is not declared.")
             connections = aslist(inp["source"])
             for src in connections:
                 if src in state and state[src] is not None:
@@ -126,6 +128,7 @@ class WorkflowJobStep(object):
 
 class WorkflowJob(object):
     def __init__(self, workflow, **kwargs):
+        self.workflow = workflow
         self.tool = workflow.tool
         self.steps = [WorkflowJobStep(s) for s in workflow.steps]
         self.id = workflow.tool["id"]
@@ -164,8 +167,10 @@ class WorkflowJob(object):
         inputparms = step.tool["inputs"]
         outputparms = step.tool["outputs"]
 
+        supportsMultipleInput = bool(self.workflow.get_requirement("MultipleInputFeatureRequirement")[0])
+
         try:
-            inputobj = object_from_state(self.state, inputparms, False)
+            inputobj = object_from_state(self.state, inputparms, False, supportsMultipleInput)
             if inputobj is None:
                 _logger.debug("[workflow %s] job step %s not ready", id(self), step.id)
                 return
@@ -243,7 +248,9 @@ class WorkflowJob(object):
             if not made_progress and completed < len(self.steps):
                 yield None
 
-        wo = object_from_state(self.state, self.tool["outputs"], True)
+        supportsMultipleInput = bool(self.workflow.get_requirement("MultipleInputFeatureRequirement")[0])
+
+        wo = object_from_state(self.state, self.tool["outputs"], True, supportsMultipleInput)
 
         if move_outputs:
             targets = set()

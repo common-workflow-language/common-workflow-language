@@ -51,6 +51,12 @@ def _draft2toDraft3(doc, loader, baseuri):
             for i, s in enumerate(doc["steps"]):
                 if "id" not in s:
                     s["id"] = "step%i" % i
+                for inp in s.get("inputs", []):
+                    if isinstance(inp.get("source"), list):
+                        if "requirements" not in doc:
+                            doc["requirements"] = []
+                        doc["requirements"].append({"class": "MultipleInputFeatureRequirement"})
+
 
         for a in doc:
             doc[a] = _draft2toDraft3(doc[a], loader, baseuri)

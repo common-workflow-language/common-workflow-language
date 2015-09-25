@@ -1595,9 +1595,13 @@
 
     ## Merging
 
+    To merge multiple inbound data links,
+    [MultipleInputFeatureRequirement](#multipleinputfeaturerequirement) must be specified
+    in the workflow or workflow step requirements.
+
     If the sink parameter is an array, or named in a [workflow
     scatter](#workflowstep) operation, there may be multiple inbound data links
-    listed in the `connect` field.  The values from the input links are merged
+    listed in the `source` field.  The values from the input links are merged
     depending on the method specified in the `linkMerge` field.  If not
     specified, the default method is "merge_nested".
 
@@ -1953,6 +1957,13 @@
   doc: |
     Indicates that the workflow platform must support the `scatter` and
     `scatterMethod` fields of [WorkflowStep](#workflowstep).
+
+- name: MultipleInputFeatureRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Indicates that the workflow platform must support multiple inbound data links
+    listed in the `source` field of [WorkflowStepInput](#workflowstepinput).
 
 
 - name: SchemaDefRequirement

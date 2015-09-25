@@ -37,7 +37,7 @@ inputs:
 outputs:
   - id: "#output"
     type: File
-    source: "#sorted.output"
+    source: "#sorted/output"
     description: "The output with the lines reversed and sorted."
 
 # The "steps" array lists the executable steps that make up the workflow.
@@ -51,15 +51,17 @@ outputs:
 # parameter "#reversed" from the first step to the input parameter of the
 # tool "sorttool.cwl#input".
 steps:
-  - inputs:
-      - { id: "#rev.input", source: "#input" }
+  - id: rev
+    inputs:
+      - { id: input, source: "#input" }
     outputs:
-      - { id: "#rev.output" }
+      - { id: output }
     run: { "@import": revtool.cwl }
 
-  - inputs:
-      - { id: "#sorted.input", source: "#rev.output" }
-      - { id: "#sorted.reverse", source: "#reverse_sort" }
+  - id: sorted
+    inputs:
+      - { id: input, source: "#rev/output" }
+      - { id: reverse, source: "#reverse_sort" }
     outputs:
-      - { id: "#sorted.output" }
+      - { id: output }
     run: { "@import": sorttool.cwl }

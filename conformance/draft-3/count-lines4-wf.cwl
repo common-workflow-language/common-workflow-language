@@ -13,6 +13,7 @@ outputs:
 
 requirements:
   - class: ScatterFeatureRequirement
+  - class: MultipleInputFeatureRequirement
 
 steps:
   - id: "#step1"

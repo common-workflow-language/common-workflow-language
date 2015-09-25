@@ -2,6 +2,9 @@
 class: Workflow
 cwlVersion: "cwl:draft-3.dev1"
 
+requirements:
+  - class: MultipleInputFeatureRequirement
+
 inputs:
     - { id: "#file1", type: {type: array, items: File} }
     - { id: "#file2", type: {type: array, items: File} }
