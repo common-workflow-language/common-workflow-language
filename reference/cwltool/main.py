@@ -153,7 +153,8 @@ def single_job_executor(t, job_order, input_basedir, args, **kwargs):
                 else:
                     raise workflow.WorkflowException("Workflow cannot make any more progress.")
         except Exception as e:
-            raise workflow.WorkflowException("%s" % e)
+            _logger.exception("Got workflow error")
+            raise workflow.WorkflowException("%s" % e, )
 
         if final_status[0] != "success":
             raise workflow.WorkflowException("Process status is %s" % (final_status))
@@ -346,7 +347,10 @@ def main(args=None, executor=single_job_executor, makeTool=workflow.defaultMakeT
     else:
         job_order_file = None
 
-    loader = Loader({"id": "@id", "path": {"@type": "@id"}})
+    if args.conformance_test:
+        loader = Loader({})
+    else:
+        loader = Loader({"id": "@id", "path": {"@type": "@id"}})
 
     if job_order_file:
         input_basedir = args.basedir if args.basedir else os.path.abspath(os.path.dirname(job_order_file))

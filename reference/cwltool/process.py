@@ -17,6 +17,7 @@ from builder import Builder
 import tempfile
 import glob
 from errors import WorkflowException
+from pathmapper import abspath
 
 _logger = logging.getLogger("cwltool")
 
@@ -53,10 +54,7 @@ class StdFsAccess(object):
         self.basedir = basedir
 
     def _abs(self, p):
-        if os.path.isabs(p):
-            return p
-        else:
-            return os.path.join(self.basedir, p)
+        return abspath(p, self.basedir)
 
     def glob(self, pattern):
         return glob.glob(self._abs(pattern))

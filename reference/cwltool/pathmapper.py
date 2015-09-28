@@ -5,6 +5,13 @@ import stat
 
 _logger = logging.getLogger("cwltool")
 
+def abspath(src, basedir):
+    if src.startswith("file://"):
+        ab = src[7:]
+    else:
+        ab = src if os.path.isabs(src) else os.path.join(basedir, src)
+    return ab
+
 class PathMapper(object):
     """Mapping of files from relative path provided in the file to a tuple of
     (absolute local path, absolute container path)"""
@@ -12,10 +19,7 @@ class PathMapper(object):
     def __init__(self, referenced_files, basedir):
         self._pathmap = {}
         for src in referenced_files:
-            if src.startswith("file://"):
-                ab = src[7:]
-            else:
-                ab = src if os.path.isabs(src) else os.path.join(basedir, src)
+            ab = abspath(src, basedir)
             self._pathmap[src] = (ab, ab)
 
     def mapper(self, src):
@@ -34,8 +38,7 @@ class DockerPathMapper(PathMapper):
         self._pathmap = {}
         self.dirs = {}
         for src in referenced_files:
-            ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
-
+            ab = abspath(src, basedir)
             dir, fn = os.path.split(ab)
 
             subdir = False
@@ -64,7 +67,7 @@ class DockerPathMapper(PathMapper):
             self.dirs[d] = name
 
         for src in referenced_files:
-            ab = src if os.path.isabs(src) else os.path.abspath(os.path.join(basedir, src))
+            ab = abspath(src, basedir)
 
             deref = ab
             st = os.lstat(deref)
