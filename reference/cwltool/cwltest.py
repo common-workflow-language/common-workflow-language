@@ -15,6 +15,8 @@ _logger = logging.getLogger("cwltool")
 _logger.addHandler(logging.StreamHandler())
 _logger.setLevel(logging.INFO)
 
+UNSUPPORTED_FEATURE = 33
+
 def compare(a, b):
     try:
         if isinstance(a, dict):
@@ -77,11 +79,14 @@ def run_test(args, i, t):
     except ValueError as v:
         _logger.error(v)
         _logger.error(outstr)
-    except subprocess.CalledProcessError:
-        _logger.error("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
-        _logger.error(t.get("doc"))
-        _logger.error("Returned non-zero")
-        return 1
+    except subprocess.CalledProcessError as err:
+        if err.returncode == UNSUPPORTED_FEATURE:
+            return UNSUPPORTED_FEATURE
+        else:
+            _logger.error("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
+            _logger.error(t.get("doc"))
+            _logger.error("Returned non-zero")
+            return 1
     except yaml.scanner.ScannerError as e:
         _logger.error("""Test failed: %s""", " ".join([pipes.quote(tc) for tc in test_command]))
         _logger.error(outstr)
@@ -135,21 +140,30 @@ def main():
         tests = yaml.load(f)
 
     failures = 0
+    unsupported = 0
 
     if args.n is not None:
         sys.stderr.write("\rTest [%i/%i] " % (args.n, len(tests)))
-        failures += run_test(args, args.n-1, tests[args.n-1])
+        rt = run_test(args, args.n-1, tests[args.n-1])
+        if rt == 1:
+            failures += 1
+        elif rt == UNSUPPORTED_FEATURE:
+            unsupported += 1
     else:
         for i, t in enumerate(tests):
             sys.stderr.write("\rTest [%i/%i] " % (i+1, len(tests)))
             sys.stderr.flush()
-            failures += run_test(args, i, t)
+            rt = run_test(args, i, t)
+            if rt == 1:
+                failures += 1
+            elif rt == UNSUPPORTED_FEATURE:
+                unsupported += 1
 
-    if failures == 0:
+    if failures == 0 and unsupported == 0:
          _logger.info("All tests passed")
          return 0
     else:
-        _logger.warn("%i failures", failures)
+        _logger.warn("%i failures, %i unsupported features", failures, unsupported)
         return 1
 
 

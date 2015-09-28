@@ -612,26 +612,28 @@
     must be accessible by tools using standard POSIX file system call API such as
     open(2) and read(2).
   fields:
-    - name: "class"
+    - name: class
       type:
         type: enum
-        name: "File_class"
+        name: File_class
         symbols:
           - cwl:File
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
       doc: Must be `File` to indicate this object describes a file.
-    - name: "path"
-      type: "string"
+    - name: path
+      type: string
       doc: The path to the file.
-    - name: "checksum"
-      type: ["null", "string"]
+      jsonldPredicate:
+        "_type": "@id"
+    - name: checksum
+      type: ["null", string]
       doc: |
         Optional hash code for validating file integrity.  Currently must be in the form
         "sha1$ + hexidecimal string" using the SHA-1 algorithm.
-    - name: "size"
-      type: ["null", "long"]
+    - name: size
+      type: ["null", long]
       doc: Optional file size.
     - name: "secondaryFiles"
       type:
