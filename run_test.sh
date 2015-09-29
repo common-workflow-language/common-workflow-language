@@ -10,7 +10,6 @@ Options:
 EOF
 
 DRAFT=draft-2
-CWLTOOL=../reference
 TEST_N=""
 
 while [[ -n "$1" ]]
