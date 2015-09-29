@@ -296,15 +296,23 @@ class Loader(object):
             self.idx[url] = result
         return result
 
+    def check_file(self, fn):
+        if fn.startswith("file://"):
+            return os.path.exists(fn[7:])
+        else:
+            return False
+
     def validate_link(self, field, link):
         if field in self.nolinkcheck:
             return True
         if isinstance(link, basestring):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
-                    raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
+                    if not self.check_file(link):
+                        raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
-                raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
+                if not self.check_file(link):
+                    raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):
             errors = []
             for i in link:
