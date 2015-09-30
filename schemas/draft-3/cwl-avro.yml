@@ -113,6 +113,9 @@
 
     **must**: Conforming CWL documents and CWL implementations are required to behave
     as described; otherwise they are in error.
+    
+    **deprecation**: Conforming CWL documents and CWL implementations are permitted but
+    no longer appreciated to behave as described.
 
     **error**: A violation of the rules of this specification; results are
     undefined. Conforming implementations may detect and report an error and may
