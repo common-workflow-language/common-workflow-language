@@ -4,7 +4,7 @@ read -rd "\000" helpmessage <<EOF
 $(basename $0): Run common workflow tool description language conformance tests.
 
 Syntax:
-        $(basename $0) [CWLTOOL=/path/to/cwltool] [RABIX=/path/to/rabix] [ARVADOS=/path/to/rabix]
+        $(basename $0) [RUNNER=/path/to/cwl-runner]
 
 Options:
 EOF
@@ -42,21 +42,16 @@ checkexit() {
 runtest() {
     echo "--- Running conformance test $DRAFT on $1 ---"
 
+    "$1" --version
+
     runs=$((runs+1))
-    ../reference/cwltool/cwltest.py --tool $1 --test=conformance_test_$DRAFT.yaml $TEST_N --basedir $DRAFT
+    (cd $DRAFT
+     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N --basedir $DRAFT
+    )
     checkexit
 }
 
-# Add your tool test here.
-for t in "$CWLTOOL/cwltool/main.py" \
-             "$RABIX/rabix/cliche/main.py" \
-             "$ARVADOS/sdk/python/bin/cwl-runner" \
-             "$TOIL/src/toil/cwl/cwltoil.py" \
-         ; do
-    if [[ -x "$t" ]]; then
-        runtest "$t"
-    fi
-done
+runtest "$(readlink -f $RUNNER)"
 
 # Final reporting
 
