@@ -8,7 +8,7 @@
 
     "schema_in": [{
         "class": "File",
-        "path": "../schemas/draft-3/cwl-avro.yml"
+        "path": "../draft-3/cwl-avro.yml"
     }],
 
     "schema_target": [
