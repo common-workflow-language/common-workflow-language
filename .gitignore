@@ -3,6 +3,5 @@
 *.egg
 *.egg-info
 .idea/*
-reference/build/*
-reference/setup.cfg
-conformance/conformance_test_tmp
+common-workflow-language.github.io/
+cwltool/
