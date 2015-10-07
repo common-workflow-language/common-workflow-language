@@ -12,7 +12,7 @@ CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
 [Docker](http://docker.com) for portable runtime environments.
 
 CWL is designed to express workflows for data-intensive science, such as
-Bioinformatics, Chemistry, Physics, and Astronomy.
+Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
 
 ## CWL Specification
 
@@ -28,7 +28,7 @@ http://common-workflow-language.github.io/draft-3/
 
 Implementations working on or currently capable of running the Common Workflow Language:
 
-* [Reference implementation (Python)](https://github.com/common-workflow-language/common-workflow-language/tree/master/reference/)
+* [Reference implementation (Python)](https://github.com/common-workflow-language/cwltool)
 * [Rabix](https://github.com/rabix/rabix)
 * [Arvados](https://arvados.org)
 * [Parallel Recipes](https://github.com/yvdriess/precipes)
