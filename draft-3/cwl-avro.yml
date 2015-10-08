@@ -1065,6 +1065,12 @@
         "_id": "cwl:cwlVersion"
         "_type": "@id"
 
+- type: enum
+  name: CWLVersions
+  doc: "Version symbols for published CWL document versions."
+  symbols:
+    - draft-3.dev1
+
 - type: record
   name: CommandLineBinding
   extends: "#Binding"
