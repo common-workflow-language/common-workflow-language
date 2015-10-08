@@ -1056,7 +1056,14 @@
         - string
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
-
+    - name: cwlVersion
+      type:
+        - "null"
+        - string
+      doc: "CWL document version"
+      jsonldPredicate:
+        "_id": "cwl:cwlVersion"
+        "_type": "@id"
 
 - type: record
   name: CommandLineBinding
