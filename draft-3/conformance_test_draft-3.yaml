@@ -261,3 +261,10 @@
   tool: draft-3/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
+
+- job: draft-3/wc4-tool.cwl
+  output:
+    output: 16
+  tool: draft-3/rename.cwl
+  doc: |
+    Test CreateFileRequirement with expression in filename.

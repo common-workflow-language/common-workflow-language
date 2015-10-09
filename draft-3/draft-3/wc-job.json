@@ -1,1 +1,6 @@
-../draft-2/wc-job.json
+{
+    "file1": {
+        "class": "File",
+        "path": "whale.txt"
+    }
+}

@@ -1981,6 +1981,25 @@
     listed in the `source` field of [WorkflowStepInput](#workflowstepinput).
 
 
+- name: InlineJavascriptRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Indicates that the workflow platform must support inline Javascript expressions.
+    If this requirement is not present, the workflow platform must not perform expression
+    interpolatation.
+  fields:
+    - name: engineConfig
+      type:
+        - "null"
+        - type: array
+          items: string
+      doc: |
+        Additional configuration or code fragments that will also be inserted
+        before the expression code.  Allows for function definitions that will
+        be called from CWL expressions.
+
+
 - name: SchemaDefRequirement
   type: record
   extends: "#ProcessRequirement"
