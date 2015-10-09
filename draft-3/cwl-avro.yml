@@ -1990,6 +1990,7 @@
     interpolatation.
   fields:
     - name: engineConfig
+      jsonldPredicate: cwl:engineConfig
       type:
         - "null"
         - type: array
@@ -2054,6 +2055,7 @@
           items: string
       doc: "The command line to invoke the expression engine."
     - name: engineConfig
+      jsonldPredicate: cwl:engineConfig
       type:
         - "null"
         - type: array
