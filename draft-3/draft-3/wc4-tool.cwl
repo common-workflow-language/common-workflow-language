@@ -5,7 +5,7 @@ requirements:
   - class: InlineJavascriptRequirement
 
 inputs:
-    - { id: "#file1", type: {type: array, items: File}, inputBinding: {} }
+    - { id: "#file1", type: File, inputBinding: {} }
 outputs:
     - id: "#output"
       type: int
