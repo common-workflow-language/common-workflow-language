@@ -705,11 +705,13 @@
         object.
 
 
-- name: JsonPointer
+- name: DefaultExpressionEngines
   type: enum
+  doc: "Symbols for default CWL expression engines that may be used in the `engine` field."
   docParent: "#Expression"
   symbols:
     - "cwl:JsonPointer"
+    - "cwl:JavaScript"
 
 
 - type: record
