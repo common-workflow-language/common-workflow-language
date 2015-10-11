@@ -711,7 +711,7 @@
   docParent: "#Expression"
   symbols:
     - "cwl:JsonPointer"
-    - "cwl:JavaScript"
+    - "cwl:JavascriptEngine"
 
 
 - type: record
