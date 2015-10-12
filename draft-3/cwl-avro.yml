@@ -711,7 +711,7 @@
         object.
     - name: format
       type:
-        - "null",
+        - "null"
         - string
         - type: array
           items: string
