@@ -705,7 +705,7 @@
         object.
 
 
-- name: DefaultExpressionEngines
+- name: StandandExpressionEngine
   type: enum
   doc: "Symbols for default CWL expression engines that may be used in the `engine` field."
   docParent: "#Expression"
@@ -726,10 +726,10 @@
   fields:
     - name: engine
       type:
-        - "#JsonPointer"
+        - "#StandardExpressionEngine"
         - string
       doc: |
-        Either `cwl:JsonPointer` or a reference to an
+        Either a standard expression engine or a reference to an
         ExpressionEngineRequirement defining which engine to use.
       jsonldPredicate:
         "_id": "cwl:engine"
