@@ -1,1 +1,1 @@
-../draft-2/scatter-wf2.cwl
+../../draft-2/draft-2/scatter-wf2.cwl

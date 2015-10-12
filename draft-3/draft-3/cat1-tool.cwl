@@ -1,1 +1,1 @@
-../draft-2/cat1-tool.cwl
+../../draft-2/draft-2/cat1-tool.cwl

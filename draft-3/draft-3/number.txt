@@ -1,1 +1,1 @@
-../draft-2/number.txt
+../../draft-2/draft-2/number.txt

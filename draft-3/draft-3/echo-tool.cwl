@@ -1,1 +1,1 @@
-../draft-2/echo-tool.cwl
+../../draft-2/draft-2/echo-tool.cwl
