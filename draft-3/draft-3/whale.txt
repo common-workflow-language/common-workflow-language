@@ -1,1 +1,1 @@
-../draft-2/whale.txt
+../../draft-2/draft-2/whale.txt

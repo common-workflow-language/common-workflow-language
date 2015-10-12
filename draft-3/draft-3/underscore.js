@@ -1,1 +1,1 @@
-../draft-2/underscore.js
+../../draft-2/draft-2/underscore.js

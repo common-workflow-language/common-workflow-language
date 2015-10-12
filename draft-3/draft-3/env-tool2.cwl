@@ -1,1 +1,1 @@
-../draft-2/env-tool2.cwl
+../../draft-2/draft-2/env-tool2.cwl

@@ -1,1 +1,1 @@
-../draft-2/rename.cwl
+../../draft-2/draft-2/rename.cwl

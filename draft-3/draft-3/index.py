@@ -1,1 +1,1 @@
-../draft-2/index.py
+../../draft-2/draft-2/index.py

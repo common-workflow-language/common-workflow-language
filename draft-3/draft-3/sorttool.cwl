@@ -1,1 +1,1 @@
-../draft-2/sorttool.cwl
+../../draft-2/draft-2/sorttool.cwl
