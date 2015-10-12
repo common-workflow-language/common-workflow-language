@@ -648,7 +648,13 @@
         included when loading primary document.  A file object listed in
         `secondaryFiles` may itself include `secondaryFiles` for which the same
         rules apply.
-
+    - name: format
+      type: ["null", string]
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+      doc: |
+        The format of the file.
 
 - name: Parameter
   type: record
@@ -703,7 +709,19 @@
       doc: |
         The default value for this parameter if not provided in the input
         object.
-
+    - name: format
+      type:
+        - "null",
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+      doc: |
+        Only applies if `type` is `File` or array of `File`.
+        Allowed file formats for this parameter (for inputs)
+        or the file format of an output parameter.
 
 - name: JsonPointer
   type: enum
@@ -771,6 +789,7 @@
             period `.` and all following characters).  If there are no file
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
+
 
 - name: InputRecordField
   type: record
@@ -2044,3 +2063,21 @@
         the expression engine.  The semantics of this field are defined by the
         underlying expression engine.  Intended for uses such as providing
         function definitions that will be called from CWL expressions.
+
+
+- name: FormatOntologyRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    URI reference to ontologies that provide a taxonomy of file formats.  Used
+    to reason about is-a relationships (it is possible to perform exact matches
+    on formats without an ontology).
+  fields:
+    - name: formats
+      type:
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        _type: "@id"
+        _id: cwl:formats
