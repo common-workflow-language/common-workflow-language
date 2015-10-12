@@ -1,1 +1,1 @@
-../draft-2/wc-tool.cwl
+../../draft-2/draft-2/wc-tool.cwl
