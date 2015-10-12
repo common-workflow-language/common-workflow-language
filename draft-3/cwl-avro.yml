@@ -705,7 +705,7 @@
         object.
 
 
-- name: StandandExpressionEngine
+- name: StandardExpressionEngine
   type: enum
   doc: "Symbols for default CWL expression engines that may be used in the `engine` field."
   docParent: "#Expression"
