@@ -262,9 +262,16 @@
   doc: |
     Test CreateFileRequirement with expression in filename.
 
-- job: draft-3/wc4-tool.cwl
+- job: draft-3/wc-job.json
   output:
     output: 16
-  tool: draft-3/rename.cwl
+  tool: draft-3/wc4-tool.cwl
   doc: |
-    Test CreateFileRequirement with expression in filename.
+    Test inline expressions
+
+- job: draft-3/wc-job.json
+  output:
+    output: 16
+  tool: draft-3/wc5-tool.cwl
+  doc: |
+    Test standard cwl:JavascriptEngine

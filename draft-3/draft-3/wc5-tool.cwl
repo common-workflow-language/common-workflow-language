@@ -3,7 +3,7 @@ class: CommandLineTool
 cwlVersion: "cwl:draft-3.dev1"
 
 inputs:
-    - { id: "#file1", type: {type: array, items: File}, inputBinding: {} }
+    - { id: "#file1", type: File, inputBinding: {} }
 outputs:
     - id: "#output"
       type: int
