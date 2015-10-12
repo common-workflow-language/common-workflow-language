@@ -1,1 +1,1 @@
-../draft-2/revtool.cwl
+../../draft-2/draft-2/revtool.cwl

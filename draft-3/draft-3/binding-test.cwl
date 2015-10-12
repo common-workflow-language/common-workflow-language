@@ -1,1 +1,1 @@
-../draft-2/binding-test.cwl
+../../draft-2/draft-2/binding-test.cwl

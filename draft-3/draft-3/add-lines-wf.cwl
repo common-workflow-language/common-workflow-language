@@ -1,1 +1,1 @@
-../draft-2/add-lines-wf.cwl
+../../draft-2/draft-2/add-lines-wf.cwl

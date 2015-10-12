@@ -1,1 +1,1 @@
-../draft-2/node-engine.cwl
+../../draft-2/draft-2/node-engine.cwl
