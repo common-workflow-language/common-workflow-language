@@ -2050,11 +2050,11 @@
   type: record
   extends: "#ProcessRequirement"
   fields:
-    name: additionalDockerImages
-    type:
-      - "null"
-      - type: array
-        items: "#DockerRequirement"
+    - name: additionalDockerImages
+      type:
+        - "null"
+        - type: array
+          items: "#DockerRequirement"
   doc: |
     Require that the command should have access to the Docker socket at
     `/var/run/docker.sock`. If the command is itself run in Docker, this means
