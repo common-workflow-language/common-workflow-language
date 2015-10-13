@@ -10,6 +10,7 @@ from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
 import yaml
 import os
+import urlparse
 
 from ref_resolver import Loader
 import validate
@@ -74,7 +75,10 @@ def main(args=None):
     metaschema_names, metaschema_doc, metaschema_loader = schema.get_metaschema()
 
     # Load schema document and resolve refs
-    schema_uri = "file://" + os.path.abspath(args.schema)
+
+    schema_uri = args.schema
+    if not urlparse.urlparse(schema_uri)[0]:
+        schema_uri = "file://" + os.path.abspath(schema_uri)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
     schema_doc, schema_metadata = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
 
@@ -150,7 +154,10 @@ def main(args=None):
 
     # Load target document and resolve refs
     try:
-        document, doc_metadata = document_loader.resolve_ref("file://" + os.path.abspath(args.document))
+        uri = args.document
+        if not urlparse.urlparse(uri)[0]:
+            doc = "file://" + os.path.abspath(uri)
+        document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s", args.document, e, exc_info=(e if args.debug else False))
         return 1
