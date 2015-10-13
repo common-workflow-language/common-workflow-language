@@ -2044,3 +2044,29 @@
         the expression engine.  The semantics of this field are defined by the
         underlying expression engine.  Intended for uses such as providing
         function definitions that will be called from CWL expressions.
+
+
+- name: DockerSocketRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  fields:
+    name: additionalDockerImages
+    type:
+      - "null"
+      - type: array
+        items: "#DockerRequirement"
+  doc: |
+    Require that the command should have access to the Docker socket at
+    `/var/run/docker.sock`. If the command is itself run in Docker, this means
+    the Docker socket must be made available inside the Docker container
+    through a bind mount.
+
+    If this requirement is present, the platform is strongly encouraged to
+    arrange that file paths are consistent inside and outside the container, as
+    paths that exist only inside the container cannot be passed to other
+    containers.
+
+    Note there are inherent security problems with providing access to the
+    Docker socket, so use of this feature should be limited to trusted
+    environments running trusted workflows. This feature is provided to support
+    existing container schemes that rely on Docker-in-Docker functionality.
