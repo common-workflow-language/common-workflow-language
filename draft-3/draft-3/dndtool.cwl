@@ -1,8 +1,8 @@
 class: CommandLineTool
 description: "Reverse each line using the `rev` command"
-reqirements:
+requirements:
   - class: DockerRequirement
-    dockerId: docker_in_docker
+    dockerImageId: dnd
     dockerFile: |
       FROM ubuntu:14.04
       MAINTAINER peter.amstutz@curoverse.com
