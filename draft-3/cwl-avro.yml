@@ -363,6 +363,11 @@
           the designated temporary directory that will be used when executing
           the tool.  Null if not applicable.
 
+        - **resources**: When used in the context of a CommandLineTool, an object
+          describing the resources allocated to run the tool.  These fields are "cores",
+          "ram", "tmpdir", "outdir".  See ResourceRequirement for details.
+
+
       * On standard output, print a single JSON value (string, number, array, object,
         boolean, or null) for the return value.
 
