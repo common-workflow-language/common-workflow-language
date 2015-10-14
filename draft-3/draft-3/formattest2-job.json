@@ -1,0 +1,10 @@
+{
+    "@context": {
+        "edam": "http://edamontology.org/"
+    },
+    "input": {
+        "class": "File",
+        "path": "ref.fasta",
+        "format": "edam:format_1929"
+    }
+}

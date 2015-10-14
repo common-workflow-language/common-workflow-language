@@ -261,3 +261,27 @@
   tool: draft-3/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
+
+- job: draft-3/formattest-job.json
+  output:
+    output:
+        "path": "output.txt"
+        "format": "http://edamontology.org/format_2330"
+        "size": 1111
+        "class": "File"
+        "checksum": "sha1$97fe1b50b4582cebc7d853796ebd62e3e163aa3f"
+  tool: draft-3/formattest.cwl
+  doc: |
+    Test simple format checking.
+
+- job: draft-3/formattest2-job.json
+  output:
+    output:
+        "path": "output.txt"
+        "format": "http://edamontology.org/format_1929"
+        "size": 12010
+        "class": "File"
+        "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
+  tool: draft-3/formattest2.cwl
+  doc: |
+    Test format checking against ontology.
