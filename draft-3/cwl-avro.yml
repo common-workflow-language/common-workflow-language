@@ -2087,5 +2087,4 @@
           items: string
       jsonldPredicate:
         _type: "@id"
-        _id: cwl:formats
-        identity: true
+        noLinkCheck: true
