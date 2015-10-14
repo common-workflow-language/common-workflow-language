@@ -2044,3 +2044,62 @@
         the expression engine.  The semantics of this field are defined by the
         underlying expression engine.  Intended for uses such as providing
         function definitions that will be called from CWL expressions.
+
+
+- type: record
+  name: ResourceRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Specify basic hardware resource requirements.
+
+    "min" is the minimum amount of a resource that must be reserved to schedule
+    a job. If "min" cannot be satisfied, the job should not be run.
+
+    "max" is the maximum amount of a resource that the job shall be permitted
+    to use. If a node has sufficient resources, multiple jobs may be scheduled
+    on a single node provided each job's "max" resource requirements are
+    met. If a job attempts to exceed its "max" resource allocation, an
+    implementation may deny additional resources, which may result in job
+    failure.
+
+    If "min" is specified but "max" is not, then "max" == "min"
+    If "max" is specified by "min" is not, then "min" == "max".
+
+    It is an error if max < min.
+
+    It is an error if the value of any of these fields is negative.
+
+    If neither "min" nor "max" is specified for a resource, an implementation may provide a default.
+
+  fields:
+    - name: coresMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved number of CPU cores
+
+    - name: coresMax
+      type: ["null", int, string, "#Expression"]
+      doc: Maximum reserved number of CPU cores
+
+    - name: ramMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved RAM in mebibytes (2**20)
+
+    - name: ramMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved RAM in mebibytes (2**20)
+
+    - name: tmpdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: tmpdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: outdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
+
+    - name: outdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
