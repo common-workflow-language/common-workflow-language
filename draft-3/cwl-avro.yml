@@ -2090,7 +2090,7 @@
     checking that an input file format is the same or `rdfs:subClassOf` the
     format required by the input parameter.
 
-    If no ontologies are specified, the runtime may perform exact file format
+    If no ontologies are specified in `formatOntologies`, the runtime may perform exact file format
     matches.
 
   fields:
