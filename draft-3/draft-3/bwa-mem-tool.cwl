@@ -11,6 +11,9 @@ hints:
     dockerPull: images.sbgenomics.com/rabix/bwa
     dockerImageId: 9d3b9b0359cf
 
+  - class: ResourceRequirement
+    coresMin: 4
+
 inputs:
   - id: "#reference"
     type: File
@@ -43,7 +46,7 @@ baseCommand: ["bwa", "mem"]
 arguments:
   - valueFrom:
       engine: "node-engine.cwl"
-      script: "$job.allocatedResources.cpu"
+      script: "$resources.cores"
     position: 1
     prefix: "-t"
 
