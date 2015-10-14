@@ -655,7 +655,12 @@
         _type: "@id"
         identity: true
       doc: |
-        The format of the file.
+        The format of the file.  This must be a URI of a concept node that
+        represents the file format, preferrably defined within an ontology.
+        If no ontology is available, file formats may be tested by exact match.
+        See (FormatOntologyRequirement)[#formatontologyrequirement] for
+        more information.
+
 
 - name: Parameter
   type: record
@@ -723,8 +728,16 @@
         identity: true
       doc: |
         Only applies if `type` is `File` or array of `File`.
-        Allowed file formats for this parameter (for inputs)
-        or the file format of an output parameter.
+
+        For input parameters, this must be one or more URIs of a concept nodes
+        that represents file formats which are allowed as input to this
+        parameter, preferrably defined within an ontology.  If no ontology is
+        available, file formats may be tested by exact match.  See
+        (FormatOntologyRequirement)[#formatontologyrequirement] for more
+        information.
+
+        For output parameters, this is the file format that will be assigned to
+        the output parameter.
 
 - name: JsonPointer
   type: enum
@@ -2074,11 +2087,12 @@
   doc: |
     URI reference to one or more ontology graphs that provide a taxonomy of
     file formats.  Reasoning about format compatability must be done by
-    checking that an input file is the same or `rdfs:subClassOf` the format of
-    the input parameter.
+    checking that an input file format is the same or `rdfs:subClassOf` the
+    format required by the input parameter.
 
-    If no ontologies are specified, the runtime may still require exact
-    file format matches.
+    If no ontologies are specified, the runtime may perform exact file format
+    matches.
+
   fields:
     - name: formatOntologies
       type:
