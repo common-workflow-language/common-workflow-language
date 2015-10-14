@@ -2071,11 +2071,15 @@
   type: record
   extends: "#ProcessRequirement"
   doc: |
-    URI reference to ontologies that provide a taxonomy of file formats.  Used
-    to reason about is-a relationships (it is possible to perform exact matches
-    on formats without an ontology).
+    URI reference to one or more ontology graphs that provide a taxonomy of
+    file formats.  Reasoning about format compatability must be done by
+    checking that an input file is the same or `rdfs:subClassOf` the format of
+    the input parameter.
+
+    If no ontologies are specified, the runtime may still require exact
+    file format matches.
   fields:
-    - name: formats
+    - name: formatOntologies
       type:
         - string
         - type: array
