@@ -4,13 +4,15 @@ read -rd "\000" helpmessage <<EOF
 $(basename $0): Run common workflow tool description language conformance tests.
 
 Syntax:
-        $(basename $0) [RUNNER=/path/to/cwl-runner]
+        $(basename $0) [RUNNER=/path/to/cwl-runner] [DRAFT=cwl-draft-version]
 
 Options:
+  -nT   Run a specific test.
 EOF
 
 DRAFT=draft-2
 TEST_N=""
+RUNNER=cwl-runner
 
 while [[ -n "$1" ]]
 do
@@ -29,6 +31,13 @@ do
             ;;
     esac
 done
+
+if ! runner="$(which $RUNNER)" ; then
+    echo >&2 "$helpmessage"
+    echo >&2
+    echo >&2 "runner '$RUNNER' not found"
+    exit 1
+fi
 
 runs=0
 failures=0
@@ -51,7 +60,7 @@ runtest() {
     checkexit
 }
 
-runtest "$(readlink -f $RUNNER)"
+runtest "$(readlink -f $runner)"
 
 # Final reporting
 
