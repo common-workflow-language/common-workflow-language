@@ -53,4 +53,7 @@ All tool tests succeeded
 ```
 
 _NOTE_: For running on OSX systems, you'll need to install coreutils via brew. This will add to your
-system some needed GNU-like tools. 
+system some needed GNU-like tools like `greadlink`.
+
+1. If you haven't already, install [brew](http://brew.sh/) package manager in your mac
+2. Run `brew install coreutils`
