@@ -13,6 +13,7 @@ EOF
 DRAFT=draft-2
 TEST_N=""
 RUNNER=cwl-runner
+PLATFORM=`uname -s`
 
 while [[ -n "$1" ]]
 do
@@ -60,7 +61,11 @@ runtest() {
     checkexit
 }
 
-runtest "$(readlink -f $runner)"
+if [[ $PLATFORM == "Linux" ]]; then
+    runtest "$(readlink -f $runner)"
+else
+    runtest "$(greadlink -f $runner)"
+fi
 
 # Final reporting
 

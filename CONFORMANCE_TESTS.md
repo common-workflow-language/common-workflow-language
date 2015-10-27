@@ -14,7 +14,7 @@ Test [1/1]
 All tests passed
 ```
 
-The cwltool relies on node.js. To install on ubuntu, 
+The cwltool relies on node.js. To install on ubuntu,
 
 ```
 $ sudo apt-get install nodejs npm
@@ -51,3 +51,6 @@ All tests passed
 
 All tool tests succeeded
 ```
+
+_NOTE_: For running on OSX systems, you'll need to install coreutils via brew. This will add to your
+system some needed GNU-like tools. 
