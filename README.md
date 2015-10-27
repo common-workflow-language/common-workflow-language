@@ -77,7 +77,7 @@ religion. We do not tolerate harassment of participants in any form.
 This code of conduct applies to all CWL Project spaces, including the Google
 Group, the Gitter chat room, the Google Hangouts chats, both online and off.
 Anyone who violates this code of conduct may be sanctioned or expelled from
-these spaces at the discretion of the FIXME.
+these spaces at the discretion of the leadership team.
 
 For more details, see our [Code of
 Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md)

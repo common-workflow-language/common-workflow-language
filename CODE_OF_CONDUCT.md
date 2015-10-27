@@ -100,4 +100,9 @@ CWL Leadership Team
 
 As a stop gap measure until a more formal governance structure is adopted, the
 following individuals make up the leadership of the CWL Project: Peter Amstutz,
-John Chilton, Michael R. Crusoe, and Nebojša Tijanić. 
+John Chilton, Michael R. Crusoe, and Nebojša Tijanić.
+
+To report an issue with anyone on the team you can escalate to Alexander Wait
+Zaranek (Curoverse) awaitz @ post.harvard.edu, Anton Nekrutenko (Galaxy)
+anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu, or
+Brandi Davis-Dusenbery (Seven Bridges Genomics) FIXME@sbgenomics.com.
