@@ -261,3 +261,26 @@
   tool: draft-3/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
+
+- job: draft-3/schemadef-job.json
+  output:
+    output:
+        path: output.txt
+        size: 12
+        class: File
+        checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
+  tool: draft-3/schemadef-tool.cwl
+  doc: |
+    Test SchemaDefRequirement definition used in tool parameter
+
+
+- job: draft-3/schemadef-job.json
+  output:
+    output:
+        path: output.txt
+        size: 12
+        class: File
+        checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
+  tool: draft-3/schemadef-wf.cwl
+  doc: |
+    Test SchemaDefRequirement definition used in workflow parameter
