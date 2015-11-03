@@ -26,12 +26,26 @@ http://common-workflow-language.github.io/draft-3/
 
 ## Implementations
 
-Implementations working on or currently capable of running the Common Workflow Language:
+Some of the software supporting running Common Workflow Language tools or workflows:
 
-* [Reference implementation (Python)](https://github.com/common-workflow-language/cwltool)
-* [Rabix](https://github.com/rabix/rabix)
-* [Arvados](https://arvados.org)
-* [Parallel Recipes](https://github.com/yvdriess/precipes)
+* [cwltool (reference implementation)](https://github.com/common-workflow-language/cwltool),
+  [cwltool wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwltool-%28reference-implementation%29)
+* [Rabix](https://github.com/rabix/rabix),
+  [Rabix wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Rabix)
+* [Arvados](https://arvados.org),
+  [Arvados wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Arvados)
+* [Galaxy](https://github.com/common-workflow-language/Galaxy),
+  [Galaxy wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Galaxy)
+* [Parallel Recipes](https://github.com/yvdriess/precipes),
+  [Parallel Recipes wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Parallel-Recipes)
+* [Toil](https://github.com/BD2KGenomics/toil),
+  [Toil wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Toil)
+* [CancerCollaboratory](https://github.com/CancerCollaboratory),
+  [CancerCollaboratory wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/CancerCollaboratory)
+* [Airflow (SciDAP)](https://github.com/SciDAP/scidap),
+  [Airflow wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/SciDAP)
+* [cwl2script](https://github.com/common-workflow-language/cwl2script),
+  [cwl2script page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwl2script)
 
 ## Examples
 
