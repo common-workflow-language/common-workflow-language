@@ -87,6 +87,7 @@ and send a pull request!
 * [University of California Davis](http://ucdavis.edu)
 * [University of California Santa Cruz](https://cbse.soe.ucsc.edu/research/bioinfo)
 * [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
+* [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
 * [BioDatomics](http://www.biodatomics.com/)
 
@@ -110,3 +111,4 @@ and send a pull request!
 * Josh Randall <joshua.randall@sanger.ac.uk>
 * Andrey Kartashov <porter@porter.st>
 * Dan Leehr <dan.leehr@duke.edu>
+* Andrey Kartashov <Andrey.Kartashov@cchmc.org>
