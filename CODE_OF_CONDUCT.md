@@ -4,23 +4,24 @@ CWL Code of Conduct
 The CWL Project is dedicated to providing a harassment-free experience for
 everyone. We do not tolerate harassment of participants in any form.
 
-This code of conduct applies to all CWL Project spaces, including the Google
-Group, the Gitter chat room, the Google Hangouts chats, both online and
-off. Anyone who violates this code of conduct may be sanctioned or expelled
-from these spaces at the discretion of the CWL Leadership Team.
+This code of conduct applies to all CWL Project spaces both online and off: the
+Google Group, the Gitter chat room, the Google Hangouts chats, and any other
+CWL spaces. Anyone who violates this code of conduct may be sanctioned or
+expelled from these spaces at the discretion of the CWL Leadership Team.
 
 Some CWL Project spaces may have additional rules in place, which will be
 made clearly available to participants. Participants are responsible for
 knowing and abiding by these rules.
 
-Harassment includes:
+Harassment includes, but is not limited to:
 
  - Offensive comments related to gender, gender identity and expression, sexual
 orientation, disability, mental illness, neuro(a)typicality, physical
 appearance, body size, age, race, or religion.
  - Unwelcome comments regarding a person’s lifestyle choices and practices,
 including those related to food, health, parenting, drugs, and employment.
- - Deliberate misgendering or use of ‘dead’ or rejected names.
+ - Deliberate misgendering or use of [dead](https://www.quora.com/What-is-deadnaming/answer/Nancy-C-Walker)
+or rejected names.
  - Gratuitous or off-topic sexual images or behaviour  in spaces where they’re not
 appropriate.
  - Physical contact and simulated physical contact (eg, textual descriptions like
@@ -47,9 +48,8 @@ people’s comfort. The CWL Leadeship Team will not act on complaints regarding:
  - ‘Reverse’ -isms, including ‘reverse racism,’ ‘reverse sexism,’ and ‘cisphobia’
  - Reasonable communication of boundaries, such as “leave me alone,” “go away,” or
 “I’m not discussing this with you.”
- - Communicating in a ‘tone’ you don’t find congenial
- - Criticizing racist, sexist, cissexist, or otherwise oppressive behavior or
-assumptions
+ - Communicating in a [tone](http://geekfeminism.wikia.com/wiki/Tone_argument)
+you don’t find congenial
 
 Reporting
 ---------
@@ -102,7 +102,7 @@ As a stop gap measure until a more formal governance structure is adopted, the
 following individuals make up the leadership of the CWL Project: Peter Amstutz,
 John Chilton, Michael R. Crusoe, and Nebojša Tijanić.
 
-To report an issue with anyone on the team you can escalate to Alexander Wait
-Zaranek (Curoverse) awaitz @ post.harvard.edu, Anton Nekrutenko (Galaxy)
+To report an issue with anyone on the team you can escalate to Ward Vandewege
+ (Curoverse) ward@curoverse.com, Anton Nekrutenko (Galaxy)
 anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu, or
 Brandi Davis-Dusenbery (Seven Bridges Genomics) brandi@sbgenomics.com.
