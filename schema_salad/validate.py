@@ -161,7 +161,7 @@ def validate_ex(expected_schema, datum, identifiers=[], strict=False):
                         found = True
                 if not found:
                     split = urlparse.urlsplit(d)
-                    if not split.scheme and d not in identifiers:
+                    if not split.scheme and d not in identifiers and d[0] != "@":
                         errors.append("could not validate field `%s` because it is not recognized and strict is True (%s)" % (d, identifiers))
         if errors:
             raise ValidationException("\n".join(errors))
