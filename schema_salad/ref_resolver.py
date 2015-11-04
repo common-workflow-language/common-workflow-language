@@ -8,6 +8,7 @@ import urlparse
 import yaml
 import validate
 import pprint
+import StringIO
 from aslist import aslist
 
 _logger = logging.getLogger("salad")
@@ -284,9 +285,11 @@ class Loader(object):
         if url in self.idx:
             return self.idx[url]
         try:
-            result = yaml.load(self.fetch_text(url))
+            text = StringIO.StringIO(self.fetch_text(url))
+            text.name = url
+            result = yaml.load(text)
         except yaml.parser.ParserError as e:
-            raise validate.ValidationException("Error loading '%s' %s" % (url, str(e)))
+            raise validate.ValidationException("Syntax error %s" % (e))
         if isinstance(result, dict) and self.identifiers:
             for identifier in self.identifiers:
                 if identifier not in result:
