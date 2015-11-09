@@ -69,6 +69,17 @@ Current build status: [![Build Status](https://ci.curoverse.com/buildStatus/icon
 
 ## Community and Contributing
 
+If you are interested in learning more or contributing ideas or code,
+[come chat with us on Gitter](https://gitter.im/common-workflow-language/common-workflow-language),
+check out [#CommonWL on Twitter](https://twitter.com/search?q=%23CommonWL),
+join the [mailing list common-workflow-language on Google Groups](https://groups.google.com/forum/#!forum/common-workflow-language) or
+[fork the repository](https://github.com/common-workflow-language/common-workflow-language)
+and send a pull request!
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### Code of Conduct
+
 The CWL Project is dedicated to providing a harassment-free experience for
 everyone, regardless of gender, gender identity and expression, sexual
 orientation, disability, physical appearance, body size, age, race, or
@@ -81,15 +92,6 @@ these spaces at the discretion of the leadership team.
 
 For more details, see our [Code of
 Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md)
-
-If you are interested in learning more or contributing ideas or code,
-[come chat with us on Gitter](https://gitter.im/common-workflow-language/common-workflow-language),
-check out [#CommonWL on Twitter](https://twitter.com/search?q=%23CommonWL),
-join the [mailing list common-workflow-language on Google Groups](https://groups.google.com/forum/#!forum/common-workflow-language) or
-[fork the repository](https://github.com/common-workflow-language/common-workflow-language)
-and send a pull request!
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Participating Organizations
 
