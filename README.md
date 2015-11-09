@@ -53,9 +53,11 @@ Some of the software supporting running Common Workflow Language tools or workfl
 
 ## Development and testing
 
-The CWL effort is on Github:
+The [CWL project](https://github.com/common-workflow-language/common-workflow-language)
+is on Github.
 
-https://github.com/common-workflow-language/common-workflow-language
+[![GitHub
+stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
 
 There is a Jenkins server maintained by Curoverse that runs tests for the
 reference implementation, builds and uploads packages, and builds and uploads
@@ -75,6 +77,21 @@ join the [mailing list common-workflow-language on Google Groups](https://groups
 and send a pull request!
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### Code of Conduct
+
+The CWL Project is dedicated to providing a harassment-free experience for
+everyone, regardless of gender, gender identity and expression, sexual
+orientation, disability, physical appearance, body size, age, race, or
+religion. We do not tolerate harassment of participants in any form.
+
+This code of conduct applies to all CWL Project spaces, including the Google
+Group, the Gitter chat room, the Google Hangouts chats, both online and off.
+Anyone who violates this code of conduct may be sanctioned or expelled from
+these spaces at the discretion of the leadership team.
+
+For more details, see our [Code of
+Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md)
 
 ## Participating Organizations
 
