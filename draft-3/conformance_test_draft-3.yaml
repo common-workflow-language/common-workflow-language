@@ -269,13 +269,6 @@
   doc: |
     Test inline expressions
 
-- job: draft-3/wc-job.json
-  output:
-    output: 16
-  tool: draft-3/wc5-tool.cwl
-  doc: |
-    Test standard cwl:JavascriptEngine
-
 - job: draft-3/schemadef-job.json
   output:
     output:

@@ -1086,6 +1086,7 @@
   doc: "Version symbols for published CWL document versions."
   symbols:
     - draft-3.dev1
+    - draft-3.dev2
 
 - type: record
   name: CommandLineBinding
