@@ -1143,7 +1143,12 @@
 
         When a binding is part of the `CommandLineTool.arguments` field,
         the `valueFrom` field is required.
-
+    - name: shellQuote
+      type: ["null", boolean]
+      doc: |
+        If `ShellCommandRequirement` is in the requirements for the current command,
+        this controls whether the value is quoted on the command line (default is true).
+        Use `shellQuote: false` to inject metacharacters for operations such as pipes.
 
 - type: record
   name: CommandOutputBinding
@@ -2044,3 +2049,15 @@
         the expression engine.  The semantics of this field are defined by the
         underlying expression engine.  Intended for uses such as providing
         function definitions that will be called from CWL expressions.
+
+- type: record
+  name: ShellCommandRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Modify the behavior of CommandLineTool to generate a single string
+    containing a shell command line.  Each item in the argument list must be
+    joined into a string separated by single spaces and quoted to prevent
+    intepretation by the shell, unless `CommandLineBinding` for that argument
+    contains `shellQuote: false`.  If `shellQuote: false` is specified, the
+    argument is joined into the command string without quoting, which allows
+    the use of shell metacharacters such as `|` for pipes.
