@@ -34,7 +34,7 @@
 
     * Luka Stojanovic <luka.stojanovic@sbgenomics.com>, Seven Bridges Genomics
     * John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
-    * Michael R. Crusoe <mcrusoe@msu.edu>, Michigan State University
+    * Michael R. Crusoe <crusoe@ucdavis.edu>, University of California, Davis
     * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
     * Maxim Mikheev <mikhmv@biodatomics.com>, BioDatomics
     * Stian Soiland-Reyes [soiland-reyes@cs.manchester.ac.uk](mailto:soiland-reyes@cs.manchester.ac.uk), University of Manchester
@@ -1009,7 +1009,7 @@
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
         values.  Input parameters include a schema for each parameter which is
-        used to validate the input object.  It may also be used build a user
+        used to validate the input object.  It may also be used to build a user
         interface for constructing the input object.
     - name: outputs
       type:
@@ -1145,7 +1145,12 @@
 
         When a binding is part of the `CommandLineTool.arguments` field,
         the `valueFrom` field is required.
-
+    - name: shellQuote
+      type: ["null", boolean]
+      doc: |
+        If `ShellCommandRequirement` is in the requirements for the current command,
+        this controls whether the value is quoted on the command line (default is true).
+        Use `shellQuote: false` to inject metacharacters for operations such as pipes.
 
 - type: record
   name: CommandOutputBinding
@@ -1695,7 +1700,7 @@
 
     A "scatter" operation specifies that the associated workflow step or
     subworkflow should execute separately over a list of input elements.  Each
-    job making up a scatter operaution is independent and may be executed
+    job making up a scatter operation is independent and may be executed
     concurrently.
 
     The `scatter` field specifies one or more input parameters which will be
@@ -2068,3 +2073,15 @@
         the expression engine.  The semantics of this field are defined by the
         underlying expression engine.  Intended for uses such as providing
         function definitions that will be called from CWL expressions.
+
+- type: record
+  name: ShellCommandRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Modify the behavior of CommandLineTool to generate a single string
+    containing a shell command line.  Each item in the argument list must be
+    joined into a string separated by single spaces and quoted to prevent
+    intepretation by the shell, unless `CommandLineBinding` for that argument
+    contains `shellQuote: false`.  If `shellQuote: false` is specified, the
+    argument is joined into the command string without quoting, which allows
+    the use of shell metacharacters such as `|` for pipes.

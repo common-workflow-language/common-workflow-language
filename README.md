@@ -26,12 +26,26 @@ http://common-workflow-language.github.io/draft-3/
 
 ## Implementations
 
-Implementations working on or currently capable of running the Common Workflow Language:
+Some of the software supporting running Common Workflow Language tools or workflows:
 
-* [Reference implementation (Python)](https://github.com/common-workflow-language/cwltool)
-* [Rabix](https://github.com/rabix/rabix)
-* [Arvados](https://arvados.org)
-* [Parallel Recipes](https://github.com/yvdriess/precipes)
+* [cwltool (reference implementation)](https://github.com/common-workflow-language/cwltool),
+  [cwltool wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwltool-%28reference-implementation%29)
+* [Rabix](https://github.com/rabix/rabix),
+  [Rabix wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Rabix)
+* [Arvados](https://arvados.org),
+  [Arvados wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Arvados)
+* [Galaxy](https://github.com/common-workflow-language/Galaxy),
+  [Galaxy wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Galaxy)
+* [Parallel Recipes](https://github.com/yvdriess/precipes),
+  [Parallel Recipes wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Parallel-Recipes)
+* [Toil](https://github.com/BD2KGenomics/toil),
+  [Toil wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Toil)
+* [CancerCollaboratory](https://github.com/CancerCollaboratory),
+  [CancerCollaboratory wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/CancerCollaboratory)
+* [Airflow (SciDAP)](https://github.com/SciDAP/scidap),
+  [Airflow wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/SciDAP)
+* [cwl2script](https://github.com/common-workflow-language/cwl2script),
+  [cwl2script page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwl2script)
 
 ## Examples
 
@@ -39,9 +53,11 @@ Implementations working on or currently capable of running the Common Workflow L
 
 ## Development and testing
 
-The CWL effort is on Github:
+The [CWL project](https://github.com/common-workflow-language/common-workflow-language)
+is on Github.
 
-https://github.com/common-workflow-language/common-workflow-language
+[![GitHub
+stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
 
 There is a Jenkins server maintained by Curoverse that runs tests for the
 reference implementation, builds and uploads packages, and builds and uploads
@@ -62,6 +78,21 @@ and send a pull request!
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+### Code of Conduct
+
+The CWL Project is dedicated to providing a harassment-free experience for
+everyone, regardless of gender, gender identity and expression, sexual
+orientation, disability, physical appearance, body size, age, race, or
+religion. We do not tolerate harassment of participants in any form.
+
+This code of conduct applies to all CWL Project spaces, including the Google
+Group, the Gitter chat room, the Google Hangouts chats, both online and off.
+Anyone who violates this code of conduct may be sanctioned or expelled from
+these spaces at the discretion of the leadership team.
+
+For more details, see our [Code of
+Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md)
+
 ## Participating Organizations
 
 * [Curoverse](http://curoverse.com)
@@ -73,6 +104,7 @@ and send a pull request!
 * [University of California Davis](http://ucdavis.edu)
 * [University of California Santa Cruz](https://cbse.soe.ucsc.edu/research/bioinfo)
 * [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
+* [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
 * [BioDatomics](http://www.biodatomics.com/)
 
@@ -96,3 +128,4 @@ and send a pull request!
 * Josh Randall <joshua.randall@sanger.ac.uk>
 * Andrey Kartashov <porter@porter.st>
 * Dan Leehr <dan.leehr@duke.edu>
+* Andrey Kartashov <Andrey.Kartashov@cchmc.org>
