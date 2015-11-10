@@ -325,57 +325,71 @@
 
     ## Expressions
 
-    An expression is a fragment of executable code which is evaluated by the
-    workflow platform to affect the inputs, outputs, or behavior of a process.
-    In the generic execution sequence, expressions may be evaluated during step
-    5 (process setup), step 6 (execute process), and/or step 7 (capture
-    output).  Expressions are distinct from regular processes in that they are
-    intended to modify the behavior of the workflow itself rather than perform
-    the primary work of the workflow.
+    An expression is a fragment of [Javascript/ECMAScript
+    5.1](http://www.ecma-international.org/ecma-262/5.1/) code which is
+    evaluated by the workflow platform to affect the inputs, outputs, or
+    behavior of a process.  In the generic execution sequence, expressions may
+    be evaluated during step 5 (process setup), step 6 (execute process),
+    and/or step 7 (capture output).  Expressions are distinct from regular
+    processes in that they are intended to modify the behavior of the workflow
+    itself rather than perform the primary work of the workflow.
 
-    An implementation must provide the predefined `cwl:JsonPointer` expression
-    engine.  This expression engine specifies a [JSON
-    Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-    into an expression input object consisting of the `job` and `context`
-    fields described below.
+    Expressions may be used in any field that allows expressions, as specified
+    by this document.
 
-    An expression engine defined with
-    [ExpressionEngineRequirement](#expressionenginerequirement) is a command
-    line program following the following protocol:
+    Expressions are denoted by the syntax `$(...)` or `${...}`.  A code
+    fragment wrapped in the `$(...)` syntax must be evaluated as a [ECMAScript
+    expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).  A
+    code fragment wrapped in the `${...}` syntax must be evaluated as a
+    [EMACScript function
+    body](http://www.ecma-international.org/ecma-262/5.1/#sec-13) for an
+    anonymous, zero-argument function.  Expressions must return a valid JSON
+    data type: one of null, string, number, boolean, array, object.
+    Implementations must permit any syntatically valid Javascript and account
+    for nesting of parenthesis or braces and the strings that may contain
+    parenthesis or braces when scanning for expressions.
 
-      * On standard input, receive a JSON object with the following fields:
+    If a field has no leading or trailing non-whitespace characters around an
+    expression, the effective value of the field is the value returned by
+    evaluating the expression, preserving the return type.
 
-        - **engineConfig**: A list of strings from the `engineConfig` field.
-          Null if `engineConfig` is not specified.
+    If a field has non-whitespace leading or trailing characters around an
+    expression, it is subject to string interpolation.  The effective value of
+    the field is a string containing the leading characters followed by the
+    value returned by evaluating the expression, followed by the trailing
+    characters.  The value returned by the expression is coerced to a string
+    subject to the following rules:
 
-        - **job**: The input object of the current Process (context dependent).
+      * strings are included directly with no transformation
+      * numbers are converted to decimal representation string
+      * null is the string `(null)`
+      * boolean "true" or "false" yield the strings "true" or "false"
+      * arrays are serialized to JSON
+      * objects are serialized to JSON
 
-        - **context**: The specific value being transformed (context dependent).  May
-          be null.
+    Multiple expressions may appear in a single field.  This case is must be treated
+    as a string interpolation.
 
-        - **script**: The code fragment to evaluate.
+    Before executing the expression, the runtime must initialize the global
+    object `inputs` containing a copy of the validated contents of the job
+    object.  The runtime must also initialize a global object `runtime`
+    containing the values for `tmpdir`, `outdir`, and values associated with
+    [ResourceRequirement](#resourcerequirement).
 
-        - **outdir**: When used in the context of a CommandLineTool, this is
-          the designated output directory that will be used when executing the
-          tool.  Null if not applicable.
-
-        - **tmpdir**: When used in the context of a CommandLineTool, this is
-          the designated temporary directory that will be used when executing
-          the tool.  Null if not applicable.
-
-      * On standard output, print a single JSON value (string, number, array, object,
-        boolean, or null) for the return value.
+    The runtime must include any code defined in the ["expressionLib" field of
+    InlineJavascriptRequirement](#inlinejavascriptrequirement) prior to
+    executing the actual expression.
 
     Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.
+    permits no side effects to leak outside the context.  Expressions also must
+    be evaluated in [Javascript strict
+    mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
 
-    Implementations may apply limits, such as process isolation, timeouts, and
-    operating system containers/jails to minimize the security risks associated
-    with running untrusted code.
+    The order in which expressions are evaluated is undefined.
 
-    The order in which expressions are evaluated within a process or workflow
-    is undefined.
+    Implementations may apply other limits, such as process isolation, timeouts,
+    and operating system containers/jails to minimize the security risks associated
+    with running untrusted code embedded in a tool description document.
 
     ## Workflow graph
 
@@ -1997,15 +2011,15 @@
     If this requirement is not present, the workflow platform must not perform expression
     interpolatation.
   fields:
-    - name: engineConfig
-      jsonldPredicate: cwl:engineConfig
+    - name: expressionLib
+      jsonldPredicate: cwl:expressionLib
       type:
         - "null"
         - type: array
           items: string
       doc: |
-        Additional configuration or code fragments that will also be inserted
-        before the expression code.  Allows for function definitions that will
+        Additional code fragments that will also be inserted
+        before executing the expression code.  Enables function definitions that may
         be called from CWL expressions.
 
 
@@ -2039,7 +2053,7 @@
   name: ExpressionEngineRequirement
   extends: "#ProcessRequirement"
   doc: |
-    Define an expression engine, as described in [Expressions](#expressions).
+    Define an expression engine.  Deprecated.
 
   fields:
     - name: id
