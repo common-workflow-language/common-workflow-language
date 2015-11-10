@@ -728,30 +728,13 @@
     - "cwl:JavascriptEngine"
 
 
-- type: record
+- type: enum
   name: Expression
   docAfter: "#ExpressionTool"
   doc: |
-    Define an expression that will be evaluated and used to modify the behavior
-    of a tool or workflow.  See [Expressions](#expressions) for more
-    information about expressions
-    and [ExpressionEngineRequirement](#expressionenginerequirement) for
-    information on how to define a expression engine.
-  fields:
-    - name: engine
-      type:
-        - "#StandardExpressionEngine"
-        - string
-      doc: |
-        Either a standard expression engine or a reference to an
-        ExpressionEngineRequirement defining which engine to use.
-      jsonldPredicate:
-        "_id": "cwl:engine"
-        "_type": "@id"
-    - name: script
-      type: string
-      doc: "The code to be executed by the expression engine."
-
+    Not a real type.  Indicates that a field must allow expressions.
+  symbols:
+    - cwl:ExpressionPlaceholder
 
 - name: Binding
   type: record
@@ -1566,7 +1549,7 @@
         "_type": "@vocab"
       type: string
     - name: expression
-      type: "#Expression"
+      type: [string, "#Expression"]
       doc: |
         The expression to execute.  The expression must return a JSON object which
         matches the output parameters of the ExpressionTool.
@@ -2013,14 +1996,13 @@
     interpolatation.
   fields:
     - name: expressionLib
-      jsonldPredicate: cwl:expressionLib
       type:
         - "null"
         - type: array
           items: string
       doc: |
         Additional code fragments that will also be inserted
-        before executing the expression code.  Enables function definitions that may
+        before executing the expression code.  Allows for function definitions that may
         be called from CWL expressions.
 
 
@@ -2049,45 +2031,6 @@
           - "#CommandInputArraySchema"
       doc: The list of type definitions.
 
-
-- type: record
-  name: ExpressionEngineRequirement
-  extends: "#ProcessRequirement"
-  doc: |
-    Define an expression engine.  Deprecated.
-
-  fields:
-    - name: id
-      type: string
-      doc: "Used to identify the expression engine in the `engine` field of Expressions."
-      jsonldPredicate: "@id"
-    - name: requirements
-      type:
-        - "null"
-        - type: array
-          items: "#ProcessRequirement"
-      jsonldPredicate: "cwl:requirements"
-      doc: |
-        Requirements to run this expression engine, such as DockerRequirement
-        for specifying a container to run the engine.
-    - name: engineCommand
-      type:
-        - "null"
-        - string
-        - type: array
-          items: string
-      doc: "The command line to invoke the expression engine."
-    - name: engineConfig
-      jsonldPredicate: cwl:engineConfig
-      type:
-        - "null"
-        - type: array
-          items: string
-      doc: |
-        Additional configuration or code fragments that will also be passed to
-        the expression engine.  The semantics of this field are defined by the
-        underlying expression engine.  Intended for uses such as providing
-        function definitions that will be called from CWL expressions.
 
 - type: record
   name: ShellCommandRequirement

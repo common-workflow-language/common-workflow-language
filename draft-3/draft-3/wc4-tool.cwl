@@ -12,7 +12,7 @@ outputs:
       outputBinding:
         glob: output.txt
         loadContents: true
-        outputEval: |
+        outputEval: |-
           ${
             var s = $self[0].contents.split(/\r?\n/);
             return parseInt(s[s.length-2]);
