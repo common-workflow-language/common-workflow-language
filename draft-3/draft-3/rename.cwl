@@ -1,1 +1,17 @@
-../../draft-2/draft-2/rename.cwl
+class: CommandLineTool
+baseCommand: "true"
+requirements:
+  - class: CreateFileRequirement
+    fileDef:
+      - filename: $(inputs.newname)
+        fileContent: $(inputs.srcfile)
+inputs:
+  - id: srcfile
+    type: File
+  - id: newname
+    type: string
+outputs:
+  - id: outfile
+    type: File
+    outputBinding:
+      glob: $(inputs.newname)

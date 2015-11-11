@@ -1,1 +1,6 @@
-../../draft-2/draft-2/cat-job.json
+{
+    "file1": {
+        "class": "File",
+        "path": "hello.txt"
+    }
+}

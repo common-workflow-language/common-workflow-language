@@ -1,1 +1,7 @@
-../../draft-2/draft-2/rename-job.json
+{
+    "srcfile": {
+        "path": "whale.txt",
+        "class": "File"
+    },
+    "newname": "fish.txt"
+}

@@ -1,23 +1,23 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev2"
 
 inputs:
-    - { id: "#file1", type: File }
+    - { id: file1, type: File }
 
 outputs:
-    - id: "#count_output"
+    - id: count_output
       type: int
-      source: "#step1.count_output"
+      source: "#step1/count_output"
 
 requirements:
   - class: SubworkflowFeatureRequirement
 
 steps:
-  - id: "#step1"
+  - id: step1
     run: {"@import": count-lines1-wf.cwl}
     inputs:
-      - id: "#step1.file1"
+      - id: file1
         source: "#file1"
     outputs:
-      - { id: "#step1.count_output" }
+      - { id: count_output }

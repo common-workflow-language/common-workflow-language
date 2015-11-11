@@ -1,1 +1,6 @@
-../../draft-2/draft-2/parseInt-job.json
+{
+    "file1": {
+        "class": "File",
+        "path": "number.txt"
+    }
+}

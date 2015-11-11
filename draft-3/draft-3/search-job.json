@@ -1,1 +1,7 @@
-../../draft-2/draft-2/search-job.json
+{
+    "infile": {
+        "class": "File",
+        "path": "whale.txt"
+    },
+    "term": "find"
+}
