@@ -1,13 +1,13 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev2"
 requirements:
   - class: InlineJavascriptRequirement
 
 inputs:
-    - { id: "#file1", type: File, inputBinding: {} }
+    - { id: file1, type: File, inputBinding: {} }
 outputs:
-    - id: "#output"
+    - id: output
       type: int
       outputBinding:
         glob: output.txt
