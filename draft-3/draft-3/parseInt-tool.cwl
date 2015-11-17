@@ -9,4 +9,5 @@ inputs:
 outputs:
   - { id: output, type: int }
 
-expression: ${return {'output': parseInt($job.file1.contents)};}
+expression: >
+  ${return {'output': parseInt($job.file1.contents)};}

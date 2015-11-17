@@ -23,7 +23,7 @@
     ],
     "minimum_seed_length": 3,
     "allocatedResources": {
-        "cpu": 4,
+        "cores": 4,
         "mem": 5000
     }
 }

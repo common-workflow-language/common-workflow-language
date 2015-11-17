@@ -1,6 +1,8 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
 cwlVersion: "cwl:draft-3.dev2"
+requirements:
+  - class: InlineJavascriptRequirement
 
 inputs:
     - { id: file1, type: File }
@@ -31,4 +33,9 @@ steps:
       - { id: parseInt_output }
     run:
       class: ExpressionTool
-      expression: ${return {'parseInt_output': parseInt($job.parseInt_file1.contents)};}
+      inputs:
+        - { id: parseInt_file1, type: File, inputBinding: { loadContents: true } }
+      outputs:
+        - { id: parseInt_output, type: int }
+      expression: >
+        ${return {'parseInt_output': parseInt(inputs.parseInt_file1.contents)};}

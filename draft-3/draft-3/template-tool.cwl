@@ -7,11 +7,11 @@ requirements:
   - class: InlineJavascriptRequirement
     expressionLib:
       - { "@include": underscore.js }
-      - "var t = function(s) { return _.template(s)({'$job': $job}); };"
+      - "var t = function(s) { return _.template(s)({'inputs': inputs}); };"
   - class: CreateFileRequirement
     fileDef:
       - filename: foo.txt
-        fileContent: $(t("The file is <%= $job.file1.path %>\n"))
+        fileContent: $(t("The file is <%= inputs.file1.path %>\n"))
 inputs:
   - id: file1
     type: File

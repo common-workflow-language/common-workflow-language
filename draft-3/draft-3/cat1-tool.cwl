@@ -5,7 +5,7 @@ description: "Print the contents of a file to stdout using 'cat' running in a do
 hints:
   - class: DockerRequirement
     dockerPull: debian:wheezy
-inputs: [
+inputs:
   - id: file1
     type: File
     inputBinding: {position: 1}
