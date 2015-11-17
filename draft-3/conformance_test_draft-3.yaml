@@ -364,4 +364,79 @@
     }
   tool: draft-3/params.cwl
   doc: |
-    Test parameter evaluation.
+    Test parameter evaluation, no support for JS expressions
+
+- job: draft-3/empty.json
+  output: {
+    "t1": {
+        "bar": {
+            "b az": 2,
+            "b\"az": null,
+            "b'az": true,
+            "baz": "zab1",
+            "buz": [
+                "a",
+                "b",
+                "c"
+            ]
+        }
+    },
+    "t10": true,
+    "t11": true,
+    "t12": null,
+    "t13": "-zab1",
+    "t14": "-zab1",
+    "t15": "-zab1",
+    "t16": "-zab1",
+    "t17": "zab1 zab1",
+    "t18": "zab1 zab1",
+    "t19": "zab1 zab1",
+    "t2": {
+        "b az": 2,
+        "b\"az": null,
+        "b'az": true,
+        "baz": "zab1",
+        "buz": [
+            "a",
+            "b",
+            "c"
+        ]
+    },
+    "t20": "zab1 zab1",
+    "t21": "2 2",
+    "t22": "true true",
+    "t23": "true true",
+    "t24": "null null",
+    "t25": "b",
+    "t26": "b b",
+    "t3": {
+        "b az": 2,
+        "b\"az": null,
+        "b'az": true,
+        "baz": "zab1",
+        "buz": [
+            "a",
+            "b",
+            "c"
+        ]
+    },
+    "t4": {
+        "b az": 2,
+        "b\"az": null,
+        "b'az": true,
+        "baz": "zab1",
+        "buz": [
+            "a",
+            "b",
+            "c"
+        ]
+    },
+    "t5": "zab1",
+    "t6": "zab1",
+    "t7": "zab1",
+    "t8": "zab1",
+    "t9": 2
+    }
+  tool: draft-3/params2.cwl
+  doc: |
+    Test parameter evaluation, with support for JS expressions
