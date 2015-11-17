@@ -3,6 +3,7 @@ class: CommandLineTool
 cwlVersion: "cwl:draft-3.dev2"
 requirements:
   - "@import": schemadef-type.yml
+  - class: InlineJavascriptRequirement
 
 inputs:
     - id: hello

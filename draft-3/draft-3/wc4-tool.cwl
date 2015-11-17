@@ -14,7 +14,7 @@ outputs:
         loadContents: true
         outputEval: |
           ${
-            var s = $self[0].contents.split(/\r?\n/);
+            var s = self[0].contents.split(/\r?\n/);
             return parseInt(s[s.length-2]);
           }
 stdout: output.txt

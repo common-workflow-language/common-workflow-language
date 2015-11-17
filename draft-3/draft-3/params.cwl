@@ -7,7 +7,8 @@ inputs:
           "baz": "zab1",
           "b az": 2,
           "b'az": true,
-          'b"az': null
+          'b"az': null,
+          "buz": ['a', 'b', 'c']
         }
 
 outputs:
@@ -112,5 +113,14 @@ outputs:
     type: Any
     outputBinding:
       outputEval: $(inputs.bar['b"az']) $(inputs.bar['b"az'])
+
+  - id: t25
+    type: Any
+    outputBinding:
+      outputEval: $(inputs.bar.buz[1])
+  - id: t26
+    type: Any
+    outputBinding:
+      outputEval: $(inputs.bar.buz[1]) $(inputs.bar.buz[1])
 
 baseCommand: "true"

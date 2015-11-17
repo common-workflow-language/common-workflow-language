@@ -1,6 +1,8 @@
 #!/usr/bin/env cwl-runner
 
 class: ExpressionTool
+requirements:
+  - class: InlineJavascriptRequirement
 cwlVersion: "cwl:draft-3.dev2"
 
 inputs:
@@ -9,5 +11,4 @@ inputs:
 outputs:
   - { id: output, type: int }
 
-expression: >
-  ${return {'output': parseInt($job.file1.contents)};}
+expression: "$({'output': parseInt(inputs.file1.contents)})"
