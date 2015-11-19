@@ -1,1 +1,22 @@
-../../draft-2/draft-2/count-lines6-job.json
+{
+    "file1": [
+        {
+            "class": "File",
+            "path": "whale.txt"
+        },
+        {
+            "class": "File",
+            "path": "whale.txt"
+        }
+    ],
+    "file2": [
+        {
+            "class": "File",
+            "path": "hello.txt"
+        },
+        {
+            "class": "File",
+            "path": "hello.txt"
+        }
+    ]
+}

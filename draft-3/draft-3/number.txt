@@ -1,1 +1,1 @@
-../../draft-2/draft-2/number.txt
+42

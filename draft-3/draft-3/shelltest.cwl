@@ -1,12 +1,13 @@
 class: CommandLineTool
+cwlVersion: "cwl:draft-3.dev2"
 description: "Reverse each line using the `rev` command then sort."
 requirements:
   - class: ShellCommandRequirement
 inputs:
-  - id: "#input"
+  - id: input
     type: File
 outputs:
-  - id: "#output"
+  - id: output
     type: File
     outputBinding:
       glob: output.txt
@@ -14,11 +15,7 @@ outputs:
 baseCommand: []
 arguments:
   - rev
-  - valueFrom:
-      engine: cwl:JsonPointer
-      script: /job/input
-  - valueFrom: " | "
-    shellQuote: false
+  - {valueFrom: $(inputs.input)}
+  - {valueFrom: " | ", shellQuote: false}
   - sort
-  - valueFrom: "> output.txt"
-    shellQuote: false
+  - {valueFrom: "> output.txt", shellQuote: false}

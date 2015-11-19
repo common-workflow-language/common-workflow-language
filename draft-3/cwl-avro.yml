@@ -323,59 +323,121 @@
     Process requirements are the primary mechanism for specifying extensions to
     the CWL core specification.
 
+    ## Parameter references
+
+    Parameter references are denoted by the syntax `$(...)` and may be used in
+    any field permitting the pseudo-type `Expression`, as specified by this
+    document.  Conforming implementations must support parameter
+    references.  Parameter references use the following subset of
+    [Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/) syntax:
+
+    symbol::    {Unicode alphanumeric}+
+    singleq::   '[' ''' ( {character} - ''' | '\' ''' )* ''' ']'
+    doubleq::   '[' '"' ( {character} - '"' | '\' '"' )* '"' ']'
+    index::     '[' {decimal digit}+ ']'
+    segment::   '.' {symbol} | {singleq} | {doubleq} | {index}
+    parameter:: '$' '(' {symbol} {segment}* ')'
+
+    Use the following algorithm to resolve a parameter reference:
+
+      1. Match the leading symbol as key
+      2. Look up the key in the parameter context (described below) to get the current value.
+         It is an error if the key is not found in the parameter context.
+      3. If there are no subsequent segments, terminate and return current value
+      4. Else, match the next segment
+      5. Extract the symbol, string, or index from the segment as key
+      6. Look up the key in current value and assign as new current value.  If
+         the key is a symbol or string, the current value must be an object.
+         If the key is an index, the current value must be an array or string.
+         It is an error if the key does not match the required type, or the key is not found or out
+         of range.
+      7. Repeat steps 3-6
+
+    The root namspace is the parameter context.  The following parameters must
+    be provided:
+
+      * `inputs`: The input object to the current Process.
+      * `self`: A context-specific value.  The contextual values for 'self' are
+        documented for specific fields elsewhere in this specification.  If
+        a contextual value of 'self' is not documented for a field, it
+        must be 'null'.
+      * `runtime`: An object containing configuration specific to the Process
+        type.  Values include `tmpdir`, `outdir`, and values associated with
+        [ResourceRequirement](#resourcerequirement).
+        Other fields under `runtime` are listed elsewhere in this document.
+
+    If the value of a field has no leading or trailing non-whitespace
+    characters around a parameter reference, the effective value of the field
+    becomes the value of the referenced parameter, preserving the return type.
+
+    If the value of a field has non-whitespace leading or trailing characters
+    around an parameter reference, it is subject to string interpolation.  The
+    effective value of the field is a string containing the leading characters;
+    followed by the string value of the parameter reference; followed by the
+    trailing characters.  The string value of the parameter reference is its
+    textual JSON representation with the following rules:
+
+      * Leading and trailing quotes are stripped from strings
+      * Objects entries are sorted by key
+
+    Multiple parameter references may appear in a single field.  This case is
+    must be treated as a string interpolation.  After interpolating the first
+    parameter reference, interpolation must be recursively applied to the
+    trailing characters to yield the final string value.
+
     ## Expressions
 
-    An expression is a fragment of executable code which is evaluated by the
-    workflow platform to affect the inputs, outputs, or behavior of a process.
-    In the generic execution sequence, expressions may be evaluated during step
-    5 (process setup), step 6 (execute process), and/or step 7 (capture
-    output).  Expressions are distinct from regular processes in that they are
-    intended to modify the behavior of the workflow itself rather than perform
-    the primary work of the workflow.
+    An expression is a fragment of [Javascript/ECMAScript
+    5.1](http://www.ecma-international.org/ecma-262/5.1/) code which is
+    evaluated by the workflow platform to affect the inputs, outputs, or
+    behavior of a process.  In the generic execution sequence, expressions may
+    be evaluated during step 5 (process setup), step 6 (execute process),
+    and/or step 7 (capture output).  Expressions are distinct from regular
+    processes in that they are intended to modify the behavior of the workflow
+    itself rather than perform the primary work of the workflow.
 
-    An implementation must provide the predefined `cwl:JsonPointer` expression
-    engine.  This expression engine specifies a [JSON
-    Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-    into an expression input object consisting of the `job` and `context`
-    fields described below.
+    To declare the use of expressions, the document must include the process
+    requirement `InlineJavascriptRequirement`.  Expressions may be used in any
+    field permitting the pseudo-type `Expression`, as specified by this
+    document.
 
-    An expression engine defined with
-    [ExpressionEngineRequirement](#expressionenginerequirement) is a command
-    line program following the following protocol:
+    Expressions are denoted by the syntax `$(...)` or `${...}`.  A code
+    fragment wrapped in the `$(...)` syntax must be evaluated as a
+    [ECMAScript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).  A
+    code fragment wrapped in the `${...}` syntax must be evaluated as a
+    [EMACScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
+    for an anonymous, zero-argument function.  Expressions must return a valid JSON
+    data type: one of null, string, number, boolean, array, object.
+    Implementations must permit any syntatically valid Javascript and account
+    for nesting of parenthesis or braces and that strings that may contain
+    parenthesis or braces when scanning for expressions.
 
-      * On standard input, receive a JSON object with the following fields:
+    The runtime must include any code defined in the ["expressionLib" field of
+    InlineJavascriptRequirement](#inlinejavascriptrequirement) prior to
+    executing the actual expression.
 
-        - **engineConfig**: A list of strings from the `engineConfig` field.
-          Null if `engineConfig` is not specified.
+    Before executing the expression, the runtime must initialize as global
+    variables the fields of the parameter context described above.
 
-        - **job**: The input object of the current Process (context dependent).
-
-        - **context**: The specific value being transformed (context dependent).  May
-          be null.
-
-        - **script**: The code fragment to evaluate.
-
-        - **outdir**: When used in the context of a CommandLineTool, this is
-          the designated output directory that will be used when executing the
-          tool.  Null if not applicable.
-
-        - **tmpdir**: When used in the context of a CommandLineTool, this is
-          the designated temporary directory that will be used when executing
-          the tool.  Null if not applicable.
-
-      * On standard output, print a single JSON value (string, number, array, object,
-        boolean, or null) for the return value.
+    The effective value of the field after expression evaluation follows the
+    same rules as parameter references discussed above.  Multiple expressions
+    may appear in a single field.
 
     Expressions must be evaluated in an isolated context (a "sandbox") which
-    permits no side effects to leak outside the context, and permit no outside
-    data to leak into the context.
+    permits no side effects to leak outside the context.  Expressions also must
+    be evaluated in [Javascript strict mode](http://www.ecma-international.org/ecma-262/5.1/#sec-4.2.2).
 
-    Implementations may apply limits, such as process isolation, timeouts, and
-    operating system containers/jails to minimize the security risks associated
-    with running untrusted code.
+    The order in which expressions are evaluated is undefined except where
+    otherwise noted in this document.
 
-    The order in which expressions are evaluated within a process or workflow
-    is undefined.
+    An implementation may choose to implement parameter references by
+    evalutating as a Javascript expression.  The results of evaluating
+    parameter references must be identical whether implemented by Javascript
+    evaluation or some other means.
+
+    Implementations may apply other limits, such as process isolation, timeouts,
+    and operating system containers/jails to minimize the security risks associated
+    with running untrusted code embedded in a CWL document.
 
     ## Workflow graph
 
@@ -705,36 +767,13 @@
         object.
 
 
-- name: JsonPointer
-  type: enum
-  docParent: "#Expression"
-  symbols:
-    - "cwl:JsonPointer"
-
-
-- type: record
+- type: enum
   name: Expression
   docAfter: "#ExpressionTool"
   doc: |
-    Define an expression that will be evaluated and used to modify the behavior
-    of a tool or workflow.  See [Expressions](#expressions) for more
-    information about expressions
-    and [ExpressionEngineRequirement](#expressionenginerequirement) for
-    information on how to define a expression engine.
-  fields:
-    - name: engine
-      type:
-        - "#JsonPointer"
-        - string
-      doc: |
-        Either `cwl:JsonPointer` or a reference to an
-        ExpressionEngineRequirement defining which engine to use.
-      jsonldPredicate:
-        "_id": "cwl:engine"
-        "_type": "@id"
-    - name: script
-      type: string
-      doc: "The code to be executed by the expression engine."
+    Not a real type.  Indicates that a field must allow expressions.
+  symbols:
+    - cwl:ExpressionPlaceholder
 
 
 - name: Binding
@@ -1070,6 +1109,7 @@
   doc: "Version symbols for published CWL document versions."
   symbols:
     - draft-3.dev1
+    - draft-3.dev2
 
 - type: record
   name: CommandLineBinding
@@ -1182,6 +1222,7 @@
     - name: outputEval
       type:
         - "null"
+        - string
         - "#Expression"
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
@@ -1548,7 +1589,7 @@
         "_type": "@vocab"
       type: string
     - name: expression
-      type: "#Expression"
+      type: [string, "#Expression"]
       doc: |
         The expression to execute.  The expression must return a JSON object which
         matches the output parameters of the ExpressionTool.
@@ -1986,6 +2027,25 @@
     listed in the `source` field of [WorkflowStepInput](#workflowstepinput).
 
 
+- name: InlineJavascriptRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Indicates that the workflow platform must support inline Javascript expressions.
+    If this requirement is not present, the workflow platform must not perform expression
+    interpolatation.
+  fields:
+    - name: expressionLib
+      type:
+        - "null"
+        - type: array
+          items: string
+      doc: |
+        Additional code fragments that will also be inserted
+        before executing the expression code.  Allows for function definitions that may
+        be called from CWL expressions.
+
+
 - name: SchemaDefRequirement
   type: record
   extends: "#ProcessRequirement"
@@ -2011,44 +2071,6 @@
           - "#CommandInputArraySchema"
       doc: The list of type definitions.
 
-
-- type: record
-  name: ExpressionEngineRequirement
-  extends: "#ProcessRequirement"
-  doc: |
-    Define an expression engine, as described in [Expressions](#expressions).
-
-  fields:
-    - name: id
-      type: string
-      doc: "Used to identify the expression engine in the `engine` field of Expressions."
-      jsonldPredicate: "@id"
-    - name: requirements
-      type:
-        - "null"
-        - type: array
-          items: "#ProcessRequirement"
-      jsonldPredicate: "cwl:requirements"
-      doc: |
-        Requirements to run this expression engine, such as DockerRequirement
-        for specifying a container to run the engine.
-    - name: engineCommand
-      type:
-        - "null"
-        - string
-        - type: array
-          items: string
-      doc: "The command line to invoke the expression engine."
-    - name: engineConfig
-      type:
-        - "null"
-        - type: array
-          items: string
-      doc: |
-        Additional configuration or code fragments that will also be passed to
-        the expression engine.  The semantics of this field are defined by the
-        underlying expression engine.  Intended for uses such as providing
-        function definitions that will be called from CWL expressions.
 
 - type: record
   name: ShellCommandRequirement

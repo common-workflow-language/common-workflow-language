@@ -1,6 +1,6 @@
 class: SchemaDefRequirement
 types:
-  - name: "#HelloType"
+  - name: HelloType
     type: record
     fields:
       - name: a

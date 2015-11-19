@@ -1,1 +1,3 @@
-../../draft-2/draft-2/scatter-job1.json
+{
+  "inp": ["one", "two", "three", "four"]
+}

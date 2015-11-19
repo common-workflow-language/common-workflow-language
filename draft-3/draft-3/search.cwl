@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-3.dev1
+cwlVersion: cwl:draft-3.dev2
 "@graph":
 - id: index
   class: CommandLineTool
@@ -10,9 +10,7 @@ cwlVersion: cwl:draft-3.dev1
     - class: CreateFileRequirement
       fileDef:
         - filename: input.txt
-          fileContent:
-            engine: "cwl:JsonPointer"
-            script: job/file
+          fileContent: $(inputs.file)
   inputs:
     - id: file
       type: File
