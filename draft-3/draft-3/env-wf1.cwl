@@ -1,26 +1,26 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev2"
 
 inputs:
-    - { id: "#in", type: string }
+    - { id: in, type: string }
 
 outputs:
-    - id: "#out"
+    - id: out
       type: File
-      source: "#step1.out"
+      source: "#step1/out"
 
 requirements:
   - class: SubworkflowFeatureRequirement
   - class: EnvVarRequirement
     envDef:
-      - envName: "TEST_ENV"
-        envValue: "override"
+      - envName: TEST_ENV
+        envValue: override
 
 steps:
-  - id: "#step1"
+  - id: step1
     run: {"@import": env-tool1.cwl}
     inputs:
-      - { id: "#step1.in", source: "#in" }
+      - { id: in, source: "#in" }
     outputs:
-      - { id: "#step1.out" }
+      - { id: out }

@@ -1,1 +1,3 @@
-../../draft-2/draft-2/env-job.json
+{
+    "in": "hello test env"
+}

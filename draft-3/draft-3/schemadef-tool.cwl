@@ -2,16 +2,20 @@
 class: CommandLineTool
 cwlVersion: "cwl:draft-3.dev2"
 requirements:
+  - "@import": schemadef-type.yml
   - class: InlineJavascriptRequirement
 
 inputs:
-    - { id: file1, type: File, inputBinding: {} }
+    - id: hello
+      type: "schemadef-type.yml#HelloType"
+      inputBinding:
+        valueFrom: $(self.a + "/" + self.b)
+
 outputs:
     - id: output
-      type: int
+      type: File
       outputBinding:
         glob: output.txt
-        loadContents: true
-        outputEval: "$(parseInt(self[0].contents))"
+
 stdout: output.txt
-baseCommand: wc
+baseCommand: echo

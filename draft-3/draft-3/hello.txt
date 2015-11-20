@@ -1,1 +1,1 @@
-../../draft-2/draft-2/hello.txt
+Hello world!
