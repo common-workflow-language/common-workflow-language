@@ -361,10 +361,13 @@
         documented for specific fields elsewhere in this specification.  If
         a contextual value of 'self' is not documented for a field, it
         must be 'null'.
-      * `runtime`: An object containing configuration specific to the Process
-        type.  Values include `tmpdir`, `outdir`, and values associated with
-        [ResourceRequirement](#resourcerequirement).
-        Other fields under `runtime` are listed elsewhere in this document.
+      * `runtime`: An object containing configuration details.  Specific to the
+        [Process](#process) type.  An implementation may provide may provide
+        opaque strings for any or all fields of `runtime`.  These must be
+        filled in by the platform after processing the Tool but before actual
+        execution.  Parameter references and expressions may only use the
+        literal string value of the field and must not perform computation on
+        the contents.
 
     If the value of a field has no leading or trailing non-whitespace
     characters around a parameter reference, the effective value of the field
@@ -1429,31 +1432,54 @@
     All files listed in the input object must be made available in the runtime
     environment.  The implementation may use a shared or distributed file
     system or transfer files via explicit download.  Implementations may choose
-    not to provide access to files not explicitly specified by the input object
+    not to provide access to files not explicitly specified in the input object
     or process requirements.
 
     Output files produced by tool execution must be written to the **designated
-    output directory**.
+    output directory**.  The initial current working directory when executing
+    the tool must be the designated output directory.
 
-    The initial current working directory when executing the tool must be the
-    designated output directory.
+    Files may also be written to the **designated temporary directory**.  Any
+    files written to the designated temporary directory may be deleted by the
+    workflow platform immediately after the tool terminates.
 
-    When executing the tool, the child process must not inherit environment
-    variables from the parent process.  The tool must execute in a new, empty
-    environment, containing only environment variables defined by
-    [EnvVarRequirement](#envvarrequirement), the default environment of the
-    Docker container specified in [DockerRequirement](#dockerrequirement) (if
-    applicable), and `TMPDIR`.
+    When executing the tool, the tool must execute in a new, empty environment
+    with only the environment variables described below; the child process must
+    not inherit environment variables from the parent process except where
+    specified or at user option.
 
-    The `TMPDIR` environment variable must be set in the runtime environment to
-    the **designated temporary directory**.  Any files written to the
-    designated temporary directory may be deleted by the workflow platform when
-    the tool invocation is complete.
+      * `HOME` must be set to the designated output directory.
+      * `TMPDIR` must be set to the designated temporary directory.
+        when the tool invocation and output collection is complete.
+      * `PATH` may be inherited from the parent process, except when run in a
+        container that provides its own `PATH`.
+      * Variables defined by [EnvVarRequirement](#envvarrequirement)
+      * The default environment of the container, such as when using
+        [DockerRequirement](#dockerrequirement)
 
     An implementation may forbid the tool from writing to any location in the
     runtime environment file system other than the designated temporary
     directory and designated output directory.  An implementation may provide
-    read-only input files, and disallow in-place update of input files.
+    read-only input files, and disallow in-place update of input files.  The
+    designated temporary directory and designated output directory may reside
+    on different mount points on different file systems.
+
+    The `runtime` section available in [parameter references](#parameterreferences)
+    and [expressions](#expressions) contains the following fields.  As noted
+    earlier, an implementation may perform deferred resolution of runtime fields by providing
+    opaque strings for any or all of the following fields; parameter references
+    and expressions may only use the literal string value of the field and must
+    not perform computation on the contents.
+
+      * `runtime.outdir`: an absolute path to the designated output directory
+      * `runtime.tmpdir`: an absolute path to the designated temporary directory
+      * `runtime.cores`:  number of CPU cores reserved for the tool process
+      * `runtime.ram`:    amount of RAM in mebibytes (2**20) reserved for the tool process
+      * `runtime.outdirSize`: reserved storage space available in the designated output directory
+      * `runtime.tmpdirSize`: reserved storage space available in the designated temporary directory
+
+    See [ResourceRequirement](#resourcerequirement) for details on how to
+    describe the hardware resources required by a tool.
 
     The standard input stream and standard output stream may be redirected as
     described in the `stdin` and `stdout` fields.
@@ -1461,8 +1487,10 @@
     ## Extensions
 
     [DockerRequirement](#dockerrequirement),
-    [CreateFileRequirement](#createfilerequirement), and
-    [EnvVarRequirement](#envvarrequirement) are available as standard
+    [CreateFileRequirement](#createfilerequirement),
+    [EnvVarRequirement](#envvarrequirement),
+    [ShellCommandRequirement](#shellcommandrequirement), and
+    [ResourceRequirement](#resourcerequirement) are available as standard
     extensions to core command line tool semantics for defining the runtime
     environment.
 
@@ -2083,3 +2111,62 @@
     contains `shellQuote: false`.  If `shellQuote: false` is specified, the
     argument is joined into the command string without quoting, which allows
     the use of shell metacharacters such as `|` for pipes.
+
+
+- type: record
+  name: ResourceRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Specify basic hardware resource requirements.
+
+    "min" is the minimum amount of a resource that must be reserved to schedule
+    a job. If "min" cannot be satisfied, the job should not be run.
+
+    "max" is the maximum amount of a resource that the job shall be permitted
+    to use. If a node has sufficient resources, multiple jobs may be scheduled
+    on a single node provided each job's "max" resource requirements are
+    met. If a job attempts to exceed its "max" resource allocation, an
+    implementation may deny additional resources, which may result in job
+    failure.
+
+    If "min" is specified but "max" is not, then "max" == "min"
+    If "max" is specified by "min" is not, then "min" == "max".
+
+    It is an error if max < min.
+
+    It is an error if the value of any of these fields is negative.
+
+    If neither "min" nor "max" is specified for a resource, an implementation may provide a default.
+
+  fields:
+    - name: coresMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved number of CPU cores
+
+    - name: coresMax
+      type: ["null", int, string, "#Expression"]
+      doc: Maximum reserved number of CPU cores
+
+    - name: ramMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved RAM in mebibytes (2**20)
+
+    - name: ramMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved RAM in mebibytes (2**20)
+
+    - name: tmpdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: tmpdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: outdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
+
+    - name: outdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)

@@ -21,9 +21,5 @@
         3,
         4
     ],
-    "minimum_seed_length": 3,
-    "allocatedResources": {
-        "cores": 4,
-        "mem": 5000
-    }
+    "minimum_seed_length": 3
 }

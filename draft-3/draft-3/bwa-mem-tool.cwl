@@ -9,6 +9,9 @@ hints:
     dockerPull: images.sbgenomics.com/rabix/bwa
     dockerImageId: 9d3b9b0359cf
 
+  - class: ResourceRequirement
+    coresMin: 4
+
 inputs:
   - id: reference
     type: File
@@ -39,7 +42,7 @@ outputs:
 baseCommand: [bwa, mem]
 
 arguments:
-  - valueFrom: $(inputs.allocatedResources.cores)
+  - valueFrom: $(runtime.cores)
     position: 1
     prefix: -t
 
