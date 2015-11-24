@@ -480,6 +480,12 @@
     operation; if so, it must provide `cwl-runner` as an alias for the
     platform's CWL implementation.
 
+    A CWL input object document may similarly begin with `#!/usr/bin/env
+    cwl-runner` and be marked as executable.  In this case, the input object
+    must include the field "cwl:tool" supplying a URI to the default CWL
+    document that should be executed with the fields of the input object as
+    input parameters.
+
     # Sample CWL workflow
 
     revtool.cwl:

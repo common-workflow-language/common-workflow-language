@@ -1,4 +1,6 @@
+#!/usr/bin/env cwl-runner
 {
+    "cwl:tool": "cwlsite.cwl",
     "index_in": {
         "class": "File",
         "path": "../README.md"
