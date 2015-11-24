@@ -1,16 +1,16 @@
 #!/usr/bin/env cwl-runner
 {
-    "cwlVersion": "cwl:draft-3.dev1",
+    "cwlVersion": "cwl:draft-3.dev2",
 
     "class": "CommandLineTool",
 
     "inputs": [
         {
-            "id": "#reads",
+            "id": "reads",
             "type": "File"
         },
         {
-            "id": "#stages",
+            "id": "stages",
             "inputBinding": {
                 "position": 1
             },
@@ -22,7 +22,7 @@
     ],
     "outputs": [
         {
-            "id": "#sam",
+            "id": "sam",
             "outputBinding": {
                 "glob": "output.sam"
             },
@@ -236,9 +236,6 @@
         }
     ]}],
     "baseCommand": ["tmap", "mapall"],
-    "stdin": {
-      "engine": "cwl:JsonPointer",
-      "script": "job/reads/path"
-      },
+    "stdin": "$(inputs.reads.path)",
     "stdout": "output.sam"
 }

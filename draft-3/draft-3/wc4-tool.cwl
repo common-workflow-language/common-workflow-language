@@ -12,6 +12,10 @@ outputs:
       outputBinding:
         glob: output.txt
         loadContents: true
-        outputEval: "$(parseInt(self[0].contents))"
+        outputEval: |
+          ${
+            var s = self[0].contents.split(/\r?\n/);
+            return parseInt(s[s.length-2]);
+          }
 stdout: output.txt
 baseCommand: wc

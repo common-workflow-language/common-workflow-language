@@ -3,7 +3,7 @@
 #
 class: Workflow
 description: "Reverse the lines in a document, then sort those lines."
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev2"
 
 # Requirements specify prerequisites and extensions to the workflow.
 # In this example, DockerRequirement specifies a default Docker container
@@ -20,10 +20,10 @@ requirements:
 # field "reverse_sort" is not provided in the input object, the default value will
 # be used.
 inputs:
-  - id: "#input"
+  - id: input
     type: File
     description: "The input file to be processed."
-  - id: "#reverse_sort"
+  - id: reverse_sort
     type: boolean
     default: true
     description: "If true, reverse (decending) sort"
@@ -35,7 +35,7 @@ inputs:
 # steps using the "connect" field.  Here, the parameter "#output" of the
 # workflow comes from the "#sorted" output of the "sort" step.
 outputs:
-  - id: "#output"
+  - id: output
     type: File
     source: "#sorted/output"
     description: "The output with the lines reversed and sorted."

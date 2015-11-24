@@ -1,0 +1,9 @@
+class: SchemaDefRequirement
+types:
+  - name: HelloType
+    type: record
+    fields:
+      - name: a
+        type: string
+      - name: b
+        type: string
