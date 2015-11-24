@@ -440,3 +440,8 @@
   tool: draft-3/params2.cwl
   doc: |
     Test parameter evaluation, with support for JS expressions
+
+- args: [cat, draft-3/hello.txt]
+  job: draft-3/cat-job.json
+  tool: draft-3/metadata.cwl
+  doc: Test metadata
