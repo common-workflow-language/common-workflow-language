@@ -246,6 +246,34 @@
       checksum: sha1$e2dc9daaef945ac15f01c238ed2f1660f60909a0
       path: result.txt
       size: 142
+    indexedfile: {
+        "path": "input.txt",
+        "class": "File",
+        "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+        "secondaryFiles": [
+            {
+                "path": "input.txt.idx1",
+                "class": "File"
+            },
+            {
+                "path": "input.idx2",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx3",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx4",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx5",
+                "class": "File"
+            }
+        ],
+        "size": 1111
+    }
   tool: draft-3/search.cwl
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles

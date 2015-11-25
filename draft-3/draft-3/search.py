@@ -7,7 +7,7 @@ import sys
 import os
 
 mainfile = sys.argv[1]
-indexfile = sys.argv[1] + ".idx"
+indexfile = sys.argv[1] + ".idx1"
 term = sys.argv[2]
 
 main = open(mainfile)

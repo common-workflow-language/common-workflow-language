@@ -11,6 +11,8 @@ cwlVersion: cwl:draft-3.dev2
       fileDef:
         - filename: input.txt
           fileContent: $(inputs.file)
+    - class: InlineJavascriptRequirement
+
   inputs:
     - id: file
       type: File
@@ -27,18 +29,28 @@ cwlVersion: cwl:draft-3.dev2
       outputBinding:
         glob: input.txt
         secondaryFiles:
-          - ".idx"
+          - ".idx1"
+          - "^.idx2"
+          - '$(self.path+".idx3")'
+          - '$({"path": self.path+".idx4", "class": "File"})'
+          - '${ return self.path+".idx5"; }'
 
 - id: search
   class: CommandLineTool
   baseCommand: python
+  requirements:
+    - class: InlineJavascriptRequirement
   inputs:
     - id: file
       type: File
       inputBinding:
         position: 1
         secondaryFiles:
-          - ".idx"
+          - ".idx1"
+          - "^.idx2"
+          - '$(self.path+".idx3")'
+          - '$({"path": self.path+".idx4", "class": "File"})'
+          - '${ return self.path+".idx5"; }'
     - id: search.py
       type: File
       default:
@@ -68,6 +80,9 @@ cwlVersion: cwl:draft-3.dev2
     - id: outfile
       type: File
       source: "#main/search/result"
+    - id: indexedfile
+      type: File
+      source: "#main/index/result"
 
   steps:
     - id: index
