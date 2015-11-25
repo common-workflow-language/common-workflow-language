@@ -453,7 +453,6 @@
     output_file:
         path: output.txt
         size: 13
-        secondaryFiles: []
         class: "File"
         checksum: "sha1$47a013e660d408619d894b20806b1d5086aab03b"
   doc: |
