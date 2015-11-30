@@ -729,8 +729,16 @@
         The format of the file.  This must be a URI of a concept node that
         represents the file format, preferrably defined within an ontology.
         If no ontology is available, file formats may be tested by exact match.
-        See (FormatOntologyRequirement)[#formatontologyrequirement] for
-        more information.
+
+        Reasoning about format compatability must be done by checking that an
+        input file format is the same or `rdfs:subClassOf` the format required
+        by the input parameter.
+
+        If no ontologies are specified in `formatOntologies`, the runtime may
+        perform exact file format matches.
+
+        File format ontologies are provided in the "@schema" section of the
+        file's "@context".
 
 
 - name: Parameter
@@ -2211,26 +2219,3 @@
     - name: outdirMax
       type: ["null", long, string, "#Expression"]
       doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
-
-
-- name: FormatOntologyRequirement
-  type: record
-  extends: "#ProcessRequirement"
-  doc: |
-    URI reference to one or more ontology graphs that provide a taxonomy of
-    file formats.  Reasoning about format compatability must be done by
-    checking that an input file format is the same or `rdfs:subClassOf` the
-    format required by the input parameter.
-
-    If no ontologies are specified in `formatOntologies`, the runtime may perform exact file format
-    matches.
-
-  fields:
-    - name: formatOntologies
-      type:
-        - string
-        - type: array
-          items: string
-      jsonldPredicate:
-        _type: "@id"
-        noLinkCheck: true
