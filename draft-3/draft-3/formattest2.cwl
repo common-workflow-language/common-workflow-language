@@ -1,12 +1,9 @@
 "@context":
   edam: http://edamontology.org/
+  "@schemas": EDAM.owl
 class: CommandLineTool
 cwlVersion: cwl:draft-3.dev1
 description: "Reverse each line using the `rev` command"
-requirements:
-  - class: FormatOntologyRequirement
-    formatOntologies:
-      - EDAM.owl
 
 inputs:
   - id: input
