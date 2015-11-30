@@ -174,13 +174,13 @@
 - job: draft-3/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
-  tool: draft-3/scatter-wf3.cwl
+  tool: "draft-3/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
 
 - job: draft-3/scatter-job2.json
   output:
     out: ["foo one three", "foo two four"]
-  tool: draft-3/scatter-wf4.cwl
+  tool: "draft-3/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
 - tool: draft-3/echo-tool.cwl
@@ -274,7 +274,7 @@
         ],
         "size": 1111
     }
-  tool: draft-3/search.cwl
+  tool: "draft-3/search.cwl#main"
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles
     on input and output.
