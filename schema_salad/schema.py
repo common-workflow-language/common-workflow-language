@@ -161,7 +161,7 @@ def validate_doc(schema_names, validate_doc, loader, strict):
         for r in schema_names.names.values():
             if r.get_prop("documentRoot"):
                 try:
-                    validate.validate_ex(r, item, loader.identifiers, strict)
+                    validate.validate_ex(r, item, loader.identifiers, strict, foreign_properties=loader.foreign_properties)
                     success = True
                     break
                 except validate.ValidationException as e:

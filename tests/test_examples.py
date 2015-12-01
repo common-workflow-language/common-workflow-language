@@ -1,5 +1,6 @@
 import unittest
 import schema_salad.ref_resolver
+import rdflib
 
 class TestSchemasInContext(unittest.TestCase):
     def test_schemas(self):

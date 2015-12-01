@@ -33,11 +33,20 @@ class NormDict(dict):
         return super(NormDict, self).__contains__(self.normalize(key))
 
 class Loader(object):
-    def __init__(self, ctx):
+    def __init__(self, ctx, schemagraph=None, foreign_properties=None):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         self.idx = NormDict(normalize)
         self.ctx = {}
-        self.graph = rdflib.Graph()
+        if schemagraph is not None:
+            self.graph = schemagraph
+        else:
+            self.graph = rdflib.Graph()
+
+        if foreign_properties is not None:
+            self.foreign_properties = foreign_properties
+        else:
+            self.foreign_properties = set()
+
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped=False, vocab_term=False):
@@ -72,14 +81,19 @@ class Loader(object):
         else:
             return url
 
+    def _add_properties(self, s):
+        for _, _, rng in self.graph.triples( (s, RDFS.range, None) ):
+            if not str(rng).startswith("http://www.w3.org/2001/XMLSchema#") or str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI":
+                self.url_fields.add(str(s))
+        self.foreign_properties.add(str(s))
 
     def add_context(self, newcontext, baseuri=""):
-        self.url_fields = []
-        self.vocab_fields = []
-        self.identifiers = []
-        self.identity_links = []
-        self.standalone = []
-        self.nolinkcheck = []
+        self.url_fields = set()
+        self.vocab_fields = set()
+        self.identifiers = set()
+        self.identity_links = set()
+        self.standalone = set()
+        self.nolinkcheck = set()
         self.vocab = {}
         self.rvocab = {}
 
@@ -93,32 +107,39 @@ class Loader(object):
         for c in self.ctx:
             if c == "@schemas":
                 for sch in aslist(self.ctx["@schemas"]):
-                    print "XXX"
                     self.graph.parse(urlparse.urljoin(baseuri, sch))
 
             if self.ctx[c] == "@id":
-                self.identifiers.append(c)
-                self.identity_links.append(c)
+                self.identifiers.add(c)
+                self.identity_links.add(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
-                self.url_fields.append(c)
+                self.url_fields.add(c)
                 if self.ctx[c].get("identity", False):
-                    self.identity_links.append(c)
+                    self.identity_links.add(c)
             elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
-                self.url_fields.append(c)
-                self.vocab_fields.append(c)
+                self.url_fields.add(c)
+                self.vocab_fields.add(c)
 
             if isinstance(self.ctx[c], dict) and self.ctx[c].get("noLinkCheck"):
-                self.nolinkcheck.append(c)
+                self.nolinkcheck.add(c)
 
             if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
                 self.vocab[c] = self.ctx[c]["@id"]
             elif isinstance(self.ctx[c], basestring):
                 self.vocab[c] = self.ctx[c]
 
+        for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
+            self._add_properties(s)
+        for s, _, o in self.graph.triples( (None, RDFS.subPropertyOf, None) ):
+            self._add_properties(s)
+            self._add_properties(o)
+        for s, _, _ in self.graph.triples( (None, RDFS.range, None) ):
+            self._add_properties(s)
         for s, _, _ in self.graph.triples( (None, RDF.type, OWL.ObjectProperty) ):
-            for _, _, rng in self.graph.triples( (s, RDFS.range, None) ):
-                if not str(rng).startswith("http://www.w3.org/2001/XMLSchema#") or str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI":
-                    self.url_fields.append(str(s))
+            self._add_properties(s)
+
+        for s, _, _ in self.graph.triples( (None, None, None) ):
+            self.idx[str(s)] = True
 
         for k,v in self.vocab.items():
             self.rvocab[self.expand_url(v, "", scoped=False)] = k
@@ -221,7 +242,7 @@ class Loader(object):
                 return document, {}
 
             if isinstance(document, dict) and "@context" in document:
-                loader = Loader(self.ctx)
+                loader = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
                 loader.idx = self.idx
                 loader.add_context(document["@context"], base_url)
                 if "@base" in loader.ctx:

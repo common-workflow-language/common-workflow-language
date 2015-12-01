@@ -6,9 +6,9 @@ import urlparse
 class ValidationException(Exception):
     pass
 
-def validate(expected_schema, datum, identifiers=[], strict=False):
+def validate(expected_schema, datum, identifiers=[], strict=False, foreign_properties=set()):
     try:
-        return validate_ex(expected_schema, datum, identifiers, strict=strict)
+        return validate_ex(expected_schema, datum, identifiers, strict=strict, foreign_properties=foreign_properties)
     except ValidationException:
         return False
 
@@ -47,7 +47,7 @@ def vpformat(datum):
         a = a[0:160] + "[...]"
     return a
 
-def validate_ex(expected_schema, datum, identifiers=[], strict=False):
+def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign_properties=set()):
     """Determine if a python datum is an instance of a schema."""
 
     schema_type = expected_schema.type
@@ -109,7 +109,7 @@ def validate_ex(expected_schema, datum, identifiers=[], strict=False):
         if isinstance(datum, list):
             for i, d in enumerate(datum):
                 try:
-                    validate_ex(expected_schema.items, d, identifiers, strict=strict)
+                    validate_ex(expected_schema.items, d, identifiers, strict=strict, foreign_properties=foreign_properties)
                 except ValidationException as v:
                     raise ValidationException("At position %i\n%s" % (i, indent(str(v))))
             return True
@@ -129,7 +129,7 @@ def validate_ex(expected_schema, datum, identifiers=[], strict=False):
             errors = []
             for s in expected_schema.schemas:
                 try:
-                    validate_ex(s, datum, identifiers, strict=strict)
+                    validate_ex(s, datum, identifiers, strict=strict, foreign_properties=foreign_properties)
                 except ValidationException as e:
                     errors.append(str(e))
             raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'),
@@ -147,7 +147,7 @@ def validate_ex(expected_schema, datum, identifiers=[], strict=False):
                 fieldval = f.default
 
             try:
-                validate_ex(f.type, fieldval, identifiers, strict=strict)
+                validate_ex(f.type, fieldval, identifiers, strict=strict, foreign_properties=foreign_properties)
             except ValidationException as v:
                 if f.name not in datum:
                     errors.append("missing required field `%s`" % f.name)
@@ -160,9 +160,13 @@ def validate_ex(expected_schema, datum, identifiers=[], strict=False):
                     if d == f.name:
                         found = True
                 if not found:
-                    split = urlparse.urlsplit(d)
-                    if not split.scheme and d not in identifiers and d[0] != "@":
-                        errors.append("could not validate field `%s` because it is not recognized and strict is True (%s)" % (d, identifiers))
+                    if d not in identifiers and d not in foreign_properties and d[0] != "@":
+                        split = urlparse.urlsplit(d)
+                        if split.scheme:
+                            errors.append("could not validate extension field `%s` because it is not recognized and strict is True.  Did you include the right @schemas in your @context?" % (d))
+                        else:
+                            errors.append("could not validate field `%s` because it is not recognized and strict is True, valid fields are: %s" % (d, ", ".join(fn.name for fn in expected_schema.fields)))
+
         if errors:
             raise ValidationException("\n".join(errors))
         else:
