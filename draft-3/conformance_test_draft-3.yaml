@@ -174,13 +174,13 @@
 - job: draft-3/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
-  tool: draft-3/scatter-wf3.cwl
+  tool: "draft-3/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
 
 - job: draft-3/scatter-job2.json
   output:
     out: ["foo one three", "foo two four"]
-  tool: draft-3/scatter-wf4.cwl
+  tool: "draft-3/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
 - tool: draft-3/echo-tool.cwl
@@ -246,7 +246,35 @@
       checksum: sha1$e2dc9daaef945ac15f01c238ed2f1660f60909a0
       path: result.txt
       size: 142
-  tool: draft-3/search.cwl
+    indexedfile: {
+        "path": "input.txt",
+        "class": "File",
+        "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+        "secondaryFiles": [
+            {
+                "path": "input.txt.idx1",
+                "class": "File"
+            },
+            {
+                "path": "input.idx2",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx3",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx4",
+                "class": "File"
+            },
+            {
+                "path": "input.txt.idx5",
+                "class": "File"
+            }
+        ],
+        "size": 1111
+    }
+  tool: "draft-3/search.cwl#main"
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles
     on input and output.
@@ -469,3 +497,15 @@
   tool: draft-3/formattest2.cwl
   doc: |
     Test format checking against ontology.
+
+- tool: draft-3/optional-output.cwl
+  job: draft-3/cat-job.json
+  output:
+    optional_file: null
+    output_file:
+        path: output.txt
+        size: 13
+        class: "File"
+        checksum: "sha1$47a013e660d408619d894b20806b1d5086aab03b"
+  doc: |
+    Test optional output file and optional secondaryFile on output.
