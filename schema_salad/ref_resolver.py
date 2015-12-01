@@ -10,6 +10,8 @@ import validate
 import pprint
 import StringIO
 from aslist import aslist
+import rdflib
+from rdflib.namespace import RDF, RDFS, OWL
 
 _logger = logging.getLogger("salad")
 
@@ -35,6 +37,7 @@ class Loader(object):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         self.idx = NormDict(normalize)
         self.ctx = {}
+        self.graph = rdflib.Graph()
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped=False, vocab_term=False):
@@ -70,7 +73,7 @@ class Loader(object):
             return url
 
 
-    def add_context(self, newcontext):
+    def add_context(self, newcontext, baseuri=""):
         self.url_fields = []
         self.vocab_fields = []
         self.identifiers = []
@@ -80,11 +83,19 @@ class Loader(object):
         self.vocab = {}
         self.rvocab = {}
 
-        self.ctx.update(newcontext)
+        if "@schemas" in newcontext:
+            self.ctx["@schemas"] = aslist(self.ctx.get("@schemas", [])).extend(aslist(newcontext["@schemas"]))
+
+        self.ctx.update({k: v for k,v in newcontext.iteritems() if k != "@context"})
 
         _logger.debug("ctx is %s", self.ctx)
 
         for c in self.ctx:
+            if c == "@schemas":
+                for sch in aslist(self.ctx["@schemas"]):
+                    print "XXX"
+                    self.graph.parse(urlparse.urljoin(baseuri, sch))
+
             if self.ctx[c] == "@id":
                 self.identifiers.append(c)
                 self.identity_links.append(c)
@@ -103,6 +114,11 @@ class Loader(object):
                 self.vocab[c] = self.ctx[c]["@id"]
             elif isinstance(self.ctx[c], basestring):
                 self.vocab[c] = self.ctx[c]
+
+        for s, _, _ in self.graph.triples( (None, RDF.type, OWL.ObjectProperty) ):
+            for _, _, rng in self.graph.triples( (s, RDFS.range, None) ):
+                if not str(rng).startswith("http://www.w3.org/2001/XMLSchema#") or str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI":
+                    self.url_fields.append(str(s))
 
         for k,v in self.vocab.items():
             self.rvocab[self.expand_url(v, "", scoped=False)] = k
@@ -207,7 +223,7 @@ class Loader(object):
             if isinstance(document, dict) and "@context" in document:
                 loader = Loader(self.ctx)
                 loader.idx = self.idx
-                loader.add_context(document["@context"])
+                loader.add_context(document["@context"], base_url)
                 if "@base" in loader.ctx:
                     base_url = loader.ctx["@base"]
 
