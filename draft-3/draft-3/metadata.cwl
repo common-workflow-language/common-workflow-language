@@ -2,6 +2,7 @@
 "@context":
   dct: http://purl.org/dc/terms/
   foaf: http://xmlns.com/foaf/0.1/
+  "@schemas": [foaf.rdf, dcterms.rdf]
 
 cwlVersion: "cwl:draft-3.dev2"
 class: CommandLineTool
