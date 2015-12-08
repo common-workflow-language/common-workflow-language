@@ -118,7 +118,9 @@ def load_schema(schema_ref):
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
     schema_doc, schema_metadata = metaschema_loader.resolve_ref(schema_ref, "")
     validate_doc(metaschema_names, schema_doc, metaschema_loader, True)
-    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, schema_metadata.get("@context", {}))
+    metactx = schema_metadata.get("@context", {})
+    metactx.update(schema_metadata.get("$namespaces", {}))
+    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, metactx)
 
     # Create the loader that will be used to load the target document.
     document_loader = ref_resolver.Loader(schema_ctx)

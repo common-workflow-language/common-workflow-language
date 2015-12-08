@@ -1,6 +1,7 @@
 import unittest
 import schema_salad.ref_resolver
 import schema_salad.main
+import schema_salad.schema
 import rdflib
 
 class TestSchemas(unittest.TestCase):
@@ -71,6 +72,25 @@ class TestSchemas(unittest.TestCase):
     def test_self_validate(self):
         schema_salad.main.main(args=["schema_salad/metaschema.yml"])
         schema_salad.main.main(args=["schema_salad/metaschema.yml", "schema_salad/metaschema.yml"])
+
+    def test_jsonld_ctx(self):
+        ldr, _, _ = schema_salad.schema.load_schema({
+            "@context": {"@base": "Y"},
+            "name": "X",
+            "$namespaces": {
+                "foo": "http://example.com/foo#"
+            },
+            "@graph": [{
+                "name": "ExampleType",
+                "type": "enum",
+                "symbols": ["asym", "bsym"]}]
+        })
+
+        ra, _ = ldr.resolve_all({"foo:bar": "asym"}, "X")
+
+        self.assertEquals(ra, {
+            'http://example.com/foo#bar': 'asym'
+        })
 
 
 if __name__ == '__main__':
