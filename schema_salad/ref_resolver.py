@@ -32,6 +32,21 @@ class NormDict(dict):
     def __contains__(self, key):
         return super(NormDict, self).__contains__(self.normalize(key))
 
+def merge_properties(a, b):
+    c = {}
+    for i in a:
+        if i not in b:
+            c[i] = a[i]
+    for i in b:
+        if i not in a:
+            c[i] = b[i]
+    for i in a:
+        if i in b:
+            c[i] = aslist(a[i]) + aslist(b[i])
+
+    return c
+
+
 class Loader(object):
     def __init__(self, ctx, schemagraph=None, foreign_properties=None):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
@@ -87,6 +102,27 @@ class Loader(object):
                 self.url_fields.add(str(s))
         self.foreign_properties.add(str(s))
 
+    def add_namespaces(self, ns):
+        self.vocab.update(ns)
+
+    def add_schemas(self, ns, base_url):
+        for sch in aslist(ns):
+            self.graph.parse(urlparse.urljoin(base_url, sch))
+
+        for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
+            self._add_properties(s)
+        for s, _, o in self.graph.triples( (None, RDFS.subPropertyOf, None) ):
+            self._add_properties(s)
+            self._add_properties(o)
+        for s, _, _ in self.graph.triples( (None, RDFS.range, None) ):
+            self._add_properties(s)
+        for s, _, _ in self.graph.triples( (None, RDF.type, OWL.ObjectProperty) ):
+            self._add_properties(s)
+
+        for s, _, _ in self.graph.triples( (None, None, None) ):
+            self.idx[str(s)] = True
+
+
     def add_context(self, newcontext, baseuri=""):
         self.url_fields = set()
         self.vocab_fields = set()
@@ -97,18 +133,11 @@ class Loader(object):
         self.vocab = {}
         self.rvocab = {}
 
-        if "@schemas" in newcontext:
-            self.ctx["@schemas"] = aslist(self.ctx.get("@schemas", [])).extend(aslist(newcontext["@schemas"]))
-
         self.ctx.update({k: v for k,v in newcontext.iteritems() if k != "@context"})
 
         _logger.debug("ctx is %s", self.ctx)
 
         for c in self.ctx:
-            if c == "@schemas":
-                for sch in aslist(self.ctx["@schemas"]):
-                    self.graph.parse(urlparse.urljoin(baseuri, sch))
-
             if self.ctx[c] == "@id":
                 self.identifiers.add(c)
                 self.identity_links.add(c)
@@ -128,19 +157,6 @@ class Loader(object):
             elif isinstance(self.ctx[c], basestring):
                 self.vocab[c] = self.ctx[c]
 
-        for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
-            self._add_properties(s)
-        for s, _, o in self.graph.triples( (None, RDFS.subPropertyOf, None) ):
-            self._add_properties(s)
-            self._add_properties(o)
-        for s, _, _ in self.graph.triples( (None, RDFS.range, None) ):
-            self._add_properties(s)
-        for s, _, _ in self.graph.triples( (None, RDF.type, OWL.ObjectProperty) ):
-            self._add_properties(s)
-
-        for s, _, _ in self.graph.triples( (None, None, None) ):
-            self.idx[str(s)] = True
-
         for k,v in self.vocab.items():
             self.rvocab[self.expand_url(v, "", scoped=False)] = k
 
@@ -156,12 +172,14 @@ class Loader(object):
 
         obj = None
         inc = False
+        merge = None
 
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
             obj = ref
             if "@import" in ref:
                 ref = obj["@import"]
+                merge = {k: v for k,v in obj.iteritems() if k != "@import" and k not in self.identifiers}
                 obj = None
             elif "@include" in obj:
                 if len(obj) == 1:
@@ -186,7 +204,10 @@ class Loader(object):
 
         # Has this reference been loaded already?
         if url in self.idx:
-            return self.idx[url], {}
+            if merge:
+                obj = self.idx[url].copy()
+            else:
+                return self.idx[url], {}
 
         # "@include" directive means load raw text
         if inc:
@@ -202,20 +223,31 @@ class Loader(object):
                 raise validate.ValidationException("Reference `#%s` not found in file `%s`." % (frg, doc_url))
             obj = self.fetch(doc_url)
 
+        if merge:
+            obj = merge_properties(merge, obj)
+            url = None
+            for identifier in self.identifiers:
+                if identifier in obj:
+                    url = obj[identifier]
+            if url:
+                url = self.expand_url(ref, base_url, scoped=True)
+
         # Recursively expand urls and resolve directives
         obj, metadata = self.resolve_all(obj, url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
-        if url in self.idx:
-            obj = self.idx[url]
-            if "@graph" in obj:
-                metadata = {k: v for k,v in obj.items() if k != "@graph"}
-                obj = obj["@graph"]
-                return obj, metadata
+        if url is not None:
+            if url in self.idx:
+                obj = self.idx[url]
             else:
-                return obj, metadata
+                raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
+
+        if "@graph" in obj:
+            metadata = {k: v for k,v in obj.items() if k != "@graph"}
+            obj = obj["@graph"]
+            return obj, metadata
         else:
-            raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
+            return obj, metadata
 
     def resolve_all(self, document, base_url):
         loader = self
@@ -241,17 +273,33 @@ class Loader(object):
             if inc:
                 return document, {}
 
-            if isinstance(document, dict) and "@context" in document:
-                loader = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
-                loader.idx = self.idx
-                loader.add_context(document["@context"], base_url)
-                if "@base" in loader.ctx:
-                    base_url = loader.ctx["@base"]
+            if isinstance(document, dict):
+                newctx = None
 
-            if "@graph" in document:
-                metadata = {k: v for k,v in document.items() if k != "@graph"}
-                document = document["@graph"]
-                metadata, _ = self.resolve_all(metadata, base_url)
+                if "@context" in document:
+                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                    loader.add_context(document["@context"], base_url)
+                    if "@base" in loader.ctx:
+                        base_url = loader.ctx["@base"]
+
+                if "$namespaces" in document:
+                    if not newctx:
+                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                    newctx.add_namespaces(document["$namespaces"])
+
+                if "$schemas" in document:
+                    if not newctx:
+                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                    newctx.add_schemas(document["$schemas"], base_url)
+
+                if newctx:
+                    loader = newctx
+                    loader.idx = self.idx
+
+                if "@graph" in document:
+                    metadata = {k: v for k,v in document.items() if k != "@graph"}
+                    document = document["@graph"]
+                    metadata, _ = self.resolve_all(metadata, base_url)
 
         elif isinstance(document, list):
             pass
@@ -261,7 +309,7 @@ class Loader(object):
         try:
             if isinstance(document, dict):
                 for d in document:
-                    d2 = self.expand_url(d, "", scoped=False, vocab_term=True)
+                    d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
                     if d != d2:
                         document[d2] = document[d]
                         del document[d]
@@ -413,24 +461,3 @@ class Loader(object):
             else:
                 raise errors[0]
         return
-
-
-POINTER_DEFAULT = object()
-
-def resolve_json_pointer(document, pointer, default=POINTER_DEFAULT):
-    parts = urlparse.unquote(pointer.lstrip('/#')).split('/') \
-        if pointer else []
-    for part in parts:
-        if isinstance(document, collections.Sequence):
-            try:
-                part = int(part)
-            except ValueError:
-                pass
-        try:
-            document = document[part]
-        except:
-            if default != POINTER_DEFAULT:
-                return default
-            else:
-                raise ValueError('Unresolvable JSON pointer: %r' % pointer)
-    return document
