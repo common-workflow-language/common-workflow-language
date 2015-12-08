@@ -177,17 +177,17 @@ class Loader(object):
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
             obj = ref
-            if "@import" in ref:
-                ref = obj["@import"]
-                merge = {k: v for k,v in obj.iteritems() if k != "@import" and k not in self.identifiers}
+            if "$import" in ref:
+                ref = obj["$import"]
+                merge = {k: v for k,v in obj.iteritems() if k != "$import" and k not in self.identifiers}
                 obj = None
-            elif "@include" in obj:
+            elif "$include" in obj:
                 if len(obj) == 1:
-                    ref = obj["@include"]
+                    ref = obj["$include"]
                     inc = True
                     obj = None
                 else:
-                    raise ValueError("'@include' must be the only field in %s" % (str(obj)))
+                    raise ValueError("'$include' must be the only field in %s" % (str(obj)))
             else:
                 ref = None
                 for identifier in self.identifiers:
@@ -209,7 +209,7 @@ class Loader(object):
             else:
                 return self.idx[url], {}
 
-        # "@include" directive means load raw text
+        # "$include" directive means load raw text
         if inc:
             return self.fetch_text(url), {}
 
@@ -254,8 +254,8 @@ class Loader(object):
         metadata = {}
 
         if isinstance(document, dict):
-            inc = '@include' in document
-            if  '@import' in document or '@include' in document:
+            inc = '$include' in document
+            if  '$import' in document or '$include' in document:
                 document, _ = self.resolve_ref(document, base_url)
             else:
                 for identifer in self.identity_links:
@@ -328,7 +328,7 @@ class Loader(object):
                 i = 0
                 while i < len(document):
                     val = document[i]
-                    if isinstance(val, dict) and "@import" in val and val.get("inline"):
+                    if isinstance(val, dict) and "$import" in val and val.get("inline"):
                         l, _ = loader.resolve_all(val, base_url)
                         del document[i]
                         for item in aslist(l):
