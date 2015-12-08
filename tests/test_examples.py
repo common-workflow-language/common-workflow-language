@@ -1,5 +1,6 @@
 import unittest
 import schema_salad.ref_resolver
+import schema_salad.main
 import rdflib
 
 class TestSchemas(unittest.TestCase):
@@ -26,7 +27,7 @@ class TestSchemas(unittest.TestCase):
         }
 
         p = l.resolve_all({"c": "d",
-                           "@import": "http://example.com/stuff"}, "")
+                           "$import": "http://example.com/stuff"}, "")
 
         self.assertEquals(p[0], {
             "a": "b",
@@ -34,14 +35,14 @@ class TestSchemas(unittest.TestCase):
         })
 
         p = l.resolve_all({"a": "c",
-                           "@import": "http://example.com/stuff"}, "")
+                           "$import": "http://example.com/stuff"}, "")
 
         self.assertEquals(p[0], {
             "a": ["c", "b"]
         })
 
         p = l.resolve_all({"a": ["c", "d"],
-                           "@import": "http://example.com/stuff"}, "")
+                           "$import": "http://example.com/stuff"}, "")
 
         self.assertEquals(p[0], {
             "a": ["c", "d", "b"]
@@ -57,7 +58,7 @@ class TestSchemas(unittest.TestCase):
         }
 
         ra, _ = l.resolve_all({
-            "@import": "http://example.com/stuff",
+            "$import": "http://example.com/stuff",
             "edam:has_format": "edam:format_1915"
             }, "")
 
@@ -66,6 +67,10 @@ class TestSchemas(unittest.TestCase):
             "$namespaces": {"edam": "http://edamontology.org/"},
             'http://edamontology.org/has_format': 'http://edamontology.org/format_1915'
         })
+
+    def test_self_validate(self):
+        schema_salad.main.main(args=["schema_salad/metaschema.yml"])
+        schema_salad.main.main(args=["schema_salad/metaschema.yml", "schema_salad/metaschema.yml"])
 
 
 if __name__ == '__main__':
