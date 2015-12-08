@@ -1162,6 +1162,7 @@
   symbols:
     - draft-3.dev1
     - draft-3.dev2
+    - draft-3.dev3
 
 - type: record
   name: CommandLineBinding
