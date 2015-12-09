@@ -1,8 +1,9 @@
-"@context":
+$namespaces:
   edam: http://edamontology.org/
-  "@schemas": EDAM.owl
+$schemas:
+  - EDAM.owl
 class: CommandLineTool
-cwlVersion: cwl:draft-3.dev1
+cwlVersion: cwl:draft-3.dev3
 description: "Reverse each line using the `rev` command"
 
 inputs:

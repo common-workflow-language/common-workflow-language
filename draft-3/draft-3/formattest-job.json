@@ -1,7 +1,4 @@
 {
-    "@context": {
-        "edam": "http://edamontology.org/"
-    },
     "input": {
         "class": "File",
         "path": "whale.txt",

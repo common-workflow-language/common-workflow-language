@@ -1917,7 +1917,7 @@ $namespaces:
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
     - name: run
-      type: ["#Process", string]
+      type: [string, "#Process"]
       jsonldPredicate:
         "_id": "cwl:steps"
         "_type": "@id"
