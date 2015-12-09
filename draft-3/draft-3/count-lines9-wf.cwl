@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 
 inputs: []
 
@@ -11,7 +11,7 @@ outputs:
 
 steps:
   - id: step1
-    run: {"@import": wc-tool.cwl}
+    run: wc-tool.cwl
     inputs:
       - id: file1
         default:
@@ -21,7 +21,7 @@ steps:
       - {id: output}
 
   - id: step2
-    run: {"@import": parseInt-tool.cwl}
+    run: parseInt-tool.cwl
     inputs:
       - {id: file1, source: "#step1/output"}
     outputs:

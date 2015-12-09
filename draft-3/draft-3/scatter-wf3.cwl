@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 "@graph":
 
 - id: echo
@@ -41,7 +41,7 @@ cwlVersion: "cwl:draft-3.dev2"
         - { id: echo_in2, source: "#main/inp2" }
       outputs:
         - { id: echo_out }
-      run: {"@import": "#echo"}
+      run: "#echo"
 
   outputs:
     - id: out

@@ -3,7 +3,7 @@
 class: ExpressionTool
 requirements:
   - class: InlineJavascriptRequirement
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 
 inputs:
   - { id: file1, type: File, inputBinding: { loadContents: true } }

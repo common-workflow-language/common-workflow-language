@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-3.dev2
+cwlVersion: cwl:draft-3.dev3
 "@graph":
 - id: index
   class: CommandLineTool
@@ -86,14 +86,14 @@ cwlVersion: cwl:draft-3.dev2
 
   steps:
     - id: index
-      run: {"@import": "#index"}
+      run: "#index"
       inputs:
         - { id: file, source: "#main/infile" }
       outputs:
         - id: result
 
     - id: search
-      run: {"@import": "#search"}
+      run: "#search"
       inputs:
         - { id: file, source: "#main/index/result" }
         - { id: term, source: "#main/term" }

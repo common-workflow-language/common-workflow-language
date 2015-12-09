@@ -1,10 +1,10 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 class: Workflow
 
 requirements:
-  - "@import": schemadef-type.yml
+  - "$import": schemadef-type.yml
 
 inputs:
     - id: hello
@@ -20,4 +20,4 @@ steps:
       - { id: hello, source: "#hello" }
     outputs:
       - { id: output }
-    run: { "@import": schemadef-tool.cwl }
+    run: { "$import": schemadef-tool.cwl }

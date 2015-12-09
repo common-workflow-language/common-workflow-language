@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 
 inputs:
     - { id: in, type: string }
@@ -19,7 +19,7 @@ requirements:
 
 steps:
   - id: step1
-    run: {"@import": env-tool2.cwl}
+    run: env-tool2.cwl
     inputs:
       - { id: in, source: "#in" }
     outputs:

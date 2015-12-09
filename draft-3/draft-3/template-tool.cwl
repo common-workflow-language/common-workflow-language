@@ -1,12 +1,12 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 class: CommandLineTool
 requirements:
   - class: DockerRequirement
     dockerPull: "debian:8"
   - class: InlineJavascriptRequirement
     expressionLib:
-      - { "@include": underscore.js }
+      - { $include: underscore.js }
       - "var t = function(s) { return _.template(s)({'inputs': inputs}); };"
   - class: CreateFileRequirement
     fileDef:

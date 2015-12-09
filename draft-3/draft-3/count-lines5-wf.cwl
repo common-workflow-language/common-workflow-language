@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 
 inputs:
     - id: file1
@@ -12,7 +12,7 @@ outputs:
       source: "#step1/output"
 steps:
   - id: step1
-    run: {"@import": wc2-tool.cwl}
+    run: wc2-tool.cwl
     inputs:
       - id: file1
         source: "#file1"

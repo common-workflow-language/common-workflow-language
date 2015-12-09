@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: "cwl:draft-3.dev2"
+cwlVersion: "cwl:draft-3.dev3"
 
 requirements:
   - class: MultipleInputFeatureRequirement
@@ -16,7 +16,7 @@ outputs:
 
 steps:
   - id: step1
-    run: {"@import": wc3-tool.cwl}
+    run: wc3-tool.cwl
     inputs:
       - id: file1
         source: ["#file1", "#file2"]

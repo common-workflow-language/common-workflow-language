@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-3.dev2
+cwlVersion: cwl:draft-3.dev3
 inputs:
   - id: bar
     type: Any
@@ -11,6 +11,6 @@ inputs:
           "buz": ['a', 'b', 'c']
         }
 
-outputs: {"@import": params_inc.yml}
+outputs: {"$import": params_inc.yml}
 
 baseCommand: "true"
