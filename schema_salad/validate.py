@@ -163,7 +163,7 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
                     if d not in identifiers and d not in foreign_properties and d[0] not in ("@", "$"):
                         split = urlparse.urlsplit(d)
                         if split.scheme:
-                            errors.append("could not validate extension field `%s` because it is not recognized and strict is True.  Did you include the right @schemas in your @context?" % (d))
+                            errors.append("could not validate extension field `%s` because it is not recognized and strict is True.  Did you include a $schemas section?" % (d))
                         else:
                             errors.append("could not validate field `%s` because it is not recognized and strict is True, valid fields are: %s" % (d, ", ".join(fn.name for fn in expected_schema.fields)))
 

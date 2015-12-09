@@ -78,7 +78,7 @@ class Loader(object):
 
         split = urlparse.urlsplit(url)
 
-        if split.scheme:
+        if split.scheme or url.startswith("$(") or url.startswith("${"):
             pass
         elif scoped and not split.fragment:
             splitbase = urlparse.urlsplit(base_url)
