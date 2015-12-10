@@ -48,9 +48,13 @@ def merge_properties(a, b):
 
 
 class Loader(object):
-    def __init__(self, ctx, schemagraph=None, foreign_properties=None):
+    def __init__(self, ctx, schemagraph=None, foreign_properties=None, idx=None):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
-        self.idx = NormDict(normalize)
+        if idx:
+            self.idx = idx
+        else:
+            self.idx = NormDict(normalize)
+
         self.ctx = {}
         if schemagraph is not None:
             self.graph = schemagraph
@@ -277,19 +281,19 @@ class Loader(object):
                 newctx = None
 
                 if "@context" in document:
-                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
                     loader.add_context(document["@context"], base_url)
                     if "@base" in loader.ctx:
                         base_url = loader.ctx["@base"]
 
                 if "$namespaces" in document:
                     if not newctx:
-                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
                     newctx.add_namespaces(document["$namespaces"])
 
                 if "$schemas" in document:
                     if not newctx:
-                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties)
+                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
                     newctx.add_schemas(document["$schemas"], base_url)
 
                 if newctx:

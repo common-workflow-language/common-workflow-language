@@ -135,6 +135,7 @@ def load_and_validate(document_loader, avsc_names, document, strict):
         data, metadata = document_loader.resolve_all(document, document["id"])
     else:
         data, metadata = document_loader.resolve_ref(document)
+
     document_loader.validate_links(data)
     validate_doc(avsc_names, data, document_loader, strict)
     return data, metadata
