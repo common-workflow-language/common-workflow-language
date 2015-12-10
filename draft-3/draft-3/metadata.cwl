@@ -11,7 +11,7 @@ class: CommandLineTool
 description: "Print the contents of a file to stdout using 'cat' running in a docker container."
 
 dct:creator:
-  "@id": "http://orcid.org/0000-0003-3566-7705"
+  id: "http://orcid.org/0000-0003-3566-7705"
   class: foaf:Person
   foaf:name: Peter Amstutz
   foaf:mbox: "mailto:peter.amstutz@curoverse.com"
