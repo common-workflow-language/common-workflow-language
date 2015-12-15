@@ -206,7 +206,7 @@ class RenderType(object):
         f["doc"] = fix_emails(f["doc"])
 
         if f["type"] == "record":
-            for field in f["fields"]:
+            for field in f.get("fields", []):
                 if "doc" not in field:
                     field["doc"] = ""
 
@@ -245,7 +245,7 @@ class RenderType(object):
             doc += "<h3>Fields</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
-            for i in f["fields"]:
+            for i in f.get("fields", []):
                 doc += "<tr>"
                 tp = i["type"]
                 if isinstance(tp, list) and tp[0] == "null":

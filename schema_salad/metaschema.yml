@@ -1,5 +1,4 @@
-"@context":
-  "@base": "https://w3id.org/cwl/salad#"
+$base: "https://w3id.org/cwl/salad#"
 
 $namespaces:
   sld:  "https://w3id.org/cwl/salad#"
@@ -8,7 +7,8 @@ $namespaces:
   rdfs: "http://www.w3.org/2000/01/rdf-schema#"
   xsd:  "http://www.w3.org/2001/XMLSchema#"
 
-"@graph":
+$graph:
+
 - name: "Semantic_Annotations_for_Linked_Avro_Data"
   type: documentation
   doc: |

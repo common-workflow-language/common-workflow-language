@@ -112,9 +112,10 @@ def main(args=None):
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
-    metactx = schema_raw_doc.get("@context", {})
-    metactx.update(schema_raw_doc.get("$namespaces", {}))
-    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, schema_raw_doc["@context"])
+    metactx = schema_raw_doc.get("$namespaces", {})
+    if "$base" in schema_raw_doc:
+        metactx["@base"] = schema_raw_doc["$base"]
+    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, metactx)
 
     # Create the loader that will be used to load the target document.
     document_loader = Loader(schema_ctx)

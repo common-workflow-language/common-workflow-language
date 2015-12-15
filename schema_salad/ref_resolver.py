@@ -50,7 +50,7 @@ def merge_properties(a, b):
 class Loader(object):
     def __init__(self, ctx, schemagraph=None, foreign_properties=None, idx=None):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
-        if idx:
+        if idx is not None:
             self.idx = idx
         else:
             self.idx = NormDict(normalize)
@@ -65,6 +65,15 @@ class Loader(object):
             self.foreign_properties = foreign_properties
         else:
             self.foreign_properties = set()
+
+        self.url_fields = set()
+        self.vocab_fields = set()
+        self.identifiers = set()
+        self.identity_links = set()
+        self.standalone = set()
+        self.nolinkcheck = set()
+        self.vocab = {}
+        self.rvocab = {}
 
         self.add_context(ctx)
 
@@ -81,6 +90,10 @@ class Loader(object):
                 url = self.vocab[prefix] + url[len(prefix)+1:]
 
         split = urlparse.urlsplit(url)
+
+        if url == "cwl:hints":
+            _logger.debug("XXX (%s) %s", id(self), self.vocab.keys())
+            raise validate.ValidationException("FUCKING KIDDING ME")
 
         if split.scheme or url.startswith("$(") or url.startswith("${"):
             pass
@@ -102,7 +115,9 @@ class Loader(object):
 
     def _add_properties(self, s):
         for _, _, rng in self.graph.triples( (s, RDFS.range, None) ):
-            if not str(rng).startswith("http://www.w3.org/2001/XMLSchema#") or str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI":
+            literal = ((str(rng).startswith("http://www.w3.org/2001/XMLSchema#") and not str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI") or
+                       str(rng) == "http://www.w3.org/2000/01/rdf-schema#Literal")
+            if not literal:
                 self.url_fields.add(str(s))
         self.foreign_properties.add(str(s))
 
@@ -128,6 +143,9 @@ class Loader(object):
 
 
     def add_context(self, newcontext, baseuri=""):
+        if self.vocab:
+            raise validate.ValidationException("Refreshing context that already has stuff in it")
+
         self.url_fields = set()
         self.vocab_fields = set()
         self.identifiers = set()
@@ -182,9 +200,11 @@ class Loader(object):
         if isinstance(ref, dict):
             obj = ref
             if "$import" in ref:
-                ref = obj["$import"]
-                merge = {k: v for k,v in obj.iteritems() if k != "$import" and k not in self.identifiers}
-                obj = None
+                if len(obj) == 1:
+                    ref = obj["$import"]
+                    obj = None
+                else:
+                    raise ValueError("'$import' must be the only field in %s" % (str(obj)))
             elif "$include" in obj:
                 if len(obj) == 1:
                     ref = obj["$include"]
@@ -227,15 +247,6 @@ class Loader(object):
                 raise validate.ValidationException("Reference `#%s` not found in file `%s`." % (frg, doc_url))
             obj = self.fetch(doc_url)
 
-        if merge:
-            obj = merge_properties(merge, obj)
-            url = None
-            for identifier in self.identifiers:
-                if identifier in obj:
-                    url = obj[identifier]
-            if url:
-                url = self.expand_url(ref, base_url, scoped=True)
-
         # Recursively expand urls and resolve directives
         obj, metadata = self.resolve_all(obj, url)
 
@@ -246,9 +257,9 @@ class Loader(object):
             else:
                 raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
-        if "@graph" in obj:
-            metadata = {k: v for k,v in obj.items() if k != "@graph"}
-            obj = obj["@graph"]
+        if "$graph" in obj:
+            metadata = {k: v for k,v in obj.items() if k != "$graph"}
+            obj = obj["$graph"]
             return obj, metadata
         else:
             return obj, metadata
@@ -256,97 +267,102 @@ class Loader(object):
     def resolve_all(self, document, base_url):
         loader = self
         metadata = {}
+        file_base = base_url
 
         if isinstance(document, dict):
-            inc = '$include' in document
-            if  '$import' in document or '$include' in document:
-                document, _ = self.resolve_ref(document, base_url)
-            else:
-                for identifer in self.identity_links:
-                    if identifer in document:
-                        if isinstance(document[identifer], basestring):
-                            document[identifer] = self.expand_url(document[identifer], base_url, scoped=True)
-                            if document[identifer] not in self.idx or isinstance(self.idx[document[identifer]], basestring):
-                                self.idx[document[identifer]] = document
-                            base_url = document[identifer]
-                        elif isinstance(document[identifer], list):
-                            for n, v in enumerate(document[identifer]):
-                                document[identifer][n] = self.expand_url(document[identifer][n], base_url, scoped=True)
-                                if document[identifer][n] not in self.idx:
-                                    self.idx[document[identifer][n]] = document[identifer][n]
-            if inc:
-                return document, {}
-
-            if isinstance(document, dict):
-                newctx = None
-
-                if "@context" in document:
-                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
-                    loader.add_context(document["@context"], base_url)
-                    if "@base" in loader.ctx:
-                        base_url = loader.ctx["@base"]
-
-                if "$namespaces" in document:
-                    if not newctx:
-                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
-                    newctx.add_namespaces(document["$namespaces"])
-
-                if "$schemas" in document:
-                    if not newctx:
-                        newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
-                    newctx.add_schemas(document["$schemas"], base_url)
-
-                if newctx:
-                    loader = newctx
-                    loader.idx = self.idx
-
-                if "@graph" in document:
-                    metadata = {k: v for k,v in document.items() if k != "@graph"}
-                    document = document["@graph"]
-                    metadata, _ = self.resolve_all(metadata, base_url)
-
+            # Handle $import and $include
+            if ('$import' in document or '$include' in document):
+                return self.resolve_ref(document, file_base)
         elif isinstance(document, list):
             pass
         else:
             return document, metadata
 
-        try:
-            if isinstance(document, dict):
-                for d in document:
-                    d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
-                    if d != d2:
-                        document[d2] = document[d]
-                        del document[d]
+        newctx = None
+        if isinstance(document, dict):
+            # Handle $base, $profile, $namespaces, $schemas and $graph
+            if "$base" in document:
+                base_url = document["$base"]
 
-                for d in loader.url_fields:
-                    if d in document:
-                        if isinstance(document[d], basestring):
-                            document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
-                        elif isinstance(document[d], list):
-                            document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
+            if "$profile" in document:
+                if not newctx:
+                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                prof = self.fetch(document["$profile"])
+                newctx.add_namespaces(document.get("$namespaces", {}), document["$profile"])
+                newctx.add_schemas(document.get("$schemas", []), document["$profile"])
 
+            if "$namespaces" in document:
+                if not newctx:
+                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                newctx.add_namespaces(document["$namespaces"])
+
+            if "$schemas" in document:
+                if not newctx:
+                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                newctx.add_schemas(document["$schemas"], file_base)
+
+            if newctx:
+                loader = newctx
+
+            if "$graph" in document:
+                metadata = {k: v for k,v in document.items() if k != "$graph"}
+                document = document["$graph"]
+                metadata, _ = loader.resolve_all(metadata, base_url)
+
+        if isinstance(document, dict):
+            for identifer in loader.identity_links:
+                if identifer in document:
+                    if isinstance(document[identifer], basestring):
+                        document[identifer] = loader.expand_url(document[identifer], base_url, scoped=True)
+                        if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
+                            loader.idx[document[identifer]] = document
+                        base_url = document[identifer]
+                    elif isinstance(document[identifer], list):
+                        for n, v in enumerate(document[identifer]):
+                            document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
+                            if document[identifer][n] not in loader.idx:
+                                loader.idx[document[identifer][n]] = document[identifer][n]
+
+            for d in document:
+                d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
+                if d != d2:
+                    document[d2] = document[d]
+                    del document[d]
+
+            for d in loader.url_fields:
+                if d in document:
+                    if isinstance(document[d], basestring):
+                        document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
+                    elif isinstance(document[d], list):
+                        document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
+
+            try:
                 for key, val in document.items():
                     document[key], _ = loader.resolve_all(val, base_url)
+            except validate.ValidationException as v:
+                _logger.debug("loader is %s", id(loader))
+                raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (id(loader), file_base, key, validate.indent(str(v))))
 
-            elif isinstance(document, list):
-                i = 0
+        elif isinstance(document, list):
+            i = 0
+            try:
                 while i < len(document):
                     val = document[i]
-                    if isinstance(val, dict) and "$import" in val and val.get("inline"):
-                        l, _ = loader.resolve_all(val, base_url)
-                        del document[i]
-                        for item in aslist(l):
-                            document.insert(i, item)
+                    if isinstance(val, dict) and "$import" in val:
+                        l, _ = loader.resolve_all(val, file_base)
+                        if isinstance(l, list):
+                            del document[i]
+                            for item in aslist(l):
+                                document.insert(i, item)
+                                i += 1
+                        else:
+                            document[i] = l
                             i += 1
                     else:
                         document[i], _ = loader.resolve_all(val, base_url)
                         i += 1
-
-        except validate.ValidationException as v:
-            if isinstance(key, basestring):
-                raise validate.ValidationException("Validation error in field %s:\n%s" % (key, validate.indent(str(v))))
-            else:
-                raise validate.ValidationException("Validation error in position %i:\n%s" % (key, validate.indent(str(v))))
+            except validate.ValidationException as v:
+                raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (id(loader), file_base, i, validate.indent(str(v))))
 
         return document, metadata
 
@@ -390,7 +406,8 @@ class Loader(object):
 
     def check_file(self, fn):
         if fn.startswith("file://"):
-            return os.path.exists(fn[7:])
+            u = urlparse.urlsplit(fn)
+            return os.path.exists(u.path)
         else:
             return False
 

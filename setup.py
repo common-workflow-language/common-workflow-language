@@ -17,7 +17,7 @@ except ImportError:
     tagger = egg_info_cmd.egg_info
 
 setup(name='schema-salad',
-      version='1.1.1',
+      version='1.2',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',

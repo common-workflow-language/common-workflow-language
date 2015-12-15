@@ -286,9 +286,9 @@ def extend_and_specialize(items, loader):
 
                 if t["type"] == "record":
                     if spec:
-                        basetype["fields"] = replace_type(basetype["fields"], spec, loader, set())
+                        basetype["fields"] = replace_type(basetype.get("fields", []), spec, loader, set())
 
-                    for f in basetype["fields"]:
+                    for f in basetype.get("fields", []):
                         if "inherited_from" not in f:
                             f["inherited_from"] = ex
 
