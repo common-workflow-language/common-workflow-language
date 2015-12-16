@@ -247,6 +247,7 @@ class Loader(object):
         if obj:
             for identifier in self.identifiers:
                 obj[identifier] = url
+            doc_url = url
         else:
             # Load structured document
             doc_url, frg = urlparse.urldefrag(url)
@@ -255,7 +256,7 @@ class Loader(object):
             obj = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        obj, metadata = self.resolve_all(obj, url)
+        obj, metadata = self.resolve_all(obj, doc_url)
 
         # Requested reference should be in the index now, otherwise it's a bad reference
         if url is not None:
