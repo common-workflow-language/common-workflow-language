@@ -1,4 +1,4 @@
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev3"
 class: CommandLineTool
 inputs:
   - id: source
@@ -13,10 +13,6 @@ outputs:
   - id: out
     type: File
     outputBinding:
-      glob:
-        engine: "cwl:JsonPointer"
-        script: "job/target"
+      glob: $(inputs.target)
 baseCommand: [python, "-mschema_salad.makedoc"]
-stdout:
-  engine: "cwl:JsonPointer"
-  script: "job/target"
+stdout: $(inputs.target)

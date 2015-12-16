@@ -1,0 +1,703 @@
+$base: "https://w3id.org/cwl/cwl#"
+
+$namespaces:
+  cwl: "https://w3id.org/cwl/cwl#"
+
+$graph:
+
+- $import: Process.yml
+
+- type: record
+  name: FileDef
+  docParent: "#CreateFileRequirement"
+  doc: |
+    Define a file that must be placed in the designated output directory
+    prior to executing the command line tool.  May be the result of executing
+    an expression, such as building a configuration file from a template.
+  fields:
+    - name: "filename"
+      type: ["string", "#Expression"]
+      doc: "The name of the file to create in the output directory."
+    - name: "fileContent"
+      type: ["string", "#Expression"]
+      doc: |
+        If the value is a string literal or an expression which evaluates to a
+        string, a new file must be created with the string as the file contents.
+
+        If the value is an expression that evaluates to a File object, this
+        indicates the referenced file should be added to the designated output
+        directory prior to executing the tool.
+
+        Files added in this way may be read-only, and may be provided
+        by bind mounts or file system links to avoid
+        unnecessary copying of the input file.
+
+
+- type: record
+  name: EnvironmentDef
+  docParent: "#EnvVarRequirement"
+  doc: |
+    Define an environment variable that will be set in the runtime environment
+    by the workflow platform when executing the command line tool.  May be the
+    result of executing an expression, such as getting a parameter from input.
+  fields:
+    - name: "envName"
+      type: "string"
+      doc: The environment variable name
+    - name: "envValue"
+      type: ["string", "#Expression"]
+      doc: The environment variable value
+
+- type: record
+  name: CommandLineBinding
+  extends: "#Binding"
+  docParent: "#CommandInputParameter"
+  doc: |
+
+    When listed under `inputBinding` in the input schema, the term
+    "value" refers to the the corresponding value in the input object.  For
+    binding objects listed in `CommandLineTool.arguments`, the term "value"
+    refers to the effective value after evaluating `valueFrom`.
+
+    The binding behavior when building the command line depends on the data
+    type of the value.  If there is a mismatch between the type described by
+    the input schema and the effective value, such as resulting from an
+    expression evaluation, an implementation must use the data type of the
+    effective value.
+
+      - **string**: Add `prefix` and the string to the command line.
+
+      - **number**: Add `prefix` and decimal representation to command line.
+
+      - **boolean**: If true, add `prefix` to the command line.  If false, add
+          nothing.
+
+      - **File**: Add `prefix` and the value of
+        [`File.path`](#file) to the command line.
+
+      - **array**: If `itemSeparator` is specified, add `prefix` and the join
+          the array into a single string with `itemSeparator` separating the
+          items.  Otherwise first add `prefix`, then recursively process
+          individual elements.
+
+      - **object**: Add `prefix` only, and recursively add object fields for
+          which `inputBinding` is specified.
+
+      - **null**: Add nothing.
+
+  fields:
+    - name: "position"
+      type: ["null", "int"]
+      doc: "The sorting key.  Default position is 0."
+    - name: "prefix"
+      type: [ "null", "string"]
+      doc: "Command line prefix to add before the value."
+    - name: "separate"
+      type: ["null", boolean]
+      doc: |
+        If true (default), then the prefix and value must be added as separate
+        command line arguments; if false, prefix and value must be concatenated
+        into a single command line argument.
+    - name: "itemSeparator"
+      type: ["null", "string"]
+      doc: |
+        Join the array elements into a single string with the elements
+        separated by by `itemSeparator`.
+    - name: "valueFrom"
+      type:
+        - "null"
+        - "string"
+        - "#Expression"
+      doc: |
+        If `valueFrom` is a constant string value, use this as the value and
+        apply the binding rules above.
+
+        If `valueFrom` is an expression, evaluate the expression to yield the
+        actual value to use to build the command line and apply the binding
+        rules above.  If the inputBinding is associated with an input
+        parameter, the "context" of the expression will be the value of the
+        input parameter.
+
+        When a binding is part of the `CommandLineTool.arguments` field,
+        the `valueFrom` field is required.
+    - name: shellQuote
+      type: ["null", boolean]
+      doc: |
+        If `ShellCommandRequirement` is in the requirements for the current command,
+        this controls whether the value is quoted on the command line (default is true).
+        Use `shellQuote: false` to inject metacharacters for operations such as pipes.
+
+- type: record
+  name: CommandOutputBinding
+  extends: "#Binding"
+  docParent: "#CommandOutputParameter"
+  doc: |
+    Describes how to generate an output parameter based on the files produced
+    by a CommandLineTool.
+
+    The output parameter is generated by applying these operations in
+    the following order:
+
+      - glob
+      - loadContents
+      - outputEval
+  fields:
+    - name: glob
+      type:
+        - "null"
+        - string
+        - "#Expression"
+        - type: array
+          items: string
+      doc: |
+        Find files relative to the output directory, using POSIX glob(3)
+        pathname matching.  If provided an array, find files that match any
+        pattern in the array.  If provided an expression, the expression must
+        return a string or an array of strings, which will then be evaluated as
+        one or more glob patterns.  Only files which actually exist will be
+        matched and returned.
+    - name: outputEval
+      type:
+        - "null"
+        - string
+        - "#Expression"
+      doc: |
+        Evaluate an expression to generate the output value.  If `glob` was
+        specified, the script `context` will be an array containing any files that were
+        matched.  Additionally, if `loadContents` is `true`, the File objects
+        will include up to the first 64 KiB of file contents in the `contents` field.
+
+
+- name: CommandInputRecordField
+  type: record
+  extends: "#InputRecordField"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandInputRecordSchema
+  type: record
+  extends: "#InputRecordSchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordField"
+      specializeTo: "#CommandInputRecordField"
+
+
+- name: CommandInputEnumSchema
+  type: record
+  extends: "#InputEnumSchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandInputArraySchema
+  type: record
+  extends: "#InputArraySchema"
+  docParent: "#InputParameter"
+  specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- name: CommandOutputRecordField
+  type: record
+  extends: "#OutputRecordField"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- name: CommandOutputRecordSchema
+  type: record
+  extends: "#OutputRecordSchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordField"
+      specializeTo: "#CommandOutputRecordField"
+
+
+- name: CommandOutputEnumSchema
+  type: record
+  extends: "#OutputEnumSchema"
+  docParent: "#OutputParameter"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- name: CommandOutputArraySchema
+  type: record
+  extends: "#OutputArraySchema"
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- type: record
+  name: CommandInputParameter
+  extends: "#InputParameter"
+  docParent: "#CommandLineTool"
+  doc: An input parameter for a CommandLineTool.
+  specialize:
+    - specializeFrom: "#InputRecordSchema"
+      specializeTo: "#CommandInputRecordSchema"
+    - specializeFrom: "#InputEnumSchema"
+      specializeTo: "#CommandInputEnumSchema"
+    - specializeFrom: "#InputArraySchema"
+      specializeTo: "#CommandInputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
+
+
+- type: record
+  name: CommandOutputParameter
+  extends: "#OutputParameter"
+  docParent: "#CommandLineTool"
+  doc: An output parameter for a CommandLineTool.
+  specialize:
+    - specializeFrom: "#OutputRecordSchema"
+      specializeTo: "#CommandOutputRecordSchema"
+    - specializeFrom: "#OutputEnumSchema"
+      specializeTo: "#CommandOutputEnumSchema"
+    - specializeFrom: "#OutputArraySchema"
+      specializeTo: "#CommandOutputArraySchema"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandOutputBinding"
+
+
+- type: record
+  name: CommandLineTool
+  extends: "#Process"
+  documentRoot: true
+  specialize:
+    - specializeFrom: "#InputParameter"
+      specializeTo: "#CommandInputParameter"
+    - specializeFrom: "#OutputParameter"
+      specializeTo: "#CommandOutputParameter"
+  doc: |
+
+    A CommandLineTool process is a process implementation for executing a
+    non-interactive application in a POSIX environment.  To accommodate
+    the enormous variety in syntax and semantics for input, runtime
+    environment, invocation, and output of arbitrary programs, CommandLineTool
+    uses an "input binding" that describes how to translate input
+    parameters to an actual program invocation, and an "output binding" that
+    describes how to generate output parameters from program output.
+
+    # Input binding
+
+    The tool command line is built by applying command line bindings to the
+    input object.  Bindings are listed either as part of an [input
+    parameter](#commandinputparameter) using the `inputBinding` field, or
+    separately using the `arguments` field of the CommandLineTool.
+
+    The algorithm to build the command line is as follows.  In this algorithm,
+    the sort key is a list consisting of one or more numeric or string
+    elements.  Strings are sorted lexicographically based on UTF-8 encoding.
+
+      1. Collect `CommandLineBinding` objects from `arguments`.  Assign a sorting
+      key `[position, i]` where `position` is
+      [`CommandLineBinding.position`](#commandlinebinding) and `i`
+      is the index in the `arguments` list.
+
+      2. Collect `CommandLineBinding` objects from the `inputs` schema and
+      associate them with values from the input object.  Where the input type
+      is a record, array, or map, recursively walk the schema and input object,
+      collecting nested `CommandLineBinding` objects and associating them with
+      values from the input object.
+
+      3. Create a sorting key by taking the value of the `position` field at
+      each level leading to each leaf binding object.  If `position` is not
+      specified, it is not added to the sorting key.  For bindings on arrays
+      and maps, the sorting key must include the array index or map key
+      following the position.  If and only if two bindings have the same sort
+      key, the tie must be broken using the ordering of the field or parameter
+      name immediately containing the leaf binding.
+
+      4. Sort elements using the assigned sorting keys.  Numeric entries sort
+      before strings.
+
+      5. In the sorted order, apply the rules defined in
+      [`CommandLineBinding`](#commandlinebinding) to convert bindings to actual
+      command line elements.
+
+      6. Insert elements from `baseCommand` at the beginning of the command
+      line.
+
+    # Runtime environment
+
+    All files listed in the input object must be made available in the runtime
+    environment.  The implementation may use a shared or distributed file
+    system or transfer files via explicit download.  Implementations may choose
+    not to provide access to files not explicitly specified in the input object
+    or process requirements.
+
+    Output files produced by tool execution must be written to the **designated
+    output directory**.  The initial current working directory when executing
+    the tool must be the designated output directory.
+
+    Files may also be written to the **designated temporary directory**.  Any
+    files written to the designated temporary directory may be deleted by the
+    workflow platform immediately after the tool terminates.
+
+    When executing the tool, the tool must execute in a new, empty environment
+    with only the environment variables described below; the child process must
+    not inherit environment variables from the parent process except where
+    specified or at user option.
+
+      * `HOME` must be set to the designated output directory.
+      * `TMPDIR` must be set to the designated temporary directory.
+        when the tool invocation and output collection is complete.
+      * `PATH` may be inherited from the parent process, except when run in a
+        container that provides its own `PATH`.
+      * Variables defined by [EnvVarRequirement](#envvarrequirement)
+      * The default environment of the container, such as when using
+        [DockerRequirement](#dockerrequirement)
+
+    An implementation may forbid the tool from writing to any location in the
+    runtime environment file system other than the designated temporary
+    directory and designated output directory.  An implementation may provide
+    read-only input files, and disallow in-place update of input files.  The
+    designated temporary directory and designated output directory may reside
+    on different mount points on different file systems.
+
+    The `runtime` section available in [parameter references](#parameterreferences)
+    and [expressions](#expressions) contains the following fields.  As noted
+    earlier, an implementation may perform deferred resolution of runtime fields by providing
+    opaque strings for any or all of the following fields; parameter references
+    and expressions may only use the literal string value of the field and must
+    not perform computation on the contents.
+
+      * `runtime.outdir`: an absolute path to the designated output directory
+      * `runtime.tmpdir`: an absolute path to the designated temporary directory
+      * `runtime.cores`:  number of CPU cores reserved for the tool process
+      * `runtime.ram`:    amount of RAM in mebibytes (2**20) reserved for the tool process
+      * `runtime.outdirSize`: reserved storage space available in the designated output directory
+      * `runtime.tmpdirSize`: reserved storage space available in the designated temporary directory
+
+    See [ResourceRequirement](#resourcerequirement) for details on how to
+    describe the hardware resources required by a tool.
+
+    The standard input stream and standard output stream may be redirected as
+    described in the `stdin` and `stdout` fields.
+
+    ## Extensions
+
+    [DockerRequirement](#dockerrequirement),
+    [CreateFileRequirement](#createfilerequirement),
+    [EnvVarRequirement](#envvarrequirement),
+    [ShellCommandRequirement](#shellcommandrequirement), and
+    [ResourceRequirement](#resourcerequirement) are available as standard
+    extensions to core command line tool semantics for defining the runtime
+    environment.
+
+    # Execution
+
+    Once the command line is built and the runtime environment is created, the
+    actual tool is executed.
+
+    The standard error stream and standard output stream (unless redirected by
+    setting `stdout`) may be captured by platform logging facilities for
+    storage and reporting.
+
+    Tools may be multithreaded or spawn child processes; however, when the
+    parent process exits, the tool is considered finished regardless of whether
+    any detached child processes are still running.  Tools must not require any
+    kind of console, GUI, or web based user interaction in order to start and
+    run to completion.
+
+    The exit code of the process indicates if the process completed
+    successfully.  By convention, an exit code of zero is treated as success
+    and non-zero exit codes are treated as failure.  This may be customized by
+    providing the fields `successCodes`, `temporaryFailCodes`, and
+    `permanentFailCodes`.  An implementation may choose to default unspecified
+    non-zero exit codes to either `temporaryFailure` or `permanentFailure`.
+
+    # Output binding
+
+    If the output directory contains a file named "cwl.output.json", that file
+    must be loaded and used as the output object.  Otherwise, the output object
+    must be generated by walking the parameters listed in `outputs` and
+    applying output bindings to the tool output.  Output bindings are
+    associated with output parameters using the `outputBinding` field.  See
+    [`CommandOutputBinding`](#commandoutputbinding) for details.
+
+  fields:
+    - name: "class"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+      type: string
+    - name: baseCommand
+      doc: |
+        Specifies the program to execute.  If the value is an array, the first
+        element is the program to execute, and subsequent elements are placed
+        at the beginning of the command line in prior to any command line
+        bindings.  If the program includes a path separator character it must
+        be an absolute path, otherwise it is an error.  If the program does not
+        include a path separator, search the `$PATH` variable in the runtime
+        environment of the workflow runner find the absolute path of the
+        executable.
+      type:
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        "_id": "cwl:baseCommand"
+        "_container": "@list"
+    - name: arguments
+      doc: |
+        Command line bindings which are not directly associated with input parameters.
+      type:
+        - "null"
+        - type: array
+          items: [string, "#CommandLineBinding"]
+      jsonldPredicate:
+        "_id": "cwl:arguments"
+        "_container": "@list"
+    - name: stdin
+      type: ["null", string, "#Expression"]
+      doc: |
+        A path to a file whose contents must be piped into the command's
+        standard input stream.
+    - name: stdout
+      type: ["null", string, "#Expression"]
+      doc: |
+        Capture the command's standard output stream to a file written to
+        the designated output directory.
+
+        If `stdout` is a string, it specifies the file name to use.
+
+        If `stdout` is an expression, the expression is evaluated and must
+        return a string with the file name to use to capture stdout.  If the
+        return value is not a string, or the resulting path contains illegal
+        characters (such as the path separator `/`) it is an error.
+    - name: successCodes
+      type:
+        - "null"
+        - type: array
+          items: int
+      doc: |
+        Exit codes that indicate the process completed successfully.
+
+    - name: temporaryFailCodes
+      type:
+        - "null"
+        - type: array
+          items: int
+      doc: |
+        Exit codes that indicate the process failed due to a possibly
+        temporary condition, where excuting the process with the same
+        runtime environment and inputs may produce different results.
+
+    - name: permanentFailCodes
+      type:
+        - "null"
+        - type: array
+          items: int
+      doc:
+        Exit codes that indicate the process failed due to a permanent logic
+        error, where excuting the process with the same runtime environment and
+        same inputs is expected to always fail.
+
+
+
+- type: record
+  name: DockerRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Indicates that a workflow component should be run in a
+    [Docker](http://docker.com) container, and specifies how to fetch or build
+    the image.
+
+    If a CommandLineTool lists `DockerRequirement` under
+    `hints` or `requirements`, it may (or must) be run in the specified Docker
+    container.
+
+    The platform must first acquire or install the correct Docker image as
+    specified by `dockerPull`, `dockerImport`, `dockerLoad` or `dockerFile`.
+
+    The platform must execute the tool in the container using `docker run` with
+    the appropriate Docker image and tool command line.
+
+    The workflow platform may provide input files and the designated output
+    directory through the use of volume bind mounts.  The platform may rewrite
+    file paths in the input object to correspond to the Docker bind mounted
+    locations.
+
+    When running a tool contained in Docker, the workflow platform must not
+    assume anything about the contents of the Docker container, such as the
+    presence or absence of specific software, except to assume that the
+    generated command line represents a valid command within the runtime
+    environment of the container.
+
+    ## Interaction with other requirements
+
+    If [EnvVarRequirement](#envvarrequirement) is specified alongside a
+    DockerRequirement, the environment variables must be provided to Docker
+    using `--env` or `--env-file` and interact with the container's preexisting
+    environment as defined by Docker.
+
+  fields:
+    - name: dockerPull
+      type: ["null", "string"]
+      doc: "Specify a Docker image to retrieve using `docker pull`."
+    - name: "dockerLoad"
+      type: ["null", "string"]
+      doc: "Specify a HTTP URL from which to download a Docker image using `docker load`."
+    - name: dockerFile
+      type: ["null", "string"]
+      doc: "Supply the contents of a Dockerfile which will be built using `docker build`."
+    - name: dockerImport
+      type: ["null", "string"]
+      doc: "Provide HTTP URL to download and gunzip a Docker images using `docker import."
+    - name: dockerImageId
+      type: ["null", "string"]
+      doc: |
+        The image id that will be used for `docker run`.  May be a
+        human-readable image name or the image identifier hash.  May be skipped
+        if `dockerPull` is specified, in which case the `dockerPull` image id
+        must be used.
+    - name: dockerOutputDirectory
+      type: ["null", "string"]
+      doc: |
+        Set the designated output directory to a specific location inside the
+        Docker container.
+
+
+
+- name: CreateFileRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Define a list of files that must be created by the workflow
+    platform in the designated output directory prior to executing the command
+    line tool.  See `FileDef` for details.
+  fields:
+    - name: fileDef
+      type:
+        type: "array"
+        items: "#FileDef"
+      doc: The list of files.
+
+
+- name: EnvVarRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Define a list of environment variables which will be set in the
+    execution environment of the tool.  See `EnvironmentDef` for details.
+  fields:
+    - name: envDef
+      type:
+        type: "array"
+        items: "#EnvironmentDef"
+      doc: The list of environment variables.
+
+
+- type: record
+  name: ShellCommandRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Modify the behavior of CommandLineTool to generate a single string
+    containing a shell command line.  Each item in the argument list must be
+    joined into a string separated by single spaces and quoted to prevent
+    intepretation by the shell, unless `CommandLineBinding` for that argument
+    contains `shellQuote: false`.  If `shellQuote: false` is specified, the
+    argument is joined into the command string without quoting, which allows
+    the use of shell metacharacters such as `|` for pipes.
+
+
+- type: record
+  name: ResourceRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Specify basic hardware resource requirements.
+
+    "min" is the minimum amount of a resource that must be reserved to schedule
+    a job. If "min" cannot be satisfied, the job should not be run.
+
+    "max" is the maximum amount of a resource that the job shall be permitted
+    to use. If a node has sufficient resources, multiple jobs may be scheduled
+    on a single node provided each job's "max" resource requirements are
+    met. If a job attempts to exceed its "max" resource allocation, an
+    implementation may deny additional resources, which may result in job
+    failure.
+
+    If "min" is specified but "max" is not, then "max" == "min"
+    If "max" is specified by "min" is not, then "min" == "max".
+
+    It is an error if max < min.
+
+    It is an error if the value of any of these fields is negative.
+
+    If neither "min" nor "max" is specified for a resource, an implementation may provide a default.
+
+  fields:
+    - name: coresMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved number of CPU cores
+
+    - name: coresMax
+      type: ["null", int, string, "#Expression"]
+      doc: Maximum reserved number of CPU cores
+
+    - name: ramMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved RAM in mebibytes (2**20)
+
+    - name: ramMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved RAM in mebibytes (2**20)
+
+    - name: tmpdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: tmpdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
+
+    - name: outdirMin
+      type: ["null", long, string, "#Expression"]
+      doc: Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
+
+    - name: outdirMax
+      type: ["null", long, string, "#Expression"]
+      doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)

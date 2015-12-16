@@ -10,7 +10,7 @@
 
     "schema_in": [{
         "class": "File",
-        "path": "../draft-3/cwl-avro.yml"
+        "path": "../draft-3/Workflow.yml"
     }],
 
     "schema_target": [

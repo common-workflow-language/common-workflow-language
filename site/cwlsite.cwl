@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: "cwl:draft-3.dev1"
+cwlVersion: "cwl:draft-3.dev3"
 
 class: Workflow
 inputs:
@@ -66,7 +66,7 @@ steps:
 
     scatterMethod: dotproduct
 
-    run: {"@import": "makespec.cwl"}
+    run: makespec.cwl
 
   - id: readme
     inputs:
@@ -75,4 +75,4 @@ steps:
       - { id: title, source: "#title" }
     outputs:
       - { id: out }
-    run:  {"@import": "makedoc.cwl"}
+    run:  makedoc.cwl
