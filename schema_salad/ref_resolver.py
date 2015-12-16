@@ -46,9 +46,11 @@ def merge_properties(a, b):
 
     return c
 
+def SubLoader(loader):
+    return Loader(loader.ctx, schemagraph=loader.graph, foreign_properties=loader.foreign_properties, idx=loader.idx, cache=loader.cache)
 
 class Loader(object):
-    def __init__(self, ctx, schemagraph=None, foreign_properties=None, idx=None):
+    def __init__(self, ctx, schemagraph=None, foreign_properties=None, idx=None, cache=None):
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
@@ -65,6 +67,11 @@ class Loader(object):
             self.foreign_properties = foreign_properties
         else:
             self.foreign_properties = set()
+
+        if cache is not None:
+            self.cache = cache
+        else:
+            self.cache = {}
 
         self.url_fields = set()
         self.vocab_fields = set()
@@ -286,19 +293,19 @@ class Loader(object):
 
             if "$profile" in document:
                 if not newctx:
-                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                    newctx = SubLoader(self)
                 prof = self.fetch(document["$profile"])
                 newctx.add_namespaces(document.get("$namespaces", {}), document["$profile"])
                 newctx.add_schemas(document.get("$schemas", []), document["$profile"])
 
             if "$namespaces" in document:
                 if not newctx:
-                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                    newctx = SubLoader(self)
                 newctx.add_namespaces(document["$namespaces"])
 
             if "$schemas" in document:
                 if not newctx:
-                    newctx = Loader(self.ctx, schemagraph=self.graph, foreign_properties=self.foreign_properties, idx=self.idx)
+                    newctx = SubLoader(self)
                 newctx.add_schemas(document["$schemas"], file_base)
 
             if newctx:
@@ -367,12 +374,15 @@ class Loader(object):
         return document, metadata
 
     def fetch_text(self, url):
+        if url in self.cache:
+            return self.cache[url]
+
         split = urlparse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
         if scheme in ['http', 'https'] and requests:
-            resp = requests.get(url)
             try:
+                resp = requests.get(url)
                 resp.raise_for_status()
             except Exception as e:
                 raise RuntimeError(url, e)

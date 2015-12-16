@@ -114,8 +114,9 @@ def get_metaschema():
     validate_doc(sch_names, j, loader, strict=True)
     return (sch_names, j, loader)
 
-def load_schema(schema_ref):
+def load_schema(schema_ref, cache=None):
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
+    metaschema_loader.cache = cache
     schema_doc, schema_metadata = metaschema_loader.resolve_ref(schema_ref, "")
     validate_doc(metaschema_names, schema_doc, metaschema_loader, True)
     metactx = schema_metadata.get("@context", {})
@@ -123,7 +124,7 @@ def load_schema(schema_ref):
     (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, metactx)
 
     # Create the loader that will be used to load the target document.
-    document_loader = ref_resolver.Loader(schema_ctx)
+    document_loader = ref_resolver.Loader(schema_ctx, cache=cache)
 
     # Make the Avro validation that will be used to validate the target document
     (avsc_names, avsc_obj) = schema_salad.schema.make_avro_schema(schema_doc, document_loader)
