@@ -1,4 +1,4 @@
-cwlVersion: "cwl:draft-3.dev3"
+cwlVersion: "cwl:draft-3.dev4"
 class: CommandLineTool
 inputs:
   - id: strip_leading_lines_in

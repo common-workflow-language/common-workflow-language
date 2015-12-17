@@ -1,5 +1,5 @@
-cwlVersion: "cwl:draft-3.dev3"
-"@graph":
+cwlVersion: "cwl:draft-3.dev4"
+$graph:
 - id: makecontext
   class: CommandLineTool
   inputs:
