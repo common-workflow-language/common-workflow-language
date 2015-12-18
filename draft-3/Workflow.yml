@@ -5,7 +5,7 @@ $namespaces:
 
 $graph:
 
-- $import: Process.yml
+- $import: CommandLineTool.yml
 
 - type: record
   name: ExpressionTool

@@ -11,5 +11,5 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.target)
-baseCommand: [python, "-mschema_salad", "--print-jsonld-context"]
+baseCommand: [python, "-mschema_salad", "--print-rdfs"]
 stdout: $(inputs.target)

@@ -3,39 +3,36 @@ cwlVersion: "cwl:draft-3.dev4"
 
 class: Workflow
 inputs:
-  - {id: index_in, type: File}
-  - {id: index_target, type: string}
-  - {id: title, type: string}
-
-  - id: index_strip_lines
-    type: int
-    default: 3
-
+  - id: readme_in
+    type: File
+  - id: readme_target
+    type: string
   - id: schema_in
-    type: { type: array, items: File }
-
-  - id: schema_target
-    type: { type: array, items: string }
-
+    type: File
   - id: context_target
-    type: { type: array, items: string }
-
+    type: string
   - id: rdfs_target
-    type: { type: array, items: string }
+    type: string
+  - id: spec_target
+    type: string
+  - id: spec_renderlist
+    type:
+      type: array
+      items: string
 
 outputs:
   - id: readme_out
     type: File
     source: "#readme/out"
   - id: index
-    type: { type: array, items: File }
-    source: "#spec/index_out"
+    type: File
+    source: "#draft3spec/out"
   - id: context
-    type: { type: array, items: File }
-    source: "#spec/context_out"
+    type: File
+    source: "#context/out"
   - id: rdfs
-    type: { type: array, items: File }
-    source: "#spec/rdfs_out"
+    type: File
+    source: "#rdfs/out"
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -46,33 +43,35 @@ hints:
     dockerPull: commonworkflowlanguage/cwltool_module
 
 steps:
-  - id: spec
+  - id: rdfs
     inputs:
-      - {id: schema_in, source: "#schema_in" }
-      - {id: schema_target, source: "#schema_target" }
-      - {id: context_target, source: "#context_target" }
-      - {id: rdfs_target, source: "#rdfs_target" }
-
+      - {id: schema, source: "#schema_in" }
+      - {id: target, source: "#rdfs_target" }
     outputs:
-      - { id: index_out }
-      - { id: context_out }
-      - { id: rdfs_out }
+      - { id: out }
+    run: makerdfs.cwl
 
-    scatter:
-      - "#spec/schema_in"
-      - "#spec/schema_target"
-      - "#spec/context_target"
-      - "#spec/rdfs_target"
-
-    scatterMethod: dotproduct
-
-    run: makespec.cwl
+  - id: context
+    inputs:
+      - {id: schema, source: "#schema_in" }
+      - {id: target, source: "#context_target" }
+    outputs:
+      - { id: out }
+    run: makecontext.cwl
 
   - id: readme
     inputs:
-      - { id: source, source: "#index_in" }
-      - { id: target, source: "#index_target" }
-      - { id: title, source: "#title" }
+      - { id: source, source: "#readme_in" }
+      - { id: target, source: "#readme_target" }
+    outputs:
+      - { id: out }
+    run:  makedoc.cwl
+
+  - id: draft3spec
+    inputs:
+      - { id: source, source: "#schema_in" }
+      - { id: target, source: "#spec_target" }
+      - { id: renderlist, source: "#spec_renderlist" }
     outputs:
       - { id: out }
     run:  makedoc.cwl
