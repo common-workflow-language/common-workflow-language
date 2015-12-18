@@ -272,10 +272,11 @@ class Loader(object):
         else:
             return obj, metadata
 
-    def resolve_all(self, document, base_url):
+    def resolve_all(self, document, base_url, file_base=None):
         loader = self
         metadata = {}
-        file_base = base_url
+        if file_base is None:
+            file_base = base_url
 
         if isinstance(document, dict):
             # Handle $import and $include
@@ -315,7 +316,7 @@ class Loader(object):
             if "$graph" in document:
                 metadata = {k: v for k,v in document.items() if k != "$graph"}
                 document = document["$graph"]
-                metadata, _ = loader.resolve_all(metadata, base_url)
+                metadata, _ = loader.resolve_all(metadata, base_url, file_base)
 
         if isinstance(document, dict):
             for identifer in loader.identity_links:
@@ -346,7 +347,7 @@ class Loader(object):
 
             try:
                 for key, val in document.items():
-                    document[key], _ = loader.resolve_all(val, base_url)
+                    document[key], _ = loader.resolve_all(val, base_url, file_base)
             except validate.ValidationException as v:
                 _logger.debug("loader is %s", id(loader))
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (id(loader), file_base, key, validate.indent(str(v))))
@@ -357,7 +358,7 @@ class Loader(object):
                 while i < len(document):
                     val = document[i]
                     if isinstance(val, dict) and "$import" in val:
-                        l, _ = loader.resolve_all(val, file_base)
+                        l, _ = loader.resolve_ref(val, file_base)
                         if isinstance(l, list):
                             del document[i]
                             for item in aslist(l):
@@ -367,7 +368,7 @@ class Loader(object):
                             document[i] = l
                             i += 1
                     else:
-                        document[i], _ = loader.resolve_all(val, base_url)
+                        document[i], _ = loader.resolve_all(val, base_url, file_base)
                         i += 1
             except validate.ValidationException as v:
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (id(loader), file_base, i, validate.indent(str(v))))
