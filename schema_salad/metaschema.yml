@@ -824,6 +824,19 @@ $graph:
         _id: "sld:docParent"
         _type: "@id"
 
+    - name: docChild
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for `docChild` should appear in a subsection under this type.
+      jsonldPredicate:
+        _id: "sld:docChild"
+        _type: "@id"
+
     - name: docAfter
       type: ["null", string]
       doc: |

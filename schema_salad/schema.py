@@ -56,6 +56,10 @@ def get_metaschema():
             "@id": "https://w3id.org/cwl/salad#docParent",
             "@type": "@id"
         },
+        "docChild": {
+            "@id": "https://w3id.org/cwl/salad#docChild",
+            "@type": "@id"
+        },
         "documentRoot": "https://w3id.org/cwl/salad#SchemaDefinedType/documentRoot",
         "documentation": "https://w3id.org/cwl/salad#documentation",
         "double": "http://www.w3.org/2001/XMLSchema#double",

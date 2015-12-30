@@ -168,6 +168,10 @@ class RenderType(object):
             if t.get("docParent"):
                 add_dictlist(self.docParent, t["docParent"], t["name"])
 
+            if t.get("docChild"):
+                for c in aslist(t["docChild"]):
+                    add_dictlist(self.docParent, t["name"], c)
+
             if t.get("docAfter"):
                 add_dictlist(self.docAfter, t["docAfter"], t["name"])
 
@@ -320,9 +324,6 @@ def avrold_doc(j, outdoc, renderlist):
       padding: 0px;
     }
 
-    ol {
-      list-style-type: none;
-    }
     ol > li > ol > li {
       padding-left: 1em;
     }
