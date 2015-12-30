@@ -509,3 +509,8 @@
         checksum: "sha1$47a013e660d408619d894b20806b1d5086aab03b"
   doc: |
     Test optional output file and optional secondaryFile on output.
+
+- job: draft-3/step-valuefrom-wf.json
+  output: {count_output: 16}
+  tool: draft-3/step-valuefrom-wf.cwl
+  doc: Test valueFrom on workflow step.
