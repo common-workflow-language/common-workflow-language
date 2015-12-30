@@ -7,6 +7,7 @@ inputs:
     type: File
   - id: readme_target
     type: string
+
   - id: schema_in
     type: File
   - id: context_target
@@ -19,6 +20,11 @@ inputs:
     type:
       type: array
       items: string
+
+  - id: salad_schema
+    type: File
+  - id: salad_target
+    type: string
 
 outputs:
   - id: readme_out
@@ -72,6 +78,23 @@ steps:
       - { id: source, source: "#schema_in" }
       - { id: target, source: "#spec_target" }
       - { id: renderlist, source: "#spec_renderlist" }
+    outputs:
+      - { id: out }
+    run:  makedoc.cwl
+
+  - id: draft3spec
+    inputs:
+      - { id: source, source: "#schema_in" }
+      - { id: target, source: "#spec_target" }
+      - { id: renderlist, source: "#spec_renderlist" }
+    outputs:
+      - { id: out }
+    run:  makedoc.cwl
+
+  - id: saladspec
+    inputs:
+      - { id: source, source: "#salad_schema" }
+      - { id: target, source: "#salad_target" }
     outputs:
       - { id: out }
     run:  makedoc.cwl

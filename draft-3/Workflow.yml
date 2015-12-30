@@ -5,7 +5,7 @@ $namespaces:
 
 $graph:
 
-- name: "CommandLineToolDoc"
+- name: "WorkflowDoc"
   type: documentation
   doc:
     - |
@@ -31,6 +31,7 @@ $graph:
     - {$include: intro.md}
 
     - |
+
       ## Introduction to draft 3
 
       This specification represents the third milestone of the CWL group.  Since

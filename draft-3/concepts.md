@@ -41,6 +41,11 @@ process and may report an error.
 the sentence) behave as described; if it does, it must provide users a means to
 enable or disable the behavior described.
 
+**deprecated**: Conforming software may implement a behavior but is discouraged
+from doing so.  Portable CWL documents should not rely on deprecated behavior.
+Behavior marked as deprecated may be removed entirely from future revisions of
+the CWL specification.
+
 # Data model
 
 ## Data concepts

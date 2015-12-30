@@ -17,5 +17,11 @@
     "spec_target": "draft-3/index.html",
     "spec_renderlist": [
         "https://w3id.org/cwl/cwl#CommandLineToolDoc"
-    ]
+    ],
+
+    "salad_schema": {
+        "class": "File",
+        "path": "../draft-3/salad/schema_salad/metaschema.yml"
+    },
+    "salad_target": "draft-3/schema_salad.html"
 }

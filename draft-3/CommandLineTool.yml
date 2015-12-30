@@ -5,20 +5,20 @@ $namespaces:
 
 $graph:
 
-- name: "CommandLineToolDoc"
+- name: CommandLineToolDoc
   type: documentation
   doc:
     - |
-      Common Workflow Language (CWL) Command Line Tool Description, draft 3
+      # Common Workflow Language (CWL) Command Line Tool Description, draft 3
 
       This version:
         * https://w3id.org/cwl/draft-3/
 
       Current version:
         * https://w3id.org/cwl/
-
+    - "\n\n"
     - {$include: contrib.md}
-
+    - "\n\n"
     - |
       # Abstract
 
@@ -73,8 +73,6 @@ $graph:
       can be implemented on a variety of computing platforms, ranging from a
       single workstation to cluster, grid, cloud, and high performance
       computing platforms.
-
-    - {$include: refs.md}
 
     - {$include: concepts.md}
 
