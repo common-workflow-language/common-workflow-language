@@ -168,6 +168,18 @@ $graph:
         The default value for this parameter if there is no `source`
         field.
       jsonldPredicate: "cwl:default"
+    - name: valueFrom
+      type:
+        - "null"
+        - "string"
+        - "#Expression"
+      doc: |
+        If `valueFrom` is a constant string value, use this as the value for
+        this input parameter.
+
+        If `valueFrom` is an expression, evaluate the expression to yield the
+        actual value to be assiged to the input field.  The "context" of the
+        expression will be the value of the source parameter.
 
 - type: record
   name: WorkflowStepOutput

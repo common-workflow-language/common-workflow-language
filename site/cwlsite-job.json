@@ -2,26 +2,50 @@
 {
     "cwl:tool": "cwlsite.cwl",
 
-    "readme_in": {
-        "class": "File",
-        "path": "../README.md"
-    },
-    "readme_target": "index.html",
-
     "schema_in": {
         "class": "File",
         "path": "../draft-3/Workflow.yml"
     },
     "context_target": "draft-3/cwl-context.json",
     "rdfs_target": "draft-3/cwl-rdfs.ttl",
-    "spec_target": "draft-3/index.html",
-    "spec_renderlist": [
-        "https://w3id.org/cwl/cwl#CommandLineToolDoc"
-    ],
 
-    "salad_schema": {
-        "class": "File",
-        "path": "../draft-3/salad/schema_salad/metaschema.yml"
-    },
-    "salad_target": "draft-3/schema_salad.html"
+    "render": [
+        {
+            "source": {
+                "class": "File",
+                "path": "../README.md"
+            },
+            "target": "index.html"
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/Workflow.yml"
+            },
+            "target": "draft-3/CommandLineTool.html",
+            "renderlist": [
+                "https://w3id.org/cwl/cwl#CommandLineToolDoc"
+            ]
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/Workflow.yml"
+            },
+            "target": "draft-3/Workflow.html",
+            "renderlist": [
+                "https://w3id.org/cwl/cwl#WorkflowDoc"
+            ]
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/salad/schema_salad/metaschema.yml"
+            },
+            "target": "draft-3/schema_salad.html",
+            "renderlist": [
+                "https://w3id.org/cwl/cwl#WorkflowDoc"
+            ]
+        }
+    ]
 }

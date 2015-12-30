@@ -8,31 +8,32 @@ inputs:
   - id: readme_target
     type: string
 
-  - id: schema_in
-    type: File
+  - id: render
+    type:
+      type: array
+      items:
+        type: record
+        fields:
+          - name: source
+            type: File
+          - name: renderlist
+            type:
+              - type: array
+                items: string
+          - name: target
+            type: string
+
   - id: context_target
     type: string
   - id: rdfs_target
     type: string
-  - id: spec_target
-    type: string
-  - id: spec_renderlist
-    type:
-      type: array
-      items: string
-
-  - id: salad_schema
-    type: File
-  - id: salad_target
-    type: string
 
 outputs:
-  - id: readme_out
-    type: File
-    source: "#readme/out"
-  - id: index
-    type: File
-    source: "#draft3spec/out"
+  - id: doc_out
+    type:
+      type: array
+      items: File
+    source: "#docs/out"
   - id: context
     type: File
     source: "#context/out"
@@ -42,7 +43,6 @@ outputs:
 
 requirements:
   - class: ScatterFeatureRequirement
-  - class: SubworkflowFeatureRequirement
 
 hints:
   - class: DockerRequirement
@@ -65,36 +65,12 @@ steps:
       - { id: out }
     run: makecontext.cwl
 
-  - id: readme
+  - id: docs
     inputs:
-      - { id: source, source: "#readme_in" }
-      - { id: target, source: "#readme_target" }
+      - { id: source, source: "#render", valueFrom: $(self.source) }
+      - { id: target, source: "#render", valueFrom: $(self.target) }
+      - { id: renderlist, source: "#render", valueFrom: $(self.renderlist) }
     outputs:
       - { id: out }
-    run:  makedoc.cwl
-
-  - id: draft3spec
-    inputs:
-      - { id: source, source: "#schema_in" }
-      - { id: target, source: "#spec_target" }
-      - { id: renderlist, source: "#spec_renderlist" }
-    outputs:
-      - { id: out }
-    run:  makedoc.cwl
-
-  - id: draft3spec
-    inputs:
-      - { id: source, source: "#schema_in" }
-      - { id: target, source: "#spec_target" }
-      - { id: renderlist, source: "#spec_renderlist" }
-    outputs:
-      - { id: out }
-    run:  makedoc.cwl
-
-  - id: saladspec
-    inputs:
-      - { id: source, source: "#salad_schema" }
-      - { id: target, source: "#salad_target" }
-    outputs:
-      - { id: out }
+    scatter: ["#docs/source", "#docs/target", "#docs/renderlist"]
     run:  makedoc.cwl
