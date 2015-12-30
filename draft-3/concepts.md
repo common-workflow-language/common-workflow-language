@@ -1,69 +1,3 @@
-Work in progress.
-
-This version:
-  * https://w3id.org/cwl/draft-3/
-
-Current version:
-  * https://w3id.org/cwl/
-
-Authors:
-
-* Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
-* Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
-
-Contributers:
-
-* Luka Stojanovic <luka.stojanovic@sbgenomics.com>, Seven Bridges Genomics
-* John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
-* Michael R. Crusoe <crusoe@ucdavis.edu>, University of California, Davis
-* Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
-* Maxim Mikheev <mikhmv@biodatomics.com>, BioDatomics
-* Stian Soiland-Reyes [soiland-reyes@cs.manchester.ac.uk](mailto:soiland-reyes@cs.manchester.ac.uk), University of Manchester
-
-# Abstract
-
-A Workflow is an analysis task represented by a directed graph describing a
-sequence of operations that transform an input data set to output.  This
-specification defines the Common Workflow Language (CWL), a vendor-neutral
-standard for representing workflows and concrete process steps intended to
-be portable across a variety of computing platforms.
-
-# Status of This Document
-
-This document is the product of the [Common Workflow Language working
-group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
-latest version of this document is available in the "specification" directory at
-
-https://github.com/common-workflow-language/common-workflow-language
-
-The products of the CWL working group (including this document) are made available
-under the terms of the Apache License, version 2.0.
-
-# Introduction
-
-The Common Workflow Language (CWL) working group is an informal, multi-vendor
-working group consisting of various organizations and individuals that have an
-interest in portability of data analysis workflows.  The goal is to create
-specifications like this one that enable data scientists to describe analysis
-tools and workflows that are powerful, easy to use, portable, and support
-reproducibility.
-
-## Introduction to draft 3
-
-This specification represents the third milestone of the CWL group.  Since
-draft-2, this draft introduces the following changes and additions:
-
-* ...
-
-## Purpose
-
-CWL is designed to express workflows for data-intensive science, such as
-Bioinformatics, Chemistry, Physics, and Astronomy.  This specification is
-intended to define a data and execution model for Workflows and Command Line
-Tools that can be implemented on top of a variety of computing platforms,
-ranging from an individual workstation to cluster, grid, cloud, and high
-performance computing systems.
-
 ## References to Other Specifications
 
 * [JSON](http://json.org)
@@ -79,7 +13,7 @@ performance computing systems.
 ## Scope
 
 This document describes the CWL syntax, execution, and object model.  It
-is not intended to document a specific implementation of CWL, however it may
+is not intended to document a CWL specific implementation, however it may
 serve as a reference for the behavior of conforming implementations.
 
 ## Terminology
@@ -200,9 +134,9 @@ execution (for example, fields related to GUI rendering) may
 be stored in [process hints](#requirements_and_hints).
 
 Input metadata (for example, a lab sample identifier) may be explicitly
-represented within a workflow using input parameters which are propagated
-to output.  Future versions of this specification may define additional
-facilities for working with input/output metadata.
+represented within a tool or workflow using input parameters which are
+propagated to output.  Future versions of this specification may define
+additional facilities for working with input/output metadata.
 
 Fields for tool and workflow metadata (for example, authorship for use in
 citations) are not defined in this specification.  Future versions of this
@@ -248,7 +182,7 @@ platform include:
 * Using virtual machines or operating system containers to manage the runtime
 (except as described in [DockerRequirement](#dockerrequirement)).
 * Using remote or distributed file systems to manage input and output files.
-* Translating or rewriting file paths.
+* Transforming file paths.
 * Determining if a process has previously been executed, skipping it and
 reusing previous results.
 * Pausing and resuming of processes or workflows.
@@ -422,18 +356,6 @@ evaluation or some other means.
 Implementations may apply other limits, such as process isolation, timeouts,
 and operating system containers/jails to minimize the security risks associated
 with running untrusted code embedded in a CWL document.
-
-## Workflow graph
-
-A workflow describes a set of **steps** and the **dependencies** between
-those processes.  When a process produces output that will be consumed by a
-second process, the first process is a dependency of the second process.
-When there is a dependency, the workflow engine must execute the dependency
-process and wait for it to successfully produce output before executing the
-dependent process.  If two processes are defined in the workflow graph that
-are not directly or indirectly dependent, these processes are
-**independent**, and may execute in any order or execute concurrently.  A
-workflow is complete when all steps have been executed.
 
 ## Success and failure
 

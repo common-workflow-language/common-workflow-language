@@ -5,6 +5,79 @@ $namespaces:
 
 $graph:
 
+- name: "CommandLineToolDoc"
+  type: documentation
+  doc:
+    - |
+      Common Workflow Language (CWL) Command Line Tool Description, draft 3
+
+      This version:
+        * https://w3id.org/cwl/draft-3/
+
+      Current version:
+        * https://w3id.org/cwl/
+
+    - {$include: contrib.md}
+
+    - |
+      # Abstract
+
+      A Command Line Tool is a non-interactive executable program that reads
+      some input, performs a computation, and terminates after producing some
+      output.  However, POSIX does not dictate computer-readable grammar or
+      semantics for program input and output, resulting in extremely
+      heterogenous command line grammar and input/output semantics among
+      programs.  A consistent language for descripting program invocation
+      enables composability, reproducibility, and portability.  This specification
+      defines the Common Workflow Language (CWL) Command Line Tool Description,
+      a vendor-neutral standard for describing the grammar and input/output
+      semantics of command line programs.
+
+    - {$include: intro.md}
+
+    - |
+      ## Introduction to draft 3
+
+      This specification represents the third milestone of the CWL group.  Since
+      draft-2, this draft introduces the following changes and additions:
+
+        * ...
+
+      ## Purpose
+
+      Standalone programs are a flexible and interoperable form of code reuse.
+      Unlike monolithic applications, applications and analysis workflows which
+      are composed of multiple separate programs can be written in multiple
+      languages and execute concurrently on multiple hosts.  However, POSIX
+      does not dictate computer-readable grammar or semantics for program input
+      and output, resulting in extremely heterogenous command line grammar and
+      input/output semantics among program.  This a particular problem in
+      distributed computing and virtualized enviroments (such as Docker
+      containers) where it is often necessary to provision resources (such as
+      input files) before executing the program.
+
+      Often this is gap is filled by hard coding program invocation and
+      implicitly assuming requirements will be met, or abstracting program
+      invocation with wrapper scripts or descriptor documents.  Unfortunately,
+      when these approaches are application or platform specific it creates a
+      significant barrier to reproducibility and portability, as methods
+      developed for one platform must be manually ported to be used on new
+      platforms.  It also creates redundant work, as wrappers for popular tools
+      must be rewritten for each application or platform in use.
+
+      The Common Workflow Language Command Line Tool Description is designed to
+      provide a common standard description of grammar and semantics for
+      invoking programs used in data-intensive fields such as Bioinformatics,
+      Chemistry, Physics, Astronomy, and Statistics.  This specification
+      defines a precise data and execution model for Command Line Tools that
+      can be implemented on a variety of computing platforms, ranging from a
+      single workstation to cluster, grid, cloud, and high performance
+      computing platforms.
+
+    - {$include: refs.md}
+
+    - {$include: concepts.md}
+
 - $import: Process.yml
 
 - type: record

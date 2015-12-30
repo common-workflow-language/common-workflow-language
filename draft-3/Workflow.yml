@@ -5,7 +5,50 @@ $namespaces:
 
 $graph:
 
-- $import: CommandLineTool.yml
+- name: "CommandLineToolDoc"
+  type: documentation
+  doc:
+    - |
+      Common Workflow Language (CWL) Workflow Description, draft 3
+
+      This version:
+        * https://w3id.org/cwl/draft-3/
+
+      Current version:
+        * https://w3id.org/cwl/
+
+    - {$include: contrib.md}
+
+    - |
+      # Abstract
+
+      A Workflow is an analysis task represented by a directed graph describing
+      a sequence of operations that transform an input data set to output.
+      This specification defines the Common Workflow Language (CWL) Workflow
+      description, a vendor-neutral standard for representing workflows
+      intended to be portable across a variety of computing platforms.
+
+    - {$include: intro.md}
+
+    - |
+      ## Introduction to draft 3
+
+      This specification represents the third milestone of the CWL group.  Since
+      draft-2, this draft introduces the following changes and additions:
+
+        * ...
+
+      ## Purpose
+
+      The Common Workflow Language Command Line Tool Description express
+      workflows for data-intensive science, such as Bioinformatics, Chemistry,
+      Physics, and Astronomy.  This specification is intended to define a data
+      and execution model for Workflows that can be implemented on top of a
+      variety of computing platforms, ranging from an individual workstation to
+      cluster, grid, cloud, and high performance computing systems.
+
+    - {$include: concepts.md}
+
 
 - type: record
   name: ExpressionTool
@@ -25,6 +68,7 @@ $graph:
         The expression to execute.  The expression must return a JSON object which
         matches the output parameters of the ExpressionTool.
 
+- $import: CommandLineTool.yml
 
 - name: LinkMergeMethod
   type: enum
@@ -303,11 +347,16 @@ $graph:
     specializeFrom: "#OutputParameter"
     specializeTo: "#WorkflowOutputParameter"
   doc: |
-    A workflow is a process consisting of one or more `steps`.  Each
-    step has input and output parameters defined by the `inputs` and `outputs`
-    fields.  A workflow executes as described in [execution model](#workflow_graph).
+    A workflow describes a set of **steps** and the **dependencies** between
+    those processes.  When a process produces output that will be consumed by a
+    second process, the first process is a dependency of the second process.
 
-    # Dependencies
+    When there is a dependency, the workflow engine must execute the preceeding
+    process and wait for it to successfully produce output before executing the
+    dependent process.  If two processes are defined in the workflow graph that
+    are not directly or indirectly dependent, these processes are
+    **independent**, and may execute in any order or execute concurrently.  A
+    workflow is complete when all steps have been executed.
 
     Dependencies between parameters are expressed using the `source` field on
     [workflow step input parameters](#workflowstepinput) and [workflow output
@@ -318,6 +367,24 @@ $graph:
     `source`, that value is propagated to the destination parameter.  When all
     data links inbound to a given step are fufilled, the step is ready to
     execute.
+
+    ## Success and failure
+
+    A completed process must result in one of `success`, `temporaryFailure` or
+    `permanentFailure` states.  An implementation may choose to retry a process
+    execution which resulted in `temporaryFailure`.  An implementation may
+    choose to either continue running other steps of a workflow, or terminate
+    immediately upon `permanentFailure`.
+
+    * If any step of a workflow execution results in `permanentFailure`, then the
+    workflow status is `permanentFailure`.
+
+    * If one or more steps result in `temporaryFailure` and all other steps
+    complete `success` or are not executed, then the workflow status is
+    `temporaryFailure`.
+
+    * If all workflow steps are executed and complete with `success`, then the workflow
+    status is `success`.
 
     # Extensions
 
