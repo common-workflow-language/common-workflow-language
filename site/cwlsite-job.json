@@ -15,7 +15,16 @@
                 "class": "File",
                 "path": "../README.md"
             },
-            "target": "index.html"
+            "target": "index.html",
+            "renderlist": []
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/README.md"
+            },
+            "target": "draft-3/index.html",
+            "renderlist": []
         },
         {
             "source": {
@@ -42,10 +51,8 @@
                 "class": "File",
                 "path": "../draft-3/salad/schema_salad/metaschema.yml"
             },
-            "target": "draft-3/schema_salad.html",
-            "renderlist": [
-                "https://w3id.org/cwl/cwl#WorkflowDoc"
-            ]
+            "target": "draft-3/SchemaSalad.html",
+            "renderlist": []
         }
     ]
 }

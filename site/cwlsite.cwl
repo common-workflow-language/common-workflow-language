@@ -3,15 +3,11 @@ cwlVersion: "cwl:draft-3.dev4"
 
 class: Workflow
 inputs:
-  - id: readme_in
-    type: File
-  - id: readme_target
-    type: string
-
   - id: render
     type:
       type: array
       items:
+        name: render
         type: record
         fields:
           - name: source
@@ -23,6 +19,8 @@ inputs:
           - name: target
             type: string
 
+  - id: schema_in
+    type: File
   - id: context_target
     type: string
   - id: rdfs_target
@@ -73,4 +71,5 @@ steps:
     outputs:
       - { id: out }
     scatter: ["#docs/source", "#docs/target", "#docs/renderlist"]
+    scatterMethod: dotproduct
     run:  makedoc.cwl
