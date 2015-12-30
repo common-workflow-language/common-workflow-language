@@ -146,11 +146,13 @@ def number_headings(toc, maindoc):
     maindoc = '\n'.join(mdlines)
     return maindoc
 
-def fix_emails(doc):
+def fix_doc(doc):
+    if isinstance(doc, list):
+        doc = "".join(doc)
     return "\n".join([re.sub(r"<([^>@]+@[^>]+)>", r"[\1](mailto:\1)", d) for d in doc.splitlines()])
 
 class RenderType(object):
-    def __init__(self, toc, j):
+    def __init__(self, toc, j, renderlist):
         self.typedoc = StringIO.StringIO()
         self.toc = toc
         self.subs = {}
@@ -176,19 +178,27 @@ class RenderType(object):
         self.uses = {}
         for t in alltypes:
             self.typemap[t["name"]] = t
-            if t["type"] == "https://w3id.org/cwl/salad#record":
-                for f in t["fields"]:
-                    p = has_types(f)
-                    for tp in p:
-                        if tp not in self.uses:
-                            self.uses[tp] = []
-                        if (t["name"], f["name"]) not in self.uses[tp]:
-                            _, frg1 = urlparse.urldefrag(t["name"])
-                            _, frg2 = urlparse.urldefrag(f["name"])
-                            self.uses[tp].append((frg1, frg2))
+            try:
+                if t["type"] == "https://w3id.org/cwl/salad#record":
+                    for f in t["fields"]:
+                        p = has_types(f)
+                        for tp in p:
+                            if tp not in self.uses:
+                                self.uses[tp] = []
+                            if (t["name"], f["name"]) not in self.uses[tp]:
+                                _, frg1 = urlparse.urldefrag(t["name"])
+                                _, frg2 = urlparse.urldefrag(f["name"])
+                                self.uses[tp].append((frg1, frg2))
+            except KeyError as e:
+                _logger.error("Did not find 'type' in %s", t)
+                raise
 
         for f in alltypes:
-            if ("extends" not in f) and ("docParent" not in f) and ("docAfter" not in f):
+            if (f["name"] in renderlist or
+                ((not renderlist) and
+                 ("extends" not in f) and
+                 ("docParent" not in f) and
+                 ("docAfter" not in f))):
                 self.render_type(f, 1)
 
 
@@ -203,10 +213,10 @@ class RenderType(object):
         if "doc" not in f:
             f["doc"] = ""
 
-        f["doc"] = fix_emails(f["doc"])
+        f["doc"] = fix_doc(f["doc"])
 
         if f["type"] == "record":
-            for field in f["fields"]:
+            for field in f.get("fields", []):
                 if "doc" not in field:
                     field["doc"] = ""
 
@@ -245,7 +255,7 @@ class RenderType(object):
             doc += "<h3>Fields</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
-            for i in f["fields"]:
+            for i in f.get("fields", []):
                 doc += "<tr>"
                 tp = i["type"]
                 if isinstance(tp, list) and tp[0] == "null":
@@ -272,11 +282,11 @@ class RenderType(object):
         for s in self.docAfter.get(f["name"], []):
             self.render_type(self.typemap[s], depth)
 
-def avrold_doc(j, outdoc):
+def avrold_doc(j, outdoc, renderlist):
     toc = ToC()
     toc.start_numbering = False
 
-    rt = RenderType(toc, j)
+    rt = RenderType(toc, j, renderlist)
 
     outdoc.write("""
     <!DOCTYPE html>
@@ -375,14 +385,21 @@ def avrold_doc(j, outdoc):
     </html>""")
 
 if __name__ == "__main__":
-    with open(sys.argv[1]) as f:
-        if sys.argv[1].endswith("yml") or sys.argv[1].endswith("yaml"):
-            uri = "file://" + os.path.abspath(sys.argv[1])
-            _, _, metaschema_loader = schema.get_metaschema()
-            j, schema_metadata = metaschema_loader.resolve_ref(uri, "")
-        else:
-            j = [{"name": sys.argv[2],
+    s = []
+    a = sys.argv[1]
+    with open(a) as f:
+        if a.endswith("md"):
+            s.append({"name": os.path.splitext(os.path.basename(a))[0],
                   "type": "documentation",
                   "doc": f.read().decode("utf-8")
-              }]
-        avrold_doc(j, sys.stdout)
+              })
+        else:
+            uri = "file://" + os.path.abspath(a)
+            _, _, metaschema_loader = schema.get_metaschema()
+            j, schema_metadata = metaschema_loader.resolve_ref(uri, "")
+            if isinstance(j, list):
+                s.extend(j)
+            else:
+                s.append(j)
+
+    avrold_doc(s, sys.stdout, sys.argv[2:])

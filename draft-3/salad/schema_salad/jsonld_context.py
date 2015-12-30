@@ -133,8 +133,11 @@ def salad_to_jsonld_context(j, schema_ctx):
         context[k] = v
         namespaces[k] = rdflib.namespace.Namespace(v)
 
-    defaultBase = context["@base"]
-    del context["@base"]
+    if "@base" in context:
+        defaultBase = context["@base"]
+        del context["@base"]
+    else:
+        defaultBase = ""
 
     for k,v in namespaces.items():
         g.bind(k, v)
