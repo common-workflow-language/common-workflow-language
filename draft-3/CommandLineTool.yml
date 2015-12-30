@@ -179,6 +179,7 @@ $graph:
         - "null"
         - "string"
         - "#Expression"
+      jsonldPredicate: "cwl:valueFrom"
       doc: |
         If `valueFrom` is a constant string value, use this as the value and
         apply the binding rules above.
