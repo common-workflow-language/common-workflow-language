@@ -146,7 +146,9 @@ def number_headings(toc, maindoc):
     maindoc = '\n'.join(mdlines)
     return maindoc
 
-def fix_emails(doc):
+def fix_doc(doc):
+    if isinstance(doc, list):
+        doc = "".join(doc)
     return "\n".join([re.sub(r"<([^>@]+@[^>]+)>", r"[\1](mailto:\1)", d) for d in doc.splitlines()])
 
 class RenderType(object):
@@ -176,16 +178,20 @@ class RenderType(object):
         self.uses = {}
         for t in alltypes:
             self.typemap[t["name"]] = t
-            if t["type"] == "https://w3id.org/cwl/salad#record":
-                for f in t["fields"]:
-                    p = has_types(f)
-                    for tp in p:
-                        if tp not in self.uses:
-                            self.uses[tp] = []
-                        if (t["name"], f["name"]) not in self.uses[tp]:
-                            _, frg1 = urlparse.urldefrag(t["name"])
-                            _, frg2 = urlparse.urldefrag(f["name"])
-                            self.uses[tp].append((frg1, frg2))
+            try:
+                if t["type"] == "https://w3id.org/cwl/salad#record":
+                    for f in t["fields"]:
+                        p = has_types(f)
+                        for tp in p:
+                            if tp not in self.uses:
+                                self.uses[tp] = []
+                            if (t["name"], f["name"]) not in self.uses[tp]:
+                                _, frg1 = urlparse.urldefrag(t["name"])
+                                _, frg2 = urlparse.urldefrag(f["name"])
+                                self.uses[tp].append((frg1, frg2))
+            except KeyError as e:
+                _logger.error("Did not find 'type' in %s", t)
+                raise
 
         for f in alltypes:
             if (f["name"] in renderlist or
@@ -207,7 +213,7 @@ class RenderType(object):
         if "doc" not in f:
             f["doc"] = ""
 
-        f["doc"] = fix_emails(f["doc"])
+        f["doc"] = fix_doc(f["doc"])
 
         if f["type"] == "record":
             for field in f.get("fields", []):

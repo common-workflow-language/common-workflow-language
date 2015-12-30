@@ -807,8 +807,12 @@ $graph:
   abstract: true
   fields:
     - name: doc
-      type: ["null", string]
-      doc: "A documentation string for this type."
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: "A documentation string for this type, or an array of strings which should be concatenated."
       jsonldPredicate: "sld:doc"
 
     - name: docParent
