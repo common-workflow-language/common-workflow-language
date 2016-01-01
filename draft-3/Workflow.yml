@@ -69,8 +69,6 @@ $graph:
         The expression to execute.  The expression must return a JSON object which
         matches the output parameters of the ExpressionTool.
 
-- $import: CommandLineTool.yml
-
 - name: LinkMergeMethod
   type: enum
   docParent: "#WorkflowStepInput"

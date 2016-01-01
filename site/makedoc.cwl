@@ -9,6 +9,14 @@ inputs:
       - "null"
       - type: array
         items: string
+        inputBinding: {prefix: "--only"}
+    inputBinding: {position: 2}
+  - id: redirect
+    type:
+      - "null"
+      - type: array
+        items: string
+        inputBinding: {prefix: "--redirect"}
     inputBinding: {position: 2}
   - id: target
     type: string

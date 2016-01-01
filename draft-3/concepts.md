@@ -74,63 +74,27 @@ not used directly in the computation.
 
 ## Syntax
 
-Documents containing CWL objects are serialized and loaded using YAML
-syntax and UTF-8 text encoding.  A conforming implementation must accept
-all valid YAML documents.
-
-The CWL schema is defined using Avro Linked Data (avro-ld).  Avro-ld is an
-extension of the Apache Avro schema language to support additional
-annotations mapping Avro fields to RDF predicates via JSON-LD.
-
-A CWL document may be validated by transforming the avro-ld schema to a
-base Apache Avro schema.
-
-An implementation may interpret a CWL document as
-[JSON-LD](http://json-ld.org) and convert a CWL document to a [Resource
-Description Framework (RDF)](http://www.w3.org/RDF/) using the
-CWL [JSON-LD Context](https://w3id.org/cwl/draft-2/context) (extracted from the avro-ld schema).
-The CWL [RDFS schema](https://w3id.org/cwl/draft-2/cwl.ttl) defines the classes and properties used by
-CWL as JSON-LD.
-
-The latest draft-2 schema is defined here:
-https://github.com/common-workflow-language/common-workflow-language/blob/master/schemas/draft-2/cwl-avro.yml
-
-
+Documents containing CWL objects are deserialized as defined in the
+[Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html).
+This specifies the preprocessing steps that must be applied when loading CWL
+documents and the schema language that may be used to validate CWL documents.
 
 ## Identifiers
 
 If an object contains an `id` field, that is used to uniquely identify the
 object in that document.  The value of the `id` field must be unique over the
-entire document.  The format of the `id` field is that of a [relative fragment
-identifier](https://tools.ietf.org/html/rfc3986#section-3.5), and must start
-with a hash `#` character.
+entire document.  Identifiers may be resolved relative to other the document
+base and/or other identifiers following the rules are described in the
+[Schema Salad specification](SchemaSalad.html#Identifier_resolution).
 
 An implementation may choose to only honor references to object types for
 which the `id` field is explicitly listed in this specification.
 
-When loading a CWL document, an implementation may resolve relative
-identifiers to absolute URI references.  For example, "my_tool.cwl" located
-in the directory "/home/example/work/" may be transformed to
-"file:///home/example/work/my_tool.cwl" and a relative fragment reference
-"#input" in this file may be transformed to
-"file:///home/example/work/my_tool.cwl#input".
-
 ## Document preprocessing
 
-An implementation must resolve `import` directives.  An `import` directive
-is an object consisting of the field `import` specifying a URI.  The URI
-referenced by `import` must be loaded as a CWL document (including
-recursive preprocessing) and then the `import` object is implicitly
-replaced by the external resource.  URIs may include document fragments
-referring to objects identified by their `id` field, in which case the `import`
-directive is replaced by only the fragment object.
-
-An implementation must resolve `include` directives.  An `include`
-directive is an object consisting of the field `include` specifying a URI.
-The URI referenced by `include` must be loaded as UTF-8 encoded text
-document and the `include` directive implicitly replaced by a string with
-the contents of the document.  Because the loaded resource is unparsed,
-URIs used with `include` must not include fragments.
+An implementation must resolve [$import](SchemaSalad.html#Import) and
+[$include](SchemaSalad.html#Import) directives as described in the
+[Schema Salad specification](SchemaSalad.html).
 
 ## Extensions and Metadata
 
@@ -171,10 +135,13 @@ hardware architecture, hardware resources, operating system, software runtime
 packages, utilities, and data files required to run the tool.
 
 A **workflow platform** is a specific hardware and software implementation
-capable of interpreting a CWL document and executing the processes specified by
+capable of interpreting CWL documents and executing the processes specified by
 the document.  The responsibilities of the workflow platform may include
 scheduling process invocation, setting up the necessary runtime environment,
 making input data available, invoking the tool process, and collecting output.
+
+A workflow platform may choose to only implement the Command Line Tool
+Description part of the CWL specification.
 
 It is intended that the workflow platform has broad leeway outside of this
 specification to optimize use of computing resources and enforce policies
@@ -245,18 +212,28 @@ the CWL core specification.
 
 ## Parameter references
 
-Parameter references are denoted by the syntax `$(...)` and may be used in
-any field permitting the pseudo-type `Expression`, as specified by this
-document.  Conforming implementations must support parameter
-references.  Parameter references use the following subset of
-[Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/) syntax:
+Parameter references are denoted by the syntax `$(...)` and may be used in any
+field permitting the pseudo-type `Expression`, as specified by this document.
+Conforming implementations must support parameter references.  Parameter
+references use the following subset of
+[Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
+syntax.
 
-symbol::    {Unicode alphanumeric}+
-singleq::   '[' ''' ( {character} - ''' | '\' ''' )* ''' ']'
-doubleq::   '[' '"' ( {character} - '"' | '\' '"' )* '"' ']'
-index::     '[' {decimal digit}+ ']'
-segment::   '.' {symbol} | {singleq} | {doubleq} | {index}
-parameter:: '$' '(' {symbol} {segment}* ')'
+In the following BNF grammar, character classes and grammar rules are denoted
+in '{}', '-' denotes exclusion from a character class, '(())' denotes grouping,
+'|' denotes alternates, trailing '*' denotes zero or more repeats, '+' denote
+one or more repeats, all other characters are literal values.
+
+<p>
+<table class="table">
+<tr><td>symbol::   </td><td>{Unicode alphanumeric}+</td></tr>
+<tr><td>singleq::  </td><td>[' (( {character - '} | \' ))* ']</td></tr>
+<tr><td>doubleq::  </td><td>[" (( {character - "} | \" ))* "]</td></tr>
+<tr><td>index::    </td><td>[ {decimal digit}+ ]</td></tr>
+<tr><td>segment::  </td><td>. {symbol} | {singleq} | {doubleq} | {index}</td></tr>
+<tr><td>parameter::</td><td>$( {symbol} {segment}*)</td></tr>
+</table>
+</p>
 
 Use the following algorithm to resolve a parameter reference:
 
@@ -391,5 +368,5 @@ platform's CWL implementation.
 A CWL input object document may similarly begin with `#!/usr/bin/env
 cwl-runner` and be marked as executable.  In this case, the input object
 must include the field "cwl:tool" supplying a URI to the default CWL
-document that should be executed with the fields of the input object as
+document that should be executed using the fields of the input object as
 input parameters.

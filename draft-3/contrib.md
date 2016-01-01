@@ -1,6 +1,6 @@
 Authors:
 
-* Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
+* Peter Amstutz <peter.amstutz@curoverse.com>, Arvados Project, Curoverse
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
 Contributers:

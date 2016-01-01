@@ -17,6 +17,14 @@ $graph:
 - $import: "https://w3id.org/cwl/salad#EnumSchema"
 - $import: "https://w3id.org/cwl/salad#ArraySchema"
 
+- name: BaseTypesDoc
+  type: documentation
+  doc: |
+    ## Base types
+  docChild:
+    - "#CWLType"
+    - "#Process"
+
 - type: enum
   name: CWLVersions
   doc: "Version symbols for published CWL document versions."
@@ -35,6 +43,7 @@ $graph:
 
 - name: File
   type: record
+  docParent: "#CWLType"
   doc: |
     Represents a file (or group of files if `secondaryFiles` is specified) that
     must be accessible by tools using standard POSIX file system call API such as

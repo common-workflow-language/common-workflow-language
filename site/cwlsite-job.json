@@ -4,7 +4,7 @@
 
     "schema_in": {
         "class": "File",
-        "path": "../draft-3/Workflow.yml"
+        "path": "../draft-3/CommonWorkflowLanguage.yml"
     },
     "context_target": "draft-3/cwl-context.json",
     "rdfs_target": "draft-3/cwl-rdfs.ttl",
@@ -16,7 +16,8 @@
                 "path": "../README.md"
             },
             "target": "index.html",
-            "renderlist": []
+            "renderlist": [],
+            "redirect": []
         },
         {
             "source": {
@@ -24,26 +25,38 @@
                 "path": "../draft-3/README.md"
             },
             "target": "draft-3/index.html",
-            "renderlist": []
+            "renderlist": [],
+            "redirect": []
         },
         {
             "source": {
                 "class": "File",
-                "path": "../draft-3/Workflow.yml"
+                "path": "../draft-3/CommandLineTool-standalone.yml"
             },
             "target": "draft-3/CommandLineTool.html",
             "renderlist": [
-                "https://w3id.org/cwl/cwl#CommandLineToolDoc"
-            ]
+                "https://w3id.org/cwl/cwl#CommandLineToolDoc",
+                "https://w3id.org/cwl/cwl#CommandLineTool"
+            ],
+            "redirect": []
         },
         {
             "source": {
                 "class": "File",
-                "path": "../draft-3/Workflow.yml"
+                "path": "../draft-3/CommonWorkflowLanguage.yml"
             },
             "target": "draft-3/Workflow.html",
             "renderlist": [
-                "https://w3id.org/cwl/cwl#WorkflowDoc"
+                "https://w3id.org/cwl/cwl#WorkflowDoc",
+                "https://w3id.org/cwl/cwl#Workflow"
+            ],
+            "redirect": [
+                "https://w3id.org/cwl/cwl#CommandLineTool=CommandLineTool.html#CommandLineTool",
+                "https://w3id.org/cwl/cwl#DockerRequirement=CommandLineTool.html#DockerRequirement",
+                "https://w3id.org/cwl/cwl#CreateFileRequirement=CommandLineTool.html#CreateFileRequirement",
+                "https://w3id.org/cwl/cwl#EnvVarRequirement=CommandLineTool.html#EnvVarRequirement",
+                "https://w3id.org/cwl/cwl#ShellCommandRequirement=CommandLineTool.html#ShellCommandRequirement",
+                "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
             ]
         },
         {
@@ -52,7 +65,8 @@
                 "path": "../draft-3/salad/schema_salad/metaschema.yml"
             },
             "target": "draft-3/SchemaSalad.html",
-            "renderlist": []
+            "renderlist": [],
+            "redirect": []
         }
     ]
 }

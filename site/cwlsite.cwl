@@ -14,8 +14,12 @@ inputs:
             type: File
           - name: renderlist
             type:
-              - type: array
-                items: string
+              type: array
+              items: string
+          - name: redirect
+            type:
+              type: array
+              items: string
           - name: target
             type: string
 
@@ -68,8 +72,9 @@ steps:
       - { id: source, source: "#render", valueFrom: $(self.source) }
       - { id: target, source: "#render", valueFrom: $(self.target) }
       - { id: renderlist, source: "#render", valueFrom: $(self.renderlist) }
+      - { id: redirect, source: "#render", valueFrom: $(self.redirect) }
     outputs:
       - { id: out }
-    scatter: ["#docs/source", "#docs/target", "#docs/renderlist"]
+    scatter: ["#docs/source", "#docs/target", "#docs/renderlist", "#docs/redirect"]
     scatterMethod: dotproduct
     run:  makedoc.cwl
