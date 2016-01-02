@@ -78,12 +78,13 @@ class ToC(object):
             num = "%i.%s" % (self.numbering[0], ".".join([str(n) for n in self.numbering[1:]]))
         else:
             num = ""
-        self.toc += """<li><a href="#%s">%s %s</a><ol class="nav nav-pills nav-stacked nav-secondary">\n""" %(to_id(title),
+        self.toc += """<li><a href="#%s">%s %s</a><ol>\n""" %(to_id(title),
             num, title)
         return num
 
     def contents(self, id):
-        c = """<nav id="%s"><ol class="nav nav-pills nav-stacked">%s""" % (id, self.toc)
+        c = """<h1 id="%s">Table of contents</h1>
+               <nav class="tocnav"><ol>%s""" % (id, self.toc)
         c += "</ol>"
         for i in range(0, len(self.numbering)):
             c += "</li></ol>"
@@ -170,6 +171,7 @@ class RenderType(object):
         self.docAfter = {}
         self.rendered = set()
         self.redirects = redirects
+        self.title = None
 
         for t in j:
             if "extends" in t:
@@ -249,7 +251,7 @@ class RenderType(object):
             lines = []
             for l in f["doc"].splitlines():
                 if len(l) > 0 and l[0] == "#":
-                    l = "#" + l
+                    l = ("#" * depth) + l
                 lines.append(l)
             f["doc"] = "\n".join(lines)
 
@@ -258,6 +260,9 @@ class RenderType(object):
             doc = "## %s %s\n" % (num, frg)
         else:
             doc = ""
+
+        if self.title is None:
+            self.title = f["doc"][0:f["doc"].index("\n")][2:]
 
         if f["type"] == "documentation":
             f["doc"] = number_headings(self.toc, f["doc"])
@@ -311,96 +316,73 @@ class RenderType(object):
         for s in self.docAfter.get(f["name"], []):
             self.render_type(self.typemap[s], depth)
 
-def avrold_doc(j, outdoc, renderlist, redirects):
+def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
     toc = ToC()
     toc.start_numbering = False
 
     rt = RenderType(toc, j, renderlist, redirects)
+    content = rt.typedoc.getvalue()
 
     outdoc.write("""
     <!DOCTYPE html>
     <html>
     <head>
     <meta charset="UTF-8">
-    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     """)
 
-    outdoc.write("<title>%s</title>" % (j[0]["name"]))
+    outdoc.write("<title>%s</title>" % (rt.title))
 
     outdoc.write("""
     <style>
-    html {
-      height:100%;
+    :target {
+      padding-top: 61px;
+      margin-top: -61px;
     }
-
     body {
-      height:100%;
-      position: relative;
+      padding-top: 61px;
     }
-
-    #main {
-     background-color: white;
+    .tocnav ol {
+      list-style: none
     }
-
-    .nav > li > a {
-      padding: 0px;
-    }
-
-    ol > li > ol > li {
-      padding-left: 1em;
-    }
-
-    .nav-secondary > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
-      text-decoration: underline;
-      color: #337AB7;
-      background-color: transparent;
-    }
-
-    #main {
-      overflow-y: auto;
-    }
-
-    #lefttoc {
-      background-color: aliceblue;
-      overflow-y: auto;
-    }
-
-    #toc {
-      margin-top: 1em;
-      margin-bottom: 2em;
-    }
-
-    @media (min-width: 992px) {
-      .full-height {
-        height: 100%;
-      }
-      #lefttoc {
-        border-right: thin solid #C0C0C0;
-      }
-    }
-
     </style>
     </head>
     <body>
-    <div class="container-fluid full-height">
     """)
 
     outdoc.write("""
-    <div class="row full-height">
-    <div id="lefttoc" class="col-md-3 full-height" role="complementary">
-    """)
-    outdoc.write(toc.contents("toc"))
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="%s">%s</a>
+    """ % (brandlink, brand))
+
+    if u"<!--ToC-->" in content:
+        content = content.replace(u"<!--ToC-->", toc.contents("toc"))
+        outdoc.write("""
+                <ul class="nav navbar-nav">
+                  <li><a href="#toc">Table of contents</a></li>
+                </ul>
+        """)
+
     outdoc.write("""
-    </div>
+          </div>
+        </div>
+      </nav>
     """)
 
     outdoc.write("""
-    <div class="col-md-9 full-height" role="main" id="main" data-spy="scroll" data-target="#toc">""")
+    <div class="container">
+    """)
 
-    outdoc.write(rt.typedoc.getvalue().encode("utf-8"))
+    outdoc.write("""
+    <div class="row">
+    """)
+
+    outdoc.write("""
+    <div class="col-md-12" role="main" id="main">""")
+
+    outdoc.write(content.encode("utf-8"))
 
     outdoc.write("""</div>""")
 
@@ -416,6 +398,8 @@ if __name__ == "__main__":
     parser.add_argument("schema")
     parser.add_argument('--only', action='append')
     parser.add_argument('--redirect', action='append')
+    parser.add_argument('--brand')
+    parser.add_argument('--brandlink')
 
     args = parser.parse_args()
 
@@ -438,4 +422,4 @@ if __name__ == "__main__":
 
     redirect = {r.split("=")[0]:r.split("=")[1] for r in args.redirect} if args.redirect else {}
     renderlist = args.only if args.only else []
-    avrold_doc(s, sys.stdout, renderlist, redirect)
+    avrold_doc(s, sys.stdout, renderlist, redirect, args.brand, args.brandlink)
