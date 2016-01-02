@@ -1,0 +1,4 @@
+- name: userguide
+  type: documentation
+  doc:
+    - $include: userguide-intro.md

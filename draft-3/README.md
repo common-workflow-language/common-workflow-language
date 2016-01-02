@@ -2,13 +2,16 @@
 
 The CWL specifications are divided up into several documents.
 
-The [Command Line Tool Description Specification](CommandLineTool.html)
-specifies the schema and semantics for wrapping and executing command line
-tools.
+The [User Guide](UserGuide.html) provides a gentle introduction to writing CWL
+command line tools and workflows.
 
-The [Workflow Description Specification](Workflow.html) specifies the schema
-and semantics for composing workflows from components such as command line
-tools and other workflows.
+The [Command Line Tool Description Specification](CommandLineTool.html)
+specifies the document schema and execution semantics for wrapping and
+executing command line tools.
+
+The [Workflow Description Specification](Workflow.html) specifies the document
+schema and execution semantics for composing workflows from components such as
+command line tools and other workflows.
 
 The
 [Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html)
