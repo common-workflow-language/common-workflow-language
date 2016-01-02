@@ -49,6 +49,7 @@ outputs:
 
 requirements:
   - class: ScatterFeatureRequirement
+  - class: StepInputExpressionRequirement
 
 hints:
   - class: DockerRequirement
