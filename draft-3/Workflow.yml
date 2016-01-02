@@ -16,9 +16,9 @@ $graph:
 
       Current version:
         * https://w3id.org/cwl/
-
+    - "\n\n"
     - {$include: contrib.md}
-
+    - "\n\n"
     - |
       # Abstract
 

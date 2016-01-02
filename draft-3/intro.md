@@ -9,6 +9,8 @@ https://github.com/common-workflow-language/common-workflow-language
 The products of the CWL working group (including this document) are made available
 under the terms of the Apache License, version 2.0.
 
+<!--ToC-->
+
 # Introduction
 
 The Common Workflow Language (CWL) working group is an informal, multi-vendor

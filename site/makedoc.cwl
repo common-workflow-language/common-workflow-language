@@ -18,6 +18,12 @@ inputs:
         items: string
         inputBinding: {prefix: "--redirect"}
     inputBinding: {position: 2}
+  - id: brand
+    type: string
+    inputBinding: {prefix: "--brand"}
+  - id: brandlink
+    type: string
+    inputBinding: {prefix: "--brandlink"}
   - id: target
     type: string
 outputs:

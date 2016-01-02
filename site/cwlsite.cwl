@@ -22,12 +22,16 @@ inputs:
               items: string
           - name: target
             type: string
+          - name: brandlink
+            type: string
 
   - id: schema_in
     type: File
   - id: context_target
     type: string
   - id: rdfs_target
+    type: string
+  - id: brand
     type: string
 
 outputs:
@@ -73,8 +77,10 @@ steps:
       - { id: target, source: "#render", valueFrom: $(self.target) }
       - { id: renderlist, source: "#render", valueFrom: $(self.renderlist) }
       - { id: redirect, source: "#render", valueFrom: $(self.redirect) }
+      - { id: brandlink, source: "#render", valueFrom: $(self.brandlink) }
+      - { id: brand, source: "#brand" }
     outputs:
       - { id: out }
-    scatter: ["#docs/source", "#docs/target", "#docs/renderlist", "#docs/redirect"]
+    scatter: ["#docs/source", "#docs/target", "#docs/renderlist", "#docs/redirect", "#docs/brandlink"]
     scatterMethod: dotproduct
     run:  makedoc.cwl

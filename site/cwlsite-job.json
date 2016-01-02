@@ -9,6 +9,8 @@
     "context_target": "draft-3/cwl-context.json",
     "rdfs_target": "draft-3/cwl-rdfs.ttl",
 
+    "brand": "CWL",
+
     "render": [
         {
             "source": {
@@ -17,7 +19,8 @@
             },
             "target": "index.html",
             "renderlist": [],
-            "redirect": []
+            "redirect": [],
+            "brandlink": "index.html"
         },
         {
             "source": {
@@ -26,7 +29,8 @@
             },
             "target": "draft-3/index.html",
             "renderlist": [],
-            "redirect": []
+            "redirect": [],
+            "brandlink": "../index.html"
         },
         {
             "source": {
@@ -38,7 +42,8 @@
                 "https://w3id.org/cwl/cwl#CommandLineToolDoc",
                 "https://w3id.org/cwl/cwl#CommandLineTool"
             ],
-            "redirect": []
+            "redirect": [],
+            "brandlink": "index.html"
         },
         {
             "source": {
@@ -57,7 +62,8 @@
                 "https://w3id.org/cwl/cwl#EnvVarRequirement=CommandLineTool.html#EnvVarRequirement",
                 "https://w3id.org/cwl/cwl#ShellCommandRequirement=CommandLineTool.html#ShellCommandRequirement",
                 "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
-            ]
+            ],
+            "brandlink": "index.html"
         },
         {
             "source": {
@@ -66,7 +72,8 @@
             },
             "target": "draft-3/SchemaSalad.html",
             "renderlist": [],
-            "redirect": []
+            "redirect": [],
+            "brandlink": "index.html"
         }
     ]
 }
