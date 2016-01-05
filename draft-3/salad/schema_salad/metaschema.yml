@@ -93,12 +93,19 @@ $graph:
 
     ## References to Other Specifications
 
-    * [JSON](http://json.org)
-    * [JSON-LD](http://json-ld.org)
-    * [YAML](http://yaml.org)
-    * [Avro](https://avro.apache.org/docs/current/spec.html)
-    * [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
-    * [Resource Description Framework (RDF)](http://www.w3.org/RDF/)
+    **Javascript Object Notation (JSON)**: http://json.org
+
+    **JSON Linked Data (JSON-LD)**: http://json-ld.org
+
+    **YAML**: http://yaml.org
+
+    **Avro**: https://avro.apache.org/docs/current/spec.html
+
+    **Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)
+
+    **Resource Description Framework (RDF)**: http://www.w3.org/RDF/
+
+    **UTF-8**: https://www.ietf.org/rfc/rfc2279.txt)
 
     ## Scope
 
@@ -178,25 +185,30 @@ $graph:
 
     ### Explicit context
 
-    If a document consists of a single root object, this object may contain the
-    field `@context` consisting of a string, object, array of strings, or array
-    of objects.  If so, it must be interpreted as a limited form of JSON-LD
-    context.  The following JSON-LD directives must be honored:
+    If a document consists of a root object, this object may contain the
+    fields `$base`, `$namespaces`, `$schemas`, and `$graph`:
 
-      * `@base`: set the base URI for the document.
+      * `$base`: Must be a string.  Set the base URI for the document used to
+        resolve relative references.
 
-    Additional directives beginning with `@` must be ignored.  The remaining
-    vocabulary defined in the context must be interpreted as namespace prefixes
-    used during identifier expansion.
+      * `$namespaces`: Must be an object with strings as values.  The keys of
+        the object are namespace prefixes used in the document; the values of
+        the object are the prefix expansions.
+
+      * `$schemas`: Must be an array of strings.  This field may list URI
+        references to documents in RDF-XML format which will be queried for RDF
+        schema data.  The subjects and predicates described by the RDF schema
+        may provide additional semantic context for the document, and may be
+        used for validation of prefixed extension fields found in the document.
+
+    Other directives beginning with `$` must be ignored.
 
     ## Document graph
 
     If a document consists of a single root object, this object may contain the
-    field `@graph` consisting of an array of objects.  If so, the outermost
-    document root object the document processed with the contents of `@graph`
-    considered the main document.  This permits declaring `@context` at the
-    root to cover the whole the document, while logically declaring multiple
-    objects at the top level.
+    field `$graph`.  This field must be an array of objects.  If present, this
+    field holds the primary content of the document.  A document that consists
+    of array of objects at the root is an implict graph.
 
     ## Document metadata
 
@@ -282,35 +294,46 @@ $graph:
 
     ### Example
 
-    The `form` field is part of the vocabulary in the following example.  The
-    base URI is `http://example.com/base`
+    Given the following schema fragment:
+
+    ```
+      [{
+        "name": "base",
+        "jsonldPredicate": "http://example.com/base"
+      }]
+    ```
+
+    Given the following extension namespace:
+    ```
+      "$namespaces": {
+        "acid": "http://example.com/acid#"
+      }
+    ```
+
+    Processing the following example:
 
     ```
     {
-      "@context": {
-        "base": "http://example.com/base"
-        "acid": "http://example.com/acid#"
-      },
       "base": "one",
       "form": {
         "http://example.com/base": "two",
-        "http://example.com/extension": "three",
+        "http://example.com/three": "three",
       },
-      "acid:extension": "four"
+      "acid:four": "four"
     }
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
       "base": "one",
       "form": {
         "base": "two",
-        "http://example.com/extension": "three",
+        "http://example.com/three": "three",
       },
-      "http://example.com/acid#extension": "four"
+      "http://example.com/acid#four": "four"
     }
     ```
 
@@ -332,8 +355,8 @@ $graph:
       identifier field to the fragment portion of the base URI.
 
       * If an identifier URI begins with a namespace prefix declared in
-      `@context` followed by a colon `:`, the prefix and colon must be replaced
-      by the namespace declared in `@context`.
+      `$namespaces` followed by a colon `:`, the prefix and colon must be replaced
+      by the namespace declared in `$namespaces`.
 
       * If an identifier URI is an absolute URI consisting of a scheme and
       path, no processing occurs.
@@ -346,13 +369,26 @@ $graph:
 
     ### Example
 
-    The `id` field is the identifier field in the following example.
+    Given the following schema fragment:
+
+    ```
+      [{
+        "name": "id",
+        "jsonldPredicate": "@id"
+      }]
+    ```
+
+    Given the following extension namespace:
+    ```
+      "$namespaces": {
+        "acid": "http://example.com/acid#"
+      }
+    ```
+
+    Processing the following example:
 
     ```
     {
-      "@context": {
-        "acid": "http://example.com/acid#"
-      },
       "id": "http://example.com/base",
       "form": {
         "id": "one",
@@ -375,7 +411,7 @@ $graph:
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
@@ -423,8 +459,8 @@ $graph:
       fragment portion of the reference URI.
 
       * If a reference URI begins with a namespace prefix declared in
-      `@context` followed by a colon `:`, the prefix and colon must be replaced
-      by the namespace declared in `@context`.
+      `$namespaces` followed by a colon `:`, the prefix and colon must be replaced
+      by the namespace declared in `$namespaces`.
 
       * If a reference URI is an absolute URI consisting of a scheme and path,
         no processing occurs.
@@ -434,16 +470,23 @@ $graph:
 
     ### Example
 
+    Given the following schema fragment:
+
+    ```
+    {
+      "name": "link"
+      "jsonldPredicate": {
+         "_type": "@id"
+       }
+    }
+    ```
+
     The `link` field is the reference field in the following example.  The
     base URI is `http://example.com/base`
 
     ```
     {
-      "@context": {
-        "link": {
-          "@id": "http://example.com/link"
-          "@type": "@id"
-        },
+      "$namespaces": {
         "acid": "http://example.com/acid#"
       },
       "link": "http://example.com/base/zero",
@@ -468,7 +511,7 @@ $graph:
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
@@ -507,15 +550,24 @@ $graph:
 
     ### Example
 
+    Given the following schema fragment:
+
+    ```
+    [{
+      "name": "voc"
+      "jsonldPredicate": {
+         "_type": "@vocab"
+       }
+    },
+    {
+      "names": "Colors",
+      "type": "enum",
+      "symbols": ["http://example.com/acid#red"]
+    ]
+    ```
+
     ```
     {
-      "@context": {
-        "voc": {
-          "@id": "http://example.com/link"
-          "@type": "@vocab"
-        },
-        "red": "http://example.com/acid#red"
-      },
       "form": {
         "things": [
           {
@@ -685,12 +737,12 @@ $graph:
   doc: ""
 
 
-- name: "JSON_LD_Context"
-  type: documentation
-  doc: |
-    # Generating JSON-LD Context
+# - name: "JSON_LD_Context"
+#   type: documentation
+#   doc: |
+#     # Generating JSON-LD Context
 
-    How to generate the json-ld context...
+#     How to generate the json-ld context...
 
 
 - name: PrimitiveType
@@ -822,6 +874,19 @@ $graph:
         for this type should appear in a subsection under `docParent`.
       jsonldPredicate:
         _id: "sld:docParent"
+        _type: "@id"
+
+    - name: docChild
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for `docChild` should appear in a subsection under this type.
+      jsonldPredicate:
+        _id: "sld:docChild"
         _type: "@id"
 
     - name: docAfter

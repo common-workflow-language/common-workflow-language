@@ -11,12 +11,15 @@ import logging
 import urlparse
 from aslist import aslist
 import re
+import argparse
 
 _logger = logging.getLogger("salad")
 
 def has_types(items):
     r = []
     if isinstance(items, dict):
+        if items["type"] == "https://w3id.org/cwl/salad#record":
+            return [items["name"]]
         for n in ("type", "items", "values"):
             if n in items:
                 r.extend(has_types(items[n]))
@@ -75,43 +78,51 @@ class ToC(object):
             num = "%i.%s" % (self.numbering[0], ".".join([str(n) for n in self.numbering[1:]]))
         else:
             num = ""
-        self.toc += """<li><a href="#%s">%s %s</a><ol class="nav nav-pills nav-stacked nav-secondary">\n""" %(to_id(title),
+        self.toc += """<li><a href="#%s">%s %s</a><ol>\n""" %(to_id(title),
             num, title)
         return num
 
     def contents(self, id):
-        c = """<nav id="%s"><ol class="nav nav-pills nav-stacked">%s""" % (id, self.toc)
+        c = """<h1 id="%s">Table of contents</h1>
+               <nav class="tocnav"><ol>%s""" % (id, self.toc)
         c += "</ol>"
         for i in range(0, len(self.numbering)):
             c += "</li></ol>"
         c += """</nav>"""
         return c
 
-def typefmt(tp, nbsp=False):
+basicTypes = ("https://w3id.org/cwl/salad#null",
+              "http://www.w3.org/2001/XMLSchema#boolean",
+              "http://www.w3.org/2001/XMLSchema#int",
+              "http://www.w3.org/2001/XMLSchema#long",
+              "http://www.w3.org/2001/XMLSchema#float",
+              "http://www.w3.org/2001/XMLSchema#double",
+              "http://www.w3.org/2001/XMLSchema#string",
+              "https://w3id.org/cwl/salad#record",
+              "https://w3id.org/cwl/salad#enum",
+              "https://w3id.org/cwl/salad#array")
+
+def typefmt(tp, redirects, nbsp=False):
     if isinstance(tp, list):
         if nbsp and len(tp) <= 3:
-            return "&nbsp;|&nbsp;".join([typefmt(n) for n in tp])
+            return "&nbsp;|&nbsp;".join([typefmt(n, redirects) for n in tp])
         else:
-            return " | ".join([typefmt(n) for n in tp])
+            return " | ".join([typefmt(n, redirects) for n in tp])
     if isinstance(tp, dict):
         if tp["type"] == "https://w3id.org/cwl/salad#array":
-            return "array&lt;%s&gt;" % (typefmt(tp["items"], True))
+            return "array&lt;%s&gt;" % (typefmt(tp["items"], redirects, nbsp=True))
         if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
             frg = schema.avro_name(tp["name"])
-            return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
+            if tp["name"] in redirects:
+                return """<a href="%s">%s</a>""" % (redirects[tp["name"]], frg)
+            else:
+                return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
         if isinstance(tp["type"], dict):
-            return typefmt(tp["type"])
+            return typefmt(tp["type"], redirects)
     else:
-        if str(tp) in ("https://w3id.org/cwl/salad#null",
-                       "http://www.w3.org/2001/XMLSchema#boolean",
-                       "http://www.w3.org/2001/XMLSchema#int",
-                       "http://www.w3.org/2001/XMLSchema#long",
-                       "http://www.w3.org/2001/XMLSchema#float",
-                       "http://www.w3.org/2001/XMLSchema#double",
-                       "http://www.w3.org/2001/XMLSchema#string",
-                       "https://w3id.org/cwl/salad#record",
-                       "https://w3id.org/cwl/salad#enum",
-                       "https://w3id.org/cwl/salad#array"):
+        if str(tp) in redirects:
+            return """<a href="%s">%s</a>""" % (redirects[tp], redirects[tp])
+        elif str(tp) in basicTypes:
             return """<a href="#CWLType">%s</a>""" % schema.avro_name(str(tp))
         else:
             _, frg = urlparse.urldefrag(tp)
@@ -152,21 +163,29 @@ def fix_doc(doc):
     return "\n".join([re.sub(r"<([^>@]+@[^>]+)>", r"[\1](mailto:\1)", d) for d in doc.splitlines()])
 
 class RenderType(object):
-    def __init__(self, toc, j, renderlist):
+    def __init__(self, toc, j, renderlist, redirects):
         self.typedoc = StringIO.StringIO()
         self.toc = toc
         self.subs = {}
         self.docParent = {}
         self.docAfter = {}
+        self.rendered = set()
+        self.redirects = redirects
+        self.title = None
+
         for t in j:
             if "extends" in t:
                 for e in aslist(t["extends"]):
                     add_dictlist(self.subs, e, t["name"])
-                    if "docParent" not in t and "docAfter" not in t:
-                        add_dictlist(self.docParent, e, t["name"])
+                    #if "docParent" not in t and "docAfter" not in t:
+                    #    add_dictlist(self.docParent, e, t["name"])
 
             if t.get("docParent"):
                 add_dictlist(self.docParent, t["docParent"], t["name"])
+
+            if t.get("docChild"):
+                for c in aslist(t["docChild"]):
+                    add_dictlist(self.docParent, t["name"], c)
 
             if t.get("docAfter"):
                 add_dictlist(self.docAfter, t["docAfter"], t["name"])
@@ -176,11 +195,13 @@ class RenderType(object):
 
         self.typemap = {}
         self.uses = {}
+        self.record_refs = {}
         for t in alltypes:
             self.typemap[t["name"]] = t
             try:
-                if t["type"] == "https://w3id.org/cwl/salad#record":
-                    for f in t["fields"]:
+                if t["type"] == "record":
+                    self.record_refs[t["name"]] = []
+                    for f in t.get("fields", []):
                         p = has_types(f)
                         for tp in p:
                             if tp not in self.uses:
@@ -189,6 +210,8 @@ class RenderType(object):
                                 _, frg1 = urlparse.urldefrag(t["name"])
                                 _, frg2 = urlparse.urldefrag(f["name"])
                                 self.uses[tp].append((frg1, frg2))
+                            if tp not in basicTypes and tp not in self.record_refs[t["name"]]:
+                                    self.record_refs[t["name"]].append(tp)
             except KeyError as e:
                 _logger.error("Did not find 'type' in %s", t)
                 raise
@@ -203,6 +226,10 @@ class RenderType(object):
 
 
     def render_type(self, f, depth):
+        if f["name"] in self.rendered or f["name"] in self.redirects:
+            return
+        self.rendered.add(f["name"])
+
         if "doc" not in f:
             f["doc"] = ""
 
@@ -224,7 +251,7 @@ class RenderType(object):
             lines = []
             for l in f["doc"].splitlines():
                 if len(l) > 0 and l[0] == "#":
-                    l = "#" + l
+                    l = ("#" * depth) + l
                 lines.append(l)
             f["doc"] = "\n".join(lines)
 
@@ -234,19 +261,22 @@ class RenderType(object):
         else:
             doc = ""
 
+        if self.title is None:
+            self.title = f["doc"][0:f["doc"].index("\n")][2:]
+
         if f["type"] == "documentation":
             f["doc"] = number_headings(self.toc, f["doc"])
 
-        if "extends" in f:
-            doc += "\n\nExtends "
-            doc += ", ".join([" %s" % linkto(ex) for ex in aslist(f["extends"])])
-        if f["name"] in self.subs:
-            doc += "\n\nExtended by"
-            doc += ", ".join([" %s" % linkto(s) for s in self.subs[f["name"]]])
+        #if "extends" in f:
+        #    doc += "\n\nExtends "
+        #    doc += ", ".join([" %s" % linkto(ex) for ex in aslist(f["extends"])])
+        #if f["name"] in self.subs:
+        #    doc += "\n\nExtended by"
+        #    doc += ", ".join([" %s" % linkto(s) for s in self.subs[f["name"]]])
+        #if f["name"] in self.uses:
+        #    doc += "\n\nReferenced by"
+        #    doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in self.uses[f["name"]]])
 
-        if f["name"] in self.uses:
-            doc += "\n\nReferenced by"
-            doc += ", ".join([" [%s.%s](#%s)" % (s[0], s[1], to_id(s[0])) for s in self.uses[f["name"]]])
         doc = doc + "\n\n" + f["doc"]
 
         doc = mistune.markdown(doc, renderer=MyRenderer())
@@ -265,116 +295,94 @@ class RenderType(object):
                     opt = True
 
                 desc = i["doc"]
-                if "inherited_from" in i:
-                    desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
+                #if "inherited_from" in i:
+                #    desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
 
                 frg = schema.avro_name(i["name"])
-                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp), opt, mistune.markdown(desc))
+                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp, self.redirects), opt, mistune.markdown(desc))
                 doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
 
         self.typedoc.write(f["doc"])
 
-        for s in self.docParent.get(f["name"], []):
-            self.render_type(self.typemap[s], depth+1)
+        subs = self.docParent.get(f["name"], []) + self.record_refs.get(f["name"], [])
+        if len(subs) == 1:
+            self.render_type(self.typemap[subs[0]], depth)
+        else:
+            for s in subs:
+                self.render_type(self.typemap[s], depth+1)
 
         for s in self.docAfter.get(f["name"], []):
             self.render_type(self.typemap[s], depth)
 
-def avrold_doc(j, outdoc, renderlist):
+def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
     toc = ToC()
     toc.start_numbering = False
 
-    rt = RenderType(toc, j, renderlist)
+    rt = RenderType(toc, j, renderlist, redirects)
+    content = rt.typedoc.getvalue()
 
     outdoc.write("""
     <!DOCTYPE html>
     <html>
     <head>
     <meta charset="UTF-8">
-    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     """)
 
-    outdoc.write("<title>%s</title>" % (j[0]["name"]))
+    outdoc.write("<title>%s</title>" % (rt.title))
 
     outdoc.write("""
     <style>
-    html {
-      height:100%;
+    :target {
+      padding-top: 61px;
+      margin-top: -61px;
     }
-
     body {
-      height:100%;
-      position: relative;
+      padding-top: 61px;
     }
-
-    #main {
-     background-color: white;
+    .tocnav ol {
+      list-style: none
     }
-
-    .nav > li > a {
-      padding: 0px;
-    }
-
-    ol {
-      list-style-type: none;
-    }
-    ol > li > ol > li {
-      padding-left: 1em;
-    }
-
-    .nav-secondary > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
-      text-decoration: underline;
-      color: #337AB7;
-      background-color: transparent;
-    }
-
-    #main {
-      overflow-y: auto;
-    }
-
-    #lefttoc {
-      background-color: aliceblue;
-      overflow-y: auto;
-    }
-
-    #toc {
-      margin-top: 1em;
-      margin-bottom: 2em;
-    }
-
-    @media (min-width: 992px) {
-      .full-height {
-        height: 100%;
-      }
-      #lefttoc {
-        border-right: thin solid #C0C0C0;
-      }
-    }
-
     </style>
     </head>
     <body>
-    <div class="container-fluid full-height">
     """)
 
     outdoc.write("""
-    <div class="row full-height">
-    <div id="lefttoc" class="col-md-3 full-height" role="complementary">
-    """)
-    outdoc.write(toc.contents("toc"))
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="%s">%s</a>
+    """ % (brandlink, brand))
+
+    if u"<!--ToC-->" in content:
+        content = content.replace(u"<!--ToC-->", toc.contents("toc"))
+        outdoc.write("""
+                <ul class="nav navbar-nav">
+                  <li><a href="#toc">Table of contents</a></li>
+                </ul>
+        """)
+
     outdoc.write("""
-    </div>
+          </div>
+        </div>
+      </nav>
     """)
 
     outdoc.write("""
-    <div class="col-md-9 full-height" role="main" id="main" data-spy="scroll" data-target="#toc">""")
+    <div class="container">
+    """)
 
-    outdoc.write(rt.typedoc.getvalue().encode("utf-8"))
+    outdoc.write("""
+    <div class="row">
+    """)
+
+    outdoc.write("""
+    <div class="col-md-12" role="main" id="main">""")
+
+    outdoc.write(content.encode("utf-8"))
 
     outdoc.write("""</div>""")
 
@@ -385,8 +393,18 @@ def avrold_doc(j, outdoc, renderlist):
     </html>""")
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("schema")
+    parser.add_argument('--only', action='append')
+    parser.add_argument('--redirect', action='append')
+    parser.add_argument('--brand')
+    parser.add_argument('--brandlink')
+
+    args = parser.parse_args()
+
     s = []
-    a = sys.argv[1]
+    a = args.schema
     with open(a) as f:
         if a.endswith("md"):
             s.append({"name": os.path.splitext(os.path.basename(a))[0],
@@ -402,4 +420,6 @@ if __name__ == "__main__":
             else:
                 s.append(j)
 
-    avrold_doc(s, sys.stdout, sys.argv[2:])
+    redirect = {r.split("=")[0]:r.split("=")[1] for r in args.redirect} if args.redirect else {}
+    renderlist = args.only if args.only else []
+    avrold_doc(s, sys.stdout, renderlist, redirect, args.brand, args.brandlink)
