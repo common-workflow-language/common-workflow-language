@@ -24,14 +24,14 @@ $graph:
 
       A Command Line Tool is a non-interactive executable program that reads
       some input, performs a computation, and terminates after producing some
-      output.  However, POSIX does not dictate computer-readable grammar or
-      semantics for program input and output, resulting in extremely
-      heterogenous command line grammar and input/output semantics among
-      programs.  A consistent language for descripting program invocation
-      enables composability, reproducibility, and portability.  This specification
-      defines the Common Workflow Language (CWL) Command Line Tool Description,
-      a vendor-neutral standard for describing the grammar and input/output
-      semantics of command line programs.
+      output.  Command line programs are a flexible unit of code sharing and
+      reuse, unfortunately the syntax and input/output semantics among command
+      line programs is extremely heterogeneous. A common layer for describing
+      the syntax and semantics of programs can reduce this incidental
+      complexity by providing a consistent way to connect programs together.
+      This specification defines the Common Workflow Language (CWL) Command
+      Line Tool Description, a vendor-neutral standard for describing the
+      syntax and input/output semantics of command line programs.
 
     - {$include: intro.md}
 
@@ -39,9 +39,19 @@ $graph:
       ## Introduction to draft 3
 
       This specification represents the third milestone of the CWL group.  Since
-      draft-2, this draft introduces the following changes and additions:
+      draft-2, this draft introduces the following major changes and additions:
 
-        * ...
+        * Greatly simplified naming within a document with scoped identifiers, as
+          described in the [Schema Salad specification](SchemaSalad.html).
+        * The draft-2 concept of pluggable expression engines has been replaced
+          by a [streamlined expression syntax](#Parameter_references)
+          and standardization on [Javascript](#Expressions).
+        * [File](#File) objects can now include a `format` field to indicate
+          the file type.
+        * The addition of [ShellCommandRequirement](#ShellCommandRequirement).
+        * The addition of [ResourceRequirement](#ResourceRequirement).
+        * The separation of CommandLineTool and Workflow components into
+          separate specifications.
 
       ## Purpose
 
@@ -50,20 +60,20 @@ $graph:
       are composed of multiple separate programs can be written in multiple
       languages and execute concurrently on multiple hosts.  However, POSIX
       does not dictate computer-readable grammar or semantics for program input
-      and output, resulting in extremely heterogenous command line grammar and
+      and output, resulting in extremely heterogeneous command line grammar and
       input/output semantics among program.  This a particular problem in
-      distributed computing and virtualized enviroments (such as Docker
-      containers) where it is often necessary to provision resources (such as
-      input files) before executing the program.
+      distributed computing (multi-node compute clusters) and virtualized
+      environments (such as Docker containers) where it is often necessary to
+      provision resources such as input files before executing the program.
 
       Often this is gap is filled by hard coding program invocation and
       implicitly assuming requirements will be met, or abstracting program
       invocation with wrapper scripts or descriptor documents.  Unfortunately,
-      when these approaches are application or platform specific it creates a
+      where these approaches are application or platform specific it creates a
       significant barrier to reproducibility and portability, as methods
       developed for one platform must be manually ported to be used on new
-      platforms.  It also creates redundant work, as wrappers for popular tools
-      must be rewritten for each application or platform in use.
+      platforms.  Similarly it creates redundant work, as wrappers for popular
+      tools must be rewritten for each application or platform in use.
 
       The Common Workflow Language Command Line Tool Description is designed to
       provide a common standard description of grammar and semantics for

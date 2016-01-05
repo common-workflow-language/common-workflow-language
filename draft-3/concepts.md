@@ -1,18 +1,22 @@
 ## References to Other Specifications
 
-* [JSON](http://json.org)
-* [JSON-LD](http://json-ld.org)
-* [JSON Pointer](https://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04)
-* [YAML](http://yaml.org)
-* [Avro](https://avro.apache.org/docs/current/spec.html)
-* [Uniform Resource Identifier (URI): Generic Syntax](https://tools.ietf.org/html/rfc3986)
-* [UTF-8](https://www.ietf.org/rfc/rfc2279.txt)
-* [Portable Operating System Interface (POSIX.1-2008)](http://pubs.opengroup.org/onlinepubs/9699919799/)
-* [Resource Description Framework (RDF)](http://www.w3.org/RDF/)
+**Javascript Object Notation (JSON)**: http://json.org
+
+**JSON Linked Data (JSON-LD)**: http://json-ld.org
+
+**YAML**: http://yaml.org
+
+**Avro**: https://avro.apache.org/docs/current/spec.html
+
+**Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)
+
+**Portable Operating System Interface (POSIX.1-2008)**: http://pubs.opengroup.org/onlinepubs/9699919799/
+
+**Resource Description Framework (RDF)**: http://www.w3.org/RDF/
 
 ## Scope
 
-This document describes the CWL syntax, execution, and object model.  It
+This document describes CWL syntax, execution, and object model.  It
 is not intended to document a CWL specific implementation, however it may
 serve as a reference for the behavior of conforming implementations.
 
@@ -41,8 +45,8 @@ process and may report an error.
 the sentence) behave as described; if it does, it must provide users a means to
 enable or disable the behavior described.
 
-**deprecated**: Conforming software may implement a behavior but is discouraged
-from doing so.  Portable CWL documents should not rely on deprecated behavior.
+**deprecated**: Conforming software may implement a behavior for backwards
+compatibility.  Portable CWL documents should not rely on deprecated behavior.
 Behavior marked as deprecated may be removed entirely from future revisions of
 the CWL specification.
 
@@ -74,10 +78,13 @@ not used directly in the computation.
 
 ## Syntax
 
-Documents containing CWL objects are deserialized as defined in the
+CWL documents must consist of an object or array of objects represented using
+JSON or YAML syntax.  Upon loading, a CWL implementation must apply the
+preprocessing steps described in the
 [Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html).
-This specifies the preprocessing steps that must be applied when loading CWL
-documents and the schema language that may be used to validate CWL documents.
+A implementation may formally validate the structure of a CWL document using
+SALAD schemas located at
+https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-3
 
 ## Identifiers
 
@@ -98,18 +105,20 @@ An implementation must resolve [$import](SchemaSalad.html#Import) and
 
 ## Extensions and Metadata
 
-Implementation extensions not required for correct
-execution (for example, fields related to GUI rendering) may
-be stored in [process hints](#requirements_and_hints).
+Input metadata (for example, a lab sample identifier) may be represented within
+a tool or workflow using input parameters which are explicitly propagated to
+output.  Future versions of this specification may define additional facilities
+for working with input/output metadata.
 
-Input metadata (for example, a lab sample identifier) may be explicitly
-represented within a tool or workflow using input parameters which are
-propagated to output.  Future versions of this specification may define
-additional facilities for working with input/output metadata.
+Implementation extensions not required for correct execution (for example,
+fields related to GUI presentation) and metadata about the tool or workflow
+itself (for example, authorship for use in citations) may be provided as
+additional fields on any object.  Such extensions fields must use a namespace
+prefix listed in the `$namespaces` section of the document as described in the
+[Schema Salad specification](SchemaSalad.html#Explicit_context).
 
-Fields for tool and workflow metadata (for example, authorship for use in
-citations) are not defined in this specification.  Future versions of this
-specification may define such fields.
+Implementation extensions which modify execution semantics must be [listed in
+the `requirements` field](#Requirements_and_hints).
 
 # Execution model
 
@@ -145,30 +154,30 @@ Description part of the CWL specification.
 
 It is intended that the workflow platform has broad leeway outside of this
 specification to optimize use of computing resources and enforce policies
-not covered by this specifcation.  Some areas that are currently out of
+not covered by this specification.  Some areas that are currently out of
 scope for CWL specification but may be handled by a specific workflow
 platform include:
 
 * Data security and permissions.
 * Scheduling tool invocations on remote cluster or cloud compute nodes.
 * Using virtual machines or operating system containers to manage the runtime
-(except as described in [DockerRequirement](#dockerrequirement)).
+(except as described in [DockerRequirement](#DockerRequirement)).
 * Using remote or distributed file systems to manage input and output files.
 * Transforming file paths.
 * Determining if a process has previously been executed, skipping it and
 reusing previous results.
-* Pausing and resuming of processes or workflows.
+* Pausing, resuming or checkpointing processes or workflows.
 
 Conforming CWL processes must not assume anything about the runtime
 environment or workflow platform unless explicitly declared though the use
-of [process requirements](#processrequirement).
+of [process requirements](#Requirements_and_hints).
 
 ## Generic execution process
 
-The generic execution sequence of a CWL process (including both workflows
-and concrete process implementations) is as follows.
+The generic execution sequence of a CWL process (including workflows and
+command line line tools) is as follows.
 
-1. Load and validate CWL document, yielding a process object.
+1. Load, process and validate a CWL document, yielding a process object.
 2. Load input object.
 3. Validate the input object against the `inputs` schema for the process.
 4. Validate that process requirements are met.
@@ -180,7 +189,7 @@ and concrete process implementations) is as follows.
 
 ## Requirements and hints
 
-A **[process requirement](#processrequirement)** modifies the semantics or runtime
+A **process requirement** modifies the semantics or runtime
 environment of a process.  If an implementation cannot satisfy all
 requirements, or a requirement is listed which is not recognized by the
 implementation, it is a fatal error and the implementation must not attempt
@@ -197,7 +206,7 @@ apply to the process implementation.
 If the same process requirement appears at different levels of the
 workflow, the most specific instance of the requirement is used, that is,
 an entry in `requirements` on a process implementation such as
-CommandLineTool will take precendence over an entry in `requirements`
+CommandLineTool will take precedence over an entry in `requirements`
 specified in a workflow step, and an entry in `requirements` on a workflow
 step takes precedence over the workflow.  Entries in `hints` are resolved
 the same way.
@@ -206,9 +215,6 @@ Requirements override hints.  If a process implementation provides a
 process requirement in `hints` which is also provided in `requirements` by
 an enclosing workflow or workflow step, the enclosing `requirements` takes
 precedence.
-
-Process requirements are the primary mechanism for specifying extensions to
-the CWL core specification.
 
 ## Parameter references
 
@@ -250,7 +256,7 @@ Use the following algorithm to resolve a parameter reference:
      of range.
   7. Repeat steps 3-6
 
-The root namspace is the parameter context.  The following parameters must
+The root namespace is the parameter context.  The following parameters must
 be provided:
 
   * `inputs`: The input object to the current Process.
@@ -308,7 +314,7 @@ code fragment wrapped in the `${...}` syntax must be evaluated as a
 [EMACScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
 for an anonymous, zero-argument function.  Expressions must return a valid JSON
 data type: one of null, string, number, boolean, array, object.
-Implementations must permit any syntatically valid Javascript and account
+Implementations must permit any syntactically valid Javascript and account
 for nesting of parenthesis or braces and that strings that may contain
 parenthesis or braces when scanning for expressions.
 
@@ -331,7 +337,7 @@ The order in which expressions are evaluated is undefined except where
 otherwise noted in this document.
 
 An implementation may choose to implement parameter references by
-evalutating as a Javascript expression.  The results of evaluating
+evaluating as a Javascript expression.  The results of evaluating
 parameter references must be identical whether implemented by Javascript
 evaluation or some other means.
 
@@ -367,6 +373,6 @@ platform's CWL implementation.
 
 A CWL input object document may similarly begin with `#!/usr/bin/env
 cwl-runner` and be marked as executable.  In this case, the input object
-must include the field "cwl:tool" supplying a URI to the default CWL
+must include the field `cwl:tool` supplying a URI to the default CWL
 document that should be executed using the fields of the input object as
 input parameters.
