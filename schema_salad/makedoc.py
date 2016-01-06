@@ -240,6 +240,14 @@ class RenderType(object):
         if "doc" not in f:
             f["doc"] = ""
 
+        enumDesc = {}
+        if f["type"] == "enum" and isinstance(f["doc"], list):
+            for i in f["doc"]:
+                idx = i.find(":")
+                if idx > -1:
+                    enumDesc[i[:idx]] = i[idx+1:]
+            f["doc"] = [i for i in f["doc"] if i.find(":") == -1 or i.find(" ") < i.find(":")]
+
         f["doc"] = fix_doc(f["doc"])
 
         if f["type"] == "record":
@@ -300,6 +308,16 @@ class RenderType(object):
 
                 frg = schema.avro_name(i["name"])
                 doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp, self.redirects), opt, mistune.markdown(desc))
+                doc += "</tr>"
+            doc += """</table>"""
+        elif f["type"] == "enum":
+            doc += "<h3>Symbols</h3>"
+            doc += """<table class="table table-striped">"""
+            doc += "<tr><th>symbol</th><th>description</th></tr>"
+            for i in f.get("symbols", []):
+                doc += "<tr>"
+                frg = schema.avro_name(i)
+                doc += "<td><code>%s</code></td><td>%s</td>" % (frg, enumDesc.get(frg, ""))
                 doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
