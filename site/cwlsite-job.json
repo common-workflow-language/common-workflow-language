@@ -71,7 +71,12 @@
                 "path": "../draft-3/salad/schema_salad/metaschema.yml"
             },
             "target": "draft-3/SchemaSalad.html",
-            "renderlist": [],
+            "renderlist": [
+                "https://w3id.org/cwl/salad#Semantic_Annotations_for_Linked_Avro_Data",
+                "https://w3id.org/cwl/salad#SaladRecordSchema",
+                "https://w3id.org/cwl/salad#SaladEnumSchema",
+                "https://w3id.org/cwl/salad#Documentation"
+            ],
             "redirect": [],
             "brandlink": "index.html"
         },
