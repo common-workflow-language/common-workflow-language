@@ -18,13 +18,11 @@ $graph:
 
     * Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
 
-    Contributers:
+    Contributors:
 
     * The developers of Apache Avro
     * The developers of JSON-LD
     * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
-    * Stian Soiland-Reyes [soiland-reyes@cs.manchester.ac.uk](mailto:soiland-reyes@cs.manchester.ac.uk), University of Manchester
-    * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
 
     # Abstract
 
@@ -183,7 +181,7 @@ $graph:
 
     The implicit context consists of the vocabulary defined by the schema and
     the base URI.  By default, the base URI must be the URI that was used to
-    load the document.  It may be overidden by an explicit context.
+    load the document.  It may be overridden by an explicit context.
 
     ### Explicit context
 
@@ -210,7 +208,7 @@ $graph:
     If a document consists of a single root object, this object may contain the
     field `$graph`.  This field must be an array of objects.  If present, this
     field holds the primary content of the document.  A document that consists
-    of array of objects at the root is an implict graph.
+    of array of objects at the root is an implicit graph.
 
     ## Document metadata
 
@@ -265,7 +263,7 @@ $graph:
 
     After processing the explicit context (if any), document preprocessing
     begins.  Starting from the document root, object fields values or array
-    items which containin objects or arrays are recursively traversed
+    items which contain objects or arrays are recursively traversed
     depth-first.  For each visited object, field names, identifier fields, link
     fields, vocabulary fields, and `$import` and `$include` directives must be
     processed as described in this section.  The order of traversal of child
@@ -806,7 +804,7 @@ $graph:
         * If the value of this field is `@id` and `identity` is false or
         unspecified, the parent field must be resolved using the link
         resolution rules.  If `identity` is true, the parent field must be
-        resolved using the identifier expandsion rules.
+        resolved using the identifier expansion rules.
 
         * If the value of this field is `@vocab`, the parent field must be
           resolved using the vocabulary resolution rules.
@@ -1128,7 +1126,7 @@ $graph:
   extends: ["#NamedType", "#DocType"]
   documentRoot: true
   doc: |
-    A documentation section.  This type exists to faciliate self-documenting
+    A documentation section.  This type exists to facilitate self-documenting
     schemas but has no role in formal validation.
   fields:
     - name: type
