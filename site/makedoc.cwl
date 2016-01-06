@@ -26,6 +26,9 @@ inputs:
     inputBinding: {prefix: "--brandlink"}
   - id: target
     type: string
+  - id: primtype
+    type: ["null", string]
+    inputBinding: {prefix: "--primtype"}
 outputs:
   - id: out
     type: File

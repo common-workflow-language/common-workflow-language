@@ -20,7 +20,8 @@
             "target": "index.html",
             "renderlist": [],
             "redirect": [],
-            "brandlink": "index.html"
+            "brandlink": "index.html",
+            "primtype": null
         },
         {
             "source": {
@@ -30,7 +31,8 @@
             "target": "draft-3/index.html",
             "renderlist": [],
             "redirect": [],
-            "brandlink": "../index.html"
+            "brandlink": "../index.html",
+            "primtype": null
         },
         {
             "source": {
@@ -43,7 +45,8 @@
                 "https://w3id.org/cwl/cwl#CommandLineTool"
             ],
             "redirect": [],
-            "brandlink": "index.html"
+            "brandlink": "index.html",
+            "primtype": "#CWLType"
         },
         {
             "source": {
@@ -63,7 +66,8 @@
                 "https://w3id.org/cwl/cwl#ShellCommandRequirement=CommandLineTool.html#ShellCommandRequirement",
                 "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
             ],
-            "brandlink": "index.html"
+            "brandlink": "index.html",
+            "primtype": "#CWLType"
         },
         {
             "source": {
@@ -78,7 +82,8 @@
                 "https://w3id.org/cwl/salad#Documentation"
             ],
             "redirect": [],
-            "brandlink": "index.html"
+            "brandlink": "index.html",
+            "primtype": null
         },
         {
             "source": {
@@ -88,7 +93,8 @@
             "target": "draft-3/UserGuide.html",
             "renderlist": [],
             "redirect": [],
-            "brandlink": "index.html"
+            "brandlink": "index.html",
+            "primtype": null
         }
     ]
 }

@@ -161,7 +161,7 @@ platform include:
 * Data security and permissions.
 * Scheduling tool invocations on remote cluster or cloud compute nodes.
 * Using virtual machines or operating system containers to manage the runtime
-(except as described in [DockerRequirement](#DockerRequirement)).
+(except as described in [DockerRequirement](CommandLineTool.html#DockerRequirement)).
 * Using remote or distributed file systems to manage input and output files.
 * Transforming file paths.
 * Determining if a process has previously been executed, skipping it and
@@ -265,7 +265,7 @@ be provided:
     a contextual value of 'self' is not documented for a field, it
     must be 'null'.
   * `runtime`: An object containing configuration details.  Specific to the
-    [Process](#process) type.  An implementation may provide may provide
+    process type.  An implementation may provide may provide
     opaque strings for any or all fields of `runtime`.  These must be
     filled in by the platform after processing the Tool but before actual
     execution.  Parameter references and expressions may only use the
@@ -319,7 +319,7 @@ for nesting of parenthesis or braces and that strings that may contain
 parenthesis or braces when scanning for expressions.
 
 The runtime must include any code defined in the ["expressionLib" field of
-InlineJavascriptRequirement](#inlinejavascriptrequirement) prior to
+InlineJavascriptRequirement](#InlineJavascriptRequirement) prior to
 executing the actual expression.
 
 Before executing the expression, the runtime must initialize as global

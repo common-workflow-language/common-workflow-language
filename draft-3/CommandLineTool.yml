@@ -150,7 +150,7 @@ $graph:
           nothing.
 
       - **File**: Add `prefix` and the value of
-        [`File.path`](#file) to the command line.
+        [`File.path`](#File) to the command line.
 
       - **array**: If `itemSeparator` is specified, add `prefix` and the join
           the array into a single string with `itemSeparator` separating the
@@ -491,7 +491,7 @@ $graph:
 
     ## Interaction with other requirements
 
-    If [EnvVarRequirement](#envvarrequirement) is specified alongside a
+    If [EnvVarRequirement](#EnvVarRequirement) is specified alongside a
     DockerRequirement, the environment variables must be provided to Docker
     using `--env` or `--env-file` and interact with the container's preexisting
     environment as defined by Docker.

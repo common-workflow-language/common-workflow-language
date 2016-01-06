@@ -40,6 +40,9 @@ outputs:
       type: array
       items: File
     source: "#docs/out"
+  - id: report
+    type: File
+    source: "#report/out"
   - id: context
     type: File
     source: "#context/out"
@@ -50,6 +53,7 @@ outputs:
 requirements:
   - class: ScatterFeatureRequirement
   - class: StepInputExpressionRequirement
+  - class: SubworkflowFeatureRequirement
 
 hints:
   - class: DockerRequirement
@@ -79,9 +83,19 @@ steps:
       - { id: renderlist, source: "#render", valueFrom: $(self.renderlist) }
       - { id: redirect, source: "#render", valueFrom: $(self.redirect) }
       - { id: brandlink, source: "#render", valueFrom: $(self.brandlink) }
+      - { id: primtype, source: "#render", valueFrom: $(self.primtype) }
       - { id: brand, source: "#brand" }
     outputs:
       - { id: out }
-    scatter: ["#docs/source", "#docs/target", "#docs/renderlist", "#docs/redirect", "#docs/brandlink"]
+    scatter: ["#docs/source", "#docs/target", "#docs/renderlist",
+      "#docs/redirect", "#docs/brandlink", "#docs/primtype"]
     scatterMethod: dotproduct
     run:  makedoc.cwl
+
+  - id: report
+    inputs:
+      - {id: inp, source: "#docs/out"}
+      - {id: target, default: "linkchecker-report.txt"}
+    outputs:
+      - id: out
+    run: linkchecker.cwl
