@@ -49,6 +49,8 @@ $graph:
     The products of the CWL working group (including this document) are made available
     under the terms of the Apache License, version 2.0.
 
+    <!--ToC-->
+
     # Introduction
 
     The JSON data model is an extremely popular way to represent structured
@@ -294,7 +296,7 @@ $graph:
 
     ### Example
 
-    Given the following schema fragment:
+    Given the following schema fragment and namespace:
 
     ```
       [{
@@ -303,14 +305,13 @@ $graph:
       }]
     ```
 
-    Given the following extension namespace:
     ```
       "$namespaces": {
         "acid": "http://example.com/acid#"
       }
     ```
 
-    Processing the following example:
+    Process the following example:
 
     ```
     {
@@ -369,7 +370,7 @@ $graph:
 
     ### Example
 
-    Given the following schema fragment:
+    Given the following schema fragment and namespace:
 
     ```
       [{
@@ -378,14 +379,13 @@ $graph:
       }]
     ```
 
-    Given the following extension namespace:
     ```
       "$namespaces": {
         "acid": "http://example.com/acid#"
       }
     ```
 
-    Processing the following example:
+    Process the following example:
 
     ```
     {
@@ -470,7 +470,7 @@ $graph:
 
     ### Example
 
-    Given the following schema fragment:
+    Given the following schema fragment and namespace:
 
     ```
     {
@@ -481,14 +481,17 @@ $graph:
     }
     ```
 
-    The `link` field is the reference field in the following example.  The
-    base URI is `http://example.com/base`
+    ```
+      "$namespaces": {
+        "acid": "http://example.com/acid#"
+      }
+
+    ```
+
+    Process the following example:
 
     ```
     {
-      "$namespaces": {
-        "acid": "http://example.com/acid#"
-      },
       "link": "http://example.com/base/zero",
       "form": {
         "link": "one",
@@ -566,6 +569,8 @@ $graph:
     ]
     ```
 
+    Process the following example:
+
     ```
     {
       "form": {
@@ -585,7 +590,7 @@ $graph:
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
@@ -655,7 +660,7 @@ $graph:
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
@@ -708,7 +713,7 @@ $graph:
 
     ```
 
-    Becomes:
+    This becomes:
 
     ```
     {
