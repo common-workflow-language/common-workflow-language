@@ -293,10 +293,11 @@ class RenderType(object):
             doc += "<h3>Fields</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
+            required = []
+            optional = []
             for i in f.get("fields", []):
-                doc += "<tr>"
                 tp = i["type"]
-                if isinstance(tp, list) and tp[0] == "null":
+                if isinstance(tp, list) and tp[0] == "https://w3id.org/cwl/salad#null":
                     opt = False
                     tp = tp[1:]
                 else:
@@ -307,8 +308,13 @@ class RenderType(object):
                 #    desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
 
                 frg = schema.avro_name(i["name"])
-                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp, self.redirects), opt, mistune.markdown(desc))
-                doc += "</tr>"
+                tr = "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp, self.redirects), opt, mistune.markdown(desc))
+                if opt:
+                    required.append(tr)
+                else:
+                    optional.append(tr)
+            for i in required+optional:
+                doc += "<tr>" + i + "</tr>"
             doc += """</table>"""
         elif f["type"] == "enum":
             doc += "<h3>Symbols</h3>"
