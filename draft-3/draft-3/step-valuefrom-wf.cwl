@@ -1,6 +1,8 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
 cwlVersion: "cwl:draft-3.dev3"
+requirements:
+  - class: StepInputExpressionRequirement
 
 inputs:
   - id: in
