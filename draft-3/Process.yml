@@ -198,6 +198,7 @@ $graph:
 - name: Binding
   type: record
   docParent: "#Parameter"
+  abstract: true
   fields:
     - name: loadContents
       type:
