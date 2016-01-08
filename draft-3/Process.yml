@@ -10,12 +10,7 @@ $graph:
   type: documentation
   doc: {$include: concepts.md}
 
-- $import: "https://w3id.org/cwl/salad#PrimitiveType"
-- $import: "https://w3id.org/cwl/salad#Any"
-- $import: "https://w3id.org/cwl/salad#RecordField"
-- $import: "https://w3id.org/cwl/salad#RecordSchema"
-- $import: "https://w3id.org/cwl/salad#EnumSchema"
-- $import: "https://w3id.org/cwl/salad#ArraySchema"
+- $import: "salad/schema_salad/metaschema.yml"
 
 - name: BaseTypesDoc
   type: documentation
