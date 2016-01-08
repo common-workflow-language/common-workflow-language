@@ -2,6 +2,14 @@ class: CommandLineTool
 requirements:
   - class: ShellCommandRequirement
   - class: InlineJavascriptRequirement
+hints:
+  - class: DockerRequirement
+    dockerFile: |
+      FROM debian:8
+      RUN apt-get update && \
+          DEBIAN_FRONTEND=noninteractive apt-get -yq install w3c-checklink \
+    dockerImageId: commonworkflowlanguage/checklink
+
 inputs:
   - id: inp
     type:
@@ -21,10 +29,9 @@ arguments:
   - valueFrom: $(inputs.inp)
   - valueFrom: $(runtime.outdir)
   - {valueFrom: ";", shellQuote: false}
-  - "linkchecker"
-  - "-a"
-  - "--ignore-url=http.*"
-  - "--ignore-url=mailto:.*"
+  - "checklink"
+  - "-X(http.*|mailto:.*)"
+  - "-q"
   - valueFrom: |
       ${
         var r = [];
@@ -33,4 +40,7 @@ arguments:
         }
         return r;
       }
-stdout: $(inputs.target)
+  - {valueFrom: " > ", shellQuote: false}
+  - valueFrom: $(inputs.target)
+  - {valueFrom: " && ! test -s", shellQuote: false}
+  - valueFrom: $(inputs.target)

@@ -395,7 +395,7 @@ $graph:
     data links inbound to a given step are fufilled, the step is ready to
     execute.
 
-    ## Success and failure
+    ## Workflow success and failure
 
     A completed process must result in one of `success`, `temporaryFailure` or
     `permanentFailure` states.  An implementation may choose to retry a process
