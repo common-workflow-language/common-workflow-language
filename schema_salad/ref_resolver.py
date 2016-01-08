@@ -98,10 +98,6 @@ class Loader(object):
 
         split = urlparse.urlsplit(url)
 
-        if url == "cwl:hints":
-            _logger.debug("XXX (%s) %s", id(self), self.vocab.keys())
-            raise validate.ValidationException("FUCKING KIDDING ME")
-
         if split.scheme or url.startswith("$(") or url.startswith("${"):
             pass
         elif scoped and not split.fragment:
