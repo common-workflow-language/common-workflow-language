@@ -1,0 +1,22 @@
+[{
+    "class": "File",
+    "path": "../draft-3/CommandLineTool.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/Process.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/Workflow.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/concepts.md"
+}, {
+    "class": "File",
+    "path": "../draft-3/contrib.md"
+}, {
+    "class": "File",
+    "path": "../draft-3/invocation.md"
+}, {
+    "class": "File",
+    "path": "../draft-3/intro.md"
+}]

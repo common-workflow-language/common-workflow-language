@@ -7,7 +7,7 @@ hints:
     dockerFile: |
       FROM debian:8
       RUN apt-get update && \
-          DEBIAN_FRONTEND=noninteractive apt-get -yq install w3c-checklink \
+          DEBIAN_FRONTEND=noninteractive apt-get -yq install w3c-linkchecker \
     dockerImageId: commonworkflowlanguage/checklink
 
 inputs:
