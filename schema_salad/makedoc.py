@@ -243,13 +243,23 @@ class RenderType(object):
         if "doc" not in f:
             f["doc"] = ""
 
+        def extendsfrom(item, ex):
+            if "extends" in item:
+                for e in aslist(item["extends"]):
+                    ex.insert(0, self.typemap[e])
+                    extendsfrom(self.typemap[e], ex)
+
+        ex = [f]
+        extendsfrom(f, ex)
+
         enumDesc = {}
         if f["type"] == "enum" and isinstance(f["doc"], list):
-            for i in f["doc"]:
-                idx = i.find(":")
-                if idx > -1:
-                    enumDesc[i[:idx]] = i[idx+1:]
-            f["doc"] = [i for i in f["doc"] if i.find(":") == -1 or i.find(" ") < i.find(":")]
+            for e in ex:
+                for i in e["doc"]:
+                    idx = i.find(":")
+                    if idx > -1:
+                        enumDesc[i[:idx]] = i[idx+1:]
+                e["doc"] = [i for i in e["doc"] if i.find(":") == -1 or i.find(" ") < i.find(":")]
 
         f["doc"] = fix_doc(f["doc"])
 
@@ -323,11 +333,12 @@ class RenderType(object):
             doc += "<h3>Symbols</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>symbol</th><th>description</th></tr>"
-            for i in f.get("symbols", []):
-                doc += "<tr>"
-                frg = schema.avro_name(i)
-                doc += "<td><code>%s</code></td><td>%s</td>" % (frg, enumDesc.get(frg, ""))
-                doc += "</tr>"
+            for e in ex:
+                for i in e.get("symbols", []):
+                    doc += "<tr>"
+                    frg = schema.avro_name(i)
+                    doc += "<td><code>%s</code></td><td>%s</td>" % (frg, enumDesc.get(frg, ""))
+                    doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
 
