@@ -292,7 +292,7 @@ $graph:
     Field name resolution is not relative.  It must not be affected by the base
     URI.
 
-    ### Example
+    ### Field name resolution example
 
     Given the following schema fragment and namespace:
 
@@ -366,7 +366,7 @@ $graph:
     It is an error for more than one object in a document to have the same
     absolute URI.
 
-    ### Example
+    ### Identifier resolution example
 
     Given the following schema fragment and namespace:
 
@@ -466,7 +466,7 @@ $graph:
     Link resolution must not affect the base URI used to resolve identifiers
     and other links.
 
-    ### Example
+    ### Link resolution example
 
     Given the following schema fragment and namespace:
 
@@ -549,7 +549,7 @@ $graph:
       term which maps to the resolved URI, the reference must be replace with
       the vocabulary term.
 
-    ### Example
+    ### Vocabulary resolution example
 
     Given the following schema fragment:
 
@@ -636,7 +636,7 @@ $graph:
     It is a fatal error if an import directive refers to an external resource
     or resource fragment which does not exist or is not accessible.
 
-    ### Example
+    ### Import example
 
     import.yml:
     ```
@@ -691,7 +691,7 @@ $graph:
     It is a fatal error if an import directive refers to an external resource
     which does not exist or is not accessible.
 
-    ### Example
+    ### Include example
 
     parent.yml:
     ```

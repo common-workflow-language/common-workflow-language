@@ -102,34 +102,6 @@ basicTypes = ("https://w3id.org/cwl/salad#null",
               "https://w3id.org/cwl/salad#enum",
               "https://w3id.org/cwl/salad#array")
 
-def typefmt(tp, redirects, nbsp=False):
-    if isinstance(tp, list):
-        if nbsp and len(tp) <= 3:
-            return "&nbsp;|&nbsp;".join([typefmt(n, redirects) for n in tp])
-        else:
-            return " | ".join([typefmt(n, redirects) for n in tp])
-    if isinstance(tp, dict):
-        if tp["type"] == "https://w3id.org/cwl/salad#array":
-            return "array&lt;%s&gt;" % (typefmt(tp["items"], redirects, nbsp=True))
-        if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
-            frg = schema.avro_name(tp["name"])
-            if tp["name"] in redirects:
-                return """<a href="%s">%s</a>""" % (redirects[tp["name"]], frg)
-            else:
-                return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
-        if isinstance(tp["type"], dict):
-            return typefmt(tp["type"], redirects)
-    else:
-        if str(tp) in redirects:
-            return """<a href="%s">%s</a>""" % (redirects[tp], redirects[tp])
-        elif str(tp) in basicTypes:
-            return """<a href="#CWLType">%s</a>""" % schema.avro_name(str(tp))
-        else:
-            _, frg = urlparse.urldefrag(tp)
-            if frg:
-                tp = frg
-            return """<a href="#%s">%s</a>""" % (to_id(tp), tp)
-
 def add_dictlist(di, key, val):
     if key not in di:
         di[key] = []
@@ -224,6 +196,37 @@ class RenderType(object):
                  ("docAfter" not in f))):
                 self.render_type(f, 1)
 
+    def typefmt(self, tp, redirects, nbsp=False):
+        global primitiveType
+        if isinstance(tp, list):
+            if nbsp and len(tp) <= 3:
+                return "&nbsp;|&nbsp;".join([self.typefmt(n, redirects) for n in tp])
+            else:
+                return " | ".join([self.typefmt(n, redirects) for n in tp])
+        if isinstance(tp, dict):
+            if tp["type"] == "https://w3id.org/cwl/salad#array":
+                return "array&lt;%s&gt;" % (self.typefmt(tp["items"], redirects, nbsp=True))
+            if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
+                frg = schema.avro_name(tp["name"])
+                if tp["name"] in redirects:
+                    return """<a href="%s">%s</a>""" % (redirects[tp["name"]], frg)
+                elif tp["name"] in self.typemap:
+                    return """<a href="#%s">%s</a>""" % (to_id(frg), frg)
+                else:
+                    return frg
+            if isinstance(tp["type"], dict):
+                return self.typefmt(tp["type"], redirects)
+        else:
+            if str(tp) in redirects:
+                return """<a href="%s">%s</a>""" % (redirects[tp], redirects[tp])
+            elif str(tp) in basicTypes:
+                return """<a href="%s">%s</a>""" % (primitiveType, schema.avro_name(str(tp)))
+            else:
+                _, frg = urlparse.urldefrag(tp)
+                if frg:
+                    tp = frg
+                return """<a href="#%s">%s</a>""" % (to_id(tp), tp)
+
 
     def render_type(self, f, depth):
         if f["name"] in self.rendered or f["name"] in self.redirects:
@@ -239,6 +242,24 @@ class RenderType(object):
 
         if "doc" not in f:
             f["doc"] = ""
+
+        def extendsfrom(item, ex):
+            if "extends" in item:
+                for e in aslist(item["extends"]):
+                    ex.insert(0, self.typemap[e])
+                    extendsfrom(self.typemap[e], ex)
+
+        ex = [f]
+        extendsfrom(f, ex)
+
+        enumDesc = {}
+        if f["type"] == "enum" and isinstance(f["doc"], list):
+            for e in ex:
+                for i in e["doc"]:
+                    idx = i.find(":")
+                    if idx > -1:
+                        enumDesc[i[:idx]] = i[idx+1:]
+                e["doc"] = [i for i in e["doc"] if i.find(":") == -1 or i.find(" ") < i.find(":")]
 
         f["doc"] = fix_doc(f["doc"])
 
@@ -285,10 +306,11 @@ class RenderType(object):
             doc += "<h3>Fields</h3>"
             doc += """<table class="table table-striped">"""
             doc += "<tr><th>field</th><th>type</th><th>required</th><th>description</th></tr>"
+            required = []
+            optional = []
             for i in f.get("fields", []):
-                doc += "<tr>"
                 tp = i["type"]
-                if isinstance(tp, list) and tp[0] == "null":
+                if isinstance(tp, list) and tp[0] == "https://w3id.org/cwl/salad#null":
                     opt = False
                     tp = tp[1:]
                 else:
@@ -299,8 +321,24 @@ class RenderType(object):
                 #    desc = "%s _Inherited from %s_" % (desc, linkto(i["inherited_from"]))
 
                 frg = schema.avro_name(i["name"])
-                doc += "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, typefmt(tp, self.redirects), opt, mistune.markdown(desc))
-                doc += "</tr>"
+                tr = "<td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td>" % (frg, self.typefmt(tp, self.redirects), opt, mistune.markdown(desc))
+                if opt:
+                    required.append(tr)
+                else:
+                    optional.append(tr)
+            for i in required+optional:
+                doc += "<tr>" + i + "</tr>"
+            doc += """</table>"""
+        elif f["type"] == "enum":
+            doc += "<h3>Symbols</h3>"
+            doc += """<table class="table table-striped">"""
+            doc += "<tr><th>symbol</th><th>description</th></tr>"
+            for e in ex:
+                for i in e.get("symbols", []):
+                    doc += "<tr>"
+                    frg = schema.avro_name(i)
+                    doc += "<td><code>%s</code></td><td>%s</td>" % (frg, enumDesc.get(frg, ""))
+                    doc += "</tr>"
             doc += """</table>"""
         f["doc"] = doc
 
@@ -400,6 +438,7 @@ if __name__ == "__main__":
     parser.add_argument('--redirect', action='append')
     parser.add_argument('--brand')
     parser.add_argument('--brandlink')
+    parser.add_argument('--primtype', default="#PrimitiveType")
 
     args = parser.parse_args()
 
@@ -419,6 +458,8 @@ if __name__ == "__main__":
                 s.extend(j)
             else:
                 s.append(j)
+
+    primitiveType = args.primtype
 
     redirect = {r.split("=")[0]:r.split("=")[1] for r in args.redirect} if args.redirect else {}
     renderlist = args.only if args.only else []
