@@ -514,3 +514,13 @@
   output: {count_output: 16}
   tool: draft-3/step-valuefrom-wf.cwl
   doc: Test valueFrom on workflow step.
+
+- job: draft-3/step-valuefrom-job.json
+  output: {val: "3\n"}
+  tool: draft-3/step-valuefrom2-wf.cwl
+  doc: Test valueFrom on workflow step with multiple sources
+
+- job: draft-3/step-valuefrom-job.json
+  output: {val: "3\n"}
+  tool: draft-3/step-valuefrom3-wf.cwl
+  doc: Test valueFrom on workflow step referencing other inputs
