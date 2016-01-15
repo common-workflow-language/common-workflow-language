@@ -183,17 +183,24 @@ $graph:
         - "#Expression"
       jsonldPredicate: "cwl:valueFrom"
       doc: |
-        To use scatter/gather, [Must declare
-        StepInputExpressionRequirement](#StepInputExpressionRequirement) must
+        To use valueFrom, [StepInputExpressionRequirement](#StepInputExpressionRequirement) must
         be specified in the workflow or workflow step requirements.
 
         If `valueFrom` is a constant string value, use this as the value for
         this input parameter.
 
-        If `valueFrom` is an expression, evaluate for a parameter reference or
-        expression to yield the actual value to be assiged to the input field.
-        The "context" of the expression will be the value of the source
-        parameter.
+        If `valueFrom` is a parameter reference or expression, it must be
+        evaluated to yield the actual value to be assiged to the input field.
+
+        The `self` value of in the parameter reference or expression must be
+        the value of the parameter(s) specified in the `source` field, or
+        null if there is no `source` field.
+
+        The value of `inputs` in the parameter reference or expression is the
+        input object to the workflow step after assigning the `source` values,
+        but before evaluating any step with `valueFrom`.  The order of
+        evaluating `valueFrom` among step input parameters is undefined.
+
 
 - type: record
   name: WorkflowStepOutput

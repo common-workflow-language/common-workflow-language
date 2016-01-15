@@ -98,11 +98,9 @@ $graph:
         input file format is the same or `rdfs:subClassOf` the format required
         by the input parameter.
 
-        If no ontologies are specified in `formatOntologies`, the runtime may
-        perform exact file format matches.
-
-        File format ontologies are provided in the "@schema" section of the
-        file's "@context".
+        File format ontologies may be provided in the "$schema" metadata at the
+        root of the document.  If no ontologies are specified in `$schema`, the
+        runtime may perform exact file format matches.
 
 
 - name: Parameter
@@ -214,8 +212,8 @@ $graph:
         Only applies when `type` is `File`.  Describes files that must be
         included alongside the primary file.
 
-        If the value is an expression, the context of the expression is the input
-        or output File parameter to which this binding applies.
+        If the value is an expression, the value of `self` in the expression
+        must be the primary input or output File to which this binding applies.
 
         If the value is a string, it specifies that the following pattern
         should be applied to the primary file:

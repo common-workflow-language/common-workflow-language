@@ -193,7 +193,7 @@ $graph:
         If `valueFrom` is an expression, evaluate the expression to yield the
         actual value to use to build the command line and apply the binding
         rules above.  If the inputBinding is associated with an input
-        parameter, the "context" of the expression will be the value of the
+        parameter, the value of `self` in the expression will be the value of the
         input parameter.
 
         When a binding is part of the `CommandLineTool.arguments` field,
@@ -240,9 +240,10 @@ $graph:
         - "#Expression"
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
-        specified, the script `context` will be an array containing any files that were
-        matched.  Additionally, if `loadContents` is `true`, the File objects
-        will include up to the first 64 KiB of file contents in the `contents` field.
+        specified, the value of `self` must be an array containing any files
+        that were matched.  Additionally, if `loadContents` is `true`, the File
+        objects will include up to the first 64 KiB of file contents in the
+        `contents` field.
 
 
 - name: CommandInputRecordField
