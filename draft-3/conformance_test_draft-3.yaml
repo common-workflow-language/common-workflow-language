@@ -524,3 +524,22 @@
   output: {val: "3\n"}
   tool: draft-3/step-valuefrom3-wf.cwl
   doc: Test valueFrom on workflow step referencing other inputs
+
+- job: draft-3/record-output-job.json
+  output:
+    "orec": {
+        "ofoo": {
+            "path": "foo",
+            "size": 1111,
+            "class": "File",
+            "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
+        },
+        "obar": {
+            "path": "bar",
+            "size": 12010,
+            "class": "File",
+            "checksum": "sha1$aeb3d11bdf536511649129f4077d5cda6a324118"
+        }
+    }
+  tool: draft-3/record-output.cwl
+  doc: Test record type output binding.

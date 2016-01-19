@@ -281,7 +281,7 @@ $graph:
 
 - name: OutputRecordField
   type: record
-  extends: "sld:RecordSchema"
+  extends: "sld:RecordField"
   docParent: "#OutputParameter"
   specialize:
     - specializeFrom: "sld:RecordSchema"
