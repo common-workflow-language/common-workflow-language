@@ -369,6 +369,12 @@ class Loader(object):
             except validate.ValidationException as v:
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (id(loader), file_base, i, validate.indent(str(v))))
 
+            for identifer in loader.identity_links:
+                if identifer in metadata:
+                    if isinstance(metadata[identifer], basestring):
+                        metadata[identifer] = loader.expand_url(metadata[identifer], base_url, scoped=True)
+                        loader.idx[metadata[identifer]] = document
+
         return document, metadata
 
     def fetch_text(self, url):
