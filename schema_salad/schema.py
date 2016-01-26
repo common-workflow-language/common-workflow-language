@@ -127,11 +127,15 @@ def get_metaschema():
     })
 
     for f in salad_files:
-        rs = resource_stream(__name__, 'metaschema/' + f):
+        rs = resource_stream(__name__, 'metaschema/' + f)
         loader.cache["https://w3id.org/cwl/" + f] = rs.read()
         rs.close()
 
-    j = yaml.load(loader.cache["https://w3id.org/cwl/metaschema.yml"])
+    rs = resource_stream(__name__, 'metaschema/metaschema.yml')
+    loader.cache["https://w3id.org/cwl/salad"] = rs.read()
+    rs.close()
+
+    j = yaml.load(loader.cache["https://w3id.org/cwl/salad"])
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
     #pprint.pprint(j)
