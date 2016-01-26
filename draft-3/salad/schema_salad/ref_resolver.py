@@ -98,10 +98,6 @@ class Loader(object):
 
         split = urlparse.urlsplit(url)
 
-        if url == "cwl:hints":
-            _logger.debug("XXX (%s) %s", id(self), self.vocab.keys())
-            raise validate.ValidationException("FUCKING KIDDING ME")
-
         if split.scheme or url.startswith("$(") or url.startswith("${"):
             pass
         elif scoped and not split.fragment:
@@ -372,6 +368,12 @@ class Loader(object):
                         i += 1
             except validate.ValidationException as v:
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (id(loader), file_base, i, validate.indent(str(v))))
+
+            for identifer in loader.identity_links:
+                if identifer in metadata:
+                    if isinstance(metadata[identifer], basestring):
+                        metadata[identifer] = loader.expand_url(metadata[identifer], base_url, scoped=True)
+                        loader.idx[metadata[identifer]] = document
 
         return document, metadata
 

@@ -18,9 +18,28 @@ import schema_salad.schema
 
 _logger = logging.getLogger("salad")
 
-def get_metaschema():
-    f = resource_stream(__name__, 'metaschema.yml')
+salad_files = ('metaschema.yml',
+              'salad.md',
+              'field_name.yml',
+              'import_include.md',
+              'link_res.yml',
+              'ident_res.yml',
+              'vocab_res.yml',
+              'vocab_res.yml',
+              'field_name_schema.yml',
+              'field_name_src.yml',
+              'field_name_proc.yml',
+              'ident_res_schema.yml',
+              'ident_res_src.yml',
+              'ident_res_proc.yml',
+              'link_res_schema.yml',
+              'link_res_src.yml',
+              'link_res_proc.yml',
+              'vocab_res_schema.yml',
+              'vocab_res_src.yml',
+              'vocab_res_proc.yml')
 
+def get_metaschema():
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
@@ -106,7 +125,13 @@ def get_metaschema():
         },
         "xsd": "http://www.w3.org/2001/XMLSchema#"
     })
-    j = yaml.load(f)
+
+    for f in salad_files:
+        rs = resource_stream(__name__, 'metaschema/' + f):
+        loader.cache["https://w3id.org/cwl/" + f] = rs.read()
+        rs.close()
+
+    j = yaml.load(loader.cache["https://w3id.org/cwl/metaschema.yml"])
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
     #pprint.pprint(j)
@@ -120,8 +145,10 @@ def get_metaschema():
 
 def load_schema(schema_ref, cache=None):
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
-    metaschema_loader.cache = cache
+    if cache is not None:
+        metaschema_loader.cache = cache
     schema_doc, schema_metadata = metaschema_loader.resolve_ref(schema_ref, "")
+
     validate_doc(metaschema_names, schema_doc, metaschema_loader, True)
     metactx = schema_metadata.get("@context", {})
     metactx.update(schema_metadata.get("$namespaces", {}))

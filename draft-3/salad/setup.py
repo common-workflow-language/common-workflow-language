@@ -17,7 +17,7 @@ except ImportError:
     tagger = egg_info_cmd.egg_info
 
 setup(name='schema-salad',
-      version='1.3',
+      version='1.5',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
@@ -26,7 +26,7 @@ setup(name='schema-salad',
       download_url="https://github.com/common-workflow-language/common-workflow-language",
       license='Apache 2.0',
       packages=["schema_salad"],
-      package_data={'schema_salad': ['metaschema.yml']},
+      package_data={'schema_salad': ['metaschema/*']},
       install_requires=[
           'requests',
           'PyYAML',
