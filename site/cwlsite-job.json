@@ -75,7 +75,7 @@
         {
             "source": {
                 "class": "File",
-                "path": "../draft-3/salad/schema_salad/metaschema.yml"
+                "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
             },
             "target": "draft-3/SchemaSalad.html",
             "renderlist": [
