@@ -348,7 +348,7 @@ $graph:
     - name: run
       type: [string, "#Process"]
       jsonldPredicate:
-        "_id": "cwl:steps"
+        "_id": "cwl:run"
         "_type": "@id"
       doc: |
         Specifies the process to run.
