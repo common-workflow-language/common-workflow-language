@@ -18,6 +18,27 @@ import schema_salad.schema
 
 _logger = logging.getLogger("salad")
 
+salad_files = ('metaschema.yml',
+              'salad.md',
+              'field_name.yml',
+              'import_include.md',
+              'link_res.yml',
+              'ident_res.yml',
+              'vocab_res.yml',
+              'vocab_res.yml',
+              'field_name_schema.yml',
+              'field_name_src.yml',
+              'field_name_proc.yml',
+              'ident_res_schema.yml',
+              'ident_res_src.yml',
+              'ident_res_proc.yml',
+              'link_res_schema.yml',
+              'link_res_src.yml',
+              'link_res_proc.yml',
+              'vocab_res_schema.yml',
+              'vocab_res_src.yml',
+              'vocab_res_proc.yml')
+
 def get_metaschema():
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
@@ -105,28 +126,10 @@ def get_metaschema():
         "xsd": "http://www.w3.org/2001/XMLSchema#"
     })
 
-    for f in ('metaschema.yml',
-              'salad.md',
-              'field_name.yml',
-              'import_include.md',
-              'link_res.yml',
-              'ident_res.yml',
-              'vocab_res.yml',
-              'vocab_res.yml',
-              'field_name_schema.yml',
-              'field_name_src.yml',
-              'field_name_proc.yml',
-              'ident_res_schema.yml',
-              'ident_res_src.yml',
-              'ident_res_proc.yml',
-              'link_res_schema.yml',
-              'link_res_src.yml',
-              'link_res_proc.yml',
-              'vocab_res_schema.yml',
-              'vocab_res_src.yml',
-              'vocab_res_proc.yml'):
-        with resource_stream(__name__, 'metaschema/' + f) as rs:
-            loader.cache["https://w3id.org/cwl/" + f] = rs.read()
+    for f in salad_files:
+        rs = resource_stream(__name__, 'metaschema/' + f):
+        loader.cache["https://w3id.org/cwl/" + f] = rs.read()
+        rs.close()
 
     j = yaml.load(loader.cache["https://w3id.org/cwl/metaschema.yml"])
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
