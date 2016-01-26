@@ -10,7 +10,7 @@ $graph:
   type: documentation
   doc: {$include: concepts.md}
 
-- $import: "salad/schema_salad/metaschema.yml"
+- $import: "salad/schema_salad/metaschema/metaschema.yml"
 
 - name: BaseTypesDoc
   type: documentation
