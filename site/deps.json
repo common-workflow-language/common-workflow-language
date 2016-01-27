@@ -22,4 +22,61 @@
 }, {
     "class": "File",
     "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/field_name_proc.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/field_name_schema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/gield_name_src.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/gield_name.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_proc.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_schema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_src.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/ident_res.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/import_include.md"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/link_res_proc.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/link_res_schema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/link_res_src.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/link_res.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/etaschema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/salad.md"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_proc.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_schema.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_src.yml"
+}, {
+    "class": "File",
+    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res.yml"
 }]

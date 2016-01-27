@@ -1,5 +1,5 @@
-cwlVersion: cwl:draft-3.dev3
-"@graph":
+cwlVersion: cwl:draft-3.dev5
+$graph:
 - id: index
   class: CommandLineTool
   baseCommand: python
@@ -28,12 +28,12 @@ cwlVersion: cwl:draft-3.dev3
       type: File
       outputBinding:
         glob: input.txt
-        secondaryFiles:
-          - ".idx1"
-          - "^.idx2"
-          - '$(self.path+".idx3")'
-          - '$({"path": self.path+".idx4", "class": "File"})'
-          - '${ return self.path+".idx5"; }'
+      secondaryFiles:
+        - ".idx1"
+        - "^.idx2"
+        - '$(self.path+".idx3")'
+        - '$({"path": self.path+".idx4", "class": "File"})'
+        - '${ return self.path+".idx5"; }'
 
 - id: search
   class: CommandLineTool
@@ -45,12 +45,12 @@ cwlVersion: cwl:draft-3.dev3
       type: File
       inputBinding:
         position: 1
-        secondaryFiles:
-          - ".idx1"
-          - "^.idx2"
-          - '$(self.path+".idx3")'
-          - '$({"path": self.path+".idx4", "class": "File"})'
-          - '${ return self.path+".idx5"; }'
+      secondaryFiles:
+        - ".idx1"
+        - "^.idx2"
+        - '$(self.path+".idx3")'
+        - '$({"path": self.path+".idx4", "class": "File"})'
+        - '${ return self.path+".idx5"; }'
     - id: search.py
       type: File
       default:

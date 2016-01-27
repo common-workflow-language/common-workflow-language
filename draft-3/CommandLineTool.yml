@@ -128,7 +128,7 @@ $graph:
 
 - type: record
   name: CommandLineBinding
-  extends: "#Binding"
+  extends: "#InputBinding"
   doc: |
 
     When listed under `inputBinding` in the input schema, the term
@@ -207,7 +207,7 @@ $graph:
 
 - type: record
   name: CommandOutputBinding
-  extends: "#Binding"
+  extends: "#OutputBinding"
   doc: |
     Describes how to generate an output parameter based on the files produced
     by a CommandLineTool.
@@ -231,8 +231,17 @@ $graph:
         pathname matching.  If provided an array, find files that match any
         pattern in the array.  If provided an expression, the expression must
         return a string or an array of strings, which will then be evaluated as
-        one or more glob patterns.  Only files which actually exist will be
-        matched and returned.
+        one or more glob patterns.  Must only match and return files which
+        actually exist.
+    - name: loadContents
+      type:
+        - "null"
+        - boolean
+      jsonldPredicate: "cwl:loadContents"
+      doc: |
+        For each file matched in `glob`, read up to
+        the first 64 KiB of text from the file and place it in the `contents`
+        field of the file object for manipulation by `outputEval`.
     - name: outputEval
       type:
         - "null"
@@ -240,10 +249,12 @@ $graph:
         - "#Expression"
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
-        specified, the value of `self` must be an array containing any files
-        that were matched.  Additionally, if `loadContents` is `true`, the File
-        objects will include up to the first 64 KiB of file contents in the
-        `contents` field.
+        specified, the value of `self` must be an array containing file objects
+        that were matched.  If no files were matched, `self' must be a zero
+        length array; if a single file was matched, the value of `self` is an
+        array of a single element.  Additionally, if `loadContents` is `true`,
+        the File objects must include up to the first 64 KiB of file contents
+        in the `contents` field.
 
 
 - name: CommandInputRecordField
@@ -256,7 +267,7 @@ $graph:
       specializeTo: "#CommandInputEnumSchema"
     - specializeFrom: "#InputArraySchema"
       specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#InputBinding"
       specializeTo: "#CommandLineBinding"
 
 
@@ -272,7 +283,7 @@ $graph:
   type: record
   extends: "#InputEnumSchema"
   specialize:
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#InputBinding"
       specializeTo: "#CommandLineBinding"
 
 
@@ -286,7 +297,7 @@ $graph:
       specializeTo: "#CommandInputEnumSchema"
     - specializeFrom: "#InputArraySchema"
       specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#InputBinding"
       specializeTo: "#CommandLineBinding"
 
 
@@ -300,7 +311,7 @@ $graph:
       specializeTo: "#CommandOutputEnumSchema"
     - specializeFrom: "#OutputArraySchema"
       specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
 
 
@@ -322,7 +333,7 @@ $graph:
       specializeTo: "#CommandOutputEnumSchema"
     - specializeFrom: "#OutputArraySchema"
       specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
 
 
@@ -336,7 +347,7 @@ $graph:
       specializeTo: "#CommandOutputEnumSchema"
     - specializeFrom: "#OutputArraySchema"
       specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
 
 
@@ -351,7 +362,7 @@ $graph:
       specializeTo: "#CommandInputEnumSchema"
     - specializeFrom: "#InputArraySchema"
       specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#InputBinding"
       specializeTo: "#CommandLineBinding"
 
 
@@ -366,7 +377,7 @@ $graph:
       specializeTo: "#CommandOutputEnumSchema"
     - specializeFrom: "#OutputArraySchema"
       specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#Binding"
+    - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
 
 

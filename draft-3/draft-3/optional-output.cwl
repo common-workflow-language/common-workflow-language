@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: "cwl:draft-3.dev3"
+cwlVersion: "cwl:draft-3.dev5"
 description: "Print the contents of a file to stdout using 'cat' running in a docker container."
 hints:
   - class: DockerRequirement
@@ -16,8 +16,8 @@ outputs:
     type: File
     outputBinding:
       glob: output.txt
-      secondaryFiles:
-        - .idx
+    secondaryFiles:
+      - .idx
   - id: optional_file
     type: ["null", File]
     outputBinding:
