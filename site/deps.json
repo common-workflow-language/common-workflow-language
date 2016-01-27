@@ -63,7 +63,7 @@
     "path": "../draft-3/salad/schema_salad/metaschema/link_res.yml"
 }, {
     "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/etaschema.yml"
+    "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
 }, {
     "class": "File",
     "path": "../draft-3/salad/schema_salad/metaschema/salad.md"
