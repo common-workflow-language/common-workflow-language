@@ -75,7 +75,8 @@
         {
             "source": {
                 "class": "File",
-                "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
+                "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml",
+                "secondaryFiles": {"$import": "deps.json"}
             },
             "target": "draft-3/SchemaSalad.html",
             "renderlist": [
