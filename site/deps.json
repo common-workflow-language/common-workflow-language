@@ -30,10 +30,10 @@
     "path": "../draft-3/salad/schema_salad/metaschema/field_name_schema.yml"
 }, {
     "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/gield_name_src.yml"
+    "path": "../draft-3/salad/schema_salad/metaschema/field_name_src.yml"
 }, {
     "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/gield_name.yml"
+    "path": "../draft-3/salad/schema_salad/metaschema/field_name.yml"
 }, {
     "class": "File",
     "path": "../draft-3/salad/schema_salad/metaschema/ident_res_proc.yml"
