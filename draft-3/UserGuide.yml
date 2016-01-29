@@ -2,3 +2,65 @@
   type: documentation
   doc:
     - $include: userguide-intro.md
+
+    - |
+      ### First example
+
+      Here is a wrapper for the "echo" command.  It accepts a single
+      input parameter `message`, runs the `echo` command, redirects standard
+      output to `output.txt`, and captures `output.txt` as the output parameter
+      `output`.
+
+      *example-1st.cwl*
+      ```
+    - $include: draft-3/example-1st.cwl
+    - |
+      ```
+
+      Use a JSON object in a separate file to describe the input of a run:
+
+      *example-1st-job*
+      ```
+    - $include: draft-3/example-1st-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-1st.cwl example-1st-job.json
+      [job 140442100106896] $ echo 'Hello world!' > output.txt
+      Final process status is success
+      {
+        "output": {
+          "path": "output.txt",
+          "size": 13,
+          "class": "File",
+          "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b"
+        }
+      }
+      $ cat output.txt
+      Hello world!
+      ```
+
+    - |
+      ### Working with files
+      ```
+    - $include: draft-3/example-files.cwl
+    - |
+      ```
+
+    - |
+      ### All about input parameters
+      ```
+    - $include: draft-3/example-inp.cwl
+    - |
+      ```
+
+    - |
+      ### All about output parameters
+      ```
+    - $include: draft-3/example-out.cwl
+    - |
+      ```
