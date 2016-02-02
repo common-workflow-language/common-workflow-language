@@ -12,6 +12,7 @@ import StringIO
 from aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
+import xml.sax
 
 _logger = logging.getLogger("salad")
 
@@ -129,7 +130,10 @@ class Loader(object):
 
     def add_schemas(self, ns, base_url):
         for sch in aslist(ns):
-            self.graph.parse(urlparse.urljoin(base_url, sch))
+            try:
+                self.graph.parse(urlparse.urljoin(base_url, sch), format="xml")
+            except xml.sax.SAXParseException:
+                self.graph.parse(urlparse.urljoin(base_url, sch), format="turtle")
 
         for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
             self._add_properties(s)
