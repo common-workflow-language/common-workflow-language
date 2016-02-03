@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 {
-    "cwlVersion": "cwl:draft-3.dev3",
+    "cwlVersion": "cwl:draft-3",
 
     "class": "CommandLineTool",
 
