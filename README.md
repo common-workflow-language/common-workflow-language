@@ -16,13 +16,11 @@ Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
 
 ## CWL Specification
 
-The current stable specification is draft 2:
-
-http://common-workflow-language.github.io/draft-2/
-
-The current work in progress specification is draft 3:
+The current stable specification is (draft 3)[http://common-workflow-language.github.io/draft-3/]:
 
 http://common-workflow-language.github.io/draft-3/
+
+Older drafts: [draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1), [draft-2](http://common-workflow-language.github.io/draft-2/)
 
 ## Implementations
 
@@ -53,8 +51,7 @@ Some of the software supporting running Common Workflow Language tools or workfl
 
 ## Development and testing
 
-The [CWL project](https://github.com/common-workflow-language/common-workflow-language)
-is on Github.
+[The CWL project is on Github.](https://github.com/common-workflow-language/common-workflow-language)
 
 [![GitHub
 stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
@@ -113,22 +110,23 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 
 ## Individual Contributors
 
+(Alphabetical)
+
 * Peter Amstutz <peter.amstutz@curoverse.com>
+* Robin Andeer <robin.andeer@gmail.com>
+* Brad Chapman <bchapman@hsph.harvard.edu>
 * John Chilton <jmchilton@gmail.com>
 * Michael R. Crusoe <michael.crusoe@gmail.com>
+* Roman Valls Guimerà <brainstorm@nopcode.org>
+* Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
+* Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
+* Andrey Kartashov <Andrey.Kartashov@cchmc.org>
 * John Kern <kern3020@gmail.com>
+* Dan Leehr <dan.leehr@duke.edu>
 * Hervé Ménager <herve.menager@gmail.com>
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Tim Pierce <twp@unchi.org>
+* Josh Randall <joshua.randall@sanger.ac.uk>
 * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
-* Nebojsa Tijanic <nebojsa.tijanic@sbgenomics.com>
-* Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
-* Robin Andeer <robin.andeer@gmail.com>
-* Roman Valls Guimerà <brainstorm@nopcode.org>
-* Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
-* Brad Chapman <bchapman@hsph.harvard.edu>
-* Josh Randall <joshua.randall@sanger.ac.uk>
-* Andrey Kartashov <porter@porter.st>
-* Dan Leehr <dan.leehr@duke.edu>
-* Andrey Kartashov <Andrey.Kartashov@cchmc.org>
+* Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
