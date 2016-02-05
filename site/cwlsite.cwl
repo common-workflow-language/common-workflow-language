@@ -25,12 +25,19 @@ inputs:
           - name: brandlink
             type: string
 
-  - id: schema_in
-    type: File
-  - id: context_target
-    type: string
-  - id: rdfs_target
-    type: string
+  - id: schemas
+    type:
+      type: array
+      items:
+        name: rdfs
+        type: record
+        fields:
+          - name: schema_in
+            type: File
+          - name: context_target
+            type: string
+          - name: rdfs_target
+            type: string
   - id: brand
     type: string
 
@@ -44,10 +51,14 @@ outputs:
     type: File
     source: "#report/out"
   - id: context
-    type: File
+    type:
+      type: array
+      items: File
     source: "#context/out"
   - id: rdfs
-    type: File
+    type:
+      type: array
+      items: File
     source: "#rdfs/out"
 
 requirements:
@@ -62,18 +73,22 @@ hints:
 steps:
   - id: rdfs
     inputs:
-      - {id: schema, source: "#schema_in" }
-      - {id: target, source: "#rdfs_target" }
+      - {id: schema, source: "#schemas", valueFrom: $(self.schema_in) }
+      - {id: target, source: "#schemas", valueFrom: $(self.rdfs_target) }
     outputs:
       - { id: out }
+    scatter: ["#rdfs/schema", "#rdfs/target"]
+    scatterMethod: dotproduct
     run: makerdfs.cwl
 
   - id: context
     inputs:
-      - {id: schema, source: "#schema_in" }
-      - {id: target, source: "#context_target" }
+      - {id: schema, source: "#schemas", valueFrom: $(self.schema_in) }
+      - {id: target, source: "#schemas", valueFrom: $(self.context_target) }
     outputs:
       - { id: out }
+    scatter: ["#context/schema", "#context/target"]
+    scatterMethod: dotproduct
     run: makecontext.cwl
 
   - id: docs
