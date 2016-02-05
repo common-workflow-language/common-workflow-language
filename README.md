@@ -16,7 +16,7 @@ Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
 
 ## CWL Specification
 
-The current stable specification is (draft 3)[http://common-workflow-language.github.io/draft-3/]:
+The current stable specification is [draft 3](http://common-workflow-language.github.io/draft-3/):
 
 http://common-workflow-language.github.io/draft-3/
 
