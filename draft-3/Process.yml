@@ -96,8 +96,11 @@ $graph:
         If no ontology is available, file formats may be tested by exact match.
 
         Reasoning about format compatability must be done by checking that an
-        input file format is the same or `rdfs:subClassOf` the format required
-        by the input parameter.
+        input file format is the same, `owl:equivalentClass` or
+        `rdfs:subClassOf` the format required by the input parameter.
+        `owl:equivalentClass` is transitive with `rdfs:subClassOf`, e.g. if
+        `<B> owl:equivalentClass <C>` and `<B> owl:subclassOf <A>` then infer
+        `<C> owl:subclassOf <A>`.
 
         File format ontologies may be provided in the "$schema" metadata at the
         root of the document.  If no ontologies are specified in `$schema`, the
@@ -150,9 +153,7 @@ $graph:
         For input parameters, this must be one or more URIs of a concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
-        available, file formats may be tested by exact match.  See
-        (FormatOntologyRequirement)[#formatontologyrequirement] for more
-        information.
+        available, file formats may be tested by exact match.
 
         For output parameters, this is the file format that will be assigned to
         the output parameter.

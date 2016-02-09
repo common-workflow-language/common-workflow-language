@@ -496,7 +496,19 @@
         "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
   tool: draft-3/formattest2.cwl
   doc: |
-    Test format checking against ontology.
+    Test format checking against ontology using subclassOf.
+
+- job: draft-3/formattest2-job.json
+  output:
+    output:
+        "path": "output.txt"
+        "format": "http://edamontology.org/format_1929"
+        "size": 12010
+        "class": "File"
+        "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
+  tool: draft-3/formattest3.cwl
+  doc: |
+    Test format checking against ontology using equivalentClass.
 
 - tool: draft-3/optional-output.cwl
   job: draft-3/cat-job.json

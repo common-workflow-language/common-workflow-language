@@ -58,13 +58,23 @@ Output files produced by tool execution must be written to the **designated
 output directory**.  The initial current working directory when executing
 the tool must be the designated output directory.
 
-Files may also be written to the **designated temporary directory**.  Any
-files written to the designated temporary directory may be deleted by the
-workflow platform immediately after the tool terminates.
+Files may also be written to the **designated temporary directory**.  This
+directory must be isolated and not shared with other processes.  Any files
+written to the designated temporary directory may be automatically deleted by
+the workflow platform immediately after the tool terminates.
+
+For compatibility, files may be written to the **system temporary directory**
+which must be located at `/tmp`.  Because the system temporary directory may be
+shared with other processes on the system, files placed in the system temporary
+directory are not guaranteed to be deleted automatically.  Correct tools must
+clean up temporary files written to the system temporary directory.  A tool
+must not use the system temporary directory as a backchannel communication with
+other tools.  It is valid for the system temporary directory to be the same as
+the designated temporary directory.
 
 When executing the tool, the tool must execute in a new, empty environment
 with only the environment variables described below; the child process must
-not inherit environment variables from the parent process except where
+not inherit environment variables from the parent process except as
 specified or at user option.
 
   * `HOME` must be set to the designated output directory.
@@ -77,11 +87,17 @@ specified or at user option.
     [DockerRequirement](#DockerRequirement)
 
 An implementation may forbid the tool from writing to any location in the
-runtime environment file system other than the designated temporary
-directory and designated output directory.  An implementation may provide
-read-only input files, and disallow in-place update of input files.  The
-designated temporary directory and designated output directory may reside
-on different mount points on different file systems.
+runtime environment file system other than the designated temporary directory,
+system temporary directory, and designated output directory.  An implementation
+may provide read-only input files, and disallow in-place update of input files.
+The designated temporary directory, system temporary directory and designated
+output directory may each reside on different mount points on different file
+systems.
+
+An implementation may forbid the tool from directly accessing network
+resources.  Correct tools must not assume any network access.  Future versions
+of the specification may incorporate optional process requirements that
+describe the networking needs of a tool.
 
 The `runtime` section available in [parameter references](#Parameter_references)
 and [expressions](#Expressions) contains the following fields.  As noted

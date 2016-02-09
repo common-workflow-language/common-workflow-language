@@ -10,7 +10,7 @@ Options:
   -nT   Run a specific test.
 EOF
 
-DRAFT=draft-2
+DRAFT=draft-3
 TEST_N=""
 RUNNER=cwl-runner
 PLATFORM=`uname -s`
