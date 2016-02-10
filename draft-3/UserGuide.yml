@@ -6,7 +6,7 @@
     - |
       ### First example
 
-      Here is a wrapper for the "echo" command.  It accepts a single
+      Here is a wrapper for the "grep" command.  It accepts a single
       input parameter `message`, runs the `echo` command, redirects standard
       output to `output.txt`, and captures `output.txt` as the output parameter
       `output`.
@@ -47,20 +47,20 @@
     - |
       ### Working with files
       ```
-    - $include: draft-3/example-files.cwl
+    #- $include: draft-3/example-files.cwl
     - |
       ```
 
     - |
       ### All about input parameters
       ```
-    - $include: draft-3/example-inp.cwl
+    #- $include: draft-3/example-inp.cwl
     - |
       ```
 
     - |
       ### All about output parameters
       ```
-    - $include: draft-3/example-out.cwl
+    #- $include: draft-3/example-out.cwl
     - |
       ```

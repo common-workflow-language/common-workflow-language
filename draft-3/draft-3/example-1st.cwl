@@ -1,13 +1,17 @@
 class: CommandLineTool
 inputs:
-  - id: message
+  - id: pattern
     type: string
     inputBinding:
       position: 1
+  - id: input
+    type: File
+    inputBinding:
+      position: 2
 outputs:
   - id: output
     type: File
     outputBinding:
-      glob: output.txt
-baseCommand: echo
-stdout: output.txt
+      glob: grep.txt
+baseCommand: grep
+stdout: grep.txt

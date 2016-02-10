@@ -1,82 +1,138 @@
-[{
-    "class": "File",
-    "path": "../draft-3/CommandLineTool.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/Process.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/Workflow.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/concepts.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/contrib.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/invocation.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/intro.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/field_name_proc.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/field_name_schema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/field_name_src.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/field_name.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_proc.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_schema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/ident_res_src.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/ident_res.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/import_include.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/link_res_proc.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/link_res_schema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/link_res_src.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/link_res.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/salad.md"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_proc.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_schema.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_src.yml"
-}, {
-    "class": "File",
-    "path": "../draft-3/salad/schema_salad/metaschema/vocab_res.yml"
-}]
+[
+    {
+        "path": "../draft-3/Process.yml", 
+        "class": "File", 
+        "secondaryFiles": [
+            {
+                "path": "../draft-3/concepts.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml", 
+                "class": "File", 
+                "secondaryFiles": [
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/salad.md", 
+                        "class": "File"
+                    }, 
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/field_name.yml", 
+                        "class": "File", 
+                        "secondaryFiles": [
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/field_name_schema.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/field_name_src.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/field_name_proc.yml", 
+                                "class": "File"
+                            }
+                        ]
+                    }, 
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/ident_res.yml", 
+                        "class": "File", 
+                        "secondaryFiles": [
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/ident_res_schema.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/ident_res_src.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/ident_res_proc.yml", 
+                                "class": "File"
+                            }
+                        ]
+                    }, 
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/link_res.yml", 
+                        "class": "File", 
+                        "secondaryFiles": [
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/link_res_schema.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/link_res_src.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/link_res_proc.yml", 
+                                "class": "File"
+                            }
+                        ]
+                    }, 
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/vocab_res.yml", 
+                        "class": "File", 
+                        "secondaryFiles": [
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_schema.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_src.yml", 
+                                "class": "File"
+                            }, 
+                            {
+                                "path": "../draft-3/salad/schema_salad/metaschema/vocab_res_proc.yml", 
+                                "class": "File"
+                            }
+                        ]
+                    }, 
+                    {
+                        "path": "../draft-3/salad/schema_salad/metaschema/import_include.md", 
+                        "class": "File"
+                    }
+                ]
+            }
+        ]
+    }, 
+    {
+        "path": "../draft-3/CommandLineTool.yml", 
+        "class": "File", 
+        "secondaryFiles": [
+            {
+                "path": "../draft-3/contrib.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/intro.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/concepts.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/invocation.md", 
+                "class": "File"
+            }
+        ]
+    }, 
+    {
+        "path": "../draft-3/Workflow.yml", 
+        "class": "File", 
+        "secondaryFiles": [
+            {
+                "path": "../draft-3/contrib.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/intro.md", 
+                "class": "File"
+            }, 
+            {
+                "path": "../draft-3/concepts.md", 
+                "class": "File"
+            }
+        ]
+    }
+]

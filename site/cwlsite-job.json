@@ -103,10 +103,7 @@
             "source": {
                 "class": "File",
                 "path": "../draft-3/UserGuide.yml",
-                "secondaryFiles": [{
-                    "class": "File",
-                    "path": "../draft-3/userguide-intro.md"
-                }]
+                "secondaryFiles": {"$import": "userguide-deps.json"}
             },
             "target": "draft-3/UserGuide.html",
             "renderlist": [],

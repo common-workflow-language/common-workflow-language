@@ -8,16 +8,17 @@ specification, draft 3.
 
 ## What is CWL?
 
-CWL is a standard way to describe command line tool and connect them together
-to create workflows.  CWL enables you to write portable tools and workflows
-that can run in a variety of platforms that support the CWL standard.
+CWL is a way to describe command line tools and connect them together to create
+workflows.  Because CWL is a specification and not a specific piece of
+software, tools and workflows described using CWL are portable across a variety
+of platforms that support the CWL standard.
 
 CWL has roots in "make" and many similar tools that determine order of
-execution based on dependencies between tasks.  Unlike "make", CWL provides
-strong isolation between tasks and requires that you list all your inputs and
-outputs explicitly.  This allows CWL tools to be portable across different
-platforms and makes CWL well suited for describing large-scale workflows in
-cluster and cloud environments where many tasks are scheduled in parallel
-across many nodes.
+execution based on dependencies between tasks.  However unlike "make", CWL
+tasks are isolated and you must list all your inputs and outputs explicitly up
+front.  This allows CWL implementations to take advantage of technologies such
+as Docker containers makes CWL well suited for describing large-scale workflows
+in cluster, cloud and high performance computing environments where tasks are
+scheduled in parallel across many nodes.
 
 ## Wrapping Command Line Tools

@@ -1,0 +1,14 @@
+[
+    {
+        "path": "../draft-3/userguide-intro.md", 
+        "class": "File"
+    }, 
+    {
+        "path": "../draft-3/draft-3/example-1st.cwl", 
+        "class": "File"
+    }, 
+    {
+        "path": "../draft-3/draft-3/example-1st-job.json", 
+        "class": "File"
+    }
+]
