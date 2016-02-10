@@ -107,6 +107,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
 * [BioDatomics](http://www.biodatomics.com/)
+* [Wolfson Wohl Cancer Research Centre](http://www.gla.ac.uk/researchinstitutes/cancersciences/ics/facilities/wwcrc/)
 
 ## Individual Contributors
 
