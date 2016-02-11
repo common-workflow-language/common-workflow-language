@@ -4,5 +4,10 @@ inputs:
     type: string
     inputBinding:
       position: 1
-outputs: []
+outputs:
+  - id: output
+    type: File
+    outputBinding:
+      glob: output.txt
 baseCommand: echo
+stdout: output.txt

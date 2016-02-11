@@ -6,10 +6,9 @@
     - |
       ### First example
 
-      Here is a wrapper for the "grep" command.  It accepts a single
-      input parameter `message`, runs the `echo` command, redirects standard
-      output to `output.txt`, and captures `output.txt` as the output parameter
-      `output`.
+      The simplest "hello world" program.  This accepts one input parameter,
+      writes a message to the terminal or job log, and produces no permanent
+      output.
 
       *example-1st.cwl*
       ```
@@ -19,9 +18,9 @@
 
       Use a JSON object in a separate file to describe the input of a run:
 
-      *example-1st-job*
+      *example-echo-job.json*
       ```
-    - $include: draft-3/example-1st-job.json
+    - $include: draft-3/example-echo-job.json
     - |
       ```
 
@@ -29,15 +28,39 @@
       on the command line:
 
       ```
-      $ cwl-runner example-1st.cwl example-1st-job.json
-      [job 140442100106896] $ echo 'Hello world!' > output.txt
+      $ cwl-runner example-1st.cwl example-echo-job.json
+      [job 140199012414352] $ echo 'Hello world!'
+      Hello world!
+      Final process status is success
+      ```
+
+    - |
+      ### Capturing a tool's standard output stream
+
+      To capture a tool's standard output stream, first add the `stdout` field
+      with the name of the file to redirect the output.  Then, add an output
+      parameter with a `glob` that matches the file with the standard output
+      contents.
+
+      *example-stdout.cwl*
+      ```
+    - $include: draft-3/example-stdout.cwl
+    - |
+      ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-stdout.cwl example-echo-job.json
+      [job 140199012414352] $ echo 'Hello world!' > output.txt
       Final process status is success
       {
-        "output": {
-          "path": "output.txt",
-          "size": 13,
-          "class": "File",
-          "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b"
+      "output": {
+        "path": "output.txt",
+        "size": 13,
+        "class": "File",
+        "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b"
         }
       }
       $ cat output.txt
@@ -45,18 +68,42 @@
       ```
 
     - |
-      ### Working with files
+      ### Turning input parameters into command line parameters
+
+      Input parameters consist of the parameter name `id` and the parameter
+      type `type`.  The optional field `inputBinding` describes how the input
+      parameter should be added to the tool's command line.
+
+      Valid types are primitive types *string*, *int*, *long*, *float*,
+      *double*, and *null*; complex types *array* and *record*; and special
+      types *File* and *Any*.
+
+      Some available fields in inputBinding are `position`, `prefix` and
+      `separate`.  The `position` is the relative position that the parameter
+      should appear in the command line.  this is a sorting key, positions do
+      not have to be exactly sequential, positions can be duplicated, and the
+      position field itself can be omitted to get a default position).
+
+      *example-inp.cwl*
       ```
-    #- $include: draft-3/example-files.cwl
+    - $include: draft-3/example-inp.cwl
     - |
       ```
 
-    - |
-      ### All about input parameters
+      *example-inp-job.json*
       ```
-    #- $include: draft-3/example-inp.cwl
+    - $include: draft-3/example-inp-job.json
     - |
       ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      [job 140020149614160] /home/peter/work/common-workflow-language/draft-3$ echo -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
+      -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
+      Final process status is success
+```
 
     - |
       ### All about output parameters
