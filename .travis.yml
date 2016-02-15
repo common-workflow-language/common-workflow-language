@@ -4,6 +4,9 @@ os:
   - linux
 env:
   - TOX_ENV=py27-lint
+  - TOX_ENV=py26-lint
+  - TOX_ENV=py27-unit
+  - TOX_ENV=py26-unit
 
 install:
   - pip install tox
