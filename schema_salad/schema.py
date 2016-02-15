@@ -301,16 +301,18 @@ def extend_and_specialize(items, loader):
     """Apply 'extend' and 'specialize' to fully materialize derived record
     types."""
 
-    types = {t["name"]: t for t in items}
+    types = {}
+    for t in items:
+        types[t["name"]] = t
     n = []
 
     for t in items:
         t = copy.deepcopy(t)
         if "extends" in t:
+            spec = {}
             if "specialize" in t:
-                spec = {sp["specializeFrom"]: sp["specializeTo"] for sp in aslist(t["specialize"])}
-            else:
-                spec = {}
+                for sp in aslist(t["specialize"]):
+                    spec[sp["specializeFrom"]] = sp["specializeTo"]
 
             exfields = []
             exsym = []
@@ -357,7 +359,9 @@ def extend_and_specialize(items, loader):
 
         n.append(t)
 
-    ex_types = {t["name"]: t for t in n}
+    ex_types = {}
+    for t in n:
+        ex_types[t["name"]] = t
 
     extended_by = {}
     for t in n:
@@ -380,7 +384,10 @@ def make_avro_schema(j, loader):
 
     j = extend_and_specialize(j, loader)
 
-    j2 = make_valid_avro(j, {t["name"]: t for t in j}, set())
+    name_dict = {}
+    for t in j:
+        name_dict[t["name"]] = t
+    j2 = make_valid_avro(j, name_dict, set())
 
     j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
 

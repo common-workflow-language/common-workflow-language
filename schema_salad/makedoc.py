@@ -460,7 +460,8 @@ if __name__ == "__main__":
                 s.append(j)
 
     primitiveType = args.primtype
-
-    redirect = {r.split("=")[0]:r.split("=")[1] for r in args.redirect} if args.redirect else {}
+    redirect = {}
+    for r in (args.redirect or []):
+        redirect[r.split("=")[0]] = r.split("=")[1]
     renderlist = args.only if args.only else []
     avrold_doc(s, sys.stdout, renderlist, redirect, args.brand, args.brandlink)

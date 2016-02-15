@@ -162,7 +162,7 @@ class Loader(object):
         self.vocab = {}
         self.rvocab = {}
 
-        self.ctx.update({k: v for k,v in newcontext.iteritems() if k != "@context"})
+        self.ctx.update(_copy_dict_without_key(newcontext, "@context"))
 
         _logger.debug("ctx is %s", self.ctx)
 
@@ -266,7 +266,7 @@ class Loader(object):
                 raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
         if "$graph" in obj:
-            metadata = {k: v for k,v in obj.items() if k != "$graph"}
+            metadata = _copy_dict_without_key(obj, "$graph")
             obj = obj["$graph"]
             return obj, metadata
         else:
@@ -314,7 +314,7 @@ class Loader(object):
                 loader = newctx
 
             if "$graph" in document:
-                metadata = {k: v for k,v in document.items() if k != "$graph"}
+                metadata = _copy_dict_without_key(document, "$graph")
                 document = document["$graph"]
                 metadata, _ = loader.resolve_all(metadata, base_url, file_base)
 
@@ -500,3 +500,11 @@ class Loader(object):
             else:
                 raise errors[0]
         return
+
+
+def _copy_dict_without_key(from_dict, filtered_key):
+    new_dict = {}
+    for key, value in from_dict.items():
+        if key != filtered_key:
+            new_dict[key] = value
+    return new_dict
