@@ -28,19 +28,100 @@
       on the command line:
 
       ```
-      $ cwl-runner example-1st.cwl example-echo-job.json
+      $ cwl-runner example-echo.cwl example-echo-job.json
       [job 140199012414352] $ echo 'Hello world!'
       Hello world!
       Final process status is success
       ```
 
     - |
+      ### Turning simple input parameters into command line parameters
+
+      Input parameters consist of the parameter `id` and the parameter `type`.
+      Valid types are primitive types *string*, *int*, *long*, *float*,
+      *double*, and *null*; complex types *array* and *record*; and special
+      types *File* and *Any*.
+
+      The field `inputBinding` describes how the input parameter should be
+      added to the tool's command line.  Some fields in inputBinding are
+      `position`, `prefix` and `separate`.  The `position` controls where the
+      parameter appears on the command line.  Parameter positions are relative,
+      not abosolute, which means:
+
+        * positions do not have to be sequential, three parameters with
+          positions [1, 3, 5] will result in the same command line as [1, 2,
+          3].
+        * positions can be negative
+        * more than one parameter can have the same position (ties are broken
+          using the parameter name)
+        * the position field itself is optional.  the default position is 0.
+
+      The `baseCommand` field always comes before parameters.
+
+      *example-inp.cwl*
+      ```
+    - $include: draft-3/example-inp.cwl
+    - |
+      ```
+
+      *example-inp-job.json*
+      ```
+    - $include: draft-3/example-inp-job.json
+    - |
+      ```
+
+      Invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-inp.cwl example-inp-job.json
+      [job 140020149614160] /home/peter/work/common-workflow-language/draft-3$ echo -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
+      -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
+      Final process status is success
+      ```
+
+    - |
+      ### Capturing output files
+
+      Like input parameters, output parameters consist of the parameter `id`
+      and the parameter `type`.  The most common output type is `File`.
+
+      The field `outputBinding` describes how to capture the output of the tool
+      to create the output object.  The most common field in outputBinding is
+      `glob`, which takes a file name or file pattern that you want to capture.
+
+      ```
+      - $include: draft-3/example-tar2.cwl
+    - |
+      ```
+
+      ```
+      - $include: draft-3/example-tar-job.json
+    - |
+      ```
+
+      ```
+      $ cwl-runner example-tar.cwl example-tar-job.json
+      [job 139868145165200] $ tar xvf hello.tar
+      hello.txt
+      Final process status is success
+      {
+      "example_out": {
+        "path": "hello.txt",
+        "size": 13,
+        "class": "File",
+        "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b"
+        }
+      }
+      ```
+
+    - |
       ### Capturing a tool's standard output stream
 
-      To capture a tool's standard output stream, first add the `stdout` field
-      with the name of the file to redirect the output.  Then, add an output
-      parameter with a `glob` that matches the file with the standard output
-      contents.
+      To capture a tool's standard output stream, add the `stdout` field to the
+      tool description with the name of the file to redirect the output.  Then,
+      add an output parameter with a `glob` that matches the file with the
+      standard output contents.
 
       *example-stdout.cwl*
       ```
@@ -65,49 +146,4 @@
       }
       $ cat output.txt
       Hello world!
-      ```
-
-    - |
-      ### Turning input parameters into command line parameters
-
-      Input parameters consist of the parameter name `id` and the parameter
-      type `type`.  The optional field `inputBinding` describes how the input
-      parameter should be added to the tool's command line.
-
-      Valid types are primitive types *string*, *int*, *long*, *float*,
-      *double*, and *null*; complex types *array* and *record*; and special
-      types *File* and *Any*.
-
-      Some available fields in inputBinding are `position`, `prefix` and
-      `separate`.  The `position` is the relative position that the parameter
-      should appear in the command line.  this is a sorting key, positions do
-      not have to be exactly sequential, positions can be duplicated, and the
-      position field itself can be omitted to get a default position).
-
-      *example-inp.cwl*
-      ```
-    - $include: draft-3/example-inp.cwl
-    - |
-      ```
-
-      *example-inp-job.json*
-      ```
-    - $include: draft-3/example-inp-job.json
-    - |
-      ```
-
-      Now invoke `cwl-runner` providing the tool wrapper and the input object
-      on the command line:
-
-      ```
-      [job 140020149614160] /home/peter/work/common-workflow-language/draft-3$ echo -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
-      -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
-      Final process status is success
-```
-
-    - |
-      ### All about output parameters
-      ```
-    #- $include: draft-3/example-out.cwl
-    - |
       ```
