@@ -314,8 +314,8 @@ def extend_and_specialize(items, loader):
                 for sp in aslist(t["specialize"]):
                     spec[sp["specializeFrom"]] = sp["specializeTo"]
 
-            exfields = [] # type: List[str]
-            exsym = [] # type: List[str]
+            exfields = []  # type: List[str]
+            exsym = []  # type: List[str]
             for ex in aslist(t["extends"]):
                 if ex not in types:
                     raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
@@ -338,7 +338,7 @@ def extend_and_specialize(items, loader):
                 exfields.extend(t.get("fields", []))
                 t["fields"] = exfields
 
-                fieldnames = set() # type: Set[str]
+                fieldnames = set()  # type: Set[str]
                 for field in t["fields"]:
                     if field["name"] in fieldnames:
                         raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
@@ -363,7 +363,7 @@ def extend_and_specialize(items, loader):
     for t in n:
         ex_types[t["name"]] = t
 
-    extended_by = {} # type: Dict[str, str]
+    extended_by = {}  # type: Dict[str, str]
     for t in n:
         if "extends" in t:
             for ex in aslist(t["extends"]):

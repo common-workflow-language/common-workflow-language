@@ -113,7 +113,7 @@ def main(args=None):
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
-    metactx = {} # type: Dict[str, str]
+    metactx = {}  # type: Dict[str, str]
     if isinstance(schema_raw_doc, dict):
         metactx = schema_raw_doc.get("$namespaces", {})
         if "$base" in schema_raw_doc:

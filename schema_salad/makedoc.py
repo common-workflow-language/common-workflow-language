@@ -17,7 +17,7 @@ import typing
 _logger = logging.getLogger("salad")
 
 def has_types(items):
-    r = [] # type: List
+    r = []  # type: List
     if isinstance(items, dict):
         if items["type"] == "https://w3id.org/cwl/salad#record":
             return [items["name"]]
@@ -139,18 +139,18 @@ class RenderType(object):
     def __init__(self, toc, j, renderlist, redirects):
         self.typedoc = StringIO.StringIO()
         self.toc = toc
-        self.subs = {} # type: Dict
-        self.docParent = {} # type: Dict
-        self.docAfter = {} # type: Dict
-        self.rendered = set() # type: Set
+        self.subs = {}  # type: Dict
+        self.docParent = {}  # type: Dict
+        self.docAfter = {}  # type: Dict
+        self.rendered = set()  # type: Set
         self.redirects = redirects
-        self.title = None # type: str
+        self.title = None  # type: str
 
         for t in j:
             if "extends" in t:
                 for e in aslist(t["extends"]):
                     add_dictlist(self.subs, e, t["name"])
-                    #if "docParent" not in t and "docAfter" not in t:
+                    # if "docParent" not in t and "docAfter" not in t:
                     #    add_dictlist(self.docParent, e, t["name"])
 
             if t.get("docParent"):
@@ -166,9 +166,9 @@ class RenderType(object):
         _, _, metaschema_loader = schema.get_metaschema()
         alltypes = schema.extend_and_specialize(j, metaschema_loader)
 
-        self.typemap = {} # type: Dict
-        self.uses = {} # type: Dict
-        self.record_refs = {} #type: Dict
+        self.typemap = {}  # type: Dict
+        self.uses = {}  # type: Dict
+        self.record_refs = {}  # type: Dict
         for t in alltypes:
             self.typemap[t["name"]] = t
             try:

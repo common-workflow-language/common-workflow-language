@@ -60,7 +60,7 @@ class Loader(object):
         else:
             self.idx = NormDict(normalize)
 
-        self.ctx = {} # type: Dict[str, Union[str, dict, basestring]]
+        self.ctx = {}  # type: Dict[str, Union[str, dict, basestring]]
         if schemagraph is not None:
             self.graph = schemagraph
         else:
@@ -76,14 +76,14 @@ class Loader(object):
         else:
             self.cache = {}
 
-        self.url_fields = set() # type: Set[str]
-        self.vocab_fields = set() # type: Set
-        self.identifiers = set() # type: Set
-        self.identity_links = set() # type: Set
-        self.standalone = set() # type: Set
-        self.nolinkcheck = set() # type: Set
-        self.vocab = {} # type: Dict
-        self.rvocab = {} # type: Dict
+        self.url_fields = set()  # type: Set[str]
+        self.vocab_fields = set()  # type: Set
+        self.identifiers = set()  # type: Set
+        self.identity_links = set()  # type: Set
+        self.standalone = set()  # type: Set
+        self.nolinkcheck = set()  # type: Set
+        self.vocab = {}  # type: Dict
+        self.rvocab = {}  # type: Dict
 
         self.add_context(ctx)
 
@@ -272,7 +272,7 @@ class Loader(object):
 
     def resolve_all(self, document, base_url, file_base=None):
         loader = self
-        metadata = {} # type: Dict[str, str]
+        metadata = {}  # type: Dict[str, str]
         if file_base is None:
             file_base = base_url
 
