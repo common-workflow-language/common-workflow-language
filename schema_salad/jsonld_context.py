@@ -148,3 +148,9 @@ def salad_to_jsonld_context(j, schema_ctx):
         process_type(t, g, context, defaultBase, namespaces, defaultPrefix)
 
     return (context, g)
+
+if __name__ == "__main__":
+    with open(sys.argv[1]) as f:
+        j = yaml.load(f)
+        (ctx, g) = salad_to_jsonld_context(j)
+        print json.dumps(ctx, indent=4, sort_keys=True)

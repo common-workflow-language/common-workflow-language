@@ -146,7 +146,7 @@ class RenderType(object):
             if "extends" in t:
                 for e in aslist(t["extends"]):
                     add_dictlist(self.subs, e, t["name"])
-                    # if "docParent" not in t and "docAfter" not in t:
+                    #if "docParent" not in t and "docAfter" not in t:
                     #    add_dictlist(self.docParent, e, t["name"])
 
             if t.get("docParent"):
