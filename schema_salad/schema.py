@@ -1,6 +1,6 @@
 import avro
 import copy
-from .makedoc import add_dictlist
+from .add_dictlist import add_dictlist
 import sys
 import pprint
 from pkg_resources import resource_stream

@@ -4,11 +4,17 @@ import hashlib
 import logging
 import collections
 import requests
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse
 import yaml
 from . import validate
 import pprint
-import StringIO
+try:
+    from io import StringIO
+except ImportError:
+    from StringIO import StringIO
 from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
@@ -406,7 +412,7 @@ class Loader(object):
         if url in self.idx:
             return self.idx[url]
         try:
-            text = StringIO.StringIO(self.fetch_text(url))
+            text = StringIO(self.fetch_text(url))
             text.name = url
             result = yaml.load(text)
         except yaml.parser.ParserError as e:

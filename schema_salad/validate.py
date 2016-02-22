@@ -1,7 +1,10 @@
 import pprint
 import avro.schema
 import yaml
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse
 import typing
 
 class ValidationException(Exception):

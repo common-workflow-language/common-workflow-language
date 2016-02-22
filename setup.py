@@ -16,6 +16,11 @@ try:
 except ImportError:
     tagger = egg_info_cmd.egg_info
 
+if sys.version_info < (3,):
+    avro_package = 'avro'
+else:
+    avro_package = 'avro-python3'
+
 setup(name='schema-salad',
       version='1.6',
       description='Schema Annotations for Linked Avro Data (SALAD)',
@@ -30,8 +35,8 @@ setup(name='schema-salad',
       install_requires=[
           'requests',
           'PyYAML',
-          'avro',
-          'rdflib >= 4.2.0',
+          avro_package,
+          'rdflib >= 4.1.0',
           'rdflib-jsonld >= 0.3.0',
           'mistune',
           'typing'

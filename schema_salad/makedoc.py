@@ -10,6 +10,7 @@ import StringIO
 import logging
 import urlparse
 from .aslist import aslist
+from .add_dictlist import add_dictlist
 import re
 import argparse
 import typing
@@ -102,11 +103,6 @@ basicTypes = ("https://w3id.org/cwl/salad#null",
               "https://w3id.org/cwl/salad#record",
               "https://w3id.org/cwl/salad#enum",
               "https://w3id.org/cwl/salad#array")
-
-def add_dictlist(di, key, val):
-    if key not in di:
-        di[key] = []
-    di[key].append(val)
 
 def number_headings(toc, maindoc):
     mdlines = []
