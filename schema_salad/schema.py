@@ -1,20 +1,20 @@
 import avro
 import copy
-from  makedoc import add_dictlist
+from .makedoc import add_dictlist
 import sys
 import pprint
 from pkg_resources import resource_stream
 import yaml
 import avro.schema
-import validate
+from . import validate
 import json
 import urlparse
-import ref_resolver
-from flatten import flatten
+from . import ref_resolver
+from .flatten import flatten
 import logging
-from aslist import aslist
-import jsonld_context
-import schema_salad.schema
+from .aslist import aslist
+from . import jsonld_context
+import typing
 
 _logger = logging.getLogger("salad")
 
@@ -162,7 +162,7 @@ def load_schema(schema_ref, cache=None):
     document_loader = ref_resolver.Loader(schema_ctx, cache=cache)
 
     # Make the Avro validation that will be used to validate the target document
-    (avsc_names, avsc_obj) = schema_salad.schema.make_avro_schema(schema_doc, document_loader)
+    (avsc_names, avsc_obj) = make_avro_schema(schema_doc, document_loader)
 
     return document_loader, avsc_names, schema_metadata
 
@@ -286,10 +286,10 @@ def make_valid_avro(items, alltypes, found, union=False):
             items["symbols"] = [avro_name(sym) for sym in items["symbols"]]
         return items
     if isinstance(items, list):
-        n = []
+        ret = []
         for i in items:
-            n.append(make_valid_avro(i, alltypes, found, union=union))
-        return n
+            ret.append(make_valid_avro(i, alltypes, found, union=union))
+        return ret
     if union and isinstance(items, basestring):
         if items in alltypes and avro_name(items) not in found:
             return make_valid_avro(alltypes[items], alltypes, found, union=union)
@@ -314,8 +314,8 @@ def extend_and_specialize(items, loader):
                 for sp in aslist(t["specialize"]):
                     spec[sp["specializeFrom"]] = sp["specializeTo"]
 
-            exfields = []
-            exsym = []
+            exfields = [] # type: List[str]
+            exsym = [] # type: List[str]
             for ex in aslist(t["extends"]):
                 if ex not in types:
                     raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
@@ -338,7 +338,7 @@ def extend_and_specialize(items, loader):
                 exfields.extend(t.get("fields", []))
                 t["fields"] = exfields
 
-                fieldnames = set()
+                fieldnames = set() # type: Set[str]
                 for field in t["fields"]:
                     if field["name"] in fieldnames:
                         raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
@@ -363,7 +363,7 @@ def extend_and_specialize(items, loader):
     for t in n:
         ex_types[t["name"]] = t
 
-    extended_by = {}
+    extended_by = {} # type: Dict[str, str]
     for t in n:
         if "extends" in t:
             for ex in aslist(t["extends"]):

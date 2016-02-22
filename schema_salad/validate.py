@@ -2,6 +2,7 @@ import pprint
 import avro.schema
 import yaml
 import urlparse
+import typing
 
 class ValidationException(Exception):
     pass

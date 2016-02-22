@@ -6,13 +6,15 @@ import collections
 import requests
 import urlparse
 import yaml
-import validate
+from . import validate
 import pprint
 import StringIO
-from aslist import aslist
+from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 import xml.sax
+import typing
+from typing import Union, Tuple
 
 _logger = logging.getLogger("salad")
 
@@ -58,7 +60,7 @@ class Loader(object):
         else:
             self.idx = NormDict(normalize)
 
-        self.ctx = {}
+        self.ctx = {} # type: Dict[str, Union[str, dict, basestring]]
         if schemagraph is not None:
             self.graph = schemagraph
         else:
@@ -74,14 +76,14 @@ class Loader(object):
         else:
             self.cache = {}
 
-        self.url_fields = set()
-        self.vocab_fields = set()
-        self.identifiers = set()
-        self.identity_links = set()
-        self.standalone = set()
-        self.nolinkcheck = set()
-        self.vocab = {}
-        self.rvocab = {}
+        self.url_fields = set() # type: Set[str]
+        self.vocab_fields = set() # type: Set
+        self.identifiers = set() # type: Set
+        self.identity_links = set() # type: Set
+        self.standalone = set() # type: Set
+        self.nolinkcheck = set() # type: Set
+        self.vocab = {} # type: Dict
+        self.rvocab = {} # type: Dict
 
         self.add_context(ctx)
 
@@ -201,7 +203,6 @@ class Loader(object):
 
         obj = None
         inc = False
-        merge = None
 
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
@@ -235,10 +236,7 @@ class Loader(object):
 
         # Has this reference been loaded already?
         if url in self.idx:
-            if merge:
-                obj = self.idx[url].copy()
-            else:
-                return self.idx[url], {}
+            return self.idx[url], {}
 
         # "$include" directive means load raw text
         if inc:
@@ -274,7 +272,7 @@ class Loader(object):
 
     def resolve_all(self, document, base_url, file_base=None):
         loader = self
-        metadata = {}
+        metadata = {} # type: Dict[str, str]
         if file_base is None:
             file_base = base_url
 

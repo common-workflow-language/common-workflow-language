@@ -33,7 +33,8 @@ setup(name='schema-salad',
           'avro',
           'rdflib >= 4.2.0',
           'rdflib-jsonld >= 0.3.0',
-          'mistune'
+          'mistune',
+          'typing'
         ],
       test_suite='tests',
       tests_require=[],

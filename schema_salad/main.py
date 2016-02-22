@@ -2,9 +2,9 @@ import argparse
 import logging
 import sys
 import pkg_resources  # part of setuptools
-import schema
-import jsonld_context
-import makedoc
+from .import schema
+from . import jsonld_context
+from . import makedoc
 import json
 from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
@@ -12,8 +12,9 @@ import yaml
 import os
 import urlparse
 
-from ref_resolver import Loader
-import validate
+from .ref_resolver import Loader
+from . import validate
+import typing
 
 _logger = logging.getLogger("salad")
 
@@ -112,7 +113,7 @@ def main(args=None):
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
-    metactx = {}
+    metactx = {} # type: Dict[str, str]
     if isinstance(schema_raw_doc, dict):
         metactx = schema_raw_doc.get("$namespaces", {})
         if "$base" in schema_raw_doc:

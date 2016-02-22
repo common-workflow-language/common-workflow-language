@@ -1,5 +1,5 @@
 import mistune
-import schema
+from . import schema
 import json
 import yaml
 import os
@@ -9,14 +9,15 @@ import sys
 import StringIO
 import logging
 import urlparse
-from aslist import aslist
+from .aslist import aslist
 import re
 import argparse
+import typing
 
 _logger = logging.getLogger("salad")
 
 def has_types(items):
-    r = []
+    r = [] # type: List
     if isinstance(items, dict):
         if items["type"] == "https://w3id.org/cwl/salad#record":
             return [items["name"]]
@@ -138,12 +139,12 @@ class RenderType(object):
     def __init__(self, toc, j, renderlist, redirects):
         self.typedoc = StringIO.StringIO()
         self.toc = toc
-        self.subs = {}
-        self.docParent = {}
-        self.docAfter = {}
-        self.rendered = set()
+        self.subs = {} # type: Dict
+        self.docParent = {} # type: Dict
+        self.docAfter = {} # type: Dict
+        self.rendered = set() # type: Set
         self.redirects = redirects
-        self.title = None
+        self.title = None # type: str
 
         for t in j:
             if "extends" in t:
@@ -165,9 +166,9 @@ class RenderType(object):
         _, _, metaschema_loader = schema.get_metaschema()
         alltypes = schema.extend_and_specialize(j, metaschema_loader)
 
-        self.typemap = {}
-        self.uses = {}
-        self.record_refs = {}
+        self.typemap = {} # type: Dict
+        self.uses = {} # type: Dict
+        self.record_refs = {} #type: Dict
         for t in alltypes:
             self.typemap[t["name"]] = t
             try:
