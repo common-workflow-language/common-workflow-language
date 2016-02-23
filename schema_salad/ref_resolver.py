@@ -213,7 +213,6 @@ class Loader(object):
 
         obj = None
         inc = False
-        merge = None
 
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
@@ -247,10 +246,7 @@ class Loader(object):
 
         # Has this reference been loaded already?
         if url in self.idx:
-            if merge:
-                obj = self.idx[url].copy()
-            else:
-                return self.idx[url], {}
+            return self.idx[url], {}
 
         # "$include" directive means load raw text
         if inc:

@@ -42,7 +42,6 @@ def main(args=None):
 
     exgroup = parser.add_mutually_exclusive_group()
     exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for schema")
-    exgroup.add_argument("--print-doc", action="store_true", help="Print HTML documentation from schema")
     exgroup.add_argument("--print-rdfs", action="store_true", help="Print RDF schema")
     exgroup.add_argument("--print-avro", action="store_true", help="Print Avro schema")
 
@@ -151,11 +150,6 @@ def main(args=None):
     # Optionally print the RDFS graph from the schema
     if args.print_rdfs:
         print(rdfs.serialize(format=args.rdf_serializer))
-        return 0
-
-    # Optionally create documentation page from the schema
-    if args.print_doc:
-        makedoc.avrold_doc(schema_doc, sys.stdout)
         return 0
 
     if args.print_metadata and not args.document:
