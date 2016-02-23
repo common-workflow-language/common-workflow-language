@@ -3,8 +3,14 @@ python: 2.7
 os:
   - linux
 env:
+  - TOX_ENV=py35-lint
+  - TOX_ENV=py34-lint
+  - TOX_ENV=py33-lint
   - TOX_ENV=py27-lint
   - TOX_ENV=py26-lint
+  - TOX_ENV=py35-unit
+  - TOX_ENV=py34-unit
+  - TOX_ENV=py33-unit
   - TOX_ENV=py27-unit
   - TOX_ENV=py26-unit
 
