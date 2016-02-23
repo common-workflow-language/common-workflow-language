@@ -29,7 +29,7 @@ if sys.version_info >= (3,):
     avro_package += '-python3'
 install_requires.append(avro_package)
 
-if sys.version_info != (2,6):
+if sys.version_info >= (2, 7):
     install_requires.append('typing')
 
 setup(name='schema-salad',

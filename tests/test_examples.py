@@ -15,7 +15,7 @@ class TestSchemas(unittest.TestCase):
             "edam:has_format": "edam:format_1915"
             }, "")
 
-        self.assertEquals(ra, {
+        self.assertEqual(ra, {
             "$schemas": ["tests/EDAM.owl"],
             "$namespaces": {"edam": "http://edamontology.org/"},
             'http://edamontology.org/has_format': 'http://edamontology.org/format_1915'

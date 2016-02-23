@@ -1,5 +1,5 @@
 import sys
-if sys.version_info != (2,6):
+if sys.version_info >= (2,7):
     import typing
 
 # http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html

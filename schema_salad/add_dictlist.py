@@ -1,5 +1,5 @@
 import sys
-if sys.version_info != (2,6):
+if sys.version_info >= (2,7):
     import typing
 
 def add_dictlist(di, key, val):

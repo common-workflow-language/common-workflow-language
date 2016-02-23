@@ -18,7 +18,7 @@ except ImportError:
 
 from .ref_resolver import Loader
 from . import validate
-if sys.version_info != (2,6):
+if sys.version_info >= (2,7):
     import typing
 
 _logger = logging.getLogger("salad")

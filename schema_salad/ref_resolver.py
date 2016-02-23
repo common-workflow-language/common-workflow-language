@@ -22,7 +22,7 @@ from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 import xml.sax
-if sys.version_info != (2,6):
+if sys.version_info >= (2,7):
     import typing
     from typing import Union, Tuple
 
