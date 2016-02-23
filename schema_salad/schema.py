@@ -1,20 +1,27 @@
 import avro
 import copy
-from  makedoc import add_dictlist
+from .add_dictlist import add_dictlist
 import sys
 import pprint
 from pkg_resources import resource_stream
 import yaml
 import avro.schema
-import validate
+from . import validate
 import json
-import urlparse
-import ref_resolver
-from flatten import flatten
+try:
+    import urlparse
+    AvroSchemaFromJSONData=avro.schema.make_avsc_object
+except ImportError:
+    import urllib.parse as urlparse
+    basestring=str
+    AvroSchemaFromJSONData=avro.schema.SchemaFromJSONData
+from . import ref_resolver
+from .flatten import flatten
 import logging
-from aslist import aslist
-import jsonld_context
-import schema_salad.schema
+from .aslist import aslist
+from . import jsonld_context
+if sys.version_info >= (2,7):
+    import typing
 
 _logger = logging.getLogger("salad")
 
@@ -162,7 +169,7 @@ def load_schema(schema_ref, cache=None):
     document_loader = ref_resolver.Loader(schema_ctx, cache=cache)
 
     # Make the Avro validation that will be used to validate the target document
-    (avsc_names, avsc_obj) = schema_salad.schema.make_avro_schema(schema_doc, document_loader)
+    (avsc_names, avsc_obj) = make_avro_schema(schema_doc, document_loader)
 
     return document_loader, avsc_names, schema_metadata
 
@@ -179,7 +186,8 @@ def load_and_validate(document_loader, avsc_names, document, strict):
 def validate_doc(schema_names, validate_doc, loader, strict):
     has_root = False
     for r in schema_names.names.values():
-        if r.get_prop("documentRoot"):
+        if ((hasattr(r, 'get_prop') and r.get_prop("documentRoot")) or (
+                "documentRoot" in r.props)):
             has_root = True
             break
 
@@ -198,13 +206,18 @@ def validate_doc(schema_names, validate_doc, loader, strict):
         errors = []
         success = False
         for r in schema_names.names.values():
-            if r.get_prop("documentRoot"):
+            if ((hasattr(r,"get_prop") and r.get_prop("documentRoot")) or (
+                "documentRoot" in r.props)):
                 try:
                     validate.validate_ex(r, item, loader.identifiers, strict, foreign_properties=loader.foreign_properties)
                     success = True
                     break
                 except validate.ValidationException as e:
-                    errors.append("Could not validate as `%s` because\n%s" % (r.get_prop("name"), validate.indent(str(e), nolead=False)))
+                    if hasattr(r, "get_prop"):
+                        name = r.get_prop("name")
+                    elif hasattr(r, "name"):
+                        name = r.name
+                    errors.append("Could not validate as `%s` because\n%s" % (name, validate.indent(str(e), nolead=False)))
         if not success:
             objerr = "Validation error at position %i" % pos
             for ident in loader.identifiers:
@@ -270,7 +283,8 @@ def make_valid_avro(items, alltypes, found, union=False):
             items["name"] = avro_name(items["name"])
 
         if "type" in items and items["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum", "record", "enum"):
-            if items.get("abstract"):
+            if (hasattr(items, "get") and items.get("abstract")) or ("abstract"
+                    in items):
                 return items
             if not items.get("name"):
                 raise Exception("Named schemas must have a non-empty name: %s" % items)
@@ -286,10 +300,10 @@ def make_valid_avro(items, alltypes, found, union=False):
             items["symbols"] = [avro_name(sym) for sym in items["symbols"]]
         return items
     if isinstance(items, list):
-        n = []
+        ret = []
         for i in items:
-            n.append(make_valid_avro(i, alltypes, found, union=union))
-        return n
+            ret.append(make_valid_avro(i, alltypes, found, union=union))
+        return ret
     if union and isinstance(items, basestring):
         if items in alltypes and avro_name(items) not in found:
             return make_valid_avro(alltypes[items], alltypes, found, union=union)
@@ -314,8 +328,8 @@ def extend_and_specialize(items, loader):
                 for sp in aslist(t["specialize"]):
                     spec[sp["specializeFrom"]] = sp["specializeTo"]
 
-            exfields = []
-            exsym = []
+            exfields = []  # type: List[str]
+            exsym = []  # type: List[str]
             for ex in aslist(t["extends"]):
                 if ex not in types:
                     raise Exception("Extends %s in %s refers to invalid base type" % (t["extends"], t["name"]))
@@ -338,7 +352,7 @@ def extend_and_specialize(items, loader):
                 exfields.extend(t.get("fields", []))
                 t["fields"] = exfields
 
-                fieldnames = set()
+                fieldnames = set()  # type: Set[str]
                 for field in t["fields"]:
                     if field["name"] in fieldnames:
                         raise validate.ValidationException("Field name %s appears twice in %s" % (field["name"], t["name"]))
@@ -363,7 +377,7 @@ def extend_and_specialize(items, loader):
     for t in n:
         ex_types[t["name"]] = t
 
-    extended_by = {}
+    extended_by = {}  # type: Dict[str, str]
     for t in n:
         if "extends" in t:
             for ex in aslist(t["extends"]):
@@ -392,7 +406,7 @@ def make_avro_schema(j, loader):
     j3 = [t for t in j2 if isinstance(t, dict) and not t.get("abstract") and t.get("type") != "documentation"]
 
     try:
-        avro.schema.make_avsc_object(j3, names)
+        AvroSchemaFromJSONData(j3, names)
     except avro.schema.SchemaParseException as e:
         names = e
 

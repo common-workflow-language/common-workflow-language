@@ -1,4 +1,7 @@
 import logging
+import sys
+if sys.version_info >= (2,7):
+    import typing
 
 __author__ = 'peter.amstutz@curoverse.com'
 
