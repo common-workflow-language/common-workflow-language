@@ -34,13 +34,11 @@ setup(name='schema-salad',
           'PyYAML',
           'rdflib >= 4.1.0',
           'rdflib-jsonld >= 0.3.0',
-          'mistune'
-          ]
+          'mistune' ],
       extras_require={
           ':python_version>=2.7': ['typing'],
           ':python_version<3': ['avro'],
-          ':python_version>=3': ['avro-python3']
-          }
+          ':python_version>=3': ['avro-python3'] },
       test_suite='tests',
       tests_require=[],
       entry_points={
