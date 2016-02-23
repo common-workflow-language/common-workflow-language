@@ -590,3 +590,13 @@
     }
   tool: draft-3/record-output.cwl
   doc: Test record type output binding.
+
+- job: draft-3/empty.json
+  output: {
+    "foo": {
+        "path": "foo",
+        "class": "File"
+    }
+  }
+  tool: draft-3/test-cwl-out.cwl
+  doc: Test support for reading cwl.output.json when running in Docker container
