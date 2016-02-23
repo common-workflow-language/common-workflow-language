@@ -11,7 +11,12 @@ import rdflib
 from rdflib import Graph, URIRef
 import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
+    unicode=str
+    basestring=str
 import logging
 from .aslist import aslist
 import typing
@@ -153,4 +158,4 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         j = yaml.load(f)
         (ctx, g) = salad_to_jsonld_context(j)
-        print json.dumps(ctx, indent=4, sort_keys=True)
+        print(json.dumps(ctx, indent=4, sort_keys=True))

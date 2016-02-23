@@ -1,8 +1,9 @@
+from __future__ import print_function
 import argparse
 import logging
 import sys
 import pkg_resources  # part of setuptools
-from .import schema
+from . import schema
 from . import jsonld_context
 from . import makedoc
 import json
@@ -10,7 +11,10 @@ from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
 import yaml
 import os
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from .ref_resolver import Loader
 from . import validate
@@ -71,7 +75,7 @@ def main(args=None):
     pkg = pkg_resources.require("schema_salad")
     if pkg:
         if args.version:
-            print "%s %s" % (sys.argv[0], pkg[0].version)
+            print("%s %s" % (sys.argv[0], pkg[0].version))
             return 0
         else:
             _logger.info("%s %s", sys.argv[0], pkg[0].version)
@@ -89,11 +93,11 @@ def main(args=None):
 
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:
-        print json.dumps(schema_doc, indent=4)
+        print(json.dumps(schema_doc, indent=4))
         return 0
 
     if not args.document and args.print_index:
-        print json.dumps(metaschema_loader.idx.keys(), indent=4)
+        print(json.dumps(metaschema_loader.idx.keys(), indent=4))
         return 0
 
     # Validate links in the schema document
@@ -129,18 +133,18 @@ def main(args=None):
     if isinstance(avsc_names, Exception):
         _logger.error("Schema `%s` error:\n%s", args.schema, avsc_names, exc_info=(avsc_names if args.debug else False))
         if args.print_avro:
-            print json.dumps(avsc_obj, indent=4)
+            print(json.dumps(avsc_obj, indent=4))
         return 1
 
     # Optionally print Avro-compatible schema from schema
     if args.print_avro:
-        print json.dumps(avsc_obj, indent=4)
+        print(json.dumps(avsc_obj, indent=4))
         return 0
 
     # Optionally print the json-ld context from the schema
     if args.print_jsonld_context:
         j = {"@context": schema_ctx}
-        print json.dumps(j, indent=4, sort_keys=True)
+        print(json.dumps(j, indent=4, sort_keys=True))
         return 0
 
     # Optionally print the RDFS graph from the schema
@@ -154,12 +158,12 @@ def main(args=None):
         return 0
 
     if args.print_metadata and not args.document:
-        print json.dumps(schema_metadata, indent=4)
+        print(json.dumps(schema_metadata, indent=4))
         return 0
 
     # If no document specified, all done.
     if not args.document:
-        print "Schema `%s` is valid" % args.schema
+        print("Schema `%s` is valid" % args.schema)
         return 0
 
     # Load target document and resolve refs
@@ -174,11 +178,11 @@ def main(args=None):
 
     # Optionally print the document after ref resolution
     if args.print_pre:
-        print json.dumps(document, indent=4)
+        print(json.dumps(document, indent=4))
         return 0
 
     if args.print_index:
-        print json.dumps(document_loader.idx.keys(), indent=4)
+        print(json.dumps(document_loader.idx.keys(), indent=4))
         return 0
 
     # Validate links in the target document
@@ -202,10 +206,10 @@ def main(args=None):
         return 0
 
     if args.print_metadata:
-        print json.dumps(doc_metadata, indent=4)
+        print(json.dumps(doc_metadata, indent=4))
         return 0
 
-    print "Document `%s` is valid" % args.document
+    print("Document `%s` is valid" % args.document)
 
     return 0
 

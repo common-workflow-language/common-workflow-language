@@ -7,14 +7,16 @@ import requests
 try:
     import urlparse
 except:
-    import urllib.parse
+    import urllib.parse as urlparse
 import yaml
 from . import validate
 import pprint
 try:
-    from io import StringIO
-except ImportError:
     from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+    unicode=str
+    basestring=str
 from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
@@ -273,11 +275,14 @@ class Loader(object):
             else:
                 raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
 
-        if "$graph" in obj:
-            metadata = _copy_dict_without_key(obj, "$graph")
-            obj = obj["$graph"]
-            return obj, metadata
-        else:
+        try:
+            if "$graph" in obj:
+                metadata = _copy_dict_without_key(obj, "$graph")
+                obj = obj["$graph"]
+                return obj, metadata
+            else:
+                return obj, metadata
+        except TypeError:
             return obj, metadata
 
     def resolve_all(self, document, base_url, file_base=None):
@@ -406,7 +411,11 @@ class Loader(object):
         elif scheme == 'file':
             try:
                 with open(path) as fp:
-                    return fp.read().decode("utf-8")
+                    read = fp.read()
+                if hasattr(read, "decode"):
+                    return read.decode("utf-8")
+                else:
+                    return read
             except (OSError, IOError) as e:
                 raise RuntimeError('Error reading %s %s' % (url, e))
         else:
@@ -416,7 +425,11 @@ class Loader(object):
         if url in self.idx:
             return self.idx[url]
         try:
-            text = StringIO(self.fetch_text(url))
+            text = self.fetch_text(url)
+            if isinstance(text, bytes):
+                text = StringIO(text.decode('utf-8'))
+            else:
+                text = StringIO(text)
             text.name = url
             result = yaml.load(text)
         except yaml.parser.ParserError as e:
@@ -484,7 +497,10 @@ class Loader(object):
                         self.validate_link(d, document[d])
             except validate.ValidationException as v:
                 errors.append(v)
-            iterator = document.iteritems()
+            if hasattr(document, "iteritems"):
+                iterator = document.iteritems()
+            else:
+                iterator = document.items()
         else:
             return
 

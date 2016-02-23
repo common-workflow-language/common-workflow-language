@@ -6,9 +6,15 @@ import os
 import copy
 import re
 import sys
-import StringIO
+try:
+    import StringIO
+except ImportError:
+    from io import StringIO
 import logging
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 from .aslist import aslist
 from .add_dictlist import add_dictlist
 import re

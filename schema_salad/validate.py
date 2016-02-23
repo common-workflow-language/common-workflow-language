@@ -4,7 +4,8 @@ import yaml
 try:
     import urlparse
 except:
-    import urllib.parse
+    import urllib.parse as urlparse
+    basestring=str
 import typing
 
 class ValidationException(Exception):
@@ -68,6 +69,9 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
             raise ValidationException("the value `%s` is not boolean" % vpformat(datum))
     elif schema_type == 'string':
         if isinstance(datum, basestring):
+            return True
+        elif isinstance(datum, bytes):
+            datum = datum.decode("utf-8")
             return True
         else:
             raise ValidationException("the value `%s` is not string" % vpformat(datum))
@@ -136,8 +140,7 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
                     validate_ex(s, datum, identifiers, strict=strict, foreign_properties=foreign_properties)
                 except ValidationException as e:
                     errors.append(str(e))
-            raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'),
-                                                                                     "\n".join(["- %s, but\n %s" % (friendly(expected_schema.schemas[i]), indent(multi(errors[i]))) for i in range(0, len(expected_schema.schemas))])))
+            raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'), "\n".join(["- %s, but\n %s" % (friendly(expected_schema.schemas[i]), indent(multi(errors[i]))) for i in range(0, len(expected_schema.schemas))])))
 
     elif schema_type in ['record', 'error', 'request']:
         if not isinstance(datum, dict):
@@ -148,7 +151,10 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
             if f.name in datum:
                 fieldval = datum[f.name]
             else:
-                fieldval = f.default
+                try:
+                    fieldval = f.default
+                except KeyError:
+                    fieldval = None
 
             try:
                 validate_ex(f.type, fieldval, identifiers, strict=strict, foreign_properties=foreign_properties)

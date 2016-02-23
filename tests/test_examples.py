@@ -62,7 +62,7 @@ class TestSchemas(unittest.TestCase):
 
         ra, _ = ldr.resolve_all({"foo:bar": "asym"}, "X")
 
-        self.assertEquals(ra, {
+        self.assertEqual(ra, {
             'http://example.com/foo#bar': 'asym'
         })
 
@@ -70,9 +70,11 @@ class TestSchemas(unittest.TestCase):
         self.maxDiff = None
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
             ldr, _, _ = schema_salad.schema.load_schema("schema_salad/metaschema/%s_schema.yml" % a)
-            src = ldr.resolve_all(yaml.load(open("schema_salad/metaschema/%s_src.yml" % a)), "")[0]
-            proc = yaml.load(open("schema_salad/metaschema/%s_proc.yml" % a))
-            self.assertEquals(proc, src)
+            with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
+                src = ldr.resolve_all(yaml.load(src_fp), "")[0]
+            with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
+                proc = yaml.load(src_proc)
+            self.assertEqual(proc, src)
 
 
 if __name__ == '__main__':
