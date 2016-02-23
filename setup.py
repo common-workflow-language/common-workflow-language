@@ -16,6 +16,11 @@ try:
 except ImportError:
     tagger = egg_info_cmd.egg_info
 
+if os.path.exists("requirements.txt"):
+    requirements = [ r for r in open("requirements.txt").read().split("\n") if ";" not in r ]
+else:
+    # In tox, it will cover them anyway.
+    requirements = []
 
 
 setup(name='schema-salad',
@@ -34,7 +39,7 @@ setup(name='schema-salad',
           'PyYAML',
           'rdflib >= 4.1.0',
           'rdflib-jsonld >= 0.3.0',
-          'mistune' ],
+          'mistune'],
       extras_require={
           ':python_version>="2.7"': ['typing'],
           ':python_version<"3"': ['avro'],
