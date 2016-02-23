@@ -19,7 +19,8 @@ from .aslist import aslist
 from .add_dictlist import add_dictlist
 import re
 import argparse
-import typing
+if sys.version_info != (2,6):
+    import typing
 
 _logger = logging.getLogger("salad")
 

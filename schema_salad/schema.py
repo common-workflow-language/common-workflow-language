@@ -20,7 +20,8 @@ from .flatten import flatten
 import logging
 from .aslist import aslist
 from . import jsonld_context
-import typing
+if sys.version_info != (2,6):
+    import typing
 
 _logger = logging.getLogger("salad")
 

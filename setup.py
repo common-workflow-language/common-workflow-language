@@ -16,10 +16,21 @@ try:
 except ImportError:
     tagger = egg_info_cmd.egg_info
 
-if sys.version_info < (3,):
-    avro_package = 'avro'
-else:
-    avro_package = 'avro-python3'
+install_requires=[
+    'requests',
+    'PyYAML',
+    'rdflib >= 4.1.0',
+    'rdflib-jsonld >= 0.3.0',
+    'mistune'
+]
+
+avro_package = 'avro'
+if sys.version_info >= (3,):
+    avro_package += '-python3'
+install_requires.append(avro_package)
+
+if sys.version_info != (2,6):
+    install_requires.append('typing')
 
 setup(name='schema-salad',
       version='1.6',
@@ -32,15 +43,7 @@ setup(name='schema-salad',
       license='Apache 2.0',
       packages=["schema_salad"],
       package_data={'schema_salad': ['metaschema/*']},
-      install_requires=[
-          'requests',
-          'PyYAML',
-          avro_package,
-          'rdflib >= 4.1.0',
-          'rdflib-jsonld >= 0.3.0',
-          'mistune',
-          'typing'
-        ],
+      install_requires=install_requires,
       test_suite='tests',
       tests_require=[],
       entry_points={

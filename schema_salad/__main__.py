@@ -1,5 +1,6 @@
 from . import main
 import sys
-import typing
+if sys.version_info != (2,6):
+    import typing
 
 sys.exit(main.main())

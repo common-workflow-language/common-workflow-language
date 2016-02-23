@@ -19,7 +19,8 @@ except ImportError:
     basestring=str
 import logging
 from .aslist import aslist
-import typing
+if sys.version_info != (2,6):
+    import typing
 
 _logger = logging.getLogger("salad")
 

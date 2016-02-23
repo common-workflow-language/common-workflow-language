@@ -1,12 +1,14 @@
 import pprint
 import avro.schema
 import yaml
+import sys
 try:
     import urlparse
 except:
     import urllib.parse as urlparse
     basestring=str
-import typing
+if sys.version_info != (2,6):
+    import typing
 
 class ValidationException(Exception):
     pass

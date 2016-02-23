@@ -1,3 +1,4 @@
+import sys
 import os
 import json
 import hashlib
@@ -21,8 +22,9 @@ from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 import xml.sax
-import typing
-from typing import Union, Tuple
+if sys.version_info != (2,6):
+    import typing
+    from typing import Union, Tuple
 
 _logger = logging.getLogger("salad")
 
