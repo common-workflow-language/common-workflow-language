@@ -600,3 +600,26 @@
   }
   tool: draft-3/test-cwl-out.cwl
   doc: Test support for reading cwl.output.json when running in Docker container
+
+- job: draft-3/abc.json
+  output:
+    files: [{
+        "path": "a",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+        "path": "b",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+        "path": "c",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    }]
+  tool: draft-3/glob-expr-list.cwl
+  doc: Test support for returning multiple glob patterns from expression
