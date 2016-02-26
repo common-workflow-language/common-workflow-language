@@ -62,6 +62,7 @@ $graph:
       type: string
       doc: The path to the file.
       jsonldPredicate:
+        "_id": "cwl:path"
         "_type": "@id"
     - name: checksum
       type: ["null", string]
