@@ -8,6 +8,7 @@ Syntax:
 
 Options:
   -nT   Run a specific test.
+  -l    List tests
 EOF
 
 DRAFT=draft-3
@@ -26,6 +27,9 @@ do
             ;;
         -n*)
             TEST_N=$arg
+            ;;
+        -l)
+            TEST_L=-l
             ;;
         --only-tools)
             ONLY_TOOLS=--only-tools
@@ -59,7 +63,7 @@ runtest() {
 
     runs=$((runs+1))
     (cd $DRAFT
-     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N $ONLY_TOOLS --basedir $DRAFT
+     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N $TEST_L $ONLY_TOOLS --basedir $DRAFT
     )
     checkexit
 }
