@@ -17,7 +17,8 @@ except ImportError:
     tagger = egg_info_cmd.egg_info
 
 if os.path.exists("requirements.txt"):
-    requirements = [ r for r in open("requirements.txt").read().split("\n") if ";" not in r ]
+    requirements = [
+        r for r in open("requirements.txt").read().split("\n") if ";" not in r]
 else:
     # In tox, it will cover them anyway.
     requirements = []
@@ -43,12 +44,22 @@ setup(name='schema-salad',
       extras_require={
           ':python_version>="2.7"': ['typing'],
           ':python_version<"3"': ['avro'],
-          ':python_version>="3"': ['avro-python3'] },
+          ':python_version>="3"': ['avro-python3']},
       test_suite='tests',
       tests_require=[],
       entry_points={
-          'console_scripts': [ "schema-salad-tool=schema_salad.main:main" ]
+          'console_scripts': ["schema-salad-tool=schema_salad.main:main"]
       },
       zip_safe=True,
       cmdclass={'egg_info': tagger},
-)
+      classifiers=[
+          "Environment :: Console",
+          "Environment :: MacOS X",
+          "Intended Audience :: Science/Research",
+          "Operating System :: POSIX :: Linux",
+          "Operating System :: MacOS :: MacOS X",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4"
+          "Programming Language :: Python :: 3.5"]
+      )
