@@ -25,7 +25,7 @@ else:
 
 
 setup(name='schema-salad',
-      version='1.6',
+      version='1.7',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
