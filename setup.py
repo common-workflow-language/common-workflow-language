@@ -54,12 +54,12 @@ setup(name='schema-salad',
       cmdclass={'egg_info': tagger},
       classifiers=[
           "Environment :: Console",
-          "Environment :: MacOS X",
           "Intended Audience :: Science/Research",
           "Operating System :: POSIX :: Linux",
           "Operating System :: MacOS :: MacOS X",
+          "Development Status :: 4 - Beta",
           "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3.3",
-          "Programming Language :: Python :: 3.4"
+          "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5"]
       )
