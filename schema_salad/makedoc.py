@@ -287,7 +287,9 @@ class RenderType(object):
             doc = ""
 
         if self.title is None:
-            self.title = f["doc"][0:f["doc"].index("\n")][2:]
+            self.title = f["doc"][0:f["doc"].index("\n")]
+            if self.title.startswith('# '):
+                self.title = self.title[2:]
 
         if f["type"] == "documentation":
             f["doc"] = number_headings(self.toc, f["doc"])
