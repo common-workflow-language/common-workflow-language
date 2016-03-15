@@ -5,10 +5,10 @@ class: Workflow
 description: "Reverse the lines in a document, then sort those lines."
 cwlVersion: cwl:draft-3
 
-# Requirements specify prerequisites and extensions to the workflow.
+# Requirements & hints specify prerequisites and extensions to the workflow.
 # In this example, DockerRequirement specifies a default Docker container
 # in which the command line tools will execute.
-requirements:
+hints:
   - class: DockerRequirement
     dockerPull: debian:8
 
