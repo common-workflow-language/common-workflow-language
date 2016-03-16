@@ -2,8 +2,12 @@
 
 import os
 import sys
-import setuptools.command.egg_info as egg_info_cmd
 import shutil
+
+import ez_setup
+ez_setup.use_setuptools(version="18.2")
+
+import setuptools.command.egg_info as egg_info_cmd
 
 from setuptools import setup, find_packages
 
