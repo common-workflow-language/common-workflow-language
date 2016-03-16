@@ -74,6 +74,10 @@ else
     runtest "$(greadlink -f $runner)"
 fi
 
+if [[ -n "$TEST_L" ]] ; then
+   exit 0
+fi
+
 # Final reporting
 
 echo
