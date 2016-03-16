@@ -4,9 +4,6 @@ import os
 import sys
 import shutil
 
-import ez_setup
-ez_setup.use_setuptools(version="18.2")
-
 import setuptools.command.egg_info as egg_info_cmd
 
 from setuptools import setup, find_packages
@@ -27,6 +24,18 @@ else:
     # In tox, it will cover them anyway.
     requirements = []
 
+install_requires=[
+      'requests',
+      'PyYAML',
+      'rdflib >= 4.1.0',
+      'rdflib-jsonld >= 0.3.0',
+      'mistune',
+      'typing']
+
+if sys.version_info.major < 3:
+    install_requires.append("avro")
+else:
+    install_requires.append("avro-python3")
 
 setup(name='schema-salad',
       version='1.7',
@@ -39,16 +48,7 @@ setup(name='schema-salad',
       license='Apache 2.0',
       packages=["schema_salad"],
       package_data={'schema_salad': ['metaschema/*']},
-      install_requires=[
-          'requests',
-          'PyYAML',
-          'rdflib >= 4.1.0',
-          'rdflib-jsonld >= 0.3.0',
-          'mistune'],
-      extras_require={
-          ':python_version>="2.7"': ['typing'],
-          ':python_version<"3"': ['avro'],
-          ':python_version>="3"': ['avro-python3']},
+      install_requires=install_requires,
       test_suite='tests',
       tests_require=[],
       entry_points={
