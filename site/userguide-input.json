@@ -1,0 +1,30 @@
+{
+    "path": "../draft-3/UserGuide.yml", 
+    "class": "File", 
+    "secondaryFiles": [
+        {
+            "path": "../draft-3/userguide-intro.md", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/draft-3/example-1st.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/draft-3/example-echo-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/draft-3/example-inp.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/draft-3/example-inp-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/draft-3/example-stdout.cwl", 
+            "class": "File"
+        }
+    ]
+}

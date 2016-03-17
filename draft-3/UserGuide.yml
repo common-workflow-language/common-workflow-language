@@ -4,7 +4,7 @@
     - $include: userguide-intro.md
 
     - |
-      ### First example
+      ## First example
 
       The simplest "hello world" program.  This accepts one input parameter,
       writes a message to the terminal or job log, and produces no permanent
@@ -24,8 +24,8 @@
     - |
       ```
 
-      Now invoke `cwl-runner` providing the tool wrapper and the input object
-      on the command line:
+      Now invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
 
       ```
       $ cwl-runner example-echo.cwl example-echo-job.json
@@ -34,29 +34,56 @@
       Final process status is success
       ```
 
+      What's going on here?  Let's break it down:
+
+      ```
+      class: CommandLineTool
+      ```
+
+      The first line indicates this document describes a command line tool.
+
+      ```
+      baseCommand: echo
+      ```
+
+      The `baseCommand` provides the name of program that will actually run
+      (echo)
+
+      ```
+      inputs:
+        - id: message
+          type: string
+          inputBinding:
+            position: 1
+      ```
+
+      This section describes the inputs of the tool.  This is a list of input
+      parameters and each parameter includes an identifier, a data type, and
+      optionally an `inputBinding` which describes how this input parameter
+      should appear on the command line.  In this example, the `position` field
+      indicates where it should appear on the command line.
+
+      ```
+      outputs: []
+      ```
+
+      This tool has no outputs, so the output section is an empty list.
+
     - |
-      ### Turning simple input parameters into command line parameters
+      ## Input parameters
 
-      Input parameters consist of the parameter `id` and the parameter `type`.
-      Valid types are primitive types *string*, *int*, *long*, *float*,
-      *double*, and *null*; complex types *array* and *record*; and special
-      types *File* and *Any*.
+      Input parameters have an `id` and `type`.  The `id` is the name of the
+      parameter, and `type` describes what types of values are valid for that
+      parameter.
 
-      The field `inputBinding` describes how the input parameter should be
-      added to the tool's command line.  Some fields in inputBinding are
-      `position`, `prefix` and `separate`.  The `position` controls where the
-      parameter appears on the command line.  Parameter positions are relative,
-      not abosolute, which means:
+      Valid primitive types are *string*, *int*, *long*, *float*, *double*, and
+      *null*; complex types are *array* and *record*; in addition there are
+      special types *File* and *Any*.
 
-        * positions do not have to be sequential, three parameters with
-          positions [1, 3, 5] will result in the same command line as [1, 2,
-          3].
-        * positions can be negative
-        * more than one parameter can have the same position (ties are broken
-          using the parameter name)
-        * the position field itself is optional.  the default position is 0.
-
-      The `baseCommand` field always comes before parameters.
+      The field `inputBinding` is optional and indicates whether and how the
+      input parameter should be appear on the tool's command line.  The
+      following example demonstrates some input parameters with different types
+      and input bindings:
 
       *example-inp.cwl*
       ```
@@ -70,8 +97,8 @@
     - |
       ```
 
-      Invoke `cwl-runner` providing the tool wrapper and the input object
-      on the command line:
+      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
 
       ```
       $ cwl-runner example-inp.cwl example-inp-job.json
@@ -80,8 +107,26 @@
       Final process status is success
       ```
 
+      Some fields in inputBinding are `prefix`, `separate`, and `position`.
+
+      The `prefix` field
+
+      The `position` controls where the parameter appears on the command line.
+      Parameter positions are relative, not abosolute, which means:
+
+        * positions do not have to be sequential, three parameters with
+          positions [1, 3, 5] will result in the same command line as [1, 2,
+          3].
+        * positions can be negative
+        * more than one parameter can have the same position (ties are broken
+          using the parameter name)
+        * the position field itself is optional.  the default position is 0.
+
+      The `baseCommand` field always comes before parameters.
+
+
     - |
-      ### Capturing output files
+      ## Capturing output files
 
       Like input parameters, output parameters consist of the parameter `id`
       and the parameter `type`.  The most common output type is `File`.
@@ -116,7 +161,7 @@
       ```
 
     - |
-      ### Capturing a tool's standard output stream
+      ## Capturing a tool's standard output stream
 
       To capture a tool's standard output stream, add the `stdout` field to the
       tool description with the name of the file to redirect the output.  Then,

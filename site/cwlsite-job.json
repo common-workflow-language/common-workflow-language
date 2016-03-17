@@ -100,11 +100,7 @@
             "primtype": null
         },
         {
-            "source": {
-                "class": "File",
-                "path": "../draft-3/UserGuide.yml",
-                "secondaryFiles": {"$import": "userguide-deps.json"}
-            },
+            "source": {"$import": "userguide-input.json"},
             "target": "draft-3/UserGuide.html",
             "renderlist": [],
             "redirect": [],

@@ -6,7 +6,9 @@ This guide will introduce you to writing tool wrappers and workflows using the
 Common Workflow Language (CWL).  This guide describes the current stable
 specification, draft 3.
 
-## What is CWL?
+<!--ToC-->
+
+# Introduction
 
 CWL is a way to describe command line tools and connect them together to create
 workflows.  Because CWL is a specification and not a specific piece of
@@ -21,4 +23,4 @@ as Docker containers makes CWL well suited for describing large-scale workflows
 in cluster, cloud and high performance computing environments where tasks are
 scheduled in parallel across many nodes.
 
-## Wrapping Command Line Tools
+# Wrapping Command Line Tools
