@@ -389,6 +389,10 @@ def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
     .tocnav ol {
       list-style: none
     }
+    pre {
+      margin-left: 2em;
+      margin-right: 2em;
+    }
     </style>
     </head>
     <body>
