@@ -22,6 +22,10 @@ http://www.commonwl.org/draft-3/
 
 Older drafts: [draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1), [draft-2](http://www.commonwl.org/draft-2/)
 
+### Citation
+
+Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v1
+
 ## Implementations
 
 Some of the software supporting running Common Workflow Language tools or workflows:
