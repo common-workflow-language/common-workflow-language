@@ -1,13 +1,12 @@
 class: CommandLineTool
-baseCommand: echo
-stdout: output.txt
+baseCommand: [tar, xvf]
 inputs:
-  - id: message
-    type: string
+  - id: tarfile
+    type: File
     inputBinding:
       position: 1
 outputs:
-  - id: output
+  - id: example_out
     type: File
     outputBinding:
-      glob: output.txt
+      glob: hello.txt

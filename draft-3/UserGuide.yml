@@ -73,10 +73,9 @@
     - |
       ## Essential input parameters
 
-      The `inputs` of a tool is a list of the names and types describing input
-      parameters that control how to run the tool.  Each parameter has an `id`
-      for the name of parameter, and `type` describing what types of values are
-      valid for that parameter.
+      The `inputs` of a tool is a list of input parameters that control how to
+      run the tool.  Each parameter has an `id` for the name of parameter, and
+      `type` describing what types of values are valid for that parameter.
 
       Available primitive types are *string*, *int*, *long*, *float*, *double*,
       and *null*; complex types are *array* and *record*; in addition there are
@@ -179,36 +178,36 @@
       The `baseCommand` field always comes before parameters.
 
     - |
-      ## Capturing output files
+      ## Returning output files
 
-      The `outputs` of a tool is a list of the names and types describing
-      output parameters resulting from running the tool.  Each parameter has an
-      `id` for the name of parameter, and `type` describing what types of
-      values are valid for that parameter.
+      The `outputs` of a tool is a list of output parameters that should be
+      returned after running the tool.  Each parameter has an `id` for the name
+      of parameter, and `type` describing what types of values are valid for
+      that parameter.
 
-      The underlying tool or script must record its output in the form of
-      files.  The outputs of the CWL tool are either the files themselves, or
-      come from reading files produced by the tool and
+      When a tool runs under CWL, the starting working directory is the
+      designated output directory.  The underlying tool or script must record
+      its results in the form of files created in the output directory.  The
+      output parameters returned by the CWL tool are either the output files
+      themselves, or come from examining the content of those files.
 
-      Generally, the output type is `File`.
-
-      The field `outputBinding` describes how to capture the output of the tool
-      to create the output object.  The most common field in outputBinding is
-      `glob`, which takes a file name or file pattern that you want to capture.
-
+      *example-tar.cwl*
       ```
-      - $include: draft-3/example-tar2.cwl
+    - $include: draft-3/example-tar.cwl
     - |
       ```
 
+      *example-tar-job.json*
       ```
-      - $include: draft-3/example-tar-job.json
+    - $include: draft-3/example-tar-job.json
     - |
       ```
 
+      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
       ```
       $ cwl-runner example-tar.cwl example-tar-job.json
-      [job 139868145165200] $ tar xvf hello.tar
+      [job 139868145165200] $ tar xvf /home/example/hello.tar
       hello.txt
       Final process status is success
       {
@@ -221,13 +220,27 @@
       }
       ```
 
+      The field `outputBinding` describes how to to set the value of each
+      output parameter.
+
+      ```
+      outputs:
+        - id: example_out
+          type: File
+          outputBinding:
+            glob: hello.txt
+      ```
+
+      The `glob` field consists of the name of a file in the output directory.
+      If you don't know name of the file in advance, you can use a wildcard
+      pattern.
+
     - |
       ## Capturing a tool's standard output stream
 
-      To capture a tool's standard output stream, add the `stdout` field to the
-      tool description with the name of the file to redirect the output.  Then,
-      add an output parameter with a `glob` that matches the file with the
-      standard output contents.
+      To capture a tool's standard output stream, add the `stdout` field with
+      the name of the file where the output stream should go.  Then use `glob`
+      on `outputBinding` to return the file.
 
       *example-stdout.cwl*
       ```

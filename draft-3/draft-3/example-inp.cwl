@@ -1,4 +1,5 @@
 class: CommandLineTool
+baseCommand: echo
 inputs:
   - id: example_flag
     type: boolean
@@ -24,4 +25,3 @@ inputs:
       position: 4
 
 outputs: []
-baseCommand: echo
