@@ -38,15 +38,16 @@ inputs:
             type: string
           - name: rdfs_target
             type: string
-  - id: brand
-    type: string
+  - id: brandimg
+    type: File
 
 outputs:
   - id: doc_out
     type:
       type: array
       items: File
-    source: "#docs/out"
+    source: ["#docs/out", "#brandimg"]
+    linkMerge: merge_flattened
   - id: report
     type: File
     source: "#report/out"
@@ -65,6 +66,7 @@ requirements:
   - class: ScatterFeatureRequirement
   - class: StepInputExpressionRequirement
   - class: SubworkflowFeatureRequirement
+  - class: MultipleInputFeatureRequirement
 
 hints:
   - class: DockerRequirement
@@ -99,7 +101,7 @@ steps:
       - { id: redirect, source: "#render", valueFrom: $(self.redirect) }
       - { id: brandlink, source: "#render", valueFrom: $(self.brandlink) }
       - { id: primtype, source: "#render", valueFrom: $(self.primtype) }
-      - { id: brand, source: "#brand" }
+      - { id: brand, source: "#brandimg", valueFrom: "<img src='$(self.path)' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>" }
     outputs:
       - { id: out }
     scatter: ["#docs/source", "#docs/target", "#docs/renderlist",
@@ -109,7 +111,7 @@ steps:
 
   - id: report
     inputs:
-      - {id: inp, source: "#docs/out"}
+      - {id: inp, source: ["#docs/out", "#brandimg"], linkMerge: merge_flattened }
       - {id: target, default: "linkchecker-report.txt"}
     outputs:
       - id: out
