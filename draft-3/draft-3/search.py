@@ -4,7 +4,6 @@
 # appears.
 
 import sys
-import os
 
 mainfile = sys.argv[1]
 indexfile = sys.argv[1] + ".idx1"

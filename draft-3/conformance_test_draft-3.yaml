@@ -79,6 +79,41 @@
   tool: draft-3/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
 
+- job: draft-3/empty.json
+  tool: draft-3/null-expression1-tool.cwl
+  output:
+    output: 1
+  doc: Test default usage of Any in expressions.
+
+- job: draft-3/null-expression1-job.json
+  tool: draft-3/null-expression1-tool.cwl
+  output:
+    output: 2
+  doc: Test explicitly passing null to Any type inputs with default values.
+
+- job: draft-3/null-expression2-job.json
+  tool: draft-3/null-expression1-tool.cwl
+  output:
+    output: 2
+  doc: Testing the string 'null' does not trip up an Any with a default value.
+
+## TODO: Upgrade framework to allow specifying negative tests.
+# - job: draft-3/empty.json
+#   tool: draft-3/null-expression2-tool.cwl
+#   failure: true
+#   doc: Test Any without defaults can be unspecified.
+
+# - job: draft-3/null-expression1-job.json
+#   tool: draft-3/null-expression2-tool.cwl
+#   failure: true
+#   doc: Test explicitly passing null to Any type without a default value.
+
+- job: draft-3/null-expression2-job.json
+  tool: draft-3/null-expression2-tool.cwl
+  output:
+    output: 2
+  doc: Testing the string 'null' does not trip up an Any without a default value.
+
 - job: draft-3/wc-job.json
   output:
     output:
@@ -555,3 +590,60 @@
     }
   tool: draft-3/record-output.cwl
   doc: Test record type output binding.
+
+- job: draft-3/empty.json
+  output: {
+    "foo": {
+        "path": "foo",
+        "class": "File"
+    }
+  }
+  tool: draft-3/test-cwl-out.cwl
+  doc: Test support for reading cwl.output.json when running in Docker container
+
+- job: draft-3/abc.json
+  output:
+    files: [{
+        "path": "a",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+        "path": "b",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+        "path": "c",
+        "size": 0,
+        "class": "File",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    }]
+  tool: draft-3/glob-expr-list.cwl
+  doc: Test support for returning multiple glob patterns from expression
+
+- job: draft-3/scatter-valuefrom-job1.json
+  output:
+    out: ["foo one one", "foo one two", "foo one three", "foo one four"]
+  tool: draft-3/scatter-valuefrom-wf1.cwl
+  doc: Test workflow scatter with single scatter parameter and valueFrom on step input
+
+- job: draft-3/scatter-valuefrom-job2.json
+  output:
+    out: [["foo one one three", "foo one one four"], ["foo one two three", "foo one two four"]]
+  tool: draft-3/scatter-valuefrom-wf2.cwl
+  doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method and valueFrom on step input
+
+- job: draft-3/scatter-valuefrom-job2.json
+  output:
+    out: ["foo one one three", "foo one one four", "foo one two three", "foo one two four"]
+  tool: "draft-3/scatter-valuefrom-wf3.cwl#main"
+  doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method and valueFrom on step input
+
+- job: draft-3/scatter-valuefrom-job2.json
+  output:
+    out: ["foo one one three", "foo one two four"]
+  tool: "draft-3/scatter-valuefrom-wf4.cwl#main"
+  doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input

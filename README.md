@@ -16,11 +16,11 @@ Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
 
 ## CWL Specification
 
-The current stable specification is [draft 3](http://common-workflow-language.github.io/draft-3/):
+The current stable specification is [draft 3](http://www.commonwl.org/draft-3/):
 
-http://common-workflow-language.github.io/draft-3/
+http://www.commonwl.org/draft-3/
 
-Older drafts: [draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1), [draft-2](http://common-workflow-language.github.io/draft-2/)
+Older drafts: [draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1), [draft-2](http://www.commonwl.org/draft-2/)
 
 ## Implementations
 
@@ -44,6 +44,8 @@ Some of the software supporting running Common Workflow Language tools or workfl
   [Airflow wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/SciDAP)
 * [cwl2script](https://github.com/common-workflow-language/cwl2script),
   [cwl2script page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwl2script)
+* [Apache Taverna](http://taverna.incubator.apache.org/), 
+  [Apache Taverna wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Taverna)
 
 ## Examples
 
@@ -107,6 +109,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
 * [BioDatomics](http://www.biodatomics.com/)
+* [Wolfson Wohl Cancer Research Centre](http://www.gla.ac.uk/researchinstitutes/cancersciences/ics/facilities/wwcrc/)
 
 ## Individual Contributors
 

@@ -8,6 +8,7 @@ Syntax:
 
 Options:
   -nT   Run a specific test.
+  -l    List tests
 EOF
 
 DRAFT=draft-3
@@ -26,6 +27,12 @@ do
             ;;
         -n*)
             TEST_N=$arg
+            ;;
+        -l)
+            TEST_L=-l
+            ;;
+        --only-tools)
+            ONLY_TOOLS=--only-tools
             ;;
         *=*)
             eval $(echo $arg | cut -d= -f1)=\"$(echo $arg | cut -d= -f2-)\"
@@ -56,7 +63,7 @@ runtest() {
 
     runs=$((runs+1))
     (cd $DRAFT
-     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N --basedir $DRAFT
+     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N $TEST_L $ONLY_TOOLS --basedir $DRAFT
     )
     checkexit
 }
@@ -65,6 +72,10 @@ if [[ $PLATFORM == "Linux" ]]; then
     runtest "$(readlink -f $runner)"
 else
     runtest "$(greadlink -f $runner)"
+fi
+
+if [[ -n "$TEST_L" ]] ; then
+   exit 0
 fi
 
 # Final reporting
