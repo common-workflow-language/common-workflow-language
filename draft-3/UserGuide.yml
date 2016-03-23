@@ -8,7 +8,8 @@
 
       The simplest "hello world" program.  This accepts one input parameter,
       writes a message to the terminal or job log, and produces no permanent
-      output.
+      output.  CWL documents are written in [JSON](http://json.org) or
+      [YAML](http://yaml.org), or a mix of the two.
 
       *example-1st.cwl*
       ```
@@ -40,7 +41,7 @@
       class: CommandLineTool
       ```
 
-      The first line indicates this document describes a command line tool.
+      The `class` field indicates this document describes a command line tool.
 
       ```
       baseCommand: echo
@@ -57,7 +58,7 @@
             position: 1
       ```
 
-      This section describes the inputs of the tool.  This is a list of input
+      The `inputs` section describes the inputs of the tool.  This is a list of input
       parameters and each parameter includes an identifier, a data type, and
       optionally an `inputBinding` which describes how this input parameter
       should appear on the command line.  In this example, the `position` field
@@ -67,23 +68,23 @@
       outputs: []
       ```
 
-      This tool has no outputs, so the output section is an empty list.
+      This tool has no formal output, so the `outputs` section is an empty list.
 
     - |
-      ## Input parameters
+      ## Essential input parameters
 
-      Input parameters have an `id` and `type`.  The `id` is the name of the
-      parameter, and `type` describes what types of values are valid for that
-      parameter.
+      The `inputs` of a tool is a list of the names and types describing input
+      parameters that control how to run the tool.  Each parameter has an `id`
+      for the name of parameter, and `type` describing what types of values are
+      valid for that parameter.
 
-      Valid primitive types are *string*, *int*, *long*, *float*, *double*, and
-      *null*; complex types are *array* and *record*; in addition there are
+      Available primitive types are *string*, *int*, *long*, *float*, *double*,
+      and *null*; complex types are *array* and *record*; in addition there are
       special types *File* and *Any*.
 
-      The field `inputBinding` is optional and indicates whether and how the
-      input parameter should be appear on the tool's command line.  The
-      following example demonstrates some input parameters with different types
-      and input bindings:
+      The following example demonstrates some input parameters with different
+      types and appearing on the command line in different ways:
+
 
       *example-inp.cwl*
       ```
@@ -102,34 +103,94 @@
 
       ```
       $ cwl-runner example-inp.cwl example-inp-job.json
-      [job 140020149614160] /home/peter/work/common-workflow-language/draft-3$ echo -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
-      -f -i42 --example-string hello --file=/home/peter/work/common-workflow-language/draft-3/draft-3/whale.txt
+      [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/example/whale.txt
+      -f -i42 --example-string hello --file=/home/example/whale.txt
       Final process status is success
       ```
 
-      Some fields in inputBinding are `prefix`, `separate`, and `position`.
+      The field `inputBinding` is optional and indicates whether and how the
+      input parameter should be appear on the tool's command line.  If
+      `inputBinding` is missing, the parameter does not appear on the command
+      line.  Let's look at each example in detail.
 
-      The `prefix` field
+      ```
+      - id: example_flag
+        type: boolean
+        inputBinding:
+          position: 1
+          prefix: -f
+      ```
 
-      The `position` controls where the parameter appears on the command line.
-      Parameter positions are relative, not abosolute, which means:
+      Boolean types are treated as a flag.  If the input parameter
+      "example_flag" is "true", then `prefix` will be added to the
+      command line.  If false, no flag is added.
 
-        * positions do not have to be sequential, three parameters with
-          positions [1, 3, 5] will result in the same command line as [1, 2,
-          3].
-        * positions can be negative
-        * more than one parameter can have the same position (ties are broken
-          using the parameter name)
-        * the position field itself is optional.  the default position is 0.
+      ```
+      - id: example_string
+        type: string
+        inputBinding:
+          position: 3
+          prefix: --example-string
+      ```
+
+      String types appear on the command line as literal values.  The `prefix`
+      is optional, if provided, it appears as a separate argument on the
+      command line before the parameter .  In the example above, this is
+      rendered as `--example-string hello`.
+
+      ```
+      - id: example_int
+        type: int
+        inputBinding:
+          position: 2
+          prefix: -i
+          separate: false
+      ```
+
+      Integer (and floating point) types appear on the command line with
+      decimal text representation.  When the option `separate` is false (the
+      default value is true), the prefix and value are combined into a single
+      argument.  In the example above, this is rendered as `-i42`.
+
+
+      ```
+      - id: example_file
+        type: ["null", File]
+        inputBinding:
+          prefix: --file=
+          separate: false
+          position: 4
+      ```
+
+      File types appear on the command line as the path to the file.  When the
+      parameter type is a list, this indicates several alternate types are
+      valid for this parameter.  The most common use is to provide "null" as an
+      alternate parameter type, which indicates that the parameter is optional.
+      In the example above, this is rendered as `--file=/home/example/whale.txt`.
+
+      The value of `position` is used to determine where parameter should
+      appear on the command line.  Positions are relative to one another, not
+      abosolute.  As a result, positions do not have to be sequential, three
+      parameters with positions `[1, 3, 5]` will result in the same command
+      line as `[1, 2, 3]`.  More than one parameter can have the same position
+      (ties are broken using the parameter name), and the position field itself
+      is optional.  the default position is 0.
 
       The `baseCommand` field always comes before parameters.
-
 
     - |
       ## Capturing output files
 
-      Like input parameters, output parameters consist of the parameter `id`
-      and the parameter `type`.  The most common output type is `File`.
+      The `outputs` of a tool is a list of the names and types describing
+      output parameters resulting from running the tool.  Each parameter has an
+      `id` for the name of parameter, and `type` describing what types of
+      values are valid for that parameter.
+
+      The underlying tool or script must record its output in the form of
+      files.  The outputs of the CWL tool are either the files themselves, or
+      come from reading files produced by the tool and
+
+      Generally, the output type is `File`.
 
       The field `outputBinding` describes how to capture the output of the tool
       to create the output object.  The most common field in outputBinding is

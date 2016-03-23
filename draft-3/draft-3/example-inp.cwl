@@ -17,7 +17,7 @@ inputs:
       prefix: -i
       separate: false
   - id: example_file
-    type: File
+    type: ["null", File]
     inputBinding:
       prefix: --file=
       separate: false
