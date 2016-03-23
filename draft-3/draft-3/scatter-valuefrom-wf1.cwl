@@ -26,15 +26,21 @@ steps:
   - id: step1
     inputs:
       - {id: echo_in, source: "#inp", valueFrom: $(self.instr) }
+      - {id: first, source: "#inp", valueFrom: "$(self[0].instr)" }
     outputs:
       - id: echo_out
     scatter: "#step1/echo_in"
     run:
       class: CommandLineTool
       inputs:
+        - id: first
+          type: string
+          inputBinding:
+            position: 1
         - id: echo_in
           type: string
-          inputBinding: {}
+          inputBinding:
+            position: 2
       outputs:
         - id: echo_out
           type: string

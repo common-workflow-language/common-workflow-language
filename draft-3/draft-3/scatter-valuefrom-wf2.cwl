@@ -34,6 +34,7 @@ steps:
     inputs:
       - { id: echo_in1, source: "#inp1", valueFrom: $(self.instr)}
       - { id: echo_in2, source: "#inp2"}
+      - {id: first, source: "#inp1", valueFrom: "$(self[0].instr)" }
     outputs:
       - id: echo_out
 
@@ -43,12 +44,18 @@ steps:
       class: CommandLineTool
       id: step1command
       inputs:
+        - id: first
+          type: string
+          inputBinding:
+            position: 1
         - id: echo_in1
           type: string
-          inputBinding: {}
+          inputBinding:
+            position: 2
         - id: echo_in2
           type: string
-          inputBinding: {}
+          inputBinding:
+            position: 3
       outputs:
         - id: echo_out
           type: string

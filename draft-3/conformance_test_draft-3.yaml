@@ -626,24 +626,24 @@
 
 - job: draft-3/scatter-valuefrom-job1.json
   output:
-    out: ["foo one", "foo two", "foo three", "foo four"]
+    out: ["foo one one", "foo one two", "foo one three", "foo one four"]
   tool: draft-3/scatter-valuefrom-wf1.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
 
 - job: draft-3/scatter-valuefrom-job2.json
   output:
-    out: [["foo one three", "foo one four"], ["foo two three", "foo two four"]]
+    out: [["foo one one three", "foo one one four"], ["foo one two three", "foo one two four"]]
   tool: draft-3/scatter-valuefrom-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method and valueFrom on step input
 
 - job: draft-3/scatter-valuefrom-job2.json
   output:
-    out: ["foo one three", "foo one four", "foo two three", "foo two four"]
+    out: ["foo one one three", "foo one one four", "foo one two three", "foo one two four"]
   tool: "draft-3/scatter-valuefrom-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method and valueFrom on step input
 
 - job: draft-3/scatter-valuefrom-job2.json
   output:
-    out: ["foo one three", "foo two four"]
+    out: ["foo one one three", "foo one two four"]
   tool: "draft-3/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
