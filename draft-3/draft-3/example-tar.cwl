@@ -1,5 +1,5 @@
 class: CommandLineTool
-baseCommand: [tar, xvf]
+baseCommand: [tar, xf]
 inputs:
   - id: tarfile
     type: File

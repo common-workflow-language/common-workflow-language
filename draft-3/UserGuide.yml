@@ -97,6 +97,9 @@
     - |
       ```
 
+      Notice that "example_file", as a `File` type, must be provided as an
+      object with the fields `class: File` and `path`.
+
       Invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
 
@@ -165,7 +168,10 @@
       parameter type is a list, this indicates several alternate types are
       valid for this parameter.  The most common use is to provide "null" as an
       alternate parameter type, which indicates that the parameter is optional.
-      In the example above, this is rendered as `--file=/home/example/whale.txt`.
+      In the example above, this is rendered as
+      `--file=/home/example/whale.txt`.  However, if the "example_file"
+      parameter were not provided in the input, nothing would appear on the
+      command line.
 
       The value of `position` is used to determine where parameter should
       appear on the command line.  Positions are relative to one another, not
@@ -207,8 +213,7 @@
       command line:
       ```
       $ cwl-runner example-tar.cwl example-tar-job.json
-      [job 139868145165200] $ tar xvf /home/example/hello.tar
-      hello.txt
+      [job 139868145165200] $ tar xf /home/example/hello.tar
       Final process status is success
       {
       "example_out": {
@@ -248,6 +253,12 @@
     - |
       ```
 
+      *example-echo-job.json*
+      ```
+    - $include: draft-3/example-echo-job.json
+    - |
+      ```
+
       Now invoke `cwl-runner` providing the tool wrapper and the input object
       on the command line:
 
@@ -266,3 +277,63 @@
       $ cat output.txt
       Hello world!
       ```
+
+    - |
+      ## Parameter references
+
+      In a previous example, we used extracted a file using the "tar" program.
+      However, that example was very limited becuase it assumed that the file
+      we were interested in was called "hello.txt".  In this example, you will
+      see how to reference the value of input parameters dynamically from other
+      fields.
+
+      *example-tar-param.cwl*
+      ```
+    - $include: draft-3/example-tar-param.cwl
+    - |
+      ```
+
+      *example-tar-param-job.json*
+      ```
+    - $include: draft-3/example-tar-param-job.json
+    - |
+      ```
+
+      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
+      ```
+      $ cwl-runner example-tar-param.cwl example-tar-param-job.json
+      [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
+      Final process status is success
+      {
+      "example_out": {
+        "path": "goodbye.txt",
+        "size": 24,
+        "class": "File",
+        "checksum": "sha1$dd0a4c4c49ba43004d6611771972b6cf969c1c01"
+        }
+      }
+      ```
+
+      Certain fields permit parameter references using the form `$()`.  These
+      are evaluated and replaced with the value being referenced.
+
+      ```
+      outputs:
+        - id: example_out
+          type: File
+          outputBinding:
+            glob: $(inputs.extractfile)
+      ```
+
+      References are written using a subset of Javascript syntax.  In this
+      example, `$(inputs.extractfile)`, `$(inputs["extractfile"])`, and
+      `$(inputs['extractfile'])` are equivalent.
+
+      The value of the "inputs" variable is the input object provided when the
+      CWL tool was invoked.
+
+      Note that because File parameters are objects, to get the path to an
+      input file you must reference the path field on a file object; to
+      reference the tar file in the above example you would write
+      `$(inputs.tarfile.path)`.
