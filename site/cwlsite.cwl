@@ -24,6 +24,8 @@ inputs:
             type: string
           - name: brandlink
             type: string
+          - name: brandimg
+            type: string
 
   - id: schemas
     type:
@@ -40,6 +42,9 @@ inputs:
             type: string
   - id: brandimg
     type: File
+  - id: empty
+    type: string
+    default: ""
 
 outputs:
   - id: doc_out
@@ -67,6 +72,9 @@ requirements:
   - class: StepInputExpressionRequirement
   - class: SubworkflowFeatureRequirement
   - class: MultipleInputFeatureRequirement
+  - class: InlineJavascriptRequirement
+    expressionLib:
+      - $include: cwlpath.js
 
 hints:
   - class: DockerRequirement
@@ -100,18 +108,26 @@ steps:
       - { id: renderlist, source: "#render", valueFrom: $(self.renderlist) }
       - { id: redirect, source: "#render", valueFrom: $(self.redirect) }
       - { id: brandlink, source: "#render", valueFrom: $(self.brandlink) }
+      - { id: brand, source: "#render", valueFrom: $(self.brandimg) }
       - { id: primtype, source: "#render", valueFrom: $(self.primtype) }
-      - { id: brand, source: "#brandimg", valueFrom: "<img src='$(self.path)' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>" }
     outputs:
       - { id: out }
-    scatter: ["#docs/source", "#docs/target", "#docs/renderlist",
-      "#docs/redirect", "#docs/brandlink", "#docs/primtype"]
+      - { id: targetdir }
+    scatter:
+      - "#docs/source"
+      - "#docs/target"
+      - "#docs/renderlist"
+      - "#docs/redirect"
+      - "#docs/brandlink"
+      - "#docs/primtype"
+      - "#docs/brand"
     scatterMethod: dotproduct
     run:  makedoc.cwl
 
   - id: report
     inputs:
       - {id: inp, source: ["#docs/out", "#brandimg"], linkMerge: merge_flattened }
+      - {id: dirs, source: ["#docs/targetdir", "#empty"], linkMerge: merge_flattened }
       - {id: target, default: "linkchecker-report.txt"}
     outputs:
       - id: out
