@@ -13,7 +13,7 @@
 
       *example-1st.cwl*
       ```
-    - $include: draft-3/example-1st.cwl
+    - $include: examples/example-1st.cwl
     - |
       ```
 
@@ -21,7 +21,7 @@
 
       *example-echo-job.json*
       ```
-    - $include: draft-3/example-echo-job.json
+    - $include: examples/example-echo-job.json
     - |
       ```
 
@@ -87,13 +87,13 @@
 
       *example-inp.cwl*
       ```
-    - $include: draft-3/example-inp.cwl
+    - $include: examples/example-inp.cwl
     - |
       ```
 
       *example-inp-job.json*
       ```
-    - $include: draft-3/example-inp-job.json
+    - $include: examples/example-inp-job.json
     - |
       ```
 
@@ -105,8 +105,8 @@
 
       ```
       $ cwl-runner example-inp.cwl example-inp-job.json
-      [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/example/whale.txt
-      -f -i42 --example-string hello --file=/home/example/whale.txt
+      [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/examples/whale.txt
+      -f -i42 --example-string hello --file=/home/examples/whale.txt
       Final process status is success
       ```
 
@@ -169,7 +169,7 @@
       valid for this parameter.  The most common use is to provide "null" as an
       alternate parameter type, which indicates that the parameter is optional.
       In the example above, this is rendered as
-      `--file=/home/example/whale.txt`.  However, if the "example_file"
+      `--file=/home/examples/whale.txt`.  However, if the "example_file"
       parameter were not provided in the input, nothing would appear on the
       command line.
 
@@ -199,13 +199,13 @@
 
       *example-tar.cwl*
       ```
-    - $include: draft-3/example-tar.cwl
+    - $include: examples/example-tar.cwl
     - |
       ```
 
       *example-tar-job.json*
       ```
-    - $include: draft-3/example-tar-job.json
+    - $include: examples/example-tar-job.json
     - |
       ```
 
@@ -213,7 +213,7 @@
       command line:
       ```
       $ cwl-runner example-tar.cwl example-tar-job.json
-      [job 139868145165200] $ tar xf /home/example/hello.tar
+      [job 139868145165200] $ tar xf /home/examples/hello.tar
       Final process status is success
       {
       "example_out": {
@@ -249,13 +249,13 @@
 
       *example-stdout.cwl*
       ```
-    - $include: draft-3/example-stdout.cwl
+    - $include: examples/example-stdout.cwl
     - |
       ```
 
       *example-echo-job.json*
       ```
-    - $include: draft-3/example-echo-job.json
+    - $include: examples/example-echo-job.json
     - |
       ```
 
@@ -289,13 +289,13 @@
 
       *example-tar-param.cwl*
       ```
-    - $include: draft-3/example-tar-param.cwl
+    - $include: examples/example-tar-param.cwl
     - |
       ```
 
       *example-tar-param-job.json*
       ```
-    - $include: draft-3/example-tar-param-job.json
+    - $include: examples/example-tar-param-job.json
     - |
       ```
 
@@ -303,7 +303,7 @@
       command line:
       ```
       $ cwl-runner example-tar-param.cwl example-tar-param-job.json
-      [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
+      [job 139868145165200] $ tar xf /home/examples/hello.tar goodbye.txt
       Final process status is success
       {
       "example_out": {
@@ -315,8 +315,8 @@
       }
       ```
 
-      Certain fields permit parameter references using the form `$()`.  These
-      are evaluated and replaced with the value being referenced.
+      Certain fields permit parameter references which are enclosed in `$(...)`.
+      These are evaluated and replaced with value being referenced.
 
       ```
       outputs:
@@ -335,5 +335,18 @@
 
       Note that because File parameters are objects, to get the path to an
       input file you must reference the path field on a file object; to
-      reference the tar file in the above example you would write
+      reference the path to the tar file in the above example you would write
       `$(inputs.tarfile.path)`.
+
+    - |
+      ## Running tools inside Docker
+
+      Docker containers simplify software installation by providing a complete
+      known-good runtime for software and its dependencies.  However,
+      containers are also purposefully isolated from the host system, so
+      running a tool inside a Docker container require additional work to
+      ensure that input files are available inside the container and output
+      files can be recovered from the contianer.  CWL can perform this extra
+      work automatically, allowing you to use Docker to simplify your software
+      management while avoiding the complexity of invoking Docker containers
+      correctly.
