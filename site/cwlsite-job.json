@@ -36,6 +36,7 @@
             "renderlist": [],
             "redirect": [],
             "brandlink": "index.html",
+            "brandimg": "<img src='CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null
         },
         {
@@ -47,6 +48,7 @@
             "renderlist": [],
             "redirect": [],
             "brandlink": "../index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null
         },
         {
@@ -62,6 +64,7 @@
             ],
             "redirect": [],
             "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": "#CWLType"
         },
         {
@@ -84,6 +87,7 @@
                 "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
             ],
             "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": "#CWLType"
         },
         {
@@ -101,6 +105,7 @@
             ],
             "redirect": [],
             "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null
         },
         {
@@ -109,6 +114,7 @@
             "renderlist": [],
             "redirect": [],
             "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null
         }
     ]

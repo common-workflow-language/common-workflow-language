@@ -1,5 +1,9 @@
 cwlVersion: "cwl:draft-3.dev4"
 class: CommandLineTool
+requirements:
+  - class: InlineJavascriptRequirement
+    expressionLib:
+      - $include: cwlpath.js
 inputs:
   - id: source
     type: File
@@ -34,5 +38,9 @@ outputs:
     type: File
     outputBinding:
       glob: $(inputs.target)
+  - id: targetdir
+    type: string
+    outputBinding:
+      outputEval: $(cwl.path.dirname(inputs.target))
 baseCommand: [python, "-mschema_salad.makedoc"]
 stdout: $(inputs.target)
