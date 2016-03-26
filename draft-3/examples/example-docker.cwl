@@ -1,5 +1,12 @@
 class: CommandLineTool
-baseCommand: javac
+baseCommand: node
 hints:
-  - id: DockerRequirement
-    dockerPull: java:7
+  - class: DockerRequirement
+    dockerPull: node:slim
+baseCommand: node
+inputs:
+  - id: src
+    type: File
+    inputBinding:
+      position: 1
+outputs: []

@@ -173,6 +173,9 @@
       parameter were not provided in the input, nothing would appear on the
       command line.
 
+      Input files are read-only.  If you wish to update an input file, you must
+      first copy it to the output directory.
+
       The value of `position` is used to determine where parameter should
       appear on the command line.  Positions are relative to one another, not
       abosolute.  As a result, positions do not have to be sequential, three
@@ -341,12 +344,82 @@
     - |
       ## Running tools inside Docker
 
-      Docker containers simplify software installation by providing a complete
+      [Docker](http://docker.io) containers simplify software installation by providing a complete
       known-good runtime for software and its dependencies.  However,
-      containers are also purposefully isolated from the host system, so
-      running a tool inside a Docker container require additional work to
+      containers are also purposefully isolated from the host system, so in
+      order to run a tool inside a Docker container there is additional work to
       ensure that input files are available inside the container and output
-      files can be recovered from the contianer.  CWL can perform this extra
-      work automatically, allowing you to use Docker to simplify your software
-      management while avoiding the complexity of invoking Docker containers
-      correctly.
+      files can be recovered from the contianer.  CWL can perform this work
+      automatically, allowing you to use Docker to simplify your software
+      management while avoiding the complexity of invoking and managing Docker
+      containers.
+
+      This example runs a simple Node.js script inside a Docker container.
+
+      *example-docker.cwl*
+      ```
+    - $include: examples/example-docker.cwl
+    - |
+      ```
+
+      *example-docker-job.json*
+      ```
+    - $include: examples/example-docker-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-docker.cwl example-docker-job.json
+      [job 140259721854416] /home/examples$ docker run -i --volume=/home/examples/hello.js:/var/lib/cwl/job369354770_examples/hello.js:ro --volume=/home/examples:/var/spool/cwl:rw --volume=/tmp/tmpDLs5hm:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp node:slim node /var/lib/cwl/job369354770_examples/hello.js
+      Hello world!
+      Final process status is success
+      ```
+
+      Notice the CWL runner has constructed a Docker command line to run the
+      script.  One of the responsibilies of the CWL runner is to the paths of
+      input files to reflect the location where they appear inside the
+      container.  In this example, the path to the script `hello.js` is
+      `/home/examples/hello.js` outside the container but
+      `/var/lib/cwl/job369354770_examples/hello.js` inside the container, as
+      reflected in the invocation of the `node` command.
+
+    - |
+      ## Additional arguments and runtime parameters
+
+      Sometimes tools require additional command line options that don't
+      correspond exactly to input parameters.
+
+      In this example, we use the Java compiler `javac` to
+
+      *example-arguments.cwl*
+      ```
+    - $include: examples/example-arguments.cwl
+    - |
+      ```
+
+      *example-arguments-job.json*
+      ```
+    - $include: examples/example-arguments-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-arguments.cwl example-arguments-job.json
+      [job 140051188854928] /home/examples$ docker run -i --volume=/home/examples/Hello.java:/var/lib/cwl/job710906416_examples/Hello.java:ro --volume=/home/examples:/var/spool/cwl:rw --volume=/tmp/tmpdlQDWi:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac -d /var/spool/cwl /var/lib/cwl/job710906416_examples/Hello.java
+      Final process status is success
+      {
+        "classfile": {
+          "size": 416,
+          "path": "/home/examples/Hello.class",
+          "checksum": "sha1$2f7ac33c1f3aac3f1fec7b936b6562422c85b38a",
+          "class": "File"
+        }
+      }
+
+      ```
