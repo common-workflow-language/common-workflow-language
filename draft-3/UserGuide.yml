@@ -392,7 +392,12 @@
       Sometimes tools require additional command line options that don't
       correspond exactly to input parameters.
 
-      In this example, we use the Java compiler `javac` to
+      In this example, we will wrap the Java compiler to compile a java source
+      file to a class file.  By default, `javac` will create the class files in
+      the same directory as the source file.  However, CWL input files (and the
+      directories in which they appear) may be read-only, so we need to
+      instruct javac to write the class file to the designated output directory
+      instead.
 
       *example-arguments.cwl*
       ```
@@ -423,3 +428,66 @@
       }
 
       ```
+
+      Here we use the `arguments` field to add an additional argument to the
+      command line that isn't tied to a specific input parameter.
+
+      ```
+      arguments:
+        - prefix: "-d"
+          valueFrom: $(runtime.outdir)
+      ```
+
+      This example references a runtime parameter.  Runtime parameters
+      provide information about the hardware or software environment when the
+      tool is actually executed.  The `$(runtime.outdir)` parameter is the path
+      to the designated output directory.  Other parameters include
+      `$(runtime.tmpdir)`, `$(runtime.ram)`, `$(runtime.cores)`,
+      `$(runtime.ram)`, `$(runtime.outdirSize)`, and `$(runtime.tmpdirSize)`.  See
+      the [Runtime Environment](CommandLineTool.html#Runtime_environment)
+      section of the CWL specification for details.
+
+    - |
+      ## Array inputs
+
+      It is easy to add arrays of input parameters represented to the command
+      line.  To specify an array parameter, the array definition is nested
+      under the `type` field with `type: array` and `items` defining the valid
+      data types that may appear in the array.
+
+      *example-array.cwl*
+      ```
+    - $include: examples/example-array.cwl
+    - |
+      ```
+
+      *example-array-job.json*
+      ```
+    - $include: examples/example-array-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      on the command line:
+
+      ```
+      $ cwl-runner example-array.cwl example-array-job.json
+      /home/peter/work/cwl-venv/bin/cwltool 1.0.20160325210917
+      [job 140334923640912] /home/peter/work/common-workflow-language/draft-3/examples$ echo -A one two three -B=four -B=five -B=six -C=seven,eight,nine
+      -A one two three -B=four -B=five -B=six -C=seven,eight,nine
+      Final process status is success
+      {}
+      ```
+
+      The `inputBinding` can appear either on the outer array parameter
+      definition or the inner array element definition, and these produce
+      different behavior when constructing the command line, as shown above.
+      In addition, the `itemSeperator` field, if provided, specifies that array
+      values should be concatenated into a single argument separated by the
+      item separator string.
+
+      - |
+      ## Record inputs
+
+    - |
+      ## Dependent and mutually exclusive parameters
