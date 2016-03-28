@@ -486,8 +486,52 @@
       values should be concatenated into a single argument separated by the
       item separator string.
 
-      - |
-      ## Record inputs
+      You can specify arrays of arrays, arrays of records, and other complex
+      types.
 
     - |
-      ## Dependent and mutually exclusive parameters
+      ## Record inputs, dependent and mutually exclusive parameters
+
+      Sometimes an underlying tool has several arguments that must be provided
+      together (they are dependent) or several arguments that cannot be
+      provided together (they are exclusive).  You can use records and type
+      unions to group parameters together to describe these two conditions.
+
+      *example-record.cwl*
+      ```
+    - $include: examples/example-record.cwl
+    - |
+      ```
+
+      *example-array-job1.json*
+      ```
+    - $include: examples/example-array-job1.json
+    - |
+      ```
+
+      Blah
+
+      ```
+      ```
+
+      *example-array-job2.json*
+      ```
+    - $include: examples/example-array-job2.json
+    - |
+      ```
+
+      ```
+      ```
+
+      Blah
+
+      *example-array-job3.json*
+      ```
+    - $include: examples/example-array-job2.json
+    - |
+      ```
+
+      ```
+      ```
+
+      Blah
