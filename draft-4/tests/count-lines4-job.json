@@ -1,0 +1,10 @@
+{
+    "file1": {
+        "class": "File",
+        "path": "whale.txt"
+    },
+    "file2": {
+        "class": "File",
+        "path": "hello.txt"
+    }
+}

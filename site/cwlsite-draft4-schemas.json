@@ -1,0 +1,18 @@
+[    {
+        "schema_in": {
+            "class": "File",
+            "path": "../draft-4/CommonWorkflowLanguage.yml",
+            "secondaryFiles": {"$import": "draft4-deps.json"}
+        },
+        "context_target": "draft-4/cwl-context.json",
+        "rdfs_target": "draft-4/cwl.ttl"
+    }, {
+        "schema_in": {
+            "class": "File",
+            "path": "../draft-4/salad/schema_salad/metaschema/metaschema.yml",
+            "secondaryFiles": {"$import": "draft4-deps.json"}
+        },
+        "context_target": "draft-4/salad-context.json",
+        "rdfs_target": "draft-4/salad.ttl"
+    }
+]

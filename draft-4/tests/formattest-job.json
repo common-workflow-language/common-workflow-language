@@ -1,0 +1,7 @@
+{
+    "input": {
+        "class": "File",
+        "path": "whale.txt",
+        "format": "edam:format_2330"
+    }
+}

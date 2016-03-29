@@ -1,0 +1,17 @@
+[{
+        "schema_in": {
+            "class": "File",
+            "path": "../draft-3/CommonWorkflowLanguage.yml",
+            "secondaryFiles": {"$import": "draft3-deps.json"}
+        },
+        "context_target": "draft-3/cwl-context.json",
+        "rdfs_target": "draft-3/cwl.ttl"
+    }, {
+        "schema_in": {
+            "class": "File",
+            "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml",
+            "secondaryFiles": {"$import": "draft3-deps.json"}
+        },
+        "context_target": "draft-3/salad-context.json",
+        "rdfs_target": "draft-3/salad.ttl"
+    }]
