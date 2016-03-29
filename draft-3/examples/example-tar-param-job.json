@@ -1,0 +1,7 @@
+{
+    "tarfile": {
+        "class": "File",
+        "path": "hello.tar"
+    },
+    "extractfile": "goodbye.txt"
+}

@@ -1,0 +1,50 @@
+{
+    "path": "../draft-3/UserGuide.yml", 
+    "class": "File", 
+    "secondaryFiles": [
+        {
+            "path": "../draft-3/userguide-intro.md", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-1st.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-echo-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-inp.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-inp-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-tar.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-tar-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-stdout.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-echo-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-tar-param.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-tar-param-job.json", 
+            "class": "File"
+        }
+    ]
+}
