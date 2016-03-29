@@ -45,6 +45,54 @@
         {
             "path": "../draft-3/examples/example-tar-param-job.json", 
             "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-docker.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-docker-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-arguments.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-arguments-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-array.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-array-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-record.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-record-job1.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-record-job2.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-record-job2.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-env.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-echo-job.json", 
+            "class": "File"
         }
     ]
 }
