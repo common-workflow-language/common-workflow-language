@@ -171,6 +171,7 @@ class Loader(object):
         self.identity_links = set()
         self.standalone = set()
         self.nolinkcheck = set()
+        self.idmap = set()
         self.vocab = {}
         self.rvocab = {}
 
@@ -192,6 +193,9 @@ class Loader(object):
 
             if isinstance(self.ctx[c], dict) and self.ctx[c].get("noLinkCheck"):
                 self.nolinkcheck.add(c)
+
+            if isinstance(self.ctx[c], dict) and self.ctx[c].get("idMap"):
+                self.idmap.add(c)
 
             if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
                 self.vocab[c] = self.ctx[c]["@id"]
@@ -330,6 +334,14 @@ class Loader(object):
                 metadata, _ = loader.resolve_all(metadata, base_url, file_base)
 
         if isinstance(document, dict):
+            for idmapField in loader.idmap:
+                if idmapField in document and isinstance(document[idmapField], dict):
+                    ls = []
+                    for k,v in document[idmapField].items():
+                        v["id"] = k
+                        ls.append(v)
+                    document[idmapField] = ls
+
             for identifer in loader.identity_links:
                 if identifer in document:
                     if isinstance(document[identifer], basestring):
