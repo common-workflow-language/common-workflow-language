@@ -38,10 +38,13 @@
       What's going on here?  Let's break it down:
 
       ```
+      cwlVersion: cwl:draft-3
       class: CommandLineTool
       ```
 
-      The `class` field indicates this document describes a command line tool.
+      The 'cwlVersion` field indicates the version of the CWL spec used by the
+      document.  The `class` field indicates this document describes a command
+      line tool.
 
       ```
       baseCommand: echo
@@ -105,8 +108,8 @@
 
       ```
       $ cwl-runner example-inp.cwl example-inp-job.json
-      [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/examples/whale.txt
-      -f -i42 --example-string hello --file=/home/examples/whale.txt
+      [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/example/whale.txt
+      -f -i42 --example-string hello --file=/home/example/whale.txt
       Final process status is success
       ```
 
@@ -169,7 +172,7 @@
       valid for this parameter.  The most common use is to provide "null" as an
       alternate parameter type, which indicates that the parameter is optional.
       In the example above, this is rendered as
-      `--file=/home/examples/whale.txt`.  However, if the "example_file"
+      `--file=/home/example/whale.txt`.  However, if the "example_file"
       parameter were not provided in the input, nothing would appear on the
       command line.
 
@@ -216,7 +219,7 @@
       command line:
       ```
       $ cwl-runner example-tar.cwl example-tar-job.json
-      [job 139868145165200] $ tar xf /home/examples/hello.tar
+      [job 139868145165200] $ tar xf /home/example/hello.tar
       Final process status is success
       {
       "example_out": {
@@ -306,7 +309,7 @@
       command line:
       ```
       $ cwl-runner example-tar-param.cwl example-tar-param-job.json
-      [job 139868145165200] $ tar xf /home/examples/hello.tar goodbye.txt
+      [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
       Final process status is success
       {
       "example_out": {
@@ -373,7 +376,7 @@
 
       ```
       $ cwl-runner example-docker.cwl example-docker-job.json
-      [job 140259721854416] /home/examples$ docker run -i --volume=/home/examples/hello.js:/var/lib/cwl/job369354770_examples/hello.js:ro --volume=/home/examples:/var/spool/cwl:rw --volume=/tmp/tmpDLs5hm:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp node:slim node /var/lib/cwl/job369354770_examples/hello.js
+      [job 140259721854416] /home/example$ docker run -i --volume=/home/example/hello.js:/var/lib/cwl/job369354770_examples/hello.js:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpDLs5hm:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp node:slim node /var/lib/cwl/job369354770_examples/hello.js
       Hello world!
       Final process status is success
       ```
@@ -382,7 +385,7 @@
       script.  One of the responsibilies of the CWL runner is to the paths of
       input files to reflect the location where they appear inside the
       container.  In this example, the path to the script `hello.js` is
-      `/home/examples/hello.js` outside the container but
+      `/home/example/hello.js` outside the container but
       `/var/lib/cwl/job369354770_examples/hello.js` inside the container, as
       reflected in the invocation of the `node` command.
 
@@ -416,12 +419,12 @@
 
       ```
       $ cwl-runner example-arguments.cwl example-arguments-job.json
-      [job 140051188854928] /home/examples$ docker run -i --volume=/home/examples/Hello.java:/var/lib/cwl/job710906416_examples/Hello.java:ro --volume=/home/examples:/var/spool/cwl:rw --volume=/tmp/tmpdlQDWi:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac -d /var/spool/cwl /var/lib/cwl/job710906416_examples/Hello.java
+      [job 140051188854928] /home/example$ docker run -i --volume=/home/example/Hello.java:/var/lib/cwl/job710906416_example/Hello.java:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpdlQDWi:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac -d /var/spool/cwl /var/lib/cwl/job710906416_examples/Hello.java
       Final process status is success
       {
         "classfile": {
           "size": 416,
-          "path": "/home/examples/Hello.class",
+          "path": "/home/example/Hello.class",
           "checksum": "sha1$2f7ac33c1f3aac3f1fec7b936b6562422c85b38a",
           "class": "File"
         }
@@ -503,35 +506,100 @@
     - |
       ```
 
-      *example-array-job1.json*
+      *example-record-job1.json*
       ```
-    - $include: examples/example-array-job1.json
-    - |
-      ```
-
-      Blah
-
-      ```
-      ```
-
-      *example-array-job2.json*
-      ```
-    - $include: examples/example-array-job2.json
+    - $include: examples/example-record-job1.json
     - |
       ```
 
       ```
+      $ cwl-runner example-record.cwl example-record-job1.json
+      Workflow error:
+        Error validating input record, could not validate field `dependent_parameters` because
+        missing required field `itemB`
       ```
 
-      Blah
+      In the first example, you can't provide `itemA` without also providing `itemB`.
 
-      *example-array-job3.json*
+      *example-record-job2.json*
       ```
-    - $include: examples/example-array-job2.json
+    - $include: examples/example-record-job2.json
     - |
       ```
 
       ```
+      $ cwl-runner example-record.cwl example-record-job2.json
+      [job 140566927111376] /home/example$ echo -A one -B two -C three
+      -A one -B two -C three
+      Final process status is success
+      {}
       ```
 
-      Blah
+      In the second example, `itemC` and `itemD` are exclusive, so only `itemC`
+      is added to the command line and `itemD` is ignored.
+
+      *example-record-job3.json*
+      ```
+    - $include: examples/example-record-job2.json
+    - |
+      ```
+
+      ```
+      $ cwl-runner example-record.cwl example-record-job3.json
+      [job 140606932172880] /home/example$ echo -A one -B two -D four
+      -A one -B two -D four
+      Final process status is success
+      {}
+      ```
+
+      In the third example, only `itemD` is provided, so it appears on the
+      command line.
+
+    - |
+      ## Environment variables
+
+      Tools run in a restricted environment and do not inherit most environment
+      variables from the parent process.  You can set environment variables for
+      the tool using `EnvVarRequirement`.
+
+      *example-env.cwl*
+      ```
+    - $include: examples/example-env.cwl
+    - |
+      ```
+
+      *example-echo-job.json*
+      ```
+    - $include: examples/example-echo-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
+
+      ```
+      $ cwltool example-env.cwl example-echo-job.json
+      /home/peter/work/cwl-venv/bin/cwltool 1.0.20160325210917
+      [job 140710387785808] /home/peter/work/common-workflow-language/draft-3/examples$ env
+      PATH=/bin:/usr/bin:/usr/local/bin
+      HELLO=Hello world!
+      TMPDIR=/tmp/tmp63Obpk
+      Final process status is success
+      {}
+      ```
+
+    - |
+      ## Creating configuation files at runtime
+
+      Some tools will expect to read their input configuration from a file
+      rather than (or in addition to) the command line parameters.  To create
+      such a file, use `CreateFileRequirement`.
+
+    - |
+      ## Staging input files in the output directory
+
+      Normally, input files are located in a read-only directory separate from
+      the output directory.  This causes problems if the underlying tool
+      expects to write its output alongside the input file in the same
+      directory.  Use  `CreateFileRequirement` to place a file in the output
+      directory.

@@ -1,3 +1,4 @@
+cwlVersion: cwl:draft-3
 class: CommandLineTool
 inputs:
   - id: dependent_parameters
