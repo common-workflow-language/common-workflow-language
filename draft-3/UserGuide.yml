@@ -579,8 +579,7 @@
 
       ```
       $ cwltool example-env.cwl example-echo-job.json
-      /home/peter/work/cwl-venv/bin/cwltool 1.0.20160325210917
-      [job 140710387785808] /home/peter/work/common-workflow-language/draft-3/examples$ env
+      [job 140710387785808] /home/example$ env
       PATH=/bin:/usr/bin:/usr/local/bin
       HELLO=Hello world!
       TMPDIR=/tmp/tmp63Obpk
@@ -589,11 +588,36 @@
       ```
 
     - |
-      ## Creating configuation files at runtime
+      ## Creating files at runtime
 
-      Some tools will expect to read their input configuration from a file
-      rather than (or in addition to) the command line parameters.  To create
-      such a file, use `CreateFileRequirement`.
+      Sometimes you need to create a file on the fly from input parameters,
+      such as tools which expect to read their input configuration from a file
+      rather than the command line parameters.  To do this, use
+      `CreateFileRequirement`.
+
+
+      *example-createfile.cwl*
+      ```
+    - $include: examples/example-createfile.cwl
+    - |
+      ```
+
+      *example-echo-job.json*
+      ```
+    - $include: examples/example-echo-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
+
+      ```
+      $ cwltool example-createfile.cwl example-echo-job.json
+      [job 140528604979344] /home/example$ cat example.conf
+      CONFIGVAR=Hello world!
+      Final process status is success
+      {}
+      ```
 
     - |
       ## Staging input files in the output directory
