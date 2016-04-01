@@ -624,6 +624,29 @@
 
       Normally, input files are located in a read-only directory separate from
       the output directory.  This causes problems if the underlying tool
-      expects to write its output alongside the input file in the same
-      directory.  Use  `CreateFileRequirement` to place a file in the output
-      directory.
+      expects to write its output files alongside the input file in the same
+      directory.  You use `CreateFileRequirement` to stage input
+      files into the output directory.
+
+      *example-linkfile.cwl*
+      ```
+    - $include: examples/example-linkfile.cwl
+    - |
+      ```
+
+      *example-echo-job.json*
+      ```
+    - $include: examples/example-echo-job.json
+    - |
+      ```
+
+      Now invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
+
+      ```
+      $ cwltool example-createfile.cwl example-echo-job.json
+      [job 140528604979344] /home/example$ cat example.conf
+      CONFIGVAR=Hello world!
+      Final process status is success
+      {}
+      ```

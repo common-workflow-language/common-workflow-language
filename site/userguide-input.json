@@ -93,6 +93,22 @@
         {
             "path": "../draft-3/examples/example-echo-job.json", 
             "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-createfile.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-echo-job.json", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-linkfile.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/example-echo-job.json", 
+            "class": "File"
         }
     ]
 }
