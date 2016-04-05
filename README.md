@@ -103,7 +103,6 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Apache Taverna](http://taverna.incubator.apache.org/)
 * [Institut Pasteur](http://www.pasteur.fr)
 * [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
-* [University of California Davis](http://ucdavis.edu)
 * [University of California Santa Cruz](https://cbse.soe.ucsc.edu/research/bioinfo)
 * [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
 * [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
