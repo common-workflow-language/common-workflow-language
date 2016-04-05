@@ -390,7 +390,7 @@
       reflected in the invocation of the `node` command.
 
     - |
-      ## Additional arguments and runtime parameters
+      ## Additional command line arguments and runtime parameters
 
       Sometimes tools require additional command line options that don't
       correspond exactly to input parameters.
@@ -588,13 +588,36 @@
       ```
 
     - |
+      ## Javascript expressions
+
+      Stuff.
+
+      *example-expression.cwl*
+      ```
+    - $include: examples/example-expression.cwl
+    - |
+      ```
+
+      ```
+      $ cwl-runner example-expression.cwl empty.json
+      [job 140000594593168] /home/example$ echo -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
+      -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
+      Final process status is success
+      {}
+      ```
+
+      You can only use expressions in certain fields.  These are: `filename`,
+      `fileContent`, `envValue`, `valueFrom`, `glob`, `outputEval`, `stdin`,
+      `stdout`, `coresMin`, `coresMax`, `ramMin`, `ramMax`, `tmpdirMin`,
+      `tmpdirMax`, `outdirMin`, and `outdirMax`.
+
+    - |
       ## Creating files at runtime
 
       Sometimes you need to create a file on the fly from input parameters,
       such as tools which expect to read their input configuration from a file
       rather than the command line parameters.  To do this, use
       `CreateFileRequirement`.
-
 
       *example-createfile.cwl*
       ```
@@ -634,9 +657,9 @@
     - |
       ```
 
-      *example-echo-job.json*
+      *example-arguments-job.json*
       ```
-    - $include: examples/example-echo-job.json
+    - $include: examples/example-arguments-job.json
     - |
       ```
 
@@ -644,9 +667,15 @@
       command line:
 
       ```
-      $ cwltool example-createfile.cwl example-echo-job.json
-      [job 140528604979344] /home/example$ cat example.conf
-      CONFIGVAR=Hello world!
+      $ cwl-runner example-linkfile.cwl example-arguments-job.json
+      [job 139928309171664] /home/example$ docker run -i --volume=/home/peter/work/common-workflow-language/draft-3/examples/Hello.java:/var/lib/cwl/job557617295_examples/Hello.java:ro --volume=/home/peter/work/common-workflow-language/draft-3/examples:/var/spool/cwl:rw --volume=/tmp/tmpmNbApw:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac Hello.java
       Final process status is success
-      {}
+      {
+      "classfile": {
+        "size": 416,
+        "path": "/home/peter/work/common-workflow-language/draft-3/examples/Hello.class",
+        "checksum": "sha1$2f7ac33c1f3aac3f1fec7b936b6562422c85b38a",
+        "class": "File"
+        }
+      }
       ```

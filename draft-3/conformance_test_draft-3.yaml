@@ -647,3 +647,15 @@
     out: ["foo one one three", "foo one two four"]
   tool: "draft-3/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
+
+- job: draft-3/conflict-job.json
+  output: {
+    "fileout": {
+        "path": "out.txt",
+        "checksum": "sha1$a2d8d6e7b28295dc9977dc3bdb652ddd480995f0",
+        "class": "File",
+        "size": 25
+    }
+  }
+  tool: "draft-3/conflict-wf.cwl#collision"
+  doc: Test workflow two input files with same name.

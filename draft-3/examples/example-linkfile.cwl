@@ -1,6 +1,5 @@
 cwlVersion: cwl:draft-3
 class: CommandLineTool
-baseCommand: javac
 hints:
   - class: DockerRequirement
     dockerPull: java:7
