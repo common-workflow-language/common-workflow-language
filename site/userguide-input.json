@@ -95,6 +95,10 @@
             "class": "File"
         }, 
         {
+            "path": "../draft-3/examples/example-expression.cwl", 
+            "class": "File"
+        }, 
+        {
             "path": "../draft-3/examples/example-createfile.cwl", 
             "class": "File"
         }, 
@@ -107,7 +111,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/example-echo-job.json", 
+            "path": "../draft-3/examples/example-arguments-job.json", 
             "class": "File"
         }
     ]
