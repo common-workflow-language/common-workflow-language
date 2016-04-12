@@ -66,41 +66,44 @@ class TestSchemas(unittest.TestCase):
             'http://example.com/foo#bar': 'asym'
         })
 
+    maxDiff = None
 
     def test_idmap(self):
         ldr = schema_salad.ref_resolver.Loader({})
         ldr.add_context({
             "inputs": {
                 "@id": "http://example.com/inputs",
-                "idMap": True
+                "mapSubject": "id",
+                "mapPredicate": "a"
             },
             "outputs": {
-                "@id": "http://example.com/outputs",
-                "idMap": True
+                "@type": "@id",
+                "identity": True,
             },
                          "id": "@id"})
 
         ra, _ = ldr.resolve_all({
+            "id": "stuff",
             "inputs": {
-                "zip": {"a": 1},
-                "zing": {"a": 2}
+                "zip": 1,
+                "zing": 2
             },
-            "outputs": {
-                "out": {"b": 3},
-            },
+            "outputs": ["out"],
             "other": {
                 'n': 9
             }
         }, "http://example2.com/")
 
         self.assertEqual(ra,
-                         {'inputs': [{'a': 2, 'id': 'http://example2.com/#zing'},
-                                     {'a': 1, 'id': 'http://example2.com/#zip'}],
-                          'outputs': [{'b': 3, 'id': 'http://example2.com/#out'}],
-                          'other': {
-                              'n': 9
-                          }
-                      }
+                         {
+                             "id": "http://example2.com/#stuff",
+                             'inputs': [{'a': 2, 'id': 'http://example2.com/#stuff/zing'},
+                                        {'a': 1, 'id': 'http://example2.com/#stuff/zip'}],
+                             'outputs': ['http://example2.com/#stuff/out'],
+                             'other': {
+                                 'n': 9
+                             }
+                         }
                      )
 
     def test_examples(self):

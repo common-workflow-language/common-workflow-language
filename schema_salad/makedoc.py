@@ -286,7 +286,7 @@ class RenderType(object):
         else:
             doc = ""
 
-        if self.title is None:
+        if self.title is None and f["doc"]:
             self.title = f["doc"][0:f["doc"].index("\n")]
             if self.title.startswith('# '):
                 self.title = self.title[2:]

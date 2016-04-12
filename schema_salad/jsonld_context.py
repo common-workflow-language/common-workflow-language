@@ -86,7 +86,7 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
             predicate = "%s:%s" % (defaultPrefix, recordname)
 
         if context.get(recordname, predicate) != predicate:
-            raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[t["name"]], predicate))
+            raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[recordname], predicate))
 
         if not recordname:
             raise Exception()
