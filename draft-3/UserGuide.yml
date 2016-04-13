@@ -11,17 +11,17 @@
       output.  CWL documents are written in [JSON](http://json.org) or
       [YAML](http://yaml.org), or a mix of the two.
 
-      *example-1st.cwl*
+      *1st.cwl*
       ```
-    - $include: examples/example-1st.cwl
+    - $include: examples/1st.cwl
     - |
       ```
 
       Use a JSON object in a separate file to describe the input of a run:
 
-      *example-echo-job.json*
+      *echo-job.json*
       ```
-    - $include: examples/example-echo-job.json
+    - $include: examples/echo-job.json
     - |
       ```
 
@@ -88,15 +88,15 @@
       types and appearing on the command line in different ways:
 
 
-      *example-inp.cwl*
+      *inp.cwl*
       ```
-    - $include: examples/example-inp.cwl
+    - $include: examples/inp.cwl
     - |
       ```
 
-      *example-inp-job.json*
+      *inp-job.json*
       ```
-    - $include: examples/example-inp-job.json
+    - $include: examples/inp-job.json
     - |
       ```
 
@@ -203,15 +203,15 @@
       output parameters returned by the CWL tool are either the output files
       themselves, or come from examining the content of those files.
 
-      *example-tar.cwl*
+      *tar.cwl*
       ```
-    - $include: examples/example-tar.cwl
+    - $include: examples/tar.cwl
     - |
       ```
 
-      *example-tar-job.json*
+      *tar-job.json*
       ```
-    - $include: examples/example-tar-job.json
+    - $include: examples/tar-job.json
     - |
       ```
 
@@ -253,15 +253,15 @@
       the name of the file where the output stream should go.  Then use `glob`
       on `outputBinding` to return the file.
 
-      *example-stdout.cwl*
+      *stdout.cwl*
       ```
-    - $include: examples/example-stdout.cwl
+    - $include: examples/stdout.cwl
     - |
       ```
 
-      *example-echo-job.json*
+      *echo-job.json*
       ```
-    - $include: examples/example-echo-job.json
+    - $include: examples/echo-job.json
     - |
       ```
 
@@ -293,15 +293,15 @@
       see how to reference the value of input parameters dynamically from other
       fields.
 
-      *example-tar-param.cwl*
+      *tar-param.cwl*
       ```
-    - $include: examples/example-tar-param.cwl
+    - $include: examples/tar-param.cwl
     - |
       ```
 
-      *example-tar-param-job.json*
+      *tar-param-job.json*
       ```
-    - $include: examples/example-tar-param-job.json
+    - $include: examples/tar-param-job.json
     - |
       ```
 
@@ -359,15 +359,15 @@
 
       This example runs a simple Node.js script inside a Docker container.
 
-      *example-docker.cwl*
+      *docker.cwl*
       ```
-    - $include: examples/example-docker.cwl
+    - $include: examples/docker.cwl
     - |
       ```
 
-      *example-docker-job.json*
+      *docker-job.json*
       ```
-    - $include: examples/example-docker-job.json
+    - $include: examples/docker-job.json
     - |
       ```
 
@@ -402,15 +402,15 @@
       instruct javac to write the class file to the designated output directory
       instead.
 
-      *example-arguments.cwl*
+      *arguments.cwl*
       ```
-    - $include: examples/example-arguments.cwl
+    - $include: examples/arguments.cwl
     - |
       ```
 
-      *example-arguments-job.json*
+      *arguments-job.json*
       ```
-    - $include: examples/example-arguments-job.json
+    - $include: examples/arguments-job.json
     - |
       ```
 
@@ -458,15 +458,15 @@
       under the `type` field with `type: array` and `items` defining the valid
       data types that may appear in the array.
 
-      *example-array.cwl*
+      *array.cwl*
       ```
-    - $include: examples/example-array.cwl
+    - $include: examples/array.cwl
     - |
       ```
 
-      *example-array-job.json*
+      *array-job.json*
       ```
-    - $include: examples/example-array-job.json
+    - $include: examples/array-job.json
     - |
       ```
 
@@ -500,15 +500,15 @@
       provided together (they are exclusive).  You can use records and type
       unions to group parameters together to describe these two conditions.
 
-      *example-record.cwl*
+      *record.cwl*
       ```
-    - $include: examples/example-record.cwl
+    - $include: examples/record.cwl
     - |
       ```
 
-      *example-record-job1.json*
+      *record-job1.json*
       ```
-    - $include: examples/example-record-job1.json
+    - $include: examples/record-job1.json
     - |
       ```
 
@@ -521,9 +521,9 @@
 
       In the first example, you can't provide `itemA` without also providing `itemB`.
 
-      *example-record-job2.json*
+      *record-job2.json*
       ```
-    - $include: examples/example-record-job2.json
+    - $include: examples/record-job2.json
     - |
       ```
 
@@ -538,9 +538,9 @@
       In the second example, `itemC` and `itemD` are exclusive, so only `itemC`
       is added to the command line and `itemD` is ignored.
 
-      *example-record-job3.json*
+      *record-job3.json*
       ```
-    - $include: examples/example-record-job2.json
+    - $include: examples/record-job2.json
     - |
       ```
 
@@ -562,15 +562,15 @@
       variables from the parent process.  You can set environment variables for
       the tool using `EnvVarRequirement`.
 
-      *example-env.cwl*
+      *env.cwl*
       ```
-    - $include: examples/example-env.cwl
+    - $include: examples/env.cwl
     - |
       ```
 
-      *example-echo-job.json*
+      *echo-job.json*
       ```
-    - $include: examples/example-echo-job.json
+    - $include: examples/echo-job.json
     - |
       ```
 
@@ -595,9 +595,9 @@
       legal you can provide a fragment of Javascript that will be evaluated by
       the CWL runner.
 
-      *example-expression.cwl*
+      *expression.cwl*
       ```
-    - $include: examples/example-expression.cwl
+    - $include: examples/expression.cwl
     - |
       ```
 
@@ -622,15 +622,15 @@
       rather than the command line parameters.  To do this, use
       `CreateFileRequirement`.
 
-      *example-createfile.cwl*
+      *createfile.cwl*
       ```
-    - $include: examples/example-createfile.cwl
+    - $include: examples/createfile.cwl
     - |
       ```
 
-      *example-echo-job.json*
+      *echo-job.json*
       ```
-    - $include: examples/example-echo-job.json
+    - $include: examples/echo-job.json
     - |
       ```
 
@@ -655,15 +655,15 @@
       output directory.  In this example, we use a Javascript expression to
       extract the base name of the input file from its leading directory path.
 
-      *example-linkfile.cwl*
+      *linkfile.cwl*
       ```
-    - $include: examples/example-linkfile.cwl
+    - $include: examples/linkfile.cwl
     - |
       ```
 
-      *example-arguments-job.json*
+      *arguments-job.json*
       ```
-    - $include: examples/example-arguments-job.json
+    - $include: examples/arguments-job.json
     - |
       ```
 
