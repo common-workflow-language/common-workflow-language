@@ -38,7 +38,7 @@ else:
     install_requires.append("avro-python3")
 
 setup(name='schema-salad',
-      version='1.8',
+      version='1.9',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
