@@ -35,7 +35,7 @@ $graph:
   type: enum
   extends: "sld:PrimitiveType"
   symbols:
-    - File
+    - cwl:File
   doc:
     - "Extends primitive types with the concept of a file as a first class type."
     - "File: A File object"
