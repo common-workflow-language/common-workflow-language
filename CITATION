@@ -1,0 +1,21 @@
+To cite the Common Workflow Language standard in a publication, please use:
+
+Amstutz, Peter; Andeer, Robin; Chapman, Brad; Chilton, John; Crusoe, Michael
+R.; Valls Guimerà, Roman; Carrasco Hernandez, Guillermo; Ivkovic, Sinisa;
+Kartashov, Andrey; Kern, John; Leehr, Dan; Ménager, Hervé; Mikheev, Maxim;
+Pierce, Tim; Randall, Josh; Soiland-Reyes, Stian; Stojanovic, Luka; Tijanić,
+Nebojša (2016): Common Workflow Language, draft 3. figshare.
+https://dx.doi.org/10.6084/m9.figshare.3115156.v1
+
+@data{common-workflow-language-draft3,
+  doi = {10.6084/m9.figshare.3115156.v1},
+  url = {http://dx.doi.org/10.6084/m9.figshare.3115156.v1},
+  author = {Peter Amstutz; Robin Andeer; Brad Chapman; John Chilton;
+Michael R. Crusoe; Roman Valls Guimerà; Guillermo Carrasco Hernandez;
+Sinisa Ivkovic; Andrey Kartashov; John Kern; Dan Leehr; Hervé Ménager;
+Maxim Mikheev; Tim Pierce; Josh Randall; Stian Soiland-Reyes; Luka Stojanovic;
+Nebojša Tijanić; },
+  publisher = {Figshare},
+  title = {Common Workflow Language, draft 3},
+  year = {2016}
+}
