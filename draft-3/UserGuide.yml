@@ -19,9 +19,9 @@
 
       Use a JSON object in a separate file to describe the input of a run:
 
-      *echo-job.json*
+      *echo-job.yml*
       ```
-    - $include: examples/echo-job.json
+    - $include: examples/echo-job.yml
     - |
       ```
 
@@ -29,7 +29,7 @@
       command line:
 
       ```
-      $ cwl-runner example-echo.cwl example-echo-job.json
+      $ cwl-runner 1st.cwl echo-job.yml
       [job 140199012414352] $ echo 'Hello world!'
       Hello world!
       Final process status is success
@@ -94,9 +94,9 @@
     - |
       ```
 
-      *inp-job.json*
+      *inp-job.yml*
       ```
-    - $include: examples/inp-job.json
+    - $include: examples/inp-job.yml
     - |
       ```
 
@@ -107,7 +107,7 @@
       command line:
 
       ```
-      $ cwl-runner example-inp.cwl example-inp-job.json
+      $ cwl-runner inp.cwl inp-job.yml
       [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/example/whale.txt
       -f -i42 --example-string hello --file=/home/example/whale.txt
       Final process status is success
@@ -209,16 +209,16 @@
     - |
       ```
 
-      *tar-job.json*
+      *tar-job.yml*
       ```
-    - $include: examples/tar-job.json
+    - $include: examples/tar-job.yml
     - |
       ```
 
       Invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
       ```
-      $ cwl-runner example-tar.cwl example-tar-job.json
+      $ cwl-runner tar.cwl tar-job.yml
       [job 139868145165200] $ tar xf /home/example/hello.tar
       Final process status is success
       {
@@ -259,9 +259,9 @@
     - |
       ```
 
-      *echo-job.json*
+      *echo-job.yml*
       ```
-    - $include: examples/echo-job.json
+    - $include: examples/echo-job.yml
     - |
       ```
 
@@ -269,7 +269,7 @@
       on the command line:
 
       ```
-      $ cwl-runner example-stdout.cwl example-echo-job.json
+      $ cwl-runner stdout.cwl echo-job.yml
       [job 140199012414352] $ echo 'Hello world!' > output.txt
       Final process status is success
       {
@@ -299,16 +299,16 @@
     - |
       ```
 
-      *tar-param-job.json*
+      *tar-param-job.yml*
       ```
-    - $include: examples/tar-param-job.json
+    - $include: examples/tar-param-job.yml
     - |
       ```
 
       Invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
       ```
-      $ cwl-runner example-tar-param.cwl example-tar-param-job.json
+      $ cwl-runner example-tar-param.cwl example-tar-param-job.yml
       [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
       Final process status is success
       {
@@ -365,9 +365,9 @@
     - |
       ```
 
-      *docker-job.json*
+      *docker-job.yml*
       ```
-    - $include: examples/docker-job.json
+    - $include: examples/docker-job.yml
     - |
       ```
 
@@ -375,7 +375,7 @@
       on the command line:
 
       ```
-      $ cwl-runner example-docker.cwl example-docker-job.json
+      $ cwl-runner example-docker.cwl example-docker-job.yml
       [job 140259721854416] /home/example$ docker run -i --volume=/home/example/hello.js:/var/lib/cwl/job369354770_examples/hello.js:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpDLs5hm:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp node:slim node /var/lib/cwl/job369354770_examples/hello.js
       Hello world!
       Final process status is success
@@ -408,9 +408,9 @@
     - |
       ```
 
-      *arguments-job.json*
+      *arguments-job.yml*
       ```
-    - $include: examples/arguments-job.json
+    - $include: examples/arguments-job.yml
     - |
       ```
 
@@ -418,7 +418,7 @@
       on the command line:
 
       ```
-      $ cwl-runner example-arguments.cwl example-arguments-job.json
+      $ cwl-runner example-arguments.cwl example-arguments-job.yml
       [job 140051188854928] /home/example$ docker run -i --volume=/home/example/Hello.java:/var/lib/cwl/job710906416_example/Hello.java:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpdlQDWi:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac -d /var/spool/cwl /var/lib/cwl/job710906416_examples/Hello.java
       Final process status is success
       {
@@ -458,15 +458,15 @@
       under the `type` field with `type: array` and `items` defining the valid
       data types that may appear in the array.
 
-      *array.cwl*
+      *array-inputs.cwl*
       ```
-    - $include: examples/array.cwl
+    - $include: examples/array-inputs.cwl
     - |
       ```
 
-      *array-job.json*
+      *array-inputs-job.yml*
       ```
-    - $include: examples/array-job.json
+    - $include: examples/array-inputs-job.yml
     - |
       ```
 
@@ -474,7 +474,7 @@
       on the command line:
 
       ```
-      $ cwl-runner example-array.cwl example-array-job.json
+      $ cwl-runner array-inputs.cwl array-inputs-job.yml
       /home/peter/work/cwl-venv/bin/cwltool 1.0.20160325210917
       [job 140334923640912] /home/peter/work/common-workflow-language/draft-3/examples$ echo -A one two three -B=four -B=five -B=six -C=seven,eight,nine
       -A one two three -B=four -B=five -B=six -C=seven,eight,nine
@@ -506,14 +506,14 @@
     - |
       ```
 
-      *record-job1.json*
+      *record-job1.yml*
       ```
-    - $include: examples/record-job1.json
+    - $include: examples/record-job1.yml
     - |
       ```
 
       ```
-      $ cwl-runner example-record.cwl example-record-job1.json
+      $ cwl-runner record.cwl record-job1.yml
       Workflow error:
         Error validating input record, could not validate field `dependent_parameters` because
         missing required field `itemB`
@@ -521,14 +521,14 @@
 
       In the first example, you can't provide `itemA` without also providing `itemB`.
 
-      *record-job2.json*
+      *record-job2.yml*
       ```
-    - $include: examples/record-job2.json
+    - $include: examples/record-job2.yml
     - |
       ```
 
       ```
-      $ cwl-runner example-record.cwl example-record-job2.json
+      $ cwl-runner record.cwl record-job2.yml
       [job 140566927111376] /home/example$ echo -A one -B two -C three
       -A one -B two -C three
       Final process status is success
@@ -538,14 +538,14 @@
       In the second example, `itemC` and `itemD` are exclusive, so only `itemC`
       is added to the command line and `itemD` is ignored.
 
-      *record-job3.json*
+      *record-job3.yml*
       ```
-    - $include: examples/record-job2.json
+    - $include: examples/record-job2.yml
     - |
       ```
 
       ```
-      $ cwl-runner example-record.cwl example-record-job3.json
+      $ cwl-runner record.cwl record-job3.yml
       [job 140606932172880] /home/example$ echo -A one -B two -D four
       -A one -B two -D four
       Final process status is success
@@ -568,9 +568,9 @@
     - |
       ```
 
-      *echo-job.json*
+      *echo-job.yml*
       ```
-    - $include: examples/echo-job.json
+    - $include: examples/echo-job.yml
     - |
       ```
 
@@ -578,7 +578,7 @@
       command line:
 
       ```
-      $ cwltool example-env.cwl example-echo-job.json
+      $ cwl-runner env.cwl echo-job.yml
       [job 140710387785808] /home/example$ env
       PATH=/bin:/usr/bin:/usr/local/bin
       HELLO=Hello world!
@@ -602,7 +602,7 @@
       ```
 
       ```
-      $ cwl-runner example-expression.cwl empty.json
+      $ cwl-runner expression.cwl empty.yml
       [job 140000594593168] /home/example$ echo -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
       -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
       Final process status is success
@@ -628,9 +628,9 @@
     - |
       ```
 
-      *echo-job.json*
+      *echo-job.yml*
       ```
-    - $include: examples/echo-job.json
+    - $include: examples/echo-job.yml
     - |
       ```
 
@@ -638,7 +638,7 @@
       command line:
 
       ```
-      $ cwltool example-createfile.cwl example-echo-job.json
+      $ cwltool createfile.cwl echo-job.yml
       [job 140528604979344] /home/example$ cat example.conf
       CONFIGVAR=Hello world!
       Final process status is success
@@ -661,9 +661,9 @@
     - |
       ```
 
-      *arguments-job.json*
+      *arguments-job.yml*
       ```
-    - $include: examples/arguments-job.json
+    - $include: examples/arguments-job.yml
     - |
       ```
 
@@ -671,7 +671,7 @@
       command line:
 
       ```
-      $ cwl-runner example-linkfile.cwl example-arguments-job.json
+      $ cwl-runner linkfile.cwl arguments-job.yml
       [job 139928309171664] /home/example$ docker run -i --volume=/home/peter/work/common-workflow-language/draft-3/examples/Hello.java:/var/lib/cwl/job557617295_examples/Hello.java:ro --volume=/home/peter/work/common-workflow-language/draft-3/examples:/var/spool/cwl:rw --volume=/tmp/tmpmNbApw:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac Hello.java
       Final process status is success
       {

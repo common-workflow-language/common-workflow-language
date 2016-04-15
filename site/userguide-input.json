@@ -11,7 +11,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/echo-job.json", 
+            "path": "../draft-3/examples/echo-job.yml", 
             "class": "File"
         }, 
         {
@@ -19,7 +19,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/inp-job.json", 
+            "path": "../draft-3/examples/inp-job.yml", 
             "class": "File"
         }, 
         {
@@ -27,7 +27,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/tar-job.json", 
+            "path": "../draft-3/examples/tar-job.yml", 
             "class": "File"
         }, 
         {
@@ -35,7 +35,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/echo-job.json", 
+            "path": "../draft-3/examples/echo-job.yml", 
             "class": "File"
         }, 
         {
@@ -43,7 +43,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/tar-param-job.json", 
+            "path": "../draft-3/examples/tar-param-job.yml", 
             "class": "File"
         }, 
         {
@@ -51,7 +51,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/docker-job.json", 
+            "path": "../draft-3/examples/docker-job.yml", 
             "class": "File"
         }, 
         {
@@ -59,15 +59,15 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/arguments-job.json", 
+            "path": "../draft-3/examples/arguments-job.yml", 
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/array.cwl", 
+            "path": "../draft-3/examples/array-inputs.cwl", 
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/array-job.json", 
+            "path": "../draft-3/examples/array-inputs-job.yml", 
             "class": "File"
         }, 
         {
@@ -75,15 +75,15 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/record-job1.json", 
+            "path": "../draft-3/examples/record-job1.yml", 
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/record-job2.json", 
+            "path": "../draft-3/examples/record-job2.yml", 
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/record-job2.json", 
+            "path": "../draft-3/examples/record-job2.yml", 
             "class": "File"
         }, 
         {
@@ -91,7 +91,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/echo-job.json", 
+            "path": "../draft-3/examples/echo-job.yml", 
             "class": "File"
         }, 
         {
@@ -103,7 +103,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/echo-job.json", 
+            "path": "../draft-3/examples/echo-job.yml", 
             "class": "File"
         }, 
         {
@@ -111,7 +111,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/arguments-job.json", 
+            "path": "../draft-3/examples/arguments-job.yml", 
             "class": "File"
         }
     ]
