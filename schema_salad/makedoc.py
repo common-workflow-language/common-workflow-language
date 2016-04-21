@@ -119,7 +119,7 @@ def number_headings(toc, maindoc):
             toc.start_numbering = True
             toc.numbering = [0]
 
-        if line == "```":
+        if "```" in line:
             skip = not skip
 
         if not skip:
