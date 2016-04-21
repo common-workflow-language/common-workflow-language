@@ -1,280 +1,280 @@
-- args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3', tests/rabix/tests/test-files/chr20.fa,
-    tests/rabix/tests/test-files/example_human_Illumina.pe_1.fastq, tests/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
-  job: tests/bwa-mem-job.json
+- args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3', draft-4/rabix/tests/test-files/chr20.fa,
+    draft-4/rabix/tests/test-files/example_human_Illumina.pe_1.fastq, draft-4/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+  job: draft-4/bwa-mem-job.json
   stdout: output.sam
-  tool: tests/bwa-mem-tool.cwl
+  tool: draft-4/bwa-mem-tool.cwl
   doc: General test of command line generation
 
-- args: [bwa, mem, tests/rabix/tests/test-files/chr20.fa,
+- args: [bwa, mem, draft-4/rabix/tests/test-files/chr20.fa,
     "-XXX",
-    "-YYY", tests/rabix/tests/test-files/example_human_Illumina.pe_1.fastq,
-    "-YYY", tests/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
-  job: tests/bwa-mem-job.json
-  tool: tests/binding-test.cwl
+    "-YYY", draft-4/rabix/tests/test-files/example_human_Illumina.pe_1.fastq,
+    "-YYY", draft-4/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+  job: draft-4/bwa-mem-job.json
+  tool: draft-4/binding-test.cwl
   doc: Test nested prefixes with arrays
 
 - args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
     '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
     '16', map2, --max-seed-hits, '-1', --max-seq-length, '20', --min-seq-length, '10']
-  job: tests/tmap-job.json
-  stdin: tests/reads.fastq
+  job: draft-4/tmap-job.json
+  stdin: draft-4/reads.fastq
   stdout: output.sam
-  tool: tests/tmap-tool.cwl
+  tool: draft-4/tmap-tool.cwl
   doc: Test nested command line bindings and stdin/stdout redirection
 
-- args: [cat, tests/hello.txt]
-  job: tests/cat-job.json
-  tool: tests/cat1-tool.cwl
+- args: [cat, draft-4/hello.txt]
+  job: draft-4/cat-job.json
+  tool: draft-4/cat1-tool.cwl
   doc: Test command line with optional input (missing)
 
-- args: [cat, -n, tests/hello.txt]
-  job: tests/cat-n-job.json
-  tool: tests/cat1-tool.cwl
+- args: [cat, -n, draft-4/hello.txt]
+  job: draft-4/cat-n-job.json
+  tool: draft-4/cat1-tool.cwl
   doc: Test command line with optional input (provided)
 
 - args: [cat]
-  job: tests/cat-job.json
-  stdin: tests/hello.txt
-  tool: tests/cat2-tool.cwl
+  job: draft-4/cat-job.json
+  stdin: draft-4/hello.txt
+  tool: draft-4/cat2-tool.cwl
   doc: Test command line with stdin redirection
 
-- args: [cat, tests/hello.txt]
-  job: tests/cat-job.json
+- args: [cat, draft-4/hello.txt]
+  job: draft-4/cat-job.json
   stdout: output.txt
-  tool: tests/cat3-tool.cwl
+  tool: draft-4/cat3-tool.cwl
   doc: Test command line with stdout redirection
 
 - args: [cat]
-  job: tests/cat-job.json
-  stdin: tests/hello.txt
+  job: draft-4/cat-job.json
+  stdin: draft-4/hello.txt
   stdout: output.txt
-  tool: tests/cat4-tool.cwl
+  tool: draft-4/cat4-tool.cwl
   doc: Test command line with stdin and stdout redirection
 
 - args: [cat, foo.txt]
-  createfiles: {foo.txt: 'The file is tests/hello.txt
+  createfiles: {foo.txt: 'The file is draft-4/hello.txt
 
       '}
-  job: tests/cat-job.json
-  tool: tests/template-tool.cwl
+  job: draft-4/cat-job.json
+  tool: draft-4/template-tool.cwl
   doc: Test CreateFileRequirement ExpressionEngineRequirement.engineConfig features
 
-- job: tests/cat-job.json
+- job: draft-4/cat-job.json
   output:
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
-  tool: tests/cat3-tool.cwl
+  tool: draft-4/cat3-tool.cwl
   doc: Test command execution in Docker with stdout redirection
 
-- job: tests/cat-job.json
+- job: draft-4/cat-job.json
   output:
     output_txt:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
-  tool: tests/cat4-tool.cwl
+  tool: draft-4/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
 
-- job: tests/empty.json
-  tool: tests/null-expression1-tool.cwl
+- job: draft-4/empty.json
+  tool: draft-4/null-expression1-tool.cwl
   output:
     output: 1
   doc: Test default usage of Any in expressions.
 
-- job: tests/null-expression1-job.json
-  tool: tests/null-expression1-tool.cwl
+- job: draft-4/null-expression1-job.json
+  tool: draft-4/null-expression1-tool.cwl
   output:
     output: 2
   doc: Test explicitly passing null to Any type inputs with default values.
 
-- job: tests/null-expression2-job.json
-  tool: tests/null-expression1-tool.cwl
+- job: draft-4/null-expression2-job.json
+  tool: draft-4/null-expression1-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any with a default value.
 
 ## TODO: Upgrade framework to allow specifying negative tests.
-# - job: tests/empty.json
-#   tool: tests/null-expression2-tool.cwl
+# - job: draft-4/empty.json
+#   tool: draft-4/null-expression2-tool.cwl
 #   failure: true
 #   doc: Test Any without defaults can be unspecified.
 
-# - job: tests/null-expression1-job.json
-#   tool: tests/null-expression2-tool.cwl
+# - job: draft-4/null-expression1-job.json
+#   tool: draft-4/null-expression2-tool.cwl
 #   failure: true
 #   doc: Test explicitly passing null to Any type without a default value.
 
-- job: tests/null-expression2-job.json
-  tool: tests/null-expression2-tool.cwl
+- job: draft-4/null-expression2-job.json
+  tool: draft-4/null-expression2-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any without a default value.
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output:
     output:
       class: File
       checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
       path: output
       size: 15
-  tool: tests/wc-tool.cwl
+  tool: draft-4/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
-- job: tests/parseInt-job.json
+- job: draft-4/parseInt-job.json
   output: {output: 42}
-  tool: tests/parseInt-tool.cwl
+  tool: draft-4/parseInt-tool.cwl
   doc: Test ExpressionTool with Docker-based expression engine
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output: {output: 16}
-  tool: tests/wc2-tool.cwl
+  tool: draft-4/wc2-tool.cwl
   doc: Test outputEval to transform output
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output: {count_output: 16}
-  tool: tests/count-lines1-wf.cwl
+  tool: draft-4/count-lines1-wf.cwl
   doc: Test two step workflow with imported tools
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output: {count_output: 16}
-  tool: tests/count-lines2-wf.cwl
+  tool: draft-4/count-lines2-wf.cwl
   doc: Test two step workflow with inline tools
 
-- job: tests/count-lines3-job.json
+- job: draft-4/count-lines3-job.json
   output:
     count_output: [16, 1]
-  tool: tests/count-lines3-wf.cwl
+  tool: draft-4/count-lines3-wf.cwl
   doc: Test single step workflow with Scatter step
 
-- job: tests/count-lines4-job.json
+- job: draft-4/count-lines4-job.json
   output:
     count_output: [16, 1]
-  tool: tests/count-lines4-wf.cwl
+  tool: draft-4/count-lines4-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, default merge behavior
 
-- job: tests/count-lines6-job.json
+- job: draft-4/count-lines6-job.json
   output:
     count_output: [32, 2]
-  tool: tests/count-lines6-wf.cwl
+  tool: draft-4/count-lines6-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, nested merge behavior
 
-- job: tests/count-lines6-job.json
+- job: draft-4/count-lines6-job.json
   output:
     count_output: 34
-  tool: tests/count-lines7-wf.cwl
+  tool: draft-4/count-lines7-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, flattened merge behavior
 
-- job: tests/empty.json
+- job: draft-4/empty.json
   output: {count_output: 1}
-  tool: tests/count-lines5-wf.cwl
+  tool: draft-4/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (missing)
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output: {count_output: 16}
-  tool: tests/count-lines5-wf.cwl
+  tool: draft-4/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (provided)
 
-- job: tests/env-job.json
+- job: draft-4/env-job.json
   output:
     out:
       class: File
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       path: out
       size: 15
-  tool: tests/env-tool1.cwl
+  tool: draft-4/env-tool1.cwl
   doc: Test EnvVarRequirement
 
-- job: tests/scatter-job1.json
+- job: draft-4/scatter-job1.json
   output:
     out: ["foo one", "foo two", "foo three", "foo four"]
-  tool: tests/scatter-wf1.cwl
+  tool: draft-4/scatter-wf1.cwl
   doc: Test workflow scatter with single scatter parameter
 
-- job: tests/scatter-job2.json
+- job: draft-4/scatter-job2.json
   output:
     out: [["foo one three", "foo one four"], ["foo two three", "foo two four"]]
-  tool: tests/scatter-wf2.cwl
+  tool: draft-4/scatter-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method
 
-- job: tests/scatter-job2.json
+- job: draft-4/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
-  tool: "tests/scatter-wf3.cwl#main"
+  tool: "draft-4/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
 
-- job: tests/scatter-job2.json
+- job: draft-4/scatter-job2.json
   output:
     out: ["foo one three", "foo two four"]
-  tool: "tests/scatter-wf4.cwl#main"
+  tool: "draft-4/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
-- tool: tests/echo-tool.cwl
-  job: tests/env-job.json
+- tool: draft-4/echo-tool.cwl
+  job: draft-4/env-job.json
   output:
     {"out": "hello test env\n"}
   doc: Test Any type input parameter
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output: {count_output: 16}
-  tool: tests/count-lines8-wf.cwl
+  tool: draft-4/count-lines8-wf.cwl
   doc: Test nested workflow
 
-- job: tests/env-job.json
+- job: draft-4/env-job.json
   output:
     out:
       class: File
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       path: out
       size: 15
-  tool: tests/env-wf1.cwl
+  tool: draft-4/env-wf1.cwl
   doc: Test requirement priority
 
-- job: tests/env-job.json
+- job: draft-4/env-job.json
   output:
     out:
       class: File
       checksum: sha1$cdc1e84968261d6a7575b5305945471f8be199b6
       path: out
       size: 9
-  tool: tests/env-wf2.cwl
+  tool: draft-4/env-wf2.cwl
   doc: Test requirements override hints
 
-- job: tests/empty.json
+- job: draft-4/empty.json
   output: {count_output: 16}
-  tool: tests/count-lines9-wf.cwl
+  tool: draft-4/count-lines9-wf.cwl
   doc: Test default value on input parameter
 
-- job: tests/revsort-job.json
+- job: draft-4/revsort-job.json
   output:
     output:
       class: File
       checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
       path: output.txt
       size: 1111
-  tool: tests/revsort.cwl
+  tool: draft-4/revsort.cwl
   doc: Test sample workflows from the specification
 
-- job: tests/cat-job.json
+- job: draft-4/cat-job.json
   output:
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
-  tool: tests/cat5-tool.cwl
+  tool: draft-4/cat5-tool.cwl
   doc: Test unknown hints are ignored.
 
-- job: tests/search-job.json
+- job: draft-4/search-job.json
   output:
     outfile:
       class: File
@@ -309,52 +309,52 @@
         ],
         "size": 1111
     }
-  tool: "tests/search.cwl#main"
+  tool: "draft-4/search.cwl#main"
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles
     on input and output.
 
-- job: tests/rename-job.json
+- job: draft-4/rename-job.json
   output:
     outfile:
       class: File
       checksum: sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376
       path: fish.txt
       size: 1111
-  tool: tests/rename.cwl
+  tool: draft-4/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
 
-- job: tests/wc-job.json
+- job: draft-4/wc-job.json
   output:
     output: 16
-  tool: tests/wc4-tool.cwl
+  tool: draft-4/wc4-tool.cwl
   doc: |
     Test inline expressions
 
-- job: tests/schemadef-job.json
+- job: draft-4/schemadef-job.json
   output:
     output:
         path: output.txt
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
-  tool: tests/schemadef-tool.cwl
+  tool: draft-4/schemadef-tool.cwl
   doc: |
     Test SchemaDefRequirement definition used in tool parameter
 
-- job: tests/schemadef-job.json
+- job: draft-4/schemadef-job.json
   output:
     output:
         path: output.txt
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
-  tool: tests/schemadef-wf.cwl
+  tool: draft-4/schemadef-wf.cwl
   doc: |
     Test SchemaDefRequirement definition used in workflow parameter
 
-- job: tests/empty.json
+- job: draft-4/empty.json
   output: {
     "t1": {
         "bar": {
@@ -425,11 +425,11 @@
     "t8": "zab1",
     "t9": 2
     }
-  tool: tests/params.cwl
+  tool: draft-4/params.cwl
   doc: |
     Test parameter evaluation, no support for JS expressions
 
-- job: tests/empty.json
+- job: draft-4/empty.json
   output: {
     "t1": {
         "bar": {
@@ -500,16 +500,16 @@
     "t8": "zab1",
     "t9": 2
     }
-  tool: tests/params2.cwl
+  tool: draft-4/params2.cwl
   doc: |
     Test parameter evaluation, with support for JS expressions
 
-- args: [cat, tests/hello.txt]
-  job: tests/cat-job.json
-  tool: tests/metadata.cwl
+- args: [cat, draft-4/hello.txt]
+  job: draft-4/cat-job.json
+  tool: draft-4/metadata.cwl
   doc: Test metadata
 
-- job: tests/formattest-job.json
+- job: draft-4/formattest-job.json
   output:
     output:
         "path": "output.txt"
@@ -517,11 +517,11 @@
         "size": 1111
         "class": "File"
         "checksum": "sha1$97fe1b50b4582cebc7d853796ebd62e3e163aa3f"
-  tool: tests/formattest.cwl
+  tool: draft-4/formattest.cwl
   doc: |
     Test simple format checking.
 
-- job: tests/formattest2-job.json
+- job: draft-4/formattest2-job.json
   output:
     output:
         "path": "output.txt"
@@ -529,11 +529,11 @@
         "size": 12010
         "class": "File"
         "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
-  tool: tests/formattest2.cwl
+  tool: draft-4/formattest2.cwl
   doc: |
     Test format checking against ontology using subclassOf.
 
-- job: tests/formattest2-job.json
+- job: draft-4/formattest2-job.json
   output:
     output:
         "path": "output.txt"
@@ -541,12 +541,12 @@
         "size": 12010
         "class": "File"
         "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
-  tool: tests/formattest3.cwl
+  tool: draft-4/formattest3.cwl
   doc: |
     Test format checking against ontology using equivalentClass.
 
-- tool: tests/optional-output.cwl
-  job: tests/cat-job.json
+- tool: draft-4/optional-output.cwl
+  job: draft-4/cat-job.json
   output:
     optional_file: null
     output_file:
@@ -557,22 +557,22 @@
   doc: |
     Test optional output file and optional secondaryFile on output.
 
-- job: tests/step-valuefrom-wf.json
+- job: draft-4/step-valuefrom-wf.json
   output: {count_output: 16}
-  tool: tests/step-valuefrom-wf.cwl
+  tool: draft-4/step-valuefrom-wf.cwl
   doc: Test valueFrom on workflow step.
 
-- job: tests/step-valuefrom-job.json
+- job: draft-4/step-valuefrom-job.json
   output: {val: "3\n"}
-  tool: tests/step-valuefrom2-wf.cwl
+  tool: draft-4/step-valuefrom2-wf.cwl
   doc: Test valueFrom on workflow step with multiple sources
 
-- job: tests/step-valuefrom-job.json
+- job: draft-4/step-valuefrom-job.json
   output: {val: "3\n"}
-  tool: tests/step-valuefrom3-wf.cwl
+  tool: draft-4/step-valuefrom3-wf.cwl
   doc: Test valueFrom on workflow step referencing other inputs
 
-- job: tests/record-output-job.json
+- job: draft-4/record-output-job.json
   output:
     "orec": {
         "ofoo": {
@@ -588,20 +588,20 @@
             "checksum": "sha1$aeb3d11bdf536511649129f4077d5cda6a324118"
         }
     }
-  tool: tests/record-output.cwl
+  tool: draft-4/record-output.cwl
   doc: Test record type output binding.
 
-- job: tests/empty.json
+- job: draft-4/empty.json
   output: {
     "foo": {
         "path": "foo",
         "class": "File"
     }
   }
-  tool: tests/test-cwl-out.cwl
+  tool: draft-4/test-cwl-out.cwl
   doc: Test support for reading cwl.output.json when running in Docker container
 
-- job: tests/abc.json
+- job: draft-4/abc.json
   output:
     files: [{
         "path": "a",
@@ -621,29 +621,41 @@
         "class": "File",
         "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
     }]
-  tool: tests/glob-expr-list.cwl
+  tool: draft-4/glob-expr-list.cwl
   doc: Test support for returning multiple glob patterns from expression
 
-- job: tests/scatter-valuefrom-job1.json
+- job: draft-4/scatter-valuefrom-job1.json
   output:
     out: ["foo one one", "foo one two", "foo one three", "foo one four"]
-  tool: tests/scatter-valuefrom-wf1.cwl
+  tool: draft-4/scatter-valuefrom-wf1.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
 
-- job: tests/scatter-valuefrom-job2.json
+- job: draft-4/scatter-valuefrom-job2.json
   output:
     out: [["foo one one three", "foo one one four"], ["foo one two three", "foo one two four"]]
-  tool: tests/scatter-valuefrom-wf2.cwl
+  tool: draft-4/scatter-valuefrom-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method and valueFrom on step input
 
-- job: tests/scatter-valuefrom-job2.json
+- job: draft-4/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one one four", "foo one two three", "foo one two four"]
-  tool: "tests/scatter-valuefrom-wf3.cwl#main"
+  tool: "draft-4/scatter-valuefrom-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method and valueFrom on step input
 
-- job: tests/scatter-valuefrom-job2.json
+- job: draft-4/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one two four"]
-  tool: "tests/scatter-valuefrom-wf4.cwl#main"
+  tool: "draft-4/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
+
+- job: draft-4/conflict-job.json
+  output: {
+    "fileout": {
+        "path": "out.txt",
+        "checksum": "sha1$a2d8d6e7b28295dc9977dc3bdb652ddd480995f0",
+        "class": "File",
+        "size": 25
+    }
+  }
+  tool: "draft-4/conflict-wf.cwl#collision"
+  doc: Test workflow two input files with same name.
