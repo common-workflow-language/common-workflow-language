@@ -18,6 +18,6 @@ class EggInfoFromGit(egg_info):
         if self.tag_build is None:
             try:
                 self.tag_build = self.git_timestamp_tag()
-            except subprocess.CalledProcessError:
+            except (subprocess.CalledProcessError, OSError):
                 pass
         return egg_info.tags(self)
