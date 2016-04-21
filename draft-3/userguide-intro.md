@@ -6,6 +6,8 @@ This guide will introduce you to writing tool wrappers and workflows using the
 Common Workflow Language (CWL).  This guide describes the current stable
 specification, draft 3.
 
+Note: This document is a work in progress.  Not all features are covered, yet.
+
 <!--ToC-->
 
 # Introduction
@@ -24,5 +26,3 @@ technologies such as Docker, be used with CWL implementations from different
 vendors, and is well suited for describing large-scale workflows in cluster,
 cloud and high performance computing environments where tasks are scheduled in
 parallel across many nodes.
-
-# Wrapping Command Line Tools
