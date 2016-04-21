@@ -9,7 +9,7 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Workflow Description, draft 3
+      # Common Workflow Language (CWL) Workflow Description, draft 4
 
       This version:
         * https://w3id.org/cwl/draft-4/
@@ -32,22 +32,10 @@ $graph:
 
     - |
 
-      ## Introduction to draft 3
+      ## Introduction to draft 4
 
-      This specification represents the third milestone of the CWL group.  Since
-      draft-2, this draft introduces the following changes and additions:
-
-        * Greatly simplified naming within a document with scoped identifiers, as
-          described in the [Schema Salad specification](SchemaSalad.html).
-        * The draft-2 concept of pluggable expression engines has been replaced
-          by a [streamlined expression syntax)[#Parameter_references]
-          and standardization on [Javascript](#Expressions).
-        * [File](#File) objects can now include a `format` field to indicate
-          the file type.
-        * The addition of [MultipleInputFeatureRequirement](#MultipleInputFeatureRequirement).
-        * The addition of [StepInputExpressionRequirement](#StepInputExpressionRequirement).
-        * The separation of Workflow and CommandLineTool components into
-          separate specifications.
+      This specification represents the third milestone of the CWL group. Since
+      draft-3, this draft introduces the following changes and additions:
 
       ## Purpose
 

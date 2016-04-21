@@ -36,22 +36,10 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to draft 3
+      ## Introduction to draft 4
 
-      This specification represents the third milestone of the CWL group.  Since
-      draft-2, this draft introduces the following major changes and additions:
-
-        * Greatly simplified naming within a document with scoped identifiers, as
-          described in the [Schema Salad specification](SchemaSalad.html).
-        * The draft-2 concept of pluggable expression engines has been replaced
-          by a [streamlined expression syntax](#Parameter_references)
-          and standardization on [Javascript](#Expressions).
-        * [File](#File) objects can now include a `format` field to indicate
-          the file type.
-        * The addition of [ShellCommandRequirement](#ShellCommandRequirement).
-        * The addition of [ResourceRequirement](#ResourceRequirement).
-        * The separation of CommandLineTool and Workflow components into
-          separate specifications.
+      This specification represents the third milestone of the CWL group.
+      Since draft-3, this draft introduces the following major changes and additions:
 
       ## Purpose
 
