@@ -14,7 +14,8 @@ EOF
 DRAFT=draft-3
 TEST_N=""
 RUNNER=cwl-runner
-PLATFORM=`uname -s`
+PLATFORM=$(uname -s)
+COVERAGE="python"
 
 while [[ -n "$1" ]]
 do
@@ -63,7 +64,9 @@ runtest() {
 
     runs=$((runs+1))
     (cd $DRAFT
-     python -mcwltool.cwltest --tool "$1" --test=conformance_test_$DRAFT.yaml $TEST_N $TEST_L $ONLY_TOOLS --basedir $DRAFT
+     ${COVERAGE} -m cwltool.cwltest --tool "$1" \
+	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
+	     ${TEST_L} ${ONLY_TOOLS} --basedir ${DRAFT}
     )
     checkexit
 }
