@@ -123,7 +123,22 @@ $graph:
         If true, this indicates that link validation traversal must stop at
         this field.  This field (it is is a URI) or any fields under it (if it
         is an object or array) are not subject to link checking.
-
+    - name: mapSubject
+      type: ["null", string]
+      doc: |
+        If the value of the field is a JSON object, it must be transformed
+        into an array of JSON objects, where each key-value pair from the
+        source JSON object is a list item, the list items must be JSON objects,
+        and the key is assigned to the field specified by `mapSubject`.
+    - name: mapPredicate
+      type: ["null", string]
+      doc: |
+        Only applies if `mapSubject` is also provided.  If the value of the
+        field is a JSON object, it is transformed as described in `mapSubject`,
+        with the addition that when the value of a map item is not an object,
+        the item is transformed to a JSON object with the key assigned to the
+        field specified by `mapSubject` and the value assigned to the field
+        specified by `mapPredicate`.
 
 - name: SpecializeDef
   type: record

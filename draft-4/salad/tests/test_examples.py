@@ -66,6 +66,46 @@ class TestSchemas(unittest.TestCase):
             'http://example.com/foo#bar': 'asym'
         })
 
+    maxDiff = None
+
+    def test_idmap(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ldr.add_context({
+            "inputs": {
+                "@id": "http://example.com/inputs",
+                "mapSubject": "id",
+                "mapPredicate": "a"
+            },
+            "outputs": {
+                "@type": "@id",
+                "identity": True,
+            },
+                         "id": "@id"})
+
+        ra, _ = ldr.resolve_all({
+            "id": "stuff",
+            "inputs": {
+                "zip": 1,
+                "zing": 2
+            },
+            "outputs": ["out"],
+            "other": {
+                'n': 9
+            }
+        }, "http://example2.com/")
+
+        self.assertEqual(ra,
+                         {
+                             "id": "http://example2.com/#stuff",
+                             'inputs': [{'a': 2, 'id': 'http://example2.com/#stuff/zing'},
+                                        {'a': 1, 'id': 'http://example2.com/#stuff/zip'}],
+                             'outputs': ['http://example2.com/#stuff/out'],
+                             'other': {
+                                 'n': 9
+                             }
+                         }
+                     )
+
     def test_examples(self):
         self.maxDiff = None
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
