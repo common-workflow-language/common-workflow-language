@@ -1,0 +1,16 @@
+{
+  "$namespaces": {
+    "acid": "http://example.com/acid#"
+  },
+  "$graph": [{
+    "name": "ExampleType",
+    "type": "record",
+    "fields": [{
+      "name": "link",
+      "type": "string",
+      "jsonldPredicate": {
+        "_type": "@id"
+      }
+    }]
+  }]
+}
