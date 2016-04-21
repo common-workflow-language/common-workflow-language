@@ -36,7 +36,7 @@ $graph:
   type: enum
   extends: "sld:PrimitiveType"
   symbols:
-    - File
+    - cwl:File
   doc:
     - "Extends primitive types with the concept of a file as a first class type."
     - "File: A File object"
@@ -450,7 +450,10 @@ $graph:
       type:
         type: array
         items: "#InputParameter"
-      jsonldPredicate: "cwl:inputs"
+      jsonldPredicate:
+        _id: "cwl:inputs"
+        mapSubject: id
+        mapPredicate: type
       doc: |
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -461,7 +464,10 @@ $graph:
       type:
         type: array
         items: "#OutputParameter"
-      jsonldPredicate: "cwl:outputs"
+      jsonldPredicate:
+        _id: "cwl:outputs"
+        mapSubject: id
+        mapPredicate: type
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -470,7 +476,9 @@ $graph:
         - "null"
         - type: array
           items: "#ProcessRequirement"
-      jsonldPredicate: "cwl:requirements"
+      jsonldPredicate:
+        _id: "cwl:requirements"
+        mapSubject: class
       doc: |
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this process.  If
@@ -483,7 +491,9 @@ $graph:
         - "null"
         - type: array
           items: Any
-      jsonldPredicate: "cwl:hints"
+      jsonldPredicate:
+        _id: "cwl:hints"
+        mapSubject: class
       doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
