@@ -1,6 +1,10 @@
 import shutil
 import json
-import yaml
+import ruamel.yaml as yaml
+try:
+        from ruamel.yaml import CSafeLoader as SafeLoader
+except ImportError:
+        from ruamel.yaml import SafeLoader
 import os
 import subprocess
 import copy
@@ -157,6 +161,6 @@ def salad_to_jsonld_context(j, schema_ctx):
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
-        j = yaml.load(f)
+        j = yaml.load(f, Loader=SafeLoader)
         (ctx, g) = salad_to_jsonld_context(j)
         print(json.dumps(ctx, indent=4, sort_keys=True))

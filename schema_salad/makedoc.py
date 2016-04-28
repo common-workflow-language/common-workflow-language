@@ -1,7 +1,6 @@
 import mistune
 from . import schema
 import json
-import yaml
 import os
 import copy
 import re

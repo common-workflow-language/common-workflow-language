@@ -24,13 +24,13 @@ else:
     # In tox, it will cover them anyway.
     requirements = []
 
-install_requires=[
-      'requests',
-      'PyYAML',
-      'rdflib >= 4.1.0',
-      'rdflib-jsonld >= 0.3.0',
-      'mistune',
-      'typing']
+install_requires = [
+    'requests',
+    'ruamel.yaml',
+    'rdflib >= 4.1.0',
+    'rdflib-jsonld >= 0.3.0',
+    'mistune',
+    'typing']
 
 if sys.version_info.major < 3:
     install_requires.append("avro")

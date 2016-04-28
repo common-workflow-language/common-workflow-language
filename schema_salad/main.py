@@ -9,7 +9,6 @@ from . import makedoc
 import json
 from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
-import yaml
 import os
 try:
     import urlparse

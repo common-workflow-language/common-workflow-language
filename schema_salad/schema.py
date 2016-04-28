@@ -4,7 +4,11 @@ from .add_dictlist import add_dictlist
 import sys
 import pprint
 from pkg_resources import resource_stream
-import yaml
+import ruamel.yaml as yaml
+try:
+        from ruamel.yaml import CSafeLoader as SafeLoader
+except ImportError:
+        from ruamel.yaml import SafeLoader
 import avro.schema
 from . import validate
 import json
@@ -142,7 +146,8 @@ def get_metaschema():
     loader.cache["https://w3id.org/cwl/salad"] = rs.read()
     rs.close()
 
-    j = yaml.load(loader.cache["https://w3id.org/cwl/salad"])
+    j = yaml.load(loader.cache["https://w3id.org/cwl/salad"],
+            Loader=SafeLoader)
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
     #pprint.pprint(j)

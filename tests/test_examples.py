@@ -3,7 +3,11 @@ import schema_salad.ref_resolver
 import schema_salad.main
 import schema_salad.schema
 import rdflib
-import yaml
+import ruamel.yaml as yaml
+try:
+        from ruamel.yaml import CSafeLoader as SafeLoader
+except ImportError:
+        from ruamel.yaml import SafeLoader
 
 class TestSchemas(unittest.TestCase):
     def test_schemas(self):
@@ -111,11 +115,13 @@ class TestSchemas(unittest.TestCase):
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
             ldr, _, _ = schema_salad.schema.load_schema("schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
-                src = ldr.resolve_all(yaml.load(src_fp), "")[0]
+                src = ldr.resolve_all(yaml.load(src_fp, Loader=SafeLoader), "")[0]
             with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
-                proc = yaml.load(src_proc)
+                proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)
 
+    def test_yaml_float_test(self):
+        self.assertEqual(yaml.load("float-test: 2e-10")["float-test"], 2e-10)
 
 if __name__ == '__main__':
     unittest.main()

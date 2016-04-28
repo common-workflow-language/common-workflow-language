@@ -9,7 +9,11 @@ try:
     import urlparse
 except:
     import urllib.parse as urlparse
-import yaml
+import ruamel.yaml as yaml
+try:
+        from ruamel.yaml import CSafeLoader as SafeLoader
+except ImportError:
+        from ruamel.yaml import SafeLoader
 from . import validate
 import pprint
 try:
@@ -456,7 +460,7 @@ class Loader(object):
             else:
                 text = StringIO(text)
             text.name = url
-            result = yaml.load(text)
+            result = yaml.load(text, Loader=SafeLoader)
         except yaml.parser.ParserError as e:
             raise validate.ValidationException("Syntax error %s" % (e))
         if isinstance(result, dict) and self.identifiers:

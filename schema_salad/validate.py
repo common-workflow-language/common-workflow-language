@@ -1,6 +1,5 @@
 import pprint
 import avro.schema
-import yaml
 import sys
 try:
     import urlparse
