@@ -5,9 +5,10 @@ import schema_salad.schema
 import rdflib
 import ruamel.yaml as yaml
 try:
-        from ruamel.yaml import CSafeLoader as SafeLoader
+    from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
-        from ruamel.yaml import SafeLoader
+    from ruamel.yaml import SafeLoader
+
 
 class TestSchemas(unittest.TestCase):
     def test_schemas(self):
@@ -17,15 +18,13 @@ class TestSchemas(unittest.TestCase):
             "$schemas": ["tests/EDAM.owl"],
             "$namespaces": {"edam": "http://edamontology.org/"},
             "edam:has_format": "edam:format_1915"
-            }, "")
+        }, "")
 
         self.assertEqual(ra, {
             "$schemas": ["tests/EDAM.owl"],
             "$namespaces": {"edam": "http://edamontology.org/"},
             'http://edamontology.org/has_format': 'http://edamontology.org/format_1915'
         })
-
-
 
     # def test_domain(self):
     #     l = schema_salad.ref_resolver.Loader({})
@@ -84,7 +83,7 @@ class TestSchemas(unittest.TestCase):
                 "@type": "@id",
                 "identity": True,
             },
-                         "id": "@id"})
+            "id": "@id"})
 
         ra, _ = ldr.resolve_all({
             "id": "stuff",
@@ -101,21 +100,24 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual(ra,
                          {
                              "id": "http://example2.com/#stuff",
-                             'inputs': [{'a': 2, 'id': 'http://example2.com/#stuff/zing'},
-                                        {'a': 1, 'id': 'http://example2.com/#stuff/zip'}],
+                             'inputs': [{'a': 1, 'id': 'http://example2.com/#stuff/zip'},
+                                        {'a': 2, 'id': 'http://example2.com/#stuff/zing'},
+                                        ],
                              'outputs': ['http://example2.com/#stuff/out'],
                              'other': {
                                  'n': 9
                              }
                          }
-                     )
+                         )
 
     def test_examples(self):
         self.maxDiff = None
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
-            ldr, _, _ = schema_salad.schema.load_schema("schema_salad/metaschema/%s_schema.yml" % a)
+            ldr, _, _ = schema_salad.schema.load_schema(
+                "schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
-                src = ldr.resolve_all(yaml.load(src_fp, Loader=SafeLoader), "")[0]
+                src = ldr.resolve_all(
+                    yaml.load(src_fp, Loader=SafeLoader), "")[0]
             with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
                 proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)
