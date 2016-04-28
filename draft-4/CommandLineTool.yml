@@ -244,6 +244,17 @@ $graph:
         the File objects must include up to the first 64 KiB of file contents
         in the `contents` field.
 
+- name: InitialWorkingDirectory
+  type: record
+  doc: |
+    Setup a working directory based on a number of input files (and/or directories)
+  fields:
+    - name: dirDef
+      type:
+        type: "array"
+        items: [ "#FileDef", "File", "Directory" ]
+      doc: list of files and/or directories
+
 
 - name: CommandInputRecordField
   type: record

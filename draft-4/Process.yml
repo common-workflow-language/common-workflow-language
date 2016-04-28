@@ -109,6 +109,34 @@ $graph:
         runtime may perform exact file format matches.
 
 
+- name: Directory
+  type: record
+  docParent: "#CWLType"
+  doc: |
+    Represents a directory to present to a command line tool. This could be a virtual
+    directory, made of files assembled from a number of concrete directories.
+  fields:
+    - name: class
+      type:
+        type: enum
+        name: Directory_class
+        symbols:
+          - cwl:Directory
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+      doc: Must be `Directory` to indicate this object describes a Directory.
+    - name: path
+      type: string
+      doc: The path to the directory.
+      jsonldPredicate:
+        "_id": "cwl:path"
+        "_type": "@id"
+    - name: size
+      type: ["null", long]
+      doc: Optional directory size.
+
+
 - name: SchemaBase
   type: record
   abstract: true
