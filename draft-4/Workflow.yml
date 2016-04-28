@@ -34,8 +34,10 @@ $graph:
 
       ## Introduction to draft 4
 
-      This specification represents the third milestone of the CWL group. Since
+      This specification represents the fourth milestone of the CWL group.  Since
       draft-3, this draft introduces the following changes and additions:
+
+        * TBD
 
       ## Purpose
 
@@ -275,22 +277,30 @@ $graph:
       type: string
       jsonldPredicate: "@id"
       doc: "The unique identifier for this workflow step."
-    - name: inputs
+    - name: in
       type:
         type: array
         items: "#WorkflowStepInput"
-      jsonldPredicate: "cwl:inputs"
+      jsonldPredicate:
+        _id: "cwl:in"
+        mapSubject: id
+        mapPredicate: source
       doc: |
         Defines the input parameters of the workflow step.  The process is ready to
         run when all required input parameters are associated with concrete
         values.  Input parameters include a schema for each parameter which is
         used to validate the input object.  It may also be used build a user
         interface for constructing the input object.
-    - name: outputs
+    - name: out
       type:
-        type: array
-        items: "#WorkflowStepOutput"
-      jsonldPredicate: "cwl:outputs"
+        - type: array
+          items: string
+        - type: array
+          items: "#WorkflowStepOutput"
+      jsonldPredicate:
+        _id: "cwl:out"
+        _type: "@id"
+        identity: true
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -299,7 +309,9 @@ $graph:
         - "null"
         - type: array
           items: "#ProcessRequirement"
-      jsonldPredicate: "cwl:requirements"
+      jsonldPredicate:
+        _id: "cwl:requirements"
+        mapSubject: class
       doc: |
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this workflow step.  If
@@ -312,7 +324,9 @@ $graph:
         - "null"
         - type: array
           items: "Any"
-      jsonldPredicate: "cwl:hints"
+      jsonldPredicate:
+        _id: "cwl:hints"
+        mapSubject: class
       doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this workflow step.  It is

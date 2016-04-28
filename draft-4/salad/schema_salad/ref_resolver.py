@@ -171,6 +171,8 @@ class Loader(object):
         self.identity_links = set()
         self.standalone = set()
         self.nolinkcheck = set()
+        self.idmap = {}
+        self.mapPredicate = {}
         self.vocab = {}
         self.rvocab = {}
 
@@ -192,6 +194,12 @@ class Loader(object):
 
             if isinstance(self.ctx[c], dict) and self.ctx[c].get("noLinkCheck"):
                 self.nolinkcheck.add(c)
+
+            if isinstance(self.ctx[c], dict) and self.ctx[c].get("mapSubject"):
+                self.idmap[c] = self.ctx[c]["mapSubject"]
+
+            if isinstance(self.ctx[c], dict) and self.ctx[c].get("mapPredicate"):
+                self.mapPredicate[c] = self.ctx[c]["mapPredicate"]
 
             if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
                 self.vocab[c] = self.ctx[c]["@id"]
@@ -330,18 +338,37 @@ class Loader(object):
                 metadata, _ = loader.resolve_all(metadata, base_url, file_base)
 
         if isinstance(document, dict):
-            for identifer in loader.identity_links:
+            for idmapField in loader.idmap:
+                if idmapField in document and isinstance(document[idmapField], dict):
+                    ls = []
+                    for k,v in document[idmapField].items():
+                        if not isinstance(v, dict):
+                            if idmapField in loader.mapPredicate:
+                                v = {loader.mapPredicate[idmapField]: v}
+                            else:
+                                raise validate.ValidationException("mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
+                        v[loader.idmap[idmapField]] = k
+                        ls.append(v)
+                    document[idmapField] = ls
+
+            for identifer in loader.identifiers:
                 if identifer in document:
                     if isinstance(document[identifer], basestring):
                         document[identifer] = loader.expand_url(document[identifer], base_url, scoped=True)
                         if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
                             loader.idx[document[identifer]] = document
                         base_url = document[identifer]
-                    elif isinstance(document[identifer], list):
-                        for n, v in enumerate(document[identifer]):
-                            document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
-                            if document[identifer][n] not in loader.idx:
-                                loader.idx[document[identifer][n]] = document[identifer][n]
+                    else:
+                        raise validate.ValidationException("identifier field '%s' must be a string" % (document[identifer]))
+
+            for identifer in loader.identity_links:
+                if identifer in document and isinstance(document[identifer], list):
+                    for n, v in enumerate(document[identifer]):
+                        document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
+                        if document[identifer][n] not in loader.idx:
+                            loader.idx[document[identifer][n]] = document[identifer][n]
+                #else:
+                #    raise validate.ValidationException("identity field '%s' must be a string" % (document[identifer]))
 
             for d in document:
                 d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)

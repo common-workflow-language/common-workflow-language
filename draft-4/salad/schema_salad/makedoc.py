@@ -47,7 +47,7 @@ def linkto(item):
 
 class MyRenderer(mistune.Renderer):
     def header(self, text, level, raw=None):
-        return """<h%i id="%s">%s</h1>""" % (level, to_id(text), text)
+        return """<h%i id="%s">%s</h%i>""" % (level, to_id(text), text, level)
 
 def to_id(text):
     textid = text
@@ -119,7 +119,7 @@ def number_headings(toc, maindoc):
             toc.start_numbering = True
             toc.numbering = [0]
 
-        if line == "```":
+        if "```" in line:
             skip = not skip
 
         if not skip:
@@ -286,7 +286,7 @@ class RenderType(object):
         else:
             doc = ""
 
-        if self.title is None:
+        if self.title is None and f["doc"]:
             self.title = f["doc"][0:f["doc"].index("\n")]
             if self.title.startswith('# '):
                 self.title = self.title[2:]
@@ -388,6 +388,10 @@ def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
     }
     .tocnav ol {
       list-style: none
+    }
+    pre {
+      margin-left: 2em;
+      margin-right: 2em;
     }
     </style>
     </head>
