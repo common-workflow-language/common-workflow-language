@@ -252,7 +252,7 @@ $graph:
     - name: dirDef
       type:
         type: "array"
-        items: [ "#FileDef", "File", "Directory" ]
+        items: [ "#FileDef", "#File", "#Directory" ]
       doc: list of files and/or directories
 
 
