@@ -2,8 +2,10 @@ How to make a new draft version of the CWL spec
 
 1. Duplicate prior draft-n directory to draft-n+1 in a branch
 2. Update references to the new draft name.
-3. Pull in the latest metaschema
+3. Pull in the latest metaschema, where `schema_salad_repo` is the remote
+   repository for the schema salad tool.
      
+     git fetch --all
      git subtree add -P draft-4/salad schema_salad_repo/master
 
 4. In the reference implementation (cwltool): make a new branch, and update the
