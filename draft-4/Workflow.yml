@@ -294,9 +294,7 @@ $graph:
     - name: out
       type:
         - type: array
-          items: string
-        - type: array
-          items: "#WorkflowStepOutput"
+          items: [string, "#WorkflowStepOutput"]
       jsonldPredicate:
         _id: "cwl:out"
         _type: "@id"
