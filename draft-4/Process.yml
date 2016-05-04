@@ -132,9 +132,9 @@ $graph:
       jsonldPredicate:
         "_id": "cwl:path"
         "_type": "@id"
-    - name: size
-      type: ["null", long]
-      doc: Optional directory size.
+    # - name: size
+    #   type: ["null", long]
+    #   doc: Optional directory size.
 
 
 - name: SchemaBase
