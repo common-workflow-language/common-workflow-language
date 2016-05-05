@@ -170,4 +170,8 @@ list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
+mypy: ${PYSOURCES}
+	MYPYPATH=typeshed/2.7 mypy --py2 schema_salad
+	#MYPYPATH=typeshed/2.7 mypy --py2  --disallow-untyped-calls schema_salad
+
 FORCE:
