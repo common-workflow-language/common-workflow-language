@@ -24,13 +24,13 @@ $graph:
   name: CWLVersions
   doc: "Version symbols for published CWL document versions."
   symbols:
-    - draft-3.dev1
-    - draft-3.dev2
-    - draft-3.dev3
-    - draft-3.dev4
-    - draft-3.dev5
-    - draft-3
-    - draft-4.dev1
+    - cwl:draft-3.dev1
+    - cwl:draft-3.dev2
+    - cwl:draft-3.dev3
+    - cwl:draft-3.dev4
+    - cwl:draft-3.dev5
+    - cwl:draft-3
+    - cwl:draft-4.dev1
 
 - name: CWLType
   type: enum
