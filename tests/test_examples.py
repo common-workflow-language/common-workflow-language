@@ -46,8 +46,8 @@ class TestSchemas(unittest.TestCase):
     #     })
 
     def test_self_validate(self):
-        schema_salad.main.main(args=["schema_salad/metaschema/metaschema.yml"])
-        schema_salad.main.main(args=["schema_salad/metaschema/metaschema.yml",
+        schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml"])
+        schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml",
                                      "schema_salad/metaschema/metaschema.yml"])
 
     def test_jsonld_ctx(self):
@@ -97,18 +97,16 @@ class TestSchemas(unittest.TestCase):
             }
         }, "http://example2.com/")
 
-        self.assertEqual(ra,
-                         {
-                             "id": "http://example2.com/#stuff",
-                             'inputs': [{'a': 1, 'id': 'http://example2.com/#stuff/zip'},
-                                        {'a': 2, 'id': 'http://example2.com/#stuff/zing'},
-                                        ],
-                             'outputs': ['http://example2.com/#stuff/out'],
-                             'other': {
-                                 'n': 9
-                             }
-                         }
-                         )
+        self.assertEqual(ra["id"], "http://example2.com/#stuff")
+        for item in ra["inputs"]:
+            if item["a"] == 2:
+                self.assertEquals(item["id"],
+                        'http://example2.com/#stuff/zing')
+            else:
+                self.assertEquals(item["id"],
+                        'http://example2.com/#stuff/zip')
+        self.assertEquals(ra['outputs'], ['http://example2.com/#stuff/out'])
+        self.assertEquals(ra['other'], {'n': 9})
 
     def test_examples(self):
         self.maxDiff = None

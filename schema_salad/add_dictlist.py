@@ -1,8 +1,7 @@
 import sys
-if sys.version_info >= (2,7):
-    import typing
+from typing import Any, Dict
 
-def add_dictlist(di, key, val):
+def add_dictlist(di, key, val):  # type: (Dict, Any, Any) -> None
     if key not in di:
         di[key] = []
     di[key].append(val)

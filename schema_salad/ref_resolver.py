@@ -5,35 +5,27 @@ import hashlib
 import logging
 import collections
 import requests
-try:
-    import urlparse
-except:
-    import urllib.parse as urlparse
+import urlparse
 import ruamel.yaml as yaml
 try:
-        from ruamel.yaml import CSafeLoader as SafeLoader
+    from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
-        from ruamel.yaml import SafeLoader
+    from ruamel.yaml import SafeLoader  # type: ignore
 from . import validate
 import pprint
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-    unicode=str
-    basestring=str
+from StringIO import StringIO
 from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 import xml.sax
-if sys.version_info >= (2,7):
-    import typing
-    from typing import Union, Tuple
+from typing import cast, Union, Tuple, Dict, Any, Callable, Iterable
 
 _logger = logging.getLogger("salad")
 
+
 class NormDict(dict):
-    def __init__(self, normalize=unicode):
+
+    def __init__(self, normalize=unicode):  # type: (type) -> None
         super(NormDict, self).__init__()
         self.normalize = normalize
 
@@ -49,6 +41,7 @@ class NormDict(dict):
     def __contains__(self, key):
         return super(NormDict, self).__contains__(self.normalize(key))
 
+
 def merge_properties(a, b):
     c = {}
     for i in a:
@@ -63,22 +56,31 @@ def merge_properties(a, b):
 
     return c
 
-def SubLoader(loader):
-    return Loader(loader.ctx, schemagraph=loader.graph, foreign_properties=loader.foreign_properties, idx=loader.idx, cache=loader.cache)
+
+def SubLoader(loader):  # type: (Loader) -> Loader
+    return Loader(loader.ctx, schemagraph=loader.graph,
+                  foreign_properties=loader.foreign_properties, idx=loader.idx,
+                  cache=loader.cache)
+
 
 class Loader(object):
-    def __init__(self, ctx, schemagraph=None, foreign_properties=None, idx=None, cache=None):
+
+    ContextType = Dict[str, Union[Dict, str, Iterable[str]]]
+
+    def __init__(self, ctx, schemagraph=None, foreign_properties=None,
+                 idx=None, cache=None):
+        # type: (Loader.ContextType, rdflib.Graph, Set[str], Dict[unicode, Any], Dict[unicode, Any]) -> None
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
         else:
             self.idx = NormDict(normalize)
 
-        self.ctx = {}  # type: Dict[str, Union[str, dict, basestring]]
+        self.ctx = {}  # type: Loader.ContextType
         if schemagraph is not None:
             self.graph = schemagraph
         else:
-            self.graph = rdflib.Graph()
+            self.graph = rdflib.graph.Graph()
 
         if foreign_properties is not None:
             self.foreign_properties = foreign_properties
@@ -90,18 +92,21 @@ class Loader(object):
         else:
             self.cache = {}
 
-        self.url_fields = set()  # type: Set[str]
-        self.vocab_fields = set()  # type: Set
-        self.identifiers = set()  # type: Set
-        self.identity_links = set()  # type: Set
-        self.standalone = set()  # type: Set
-        self.nolinkcheck = set()  # type: Set
-        self.vocab = {}  # type: Dict
-        self.rvocab = {}  # type: Dict
+        self.url_fields = None  # type: Set[str]
+        self.vocab_fields = None  # type: Set[str]
+        self.identifiers = None  # type: Set[str]
+        self.identity_links = None  # type: Set[str]
+        self.standalone = None  # type: Set[str]
+        self.nolinkcheck = None  # type: Set[str]
+        self.vocab = {}  # type: Dict[unicode, Any]
+        self.rvocab = {}  # type: Dict[unicode, Any]
+        self.idmap = None  # type: Dict[unicode, Any]
+        self.mapPredicate = None  # type: Dict[unicode, Any]
 
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped=False, vocab_term=False):
+        # type: (Union[str, unicode], Union[str, unicode], bool, bool) -> Union[str, unicode]
         if url in ("@id", "@type"):
             return url
 
@@ -111,7 +116,7 @@ class Loader(object):
         if self.vocab and ":" in url:
             prefix = url.split(":")[0]
             if prefix in self.vocab:
-                url = self.vocab[prefix] + url[len(prefix)+1:]
+                url = self.vocab[prefix] + url[len(prefix) + 1:]
 
         split = urlparse.urlsplit(url)
 
@@ -124,7 +129,8 @@ class Loader(object):
                 frg = splitbase.fragment + "/" + split.path
             else:
                 frg = split.path
-            url = urlparse.urlunsplit((splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
+            url = urlparse.urlunsplit(
+                (splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
         else:
             url = urlparse.urljoin(base_url, url)
 
@@ -133,41 +139,46 @@ class Loader(object):
         else:
             return url
 
-    def _add_properties(self, s):
-        for _, _, rng in self.graph.triples( (s, RDFS.range, None) ):
+    def _add_properties(self, s):  # type: (str) -> None
+        for _, _, rng in self.graph.triples((s, RDFS.range, None)):
             literal = ((str(rng).startswith("http://www.w3.org/2001/XMLSchema#") and not str(rng) == "http://www.w3.org/2001/XMLSchema#anyURI") or
                        str(rng) == "http://www.w3.org/2000/01/rdf-schema#Literal")
             if not literal:
                 self.url_fields.add(str(s))
         self.foreign_properties.add(str(s))
 
-    def add_namespaces(self, ns):
+    def add_namespaces(self, ns):  # type: (Dict[unicode, Any]) -> None
         self.vocab.update(ns)
 
     def add_schemas(self, ns, base_url):
+        # type: (Dict[str, Any], Union[str, unicode]) -> None
         for sch in aslist(ns):
-            try:
-                self.graph.parse(urlparse.urljoin(base_url, sch), format="xml")
-            except xml.sax.SAXParseException:
-                self.graph.parse(urlparse.urljoin(base_url, sch), format="turtle")
+            for fmt in ['xml', 'turtle', 'rdfa']:
+                try:
+                    self.graph.parse(urlparse.urljoin(base_url, sch),
+                                     format=fmt)
+                    break
+                except xml.sax.SAXParseException:  # type: ignore
+                    pass
 
-        for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
+        for s, _, _ in self.graph.triples((None, RDF.type, RDF.Property)):
             self._add_properties(s)
-        for s, _, o in self.graph.triples( (None, RDFS.subPropertyOf, None) ):
+        for s, _, o in self.graph.triples((None, RDFS.subPropertyOf, None)):
             self._add_properties(s)
             self._add_properties(o)
-        for s, _, _ in self.graph.triples( (None, RDFS.range, None) ):
+        for s, _, _ in self.graph.triples((None, RDFS.range, None)):
             self._add_properties(s)
-        for s, _, _ in self.graph.triples( (None, RDF.type, OWL.ObjectProperty) ):
+        for s, _, _ in self.graph.triples((None, RDF.type, OWL.ObjectProperty)):
             self._add_properties(s)
 
-        for s, _, _ in self.graph.triples( (None, None, None) ):
+        for s, _, _ in self.graph.triples((None, None, None)):
             self.idx[str(s)] = True
 
-
     def add_context(self, newcontext, baseuri=""):
+        # type: (Loader.ContextType, str) -> None
         if self.vocab:
-            raise validate.ValidationException("Refreshing context that already has stuff in it")
+            raise validate.ValidationException(
+                "Refreshing context that already has stuff in it")
 
         self.url_fields = set()
         self.vocab_fields = set()
@@ -184,33 +195,33 @@ class Loader(object):
 
         _logger.debug("ctx is %s", self.ctx)
 
-        for c in self.ctx:
-            if self.ctx[c] == "@id":
-                self.identifiers.add(c)
-                self.identity_links.add(c)
-            elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@id":
-                self.url_fields.add(c)
-                if self.ctx[c].get("identity", False):
-                    self.identity_links.add(c)
-            elif isinstance(self.ctx[c], dict) and self.ctx[c].get("@type") == "@vocab":
-                self.url_fields.add(c)
-                self.vocab_fields.add(c)
+        for key, value in self.ctx.items():
+            if value == "@id":
+                self.identifiers.add(key)
+                self.identity_links.add(key)
+            elif isinstance(value, dict) and value.get("@type") == "@id":
+                self.url_fields.add(key)
+                if value.get("identity", False):
+                    self.identity_links.add(key)
+            elif isinstance(value, dict) and value.get("@type") == "@vocab":
+                self.url_fields.add(key)
+                self.vocab_fields.add(key)
 
-            if isinstance(self.ctx[c], dict) and self.ctx[c].get("noLinkCheck"):
-                self.nolinkcheck.add(c)
+            if isinstance(value, dict) and value.get("noLinkCheck"):
+                self.nolinkcheck.add(key)
 
-            if isinstance(self.ctx[c], dict) and self.ctx[c].get("mapSubject"):
-                self.idmap[c] = self.ctx[c]["mapSubject"]
+            if isinstance(value, dict) and value.get("mapSubject"):
+                self.idmap[key] = value["mapSubject"]
 
-            if isinstance(self.ctx[c], dict) and self.ctx[c].get("mapPredicate"):
-                self.mapPredicate[c] = self.ctx[c]["mapPredicate"]
+            if isinstance(value, dict) and value.get("mapPredicate"):
+                self.mapPredicate[key] = value["mapPredicate"]
 
-            if isinstance(self.ctx[c], dict) and "@id" in self.ctx[c]:
-                self.vocab[c] = self.ctx[c]["@id"]
-            elif isinstance(self.ctx[c], basestring):
-                self.vocab[c] = self.ctx[c]
+            if isinstance(value, dict) and "@id" in value:
+                self.vocab[key] = value["@id"]
+            elif isinstance(value, basestring):
+                self.vocab[key] = value
 
-        for k,v in self.vocab.items():
+        for k, v in self.vocab.items():
             self.rvocab[self.expand_url(v, "", scoped=False)] = k
 
         _logger.debug("identifiers is %s", self.identifiers)
@@ -219,11 +230,11 @@ class Loader(object):
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
 
-
     def resolve_ref(self, ref, base_url=None):
+        # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode]) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
 
-        obj = None
+        obj = None  # type: Dict[str, Any]
         inc = False
 
         # If `ref` is a dict, look for special directives.
@@ -234,14 +245,16 @@ class Loader(object):
                     ref = obj["$import"]
                     obj = None
                 else:
-                    raise ValueError("'$import' must be the only field in %s" % (str(obj)))
+                    raise ValueError(
+                        "'$import' must be the only field in %s" % (str(obj)))
             elif "$include" in obj:
                 if len(obj) == 1:
                     ref = obj["$include"]
                     inc = True
                     obj = None
                 else:
-                    raise ValueError("'$include' must be the only field in %s" % (str(obj)))
+                    raise ValueError(
+                        "'$include' must be the only field in %s" % (str(obj)))
             else:
                 ref = None
                 for identifier in self.identifiers:
@@ -249,12 +262,15 @@ class Loader(object):
                         ref = obj[identifier]
                         break
                 if not ref:
-                    raise ValueError("Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
+                    raise ValueError(
+                        "Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
 
-        if not isinstance(ref, basestring):
+        if not isinstance(ref, (str, unicode)):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = self.expand_url(ref, base_url, scoped=(obj is not None))
+        url = self.expand_url(cast(  # bug in mypy 0.3.1, fixed in 0.4-dev
+            Union[str, unicode], ref), base_url,
+            scoped=(obj is not None))
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -264,6 +280,7 @@ class Loader(object):
         if inc:
             return self.fetch_text(url), {}
 
+        doc = None
         if obj:
             for identifier in self.identifiers:
                 obj[identifier] = url
@@ -272,18 +289,21 @@ class Loader(object):
             # Load structured document
             doc_url, frg = urlparse.urldefrag(url)
             if doc_url in self.idx:
-                raise validate.ValidationException("Reference `#%s` not found in file `%s`." % (frg, doc_url))
-            obj = self.fetch(doc_url)
+                raise validate.ValidationException(
+                    "Reference `#%s` not found in file `%s`." % (frg, doc_url))
+            doc = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        obj, metadata = self.resolve_all(obj, doc_url)
+        obj, metadata = self.resolve_all(doc if doc else obj, doc_url)
 
-        # Requested reference should be in the index now, otherwise it's a bad reference
+        # Requested reference should be in the index now, otherwise it's a bad
+        # reference
         if url is not None:
             if url in self.idx:
                 obj = self.idx[url]
             else:
-                raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
+                raise RuntimeError("Reference `%s` is not in the index.  Index contains:\n  %s" % (
+                    url, "\n  ".join(self.idx)))
 
         try:
             if "$graph" in obj:
@@ -296,8 +316,9 @@ class Loader(object):
             return obj, metadata
 
     def resolve_all(self, document, base_url, file_base=None):
+        # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, str]]
         loader = self
-        metadata = {}  # type: Dict[str, str]
+        metadata = {}  # type: Dict[str, Any]
         if file_base is None:
             file_base = base_url
 
@@ -308,7 +329,7 @@ class Loader(object):
         elif isinstance(document, list):
             pass
         else:
-            return document, metadata
+            return (document, metadata)
 
         newctx = None
         if isinstance(document, dict):
@@ -320,8 +341,9 @@ class Loader(object):
                 if not newctx:
                     newctx = SubLoader(self)
                 prof = self.fetch(document["$profile"])
-                newctx.add_namespaces(document.get("$namespaces", {}), document["$profile"])
-                newctx.add_schemas(document.get("$schemas", []), document["$profile"])
+                newctx.add_namespaces(document.get("$namespaces", {}))
+                newctx.add_schemas(document.get(
+                    "$schemas", []), document["$profile"])
 
             if "$namespaces" in document:
                 if not newctx:
@@ -345,12 +367,13 @@ class Loader(object):
             for idmapField in loader.idmap:
                 if idmapField in document and isinstance(document[idmapField], dict):
                     ls = []
-                    for k,v in document[idmapField].items():
+                    for k, v in document[idmapField].items():
                         if not isinstance(v, dict):
                             if idmapField in loader.mapPredicate:
                                 v = {loader.mapPredicate[idmapField]: v}
                             else:
-                                raise validate.ValidationException("mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
+                                raise validate.ValidationException(
+                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
                         v[loader.idmap[idmapField]] = k
                         ls.append(v)
                     document[idmapField] = ls
@@ -358,22 +381,24 @@ class Loader(object):
             for identifer in loader.identifiers:
                 if identifer in document:
                     if isinstance(document[identifer], basestring):
-                        document[identifer] = loader.expand_url(document[identifer], base_url, scoped=True)
+                        document[identifer] = loader.expand_url(
+                            document[identifer], base_url, scoped=True)
                         if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
                             loader.idx[document[identifer]] = document
                         base_url = document[identifer]
                     else:
-                        raise validate.ValidationException("identifier field '%s' must be a string" % (document[identifer]))
+                        raise validate.ValidationException(
+                            "identifier field '%s' must be a string" % (document[identifer]))
 
             for identifer in loader.identity_links:
                 if identifer in document and isinstance(document[identifer], list):
                     for n, v in enumerate(document[identifer]):
                         if isinstance(document[identifer][n], basestring):
-                            document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
+                            document[identifer][n] = loader.expand_url(
+                                document[identifer][n], base_url, scoped=True)
                             if document[identifer][n] not in loader.idx:
-                                loader.idx[document[identifer][n]] = document[identifer][n]
-                #else:
-                #    raise validate.ValidationException("identity field '%s' must be a string" % (document[identifer]))
+                                loader.idx[document[identifer][
+                                    n]] = document[identifer][n]
 
             for d in document:
                 d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
@@ -384,16 +409,24 @@ class Loader(object):
             for d in loader.url_fields:
                 if d in document:
                     if isinstance(document[d], basestring):
-                        document[d] = loader.expand_url(document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
+                        document[d] = loader.expand_url(
+                            document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
                     elif isinstance(document[d], list):
-                        document[d] = [loader.expand_url(url, base_url, scoped=False, vocab_term=(d in loader.vocab_fields)) if isinstance(url, basestring) else url for url in document[d] ]
+                        document[d] = [
+                            loader.expand_url(
+                                url, base_url, scoped=False,
+                                vocab_term=(d in loader.vocab_fields))
+                            if isinstance(url, (str, unicode))
+                            else url for url in document[d]]
 
             try:
                 for key, val in document.items():
-                    document[key], _ = loader.resolve_all(val, base_url, file_base)
+                    document[key], _ = loader.resolve_all(
+                        val, base_url, file_base)
             except validate.ValidationException as v:
                 _logger.debug("loader is %s", id(loader))
-                raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (id(loader), file_base, key, validate.indent(str(v))))
+                raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
+                    id(loader), file_base, key, validate.indent(str(v))))
 
         elif isinstance(document, list):
             i = 0
@@ -411,20 +444,24 @@ class Loader(object):
                             document[i] = l
                             i += 1
                     else:
-                        document[i], _ = loader.resolve_all(val, base_url, file_base)
+                        document[i], _ = loader.resolve_all(
+                            val, base_url, file_base)
                         i += 1
             except validate.ValidationException as v:
-                raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (id(loader), file_base, i, validate.indent(str(v))))
+                raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
+                    id(loader), file_base, i, validate.indent(str(v))))
 
             for identifer in loader.identity_links:
                 if identifer in metadata:
-                    if isinstance(metadata[identifer], basestring):
-                        metadata[identifer] = loader.expand_url(metadata[identifer], base_url, scoped=True)
+                    if isinstance(metadata[identifer], (str, unicode)):
+                        metadata[identifer] = loader.expand_url(
+                            metadata[identifer], base_url, scoped=True)
                         loader.idx[metadata[identifer]] = document
 
         return document, metadata
 
     def fetch_text(self, url):
+        # type: (Union[str, unicode]) -> Union[str, unicode]
         if url in self.cache:
             return self.cache[url]
 
@@ -451,18 +488,18 @@ class Loader(object):
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
-    def fetch(self, url):
+    def fetch(self, url):  # type: (Union[str, unicode]) -> Any
         if url in self.idx:
             return self.idx[url]
         try:
             text = self.fetch_text(url)
             if isinstance(text, bytes):
-                text = StringIO(text.decode('utf-8'))
+                textIO = StringIO(text.decode('utf-8'))
             else:
-                text = StringIO(text)
-            text.name = url
-            result = yaml.load(text, Loader=SafeLoader)
-        except yaml.parser.ParserError as e:
+                textIO = StringIO(text)
+            textIO.name = url  # type: ignore
+            result = yaml.load(textIO, Loader=SafeLoader)
+        except yaml.parser.ParserError as e:  # type: ignore
             raise validate.ValidationException("Syntax error %s" % (e))
         if isinstance(result, dict) and self.identifiers:
             for identifier in self.identifiers:
@@ -473,7 +510,7 @@ class Loader(object):
             self.idx[url] = result
         return result
 
-    def check_file(self, fn):
+    def check_file(self, fn):  # type: (Union[str, unicode]) -> bool
         if fn.startswith("file://"):
             u = urlparse.urlsplit(fn)
             return os.path.exists(u.path)
@@ -481,16 +518,21 @@ class Loader(object):
             return False
 
     def validate_link(self, field, link):
+        # type: (str, Union[str, unicode, List[str], Dict[str, Any]]) -> bool
         if field in self.nolinkcheck:
             return True
-        if isinstance(link, basestring):
+        if isinstance(link, (str, unicode)):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
-                    if not self.check_file(link):
-                        raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
+                    if not self.check_file(cast(  # bug in mypy 0.3.1
+                            Union[str, unicode], link)):  # fixed in mypy 0.4-dev
+                        raise validate.ValidationException(
+                            "Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
-                if not self.check_file(link):
-                    raise validate.ValidationException("Field `%s` contains undefined reference to `%s`" % (field, link))
+                if not self.check_file(cast(  # bug in mypy 0.3.1
+                        Union[str, unicode], link)):  # fixed in mypy 0.4-dev
+                    raise validate.ValidationException(
+                        "Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):
             errors = []
             for i in link:
@@ -499,12 +541,16 @@ class Loader(object):
                 except validate.ValidationException as v:
                     errors.append(v)
             if errors:
-                raise validate.ValidationException("\n".join([str(e) for e in errors]))
+                raise validate.ValidationException(
+                    "\n".join([str(e) for e in errors]))
         elif isinstance(link, dict):
             self.validate_links(link)
+        else:
+            raise validate.ValidationException("Link must be a str, unicode, "
+                                               "list, or a dict.")
         return True
 
-    def getid(self, d):
+    def getid(self, d):  # type: (Any) -> Union[basestring, None]
         if isinstance(d, dict):
             for i in self.identifiers:
                 if i in d:
@@ -512,12 +558,13 @@ class Loader(object):
                         return d[i]
         return None
 
-    def validate_links(self, document):
+    def validate_links(self, document):  # type: (Any) -> None
         docid = self.getid(document)
         if docid is None:
             docid = ""
 
         errors = []
+        iterator = None  # type: Any
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
@@ -541,22 +588,27 @@ class Loader(object):
                 if key not in self.nolinkcheck:
                     docid = self.getid(val)
                     if docid:
-                        errors.append(validate.ValidationException("While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
+                        errors.append(validate.ValidationException(
+                            "While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
                     else:
                         if isinstance(key, basestring):
-                            errors.append(validate.ValidationException("While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
+                            errors.append(validate.ValidationException(
+                                "While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
                         else:
-                            errors.append(validate.ValidationException("While checking position %s\n%s" % (key, validate.indent(str(v)))))
+                            errors.append(validate.ValidationException(
+                                "While checking position %s\n%s" % (key, validate.indent(str(v)))))
 
         if errors:
             if len(errors) > 1:
-                raise validate.ValidationException("\n".join([str(e) for e in errors]))
+                raise validate.ValidationException(
+                    "\n".join([str(e) for e in errors]))
             else:
                 raise errors[0]
         return
 
 
 def _copy_dict_without_key(from_dict, filtered_key):
+    # type: (Dict, Any) -> Dict
     new_dict = {}
     for key, value in from_dict.items():
         if key != filtered_key:

@@ -102,51 +102,50 @@ diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
 
 .coverage: $(PYSOURCES)
-	python-coverage run --branch --source=${MODULE} tests/test_examples.py
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --branch --source=${MODULE} setup.py test
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-jsonld-context schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-rdfs schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-avro schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-rdf schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-pre schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-index schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.main \
 		--print-metadata schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	python-coverage run --append --branch --source=${MODULE} \
+	coverage run --append --branch --source=${MODULE} \
 		-m schema_salad.makedoc schema_salad/metaschema/metaschema.yml \
 		> /dev/null
 
-
 coverage.xml: .coverage
-	python-coverage xml
+	coverage xml
 
 coverage.html: htmlcov/index.html
 
 htmlcov/index.html: .coverage
-	python-coverage html
+	coverage html
 	@echo Test coverage of the Python code is now in htmlcov/index.html
 
 coverage-report: .coverage
-	python-coverage report
+	coverage report
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
@@ -169,5 +168,15 @@ sloccount: ${PYSOURCES} Makefile
 list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
+
+mypy: ${PYSOURCES}
+	MYPYPATH=typeshed/2.7 mypy --py2 schema_salad
+	#MYPYPATH=typeshed/2.7 mypy --py2  --disallow-untyped-calls schema_salad
+
+jenkins:
+	if ! test -d env ; then virtualenv env ; fi
+	. env/bin/activate ; \
+	${MAKE} install-dep coverage.html coverage.xml mypy pep257_report.txt \
+		sloccount.sc pep8_report.txt pylint_report.txt
 
 FORCE:
