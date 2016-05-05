@@ -976,7 +976,7 @@ $graph:
   extends: "#InputSchema"
   docParent: "#SchemaDefRequirement"
   specialize:
-    - specializeFrom: "#Schema"
+    - specializeFrom: "#InputSchema"
       specializeTo: "#SchemaDef"
   fields:
     - name: name
