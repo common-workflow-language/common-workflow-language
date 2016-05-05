@@ -176,7 +176,7 @@ def load_schema(schema_ref, cache=None):
     # Make the Avro validation that will be used to validate the target document
     (avsc_names, avsc_obj) = make_avro_schema(schema_doc, document_loader)
 
-    return document_loader, avsc_names, schema_metadata
+    return document_loader, avsc_names, schema_metadata, metaschema_loader
 
 def load_and_validate(document_loader, avsc_names, document, strict):
     if isinstance(document, dict):

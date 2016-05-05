@@ -368,9 +368,10 @@ class Loader(object):
             for identifer in loader.identity_links:
                 if identifer in document and isinstance(document[identifer], list):
                     for n, v in enumerate(document[identifer]):
-                        document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
-                        if document[identifer][n] not in loader.idx:
-                            loader.idx[document[identifer][n]] = document[identifer][n]
+                        if isinstance(document[identifer][n], basestring):
+                            document[identifer][n] = loader.expand_url(document[identifer][n], base_url, scoped=True)
+                            if document[identifer][n] not in loader.idx:
+                                loader.idx[document[identifer][n]] = document[identifer][n]
                 #else:
                 #    raise validate.ValidationException("identity field '%s' must be a string" % (document[identifer]))
 

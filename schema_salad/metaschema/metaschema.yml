@@ -70,7 +70,7 @@ $graph:
     - "string: Unicode character sequence"
 
 
-- name: "Any"
+- name: Any
   type: enum
   symbols: ["#Any"]
   doc: |
