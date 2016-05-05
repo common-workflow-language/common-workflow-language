@@ -25,6 +25,7 @@ $graph:
   name: CWLVersions
   doc: "Version symbols for published CWL document versions."
   symbols:
+    - cwl:draft-2
     - cwl:draft-3.dev1
     - cwl:draft-3.dev2
     - cwl:draft-3.dev3
@@ -507,7 +508,7 @@ $graph:
     - name: cwlVersion
       type:
         - "null"
-        - string
+        - "#CWLVersions"
       doc: "CWL document version"
       jsonldPredicate:
         "_id": "cwl:cwlVersion"

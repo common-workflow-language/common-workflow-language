@@ -587,6 +587,11 @@ $graph:
   type: documentation
   doc: This section specifies the core object types that make up a CWL document.
 
+- type: enum
+  name: CWLVersions
+  doc: "Version symbols for published CWL document versions."
+  symbols:
+    - cwl:draft-2
 
 - name: Datatype
   type: enum
@@ -1066,12 +1071,11 @@ $graph:
     - name: cwlVersion
       type:
         - "null"
-        - string
+        - "#CWLVersions"
       doc: "CWL document version"
       jsonldPredicate:
         "_id": "cwl:cwlVersion"
         "_type": "@vocab"
-
 
 - type: record
   name: CommandLineBinding
