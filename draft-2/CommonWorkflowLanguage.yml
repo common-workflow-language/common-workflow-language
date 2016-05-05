@@ -1049,7 +1049,7 @@ $graph:
         listed which is not recognized by the implementation, it is a fatal
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
-    - name: cwl:hints
+    - name: hints
       type:
         - "null"
         - type: array
@@ -1059,6 +1059,9 @@ $graph:
         workflow engine that may be helpful in executing this process.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
+      jsonldPredicate:
+        _id: cwl:hints
+        noLinkCheck: true
     - name: label
       type:
         - "null"
@@ -1700,7 +1703,7 @@ $graph:
         listed which is not recognized by the implementation, it is a fatal
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
-    - name: cwl:hints
+    - name: hints
       type:
         - "null"
         - type: array
@@ -1711,6 +1714,7 @@ $graph:
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
       jsonldPredicate:
+        _id: cwl:hints
         noLinkCheck: true
     - name: label
       type:
