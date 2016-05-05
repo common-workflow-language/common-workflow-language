@@ -100,9 +100,8 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual(ra,
                          {
                              "id": "http://example2.com/#stuff",
-                             'inputs': [{'a': 1, 'id': 'http://example2.com/#stuff/zip'},
-                                        {'a': 2, 'id': 'http://example2.com/#stuff/zing'},
-                                        ],
+                             'inputs': [{'a': 2, 'id': 'http://example2.com/#stuff/zing'},
+                                        {'a': 1, 'id': 'http://example2.com/#stuff/zip'}],
                              'outputs': ['http://example2.com/#stuff/out'],
                              'other': {
                                  'n': 9

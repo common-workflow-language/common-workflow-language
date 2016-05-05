@@ -38,7 +38,7 @@ install_requires.append("avro")  # TODO: remove me once cwltool is
 # extras_require={                # TODO: uncomment me, same conditions as above
 #        ':python_version<"3"': ['avro'],
 #        ':python_version>="3"': ['avro-python3']}
-extras_requires = {}               # TODO: to be removed when the above is added
+extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
       version='1.9',
@@ -52,7 +52,7 @@ setup(name='schema-salad',
       packages=["schema_salad"],
       package_data={'schema_salad': ['metaschema/*']},
       install_requires=install_requires,
-      extras_requires=extras_requires,
+      extras_require=extras_require,
       test_suite='tests',
       tests_require=[],
       entry_points={

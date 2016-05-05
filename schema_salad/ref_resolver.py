@@ -146,10 +146,13 @@ class Loader(object):
 
     def add_schemas(self, ns, base_url):
         for sch in aslist(ns):
-            try:
-                self.graph.parse(urlparse.urljoin(base_url, sch), format="xml")
-            except xml.sax.SAXParseException:
-                self.graph.parse(urlparse.urljoin(base_url, sch), format="turtle")
+            for fmt in ['xml', 'turtle', 'rdfa']:
+                try:
+                    self.graph.parse(urlparse.urljoin(base_url, sch),
+                                     format=fmt)
+                    break
+                except xml.sax.SAXParseException:
+                    pass
 
         for s, _, _ in self.graph.triples( (None, RDF.type, RDF.Property) ):
             self._add_properties(s)
