@@ -44,6 +44,7 @@ class MyRenderer(mistune.Renderer):
 
     def __init__(self):  # type: () -> None
         super(mistune.Renderer, self).__init__()
+        self.options = {}
 
     def header(self, text, level, raw=None):
         return """<h%i id="%s">%s</h%i>""" % (level, to_id(text), text, level)
