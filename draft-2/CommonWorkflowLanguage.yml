@@ -975,6 +975,9 @@ $graph:
   name: SchemaDef
   extends: "#Schema"
   docParent: "#SchemaDefRequirement"
+  specialize:
+    - specializeFrom: "#Schema"
+      specializeTo: "#SchemaDef"
   fields:
     - name: name
       type: string
@@ -1707,6 +1710,8 @@ $graph:
         workflow engine that may be helpful in executing this workflow step.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
+      jsonldPredicate:
+        noLinkCheck: true
     - name: label
       type:
         - "null"
