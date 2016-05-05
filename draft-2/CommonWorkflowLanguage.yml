@@ -1243,6 +1243,7 @@ $graph:
       specializeTo: "#CommandInputParameter"
     - specializeFrom: "#OutputParameter"
       specializeTo: "#CommandOutputParameter"
+  documentRoot: true
   doc: |
 
     A CommandLineTool process is a process implementation for executing a
@@ -1448,6 +1449,7 @@ $graph:
   name: ExpressionTool
   extends: "#Process"
   docAfter: "#CommandLineTool"
+  documentRoot: true
   doc: |
     Execute an expression as a process step.
   fields:
@@ -1736,6 +1738,7 @@ $graph:
   specialize:
     - specializeFrom: "#OutputParameter"
       specializeTo: "#WorkflowOutputParameter"
+  documentRoot: true
   doc: |
     A workflow is a process consisting of one or more `steps`.  Each
     step has input and output parameters defined by the `inputs` and `outputs`
