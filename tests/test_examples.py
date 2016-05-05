@@ -51,7 +51,7 @@ class TestSchemas(unittest.TestCase):
                                      "schema_salad/metaschema/metaschema.yml"])
 
     def test_jsonld_ctx(self):
-        ldr, _, _ = schema_salad.schema.load_schema({
+        ldr, _, _, _ = schema_salad.schema.load_schema({
             "$base": "Y",
             "name": "X",
             "$namespaces": {
@@ -111,7 +111,7 @@ class TestSchemas(unittest.TestCase):
     def test_examples(self):
         self.maxDiff = None
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
-            ldr, _, _ = schema_salad.schema.load_schema(
+            ldr, _, _, _ = schema_salad.schema.load_schema(
                 "schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
                 src = ldr.resolve_all(
