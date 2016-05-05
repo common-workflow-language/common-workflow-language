@@ -973,7 +973,7 @@ $graph:
 
 - type: record
   name: SchemaDef
-  extends: "#Schema"
+  extends: "#InputSchema"
   docParent: "#SchemaDefRequirement"
   specialize:
     - specializeFrom: "#Schema"
