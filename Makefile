@@ -176,7 +176,10 @@ mypy: ${PYSOURCES}
 jenkins:
 	if ! test -d env ; then virtualenv env ; fi
 	. env/bin/activate ; \
-	${MAKE} install-dep coverage.html coverage.xml mypy pep257_report.txt \
+	${MAKE} install-dep coverage.html coverage.xml pep257_report.txt \
 		sloccount.sc pep8_report.txt pylint_report.txt
+	if ! test -d env3 ; then virtualenv -p python3 env3 ; fi
+	. env3/bin/activate ; \
+	pip install mypy-lang; ${MAKE} mypy
 
 FORCE:
