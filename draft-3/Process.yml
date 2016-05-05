@@ -510,7 +510,7 @@ $graph:
       doc: "CWL document version"
       jsonldPredicate:
         "_id": "cwl:cwlVersion"
-        "_type": "@id"
+        "_type": "@vocab"
 
 - name: InlineJavascriptRequirement
   type: record

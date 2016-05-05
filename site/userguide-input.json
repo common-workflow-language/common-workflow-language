@@ -7,7 +7,7 @@
             "class": "File"
         }, 
         {
-            "path": "../draft-3/examples/1st.cwl", 
+            "path": "../draft-3/examples/1st-tool.cwl", 
             "class": "File"
         }, 
         {
@@ -71,6 +71,14 @@
             "class": "File"
         }, 
         {
+            "path": "../draft-3/examples/array-outputs.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/array-outputs-job.yml", 
+            "class": "File"
+        }, 
+        {
             "path": "../draft-3/examples/record.cwl", 
             "class": "File"
         }, 
@@ -112,6 +120,14 @@
         }, 
         {
             "path": "../draft-3/examples/arguments-job.yml", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/1st-workflow.cwl", 
+            "class": "File"
+        }, 
+        {
+            "path": "../draft-3/examples/1st-workflow-job.yml", 
             "class": "File"
         }
     ]
