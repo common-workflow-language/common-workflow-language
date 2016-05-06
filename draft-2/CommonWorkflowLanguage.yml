@@ -978,6 +978,8 @@ $graph:
   specialize:
     - specializeFrom: "#InputSchema"
       specializeTo: "#SchemaDef"
+    - specializeFrom: "#Binding"
+      specializeTo: "#CommandLineBinding"
   fields:
     - name: name
       type: string
