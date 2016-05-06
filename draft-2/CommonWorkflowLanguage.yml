@@ -982,7 +982,7 @@ $graph:
       specializeTo: "#CommandLineBinding"
   fields:
     - name: name
-      type: string
+      type: ["null", string]
       doc: "The type name being defined."
 
 
