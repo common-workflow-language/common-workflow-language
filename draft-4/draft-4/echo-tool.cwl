@@ -3,11 +3,11 @@
 class: CommandLineTool
 cwlVersion: cwl:draft-4.dev1
 inputs:
-  - id: in
+  in:
     type: Any
     inputBinding: {}
 outputs:
-  - id: out
+  out:
     type: string
     outputBinding:
       glob: out.txt

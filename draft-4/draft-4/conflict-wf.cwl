@@ -1,14 +1,14 @@
 cwlVersion: cwl:draft-4.dev1
 $graph:
-- class: CommandLineTool
-  id: echo
+- id: echo
+  class: CommandLineTool
   inputs:
-    - id: text
+    text:
       type: string
       inputBinding: {}
 
   outputs:
-    - id: fileout
+    fileout:
       type: File
       outputBinding:
         glob: out.txt
@@ -16,20 +16,20 @@ $graph:
   baseCommand: echo
   stdout: out.txt
 
-- class: CommandLineTool
-  id: cat
+- id: cat
+  class: CommandLineTool
   inputs:
-    - id: file1
+    file1:
       type: File
       inputBinding:
         position: 1
-    - id: file2
+    file2:
       type: File
       inputBinding:
         position: 2
 
   outputs:
-    - id: fileout
+    fileout:
       type: File
       outputBinding:
         glob: out.txt
@@ -41,40 +41,35 @@ $graph:
   id: collision
 
   inputs:
-    - id: input_1
+    input_1:
       type: string
 
-    - id: input_2
+    input_2:
       type: string
 
   outputs:
-    - id: fileout
+    fileout:
       type: File
       source: "#collision/cat_step/fileout"
 
   steps:
-    - id: echo_1
+    echo_1:
       run: "#echo"
-      inputs:
-        - id: text
-          source: "#collision/input_1"
-      outputs:
-        - id: fileout
+      in:
+        text: "#collision/input_1"
+      out: [fileout]
 
-    - id: echo_2
+    echo_2:
       run: "#echo"
-      inputs:
-        - id: text
-          source: "#collision/input_2"
-      outputs:
-        - id: fileout
+      in:
+        text: "#collision/input_2"
+      out: [fileout]
 
-    - id: cat_step
+    cat_step:
       run: "#cat"
-      inputs:
-        - id: file1
+      in:
+        file1:
           source: "#collision/echo_1/fileout"
-        - id: file2
+        file2:
           source: "#collision/echo_2/fileout"
-      outputs:
-        - id: fileout
+      out: [fileout]

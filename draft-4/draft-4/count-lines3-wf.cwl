@@ -3,23 +3,21 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-    - id: file1
+    file1:
       type: { type: array, items: File }
 
 outputs:
-    - id: count_output
+    count_output:
       type: { type: array, items: int }
       source: "#step1/output"
 
 requirements:
-  - class: ScatterFeatureRequirement
+  ScatterFeatureRequirement: {}
 
 steps:
-  - id: step1
+  step1:
     run: wc2-tool.cwl
     scatter: "#step1/file1"
-    inputs:
-      - id: file1
-        source: "#file1"
-    outputs:
-      - id: output
+    in:
+      file1: "#file1"
+    out: [output]

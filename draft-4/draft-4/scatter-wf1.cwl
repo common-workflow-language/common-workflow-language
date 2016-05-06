@@ -2,12 +2,12 @@
 cwlVersion: cwl:draft-4.dev1
 class: Workflow
 inputs:
-  - id: inp
+  inp:
     type:
       type: array
       items: string
 outputs:
-  - id: out
+  out:
     type:
       type: array
       items: string
@@ -18,19 +18,18 @@ requirements:
 
 steps:
   - id: step1
-    inputs:
-      - {id: echo_in, source: "#inp"}
-    outputs:
-      - id: echo_out
+    in:
+      echo_in: "#inp"
+    out: [echo_out]
     scatter: "#step1/echo_in"
     run:
       class: CommandLineTool
       inputs:
-        - id: echo_in
+        echo_in:
           type: string
           inputBinding: {}
       outputs:
-        - id: echo_out
+        echo_out:
           type: string
           outputBinding:
             glob: "step1_out"

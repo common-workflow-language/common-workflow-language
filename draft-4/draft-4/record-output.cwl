@@ -3,7 +3,7 @@ cwlVersion: cwl:draft-4.dev1
 requirements:
   - class: ShellCommandRequirement
 inputs:
-  - id: irec
+  irec:
     type:
       name: irec
       type: record
@@ -17,7 +17,7 @@ inputs:
         inputBinding:
           position: 6
 outputs:
-  - id: orec
+  orec:
     type:
       name: orec
       type: record

@@ -20,10 +20,10 @@ hints:
 # field "reverse_sort" is not provided in the input object, the default value will
 # be used.
 inputs:
-  - id: input
+  input:
     type: File
     description: "The input file to be processed."
-  - id: reverse_sort
+  reverse_sort:
     type: boolean
     default: true
     description: "If true, reverse (decending) sort"
@@ -35,7 +35,7 @@ inputs:
 # steps using the "connect" field.  Here, the parameter "#output" of the
 # workflow comes from the "#sorted" output of the "sort" step.
 outputs:
-  - id: output
+  output:
     type: File
     source: "#sorted/output"
     description: "The output with the lines reversed and sorted."
@@ -51,17 +51,15 @@ outputs:
 # parameter "#reversed" from the first step to the input parameter of the
 # tool "sorttool.cwl#input".
 steps:
-  - id: rev
-    inputs:
-      - { id: input, source: "#input" }
-    outputs:
-      - { id: output }
+  rev:
+    in:
+      input: "#input"
+    out: [output]
     run: revtool.cwl
 
-  - id: sorted
-    inputs:
-      - { id: input, source: "#rev/output" }
-      - { id: reverse, source: "#reverse_sort" }
-    outputs:
-      - { id: output }
+  sorted:
+    in:
+      input: "#rev/output"
+      reverse: "#reverse_sort"
+    out: [output]
     run: sorttool.cwl

@@ -5,29 +5,29 @@ cwlVersion: cwl:draft-4.dev1
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: images.sbgenomics.com/rabix/bwa
     dockerImageId: 9d3b9b0359cf
 
-  - class: ResourceRequirement
+  ResourceRequirement:
     coresMin: 4
 
 inputs:
-  - id: reference
+  reference:
     type: File
     inputBinding: { position: 2 }
 
-  - id: reads
+  reads:
     type:
       type: array
       items: File
     inputBinding: { position: 3 }
 
-  - id: minimum_seed_length
+  minimum_seed_length:
     type: int
     inputBinding: { position: 1, prefix: -m }
 
-  - id: min_std_max_min
+  min_std_max_min:
     type: { type: array, items: int }
     inputBinding:
       position: 1
@@ -35,7 +35,7 @@ inputs:
       itemSeparator: ","
 
 outputs:
-  - id: sam
+  sam:
     type: File
     outputBinding: { glob: output.sam }
 

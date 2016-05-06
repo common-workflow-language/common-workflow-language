@@ -3,10 +3,10 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-    - { id: in, type: string }
+    in: string
 
 outputs:
-    - id: out
+    out:
       type: File
       source: "#step1/out"
 
@@ -14,13 +14,11 @@ requirements:
   - class: SubworkflowFeatureRequirement
   - class: EnvVarRequirement
     envDef:
-      - envName: TEST_ENV
-        envValue: override
+      TEST_ENV: override
 
 steps:
-  - id: step1
+  step1:
     run: env-tool2.cwl
-    inputs:
-      - { id: in, source: "#in" }
-    outputs:
-      - { id: out }
+    in:
+      in: "#in"
+    out: [out]

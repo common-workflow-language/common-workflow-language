@@ -4,11 +4,11 @@ class: CommandLineTool
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-  - id: reference
+  reference:
     type: File
     inputBinding: { position: 2 }
 
-  - id: reads
+  reads:
     type:
       type: array
       items: File

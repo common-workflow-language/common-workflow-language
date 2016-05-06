@@ -17,13 +17,13 @@ dct:creator:
   foaf:mbox: "mailto:peter.amstutz@curoverse.com"
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: debian:wheezy
 inputs:
-  - id: file1
+  file1:
     type: File
     inputBinding: {position: 1}
-  - id: numbering
+  numbering:
     type: ["null", boolean]
     inputBinding:
       position: 0

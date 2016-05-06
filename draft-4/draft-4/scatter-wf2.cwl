@@ -3,13 +3,13 @@ cwlVersion: cwl:draft-4.dev1
 class: Workflow
 
 inputs:
-  - id: inp1
+  inp1:
     type: { type: array, items: string }
-  - id: inp2
+  inp2:
     type: { type: array, items: string }
 
 outputs:
-  - id: out
+  out:
     source: "#step1/echo_out"
     type:
       type: array
@@ -21,12 +21,11 @@ requirements:
   - class: ScatterFeatureRequirement
 
 steps:
-  - id: step1
-    inputs:
-      - { id: echo_in1, source: "#inp1"}
-      - { id: echo_in2, source: "#inp2"}
-    outputs:
-      - id: echo_out
+  step1:
+    in:
+      echo_in1: "#inp1"
+      echo_in2: "#inp2"
+    out: [echo_out]
 
     scatter: ["#step1/echo_in1", "#step1/echo_in2"]
     scatterMethod: nested_crossproduct
@@ -34,14 +33,14 @@ steps:
       class: CommandLineTool
       id: step1command
       inputs:
-        - id: echo_in1
+        echo_in1:
           type: string
           inputBinding: {}
-        - id: echo_in2
+        echo_in2:
           type: string
           inputBinding: {}
       outputs:
-        - id: echo_out
+        echo_out:
           type: string
           outputBinding:
             glob: "step1_out"

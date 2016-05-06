@@ -7,17 +7,17 @@ requirements:
   - "$import": schemadef-type.yml
 
 inputs:
-    - id: hello
-      type: "schemadef-type.yml#HelloType"
+  hello:
+    type: "schemadef-type.yml#HelloType"
+
 outputs:
-    - id: output
-      type: File
-      source: "#step1/output"
+  output:
+    type: File
+    source: "#step1/output"
 
 steps:
-  - id: step1
-    inputs:
-      - { id: hello, source: "#hello" }
-    outputs:
-      - { id: output }
-    run: { "$import": schemadef-tool.cwl }
+  step1:
+    in:
+      hello: "#hello"
+    out: [output]
+    run: schemadef-tool.cwl

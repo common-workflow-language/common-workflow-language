@@ -1,7 +1,7 @@
 class: CommandLineTool
 cwlVersion: cwl:draft-4.dev1
 inputs:
-  - id: bar
+  bar:
     type: Any
     default: {
           "baz": "zab1",

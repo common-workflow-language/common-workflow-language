@@ -4,7 +4,7 @@ requirements:
   - class: InlineJavascriptRequirement
 
 inputs:
-  - id: bar
+  bar:
     type: Any
     default: {
           "baz": "zab1",

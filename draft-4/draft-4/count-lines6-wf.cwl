@@ -3,11 +3,13 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-    - { id: file1, type: {type: array, items: File} }
-    - { id: file2, type: {type: array, items: File} }
+    file1:
+      type: {type: array, items: File}
+    file2:
+      type: {type: array, items: File}
 
 outputs:
-    - id: count_output
+    count_output:
       type: {type: array, items: int}
       source: "#step1/output"
 
@@ -16,12 +18,11 @@ requirements:
   - class: MultipleInputFeatureRequirement
 
 steps:
-  - id: step1
+  step1:
     run: wc3-tool.cwl
     scatter: "#step1/file1"
-    inputs:
-      - id: file1
+    in:
+      file1:
         source: ["#file1", "#file2"]
         linkMerge: merge_nested
-    outputs:
-      - id: output
+    out: [output]

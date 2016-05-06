@@ -7,27 +7,25 @@ requirements:
   - class: MultipleInputFeatureRequirement
 
 inputs:
-  - id: a
-    type: int
-  - id: b
-    type: int
+  a: int
+  b: int
 
 outputs:
-  - id: val
+  val:
     type: string
     source: "#step1/echo_out"
 
 steps:
-  - id: step1
+  step1:
     run:
       id: echo
       class: CommandLineTool
       inputs:
-        - id: c
+        c:
           type: int
           inputBinding: {}
       outputs:
-        - id: echo_out
+        echo_out:
           type: string
           outputBinding:
             glob: "step1_out"
@@ -36,7 +34,8 @@ steps:
       baseCommand: "echo"
       stdout: step1_out
 
-    inputs:
-      - {id: c, source: ["#a", "#b"], valueFrom: "$(self[0] + self[1])" }
-    outputs:
-      - {id: echo_out}
+    in:
+      c:
+        source: ["#a", "#b"]
+        valueFrom: "$(self[0] + self[1])"
+    out: [echo_out]

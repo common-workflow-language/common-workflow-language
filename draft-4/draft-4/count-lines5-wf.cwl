@@ -3,18 +3,17 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-    - id: file1
+    file1:
       type: File
       default: {class: File, path: hello.txt}
 outputs:
-    - id: count_output
+    count_output:
       type: int
       source: "#step1/output"
 steps:
-  - id: step1
+  step1:
     run: wc2-tool.cwl
-    inputs:
-      - id: file1
+    in:
+      file1:
         source: "#file1"
-    outputs:
-      - id: output
+    out: [output]

@@ -3,10 +3,11 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-    - { id: file1, type: File }
+    file1:
+      type: File
 
 outputs:
-    - id: count_output
+    count_output:
       type: int
       source: "#step1/count_output"
 
@@ -14,10 +15,8 @@ requirements:
   - class: SubworkflowFeatureRequirement
 
 steps:
-  - id: step1
+  step1:
     run: count-lines1-wf.cwl
-    inputs:
-      - id: file1
-        source: "#file1"
-    outputs:
-      - { id: count_output }
+    in:
+      file1: "#file1"
+    out: [count_output]

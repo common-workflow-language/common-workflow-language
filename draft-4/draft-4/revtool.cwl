@@ -14,7 +14,7 @@ description: "Reverse each line using the `rev` command"
 # which indicates that the file name should be added to the command line at
 # a default location.
 inputs:
-  - id: input
+  input:
     type: File
     inputBinding: {}
 
@@ -24,7 +24,7 @@ inputs:
 # and after the program executes, the output value will be the file
 # output.txt in the designated output directory.
 outputs:
-  - id: output
+  output:
     type: File
     outputBinding:
       glob: output.txt

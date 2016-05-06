@@ -14,9 +14,8 @@ $graph:
     - class: InlineJavascriptRequirement
 
   inputs:
-    - id: file
-      type: File
-    - id: index.py
+    file:  File
+    index.py:
       type: File
       default:
         class: File
@@ -24,7 +23,7 @@ $graph:
       inputBinding:
         position: 0
   outputs:
-    - id: result
+    result:
       type: File
       outputBinding:
         glob: input.txt
@@ -41,7 +40,7 @@ $graph:
   requirements:
     - class: InlineJavascriptRequirement
   inputs:
-    - id: file
+    file:
       type: File
       inputBinding:
         position: 1
@@ -51,19 +50,19 @@ $graph:
         - '$(self.path+".idx3")'
         - '$({"path": self.path+".idx4", "class": "File"})'
         - '${ return self.path+".idx5"; }'
-    - id: search.py
+    search.py:
       type: File
       default:
         class: File
         path: search.py
       inputBinding:
         position: 0
-    - id: term
+    term:
       type: string
       inputBinding:
         position: 2
   outputs:
-    - id: result
+    result:
       type: File
       outputBinding:
         glob: result.txt
@@ -72,30 +71,26 @@ $graph:
 - id: main
   class: Workflow
   inputs:
-    - id: infile
-      type: File
-    - id: term
-      type: string
+    infile: File
+    term: string
   outputs:
-    - id: outfile
+    outfile:
       type: File
       source: "#main/search/result"
-    - id: indexedfile
+    indexedfile:
       type: File
       source: "#main/index/result"
 
   steps:
-    - id: index
+    index:
       run: "#index"
-      inputs:
-        - { id: file, source: "#main/infile" }
-      outputs:
-        - id: result
+      in:
+        file: "#main/infile"
+      out: [result]
 
-    - id: search
+    search:
       run: "#search"
-      inputs:
-        - { id: file, source: "#main/index/result" }
-        - { id: term, source: "#main/term" }
-      outputs:
-        - id: result
+      in:
+        file: "#main/index/result"
+        term: "#main/term"
+      out: [result]

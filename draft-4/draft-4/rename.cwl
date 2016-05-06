@@ -2,17 +2,17 @@ class: CommandLineTool
 cwlVersion: cwl:draft-4.dev1
 baseCommand: "true"
 requirements:
-  - class: CreateFileRequirement
+  CreateFileRequirement:
     fileDef:
       - filename: $(inputs.newname)
         fileContent: $(inputs.srcfile)
 inputs:
-  - id: srcfile
+  srcfile:
     type: File
-  - id: newname
+  newname:
     type: string
 outputs:
-  - id: outfile
+  outfile:
     type: File
     outputBinding:
       glob: $(inputs.newname)

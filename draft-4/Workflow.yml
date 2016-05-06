@@ -441,7 +441,8 @@ $graph:
       type:
         - type: array
           items: "#WorkflowStep"
-
+      jsonldPredicate:
+          mapSubject: id
 
 
 - type: record

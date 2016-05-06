@@ -1,18 +1,17 @@
 class: CommandLineTool
 cwlVersion: cwl:draft-4.dev1
 inputs:
-  - { id: in, type: string }
+  in: string
 outputs:
-  - id: out
+  out:
     type: File
     outputBinding:
       glob: out
 
 hints:
-  - class: EnvVarRequirement
+  EnvVarRequirement:
     envDef:
-      - envName: TEST_ENV
-        envValue: $(inputs.in)
+      TEST_ENV: $(inputs.in)
 
 baseCommand: ["/bin/bash", "-c", "echo $TEST_ENV"]
 

@@ -2,7 +2,7 @@
 cwlVersion: cwl:draft-4.dev1
 class: Workflow
 inputs:
-  - id: inp
+  inp:
     type:
       type: array
       items:
@@ -12,7 +12,7 @@ inputs:
           - name: instr
             type: string
 outputs:
-  - id: out
+  out:
     type:
       type: array
       items: string
@@ -23,26 +23,29 @@ requirements:
   - class: StepInputExpressionRequirement
 
 steps:
-  - id: step1
-    inputs:
-      - {id: echo_in, source: "#inp", valueFrom: $(self.instr) }
-      - {id: first, source: "#inp", valueFrom: "$(self[0].instr)" }
-    outputs:
-      - id: echo_out
+  step1:
+    in:
+      echo_in:
+        source: "#inp"
+        valueFrom: $(self.instr)
+      first:
+        source: "#inp"
+        valueFrom: "$(self[0].instr)"
+    out: [echo_out]
     scatter: "#step1/echo_in"
     run:
       class: CommandLineTool
       inputs:
-        - id: first
+        first:
           type: string
           inputBinding:
             position: 1
-        - id: echo_in
+        echo_in:
           type: string
           inputBinding:
             position: 2
       outputs:
-        - id: echo_out
+        echo_out:
           type: string
           outputBinding:
             glob: "step1_out"

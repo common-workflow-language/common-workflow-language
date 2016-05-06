@@ -3,24 +3,23 @@ class: Workflow
 cwlVersion: cwl:draft-4.dev1
 
 inputs:
-  - { id: file1, type: File }
+  file1:
+    type: File
 
 outputs:
-  - id: count_output
+  count_output:
     type: int
     source: "#step2/output"
 
 steps:
-  - id: step1
+  step1:
     run: wc-tool.cwl
-    inputs:
-      - {id: file1, source: "#file1"}
-    outputs:
-      - {id: output}
+    in:
+      file1: "#file1"
+    out: [output]
 
-  - id: step2
+  step2:
     run: parseInt-tool.cwl
-    inputs:
-      - {id: file1, source: "#step1/output"}
-    outputs:
-      - {id: output}
+    in:
+      file1: "#step1/output"
+    out: [output]

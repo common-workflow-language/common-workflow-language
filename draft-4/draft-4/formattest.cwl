@@ -4,13 +4,13 @@ cwlVersion: cwl:draft-4.dev1
 class: CommandLineTool
 description: "Reverse each line using the `rev` command"
 inputs:
-  - id: "#input"
+  input:
     type: File
     inputBinding: {}
     format: edam:format_2330
 
 outputs:
-  - id: "#output"
+  output:
     type: File
     outputBinding:
       glob: output.txt
