@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-3
+cwlVersion: cwl:draft-4.dev1
 requirements:
   - class: InlineJavascriptRequirement
 

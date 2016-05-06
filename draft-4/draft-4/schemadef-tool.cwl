@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: cwl:draft-3
+cwlVersion: cwl:draft-4.dev1
 requirements:
   - $import: schemadef-type.yml
   - class: InlineJavascriptRequirement

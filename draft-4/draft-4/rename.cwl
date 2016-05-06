@@ -1,4 +1,5 @@
 class: CommandLineTool
+cwlVersion: cwl:draft-4.dev1
 baseCommand: "true"
 requirements:
   - class: CreateFileRequirement
