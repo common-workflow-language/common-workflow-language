@@ -562,6 +562,9 @@ $graph:
         type: "array"
         items: "#EnvironmentDef"
       doc: The list of environment variables.
+      jsonldPredicate:
+        mapSubject: envName
+        mapPredicate: envValue
 
 
 - type: record
