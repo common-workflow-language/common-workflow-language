@@ -365,7 +365,9 @@ class Loader(object):
 
         if isinstance(document, dict):
             for idmapField in loader.idmap:
-                if idmapField in document and isinstance(document[idmapField], dict):
+                if (idmapField in document and isinstance(document[idmapField], dict) and
+                    "$import" not in document[idmapField] and
+                    "$include" not in document[idmapField]):
                     ls = []
                     for k, v in document[idmapField].items():
                         if not isinstance(v, dict):
