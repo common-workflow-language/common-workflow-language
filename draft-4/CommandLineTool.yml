@@ -38,8 +38,12 @@ $graph:
     - |
       ## Introduction to draft 4
 
-      This specification represents the third milestone of the CWL group.
-      Since draft-3, this draft introduces the following major changes and additions:
+      This specification represents the fourth milestone of the CWL group.
+      Since draft-3, this draft introduces the following changes and additions:
+
+        * Preliminary support for initialWorkDir & the Directory type
+        * "id: name" is now just "name"; "class: Classname" is now just
+          "Classtname".
 
       ## Purpose
 

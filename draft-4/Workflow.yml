@@ -34,10 +34,10 @@ $graph:
 
       ## Introduction to draft 4
 
-      This specification represents the fourth milestone of the CWL group.  Since
-      draft-3, this draft introduces the following changes and additions:
+      This specification represents the fourth milestone of the CWL group.
+      Since draft-3, this draft introduces the following changes and additions:
 
-        * TBD
+        * The 'inputs' and 'outputs' fields have been renamed 'in' and 'out'.
 
       ## Purpose
 
