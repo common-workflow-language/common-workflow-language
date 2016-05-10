@@ -1,0 +1,79 @@
+[{
+    "source": {
+                "class": "File",
+                "path": "../draft-3/README.md"
+            },
+            "target": "draft-3/index.html",
+            "renderlist": [],
+            "redirect": [],
+            "brandlink": "../index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
+            "primtype": null
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/CommandLineTool-standalone.yml",
+                "secondaryFiles": {"$import": "draft3-deps.json"}
+            },
+            "target": "draft-3/CommandLineTool.html",
+            "renderlist": [
+                "https://w3id.org/cwl/cwl#CommandLineToolDoc",
+                "https://w3id.org/cwl/cwl#CommandLineTool"
+            ],
+            "redirect": [],
+            "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
+            "primtype": "#CWLType"
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/CommonWorkflowLanguage.yml",
+                "secondaryFiles": {"$import": "draft3-deps.json"}
+            },
+            "target": "draft-3/Workflow.html",
+            "renderlist": [
+                "https://w3id.org/cwl/cwl#WorkflowDoc",
+                "https://w3id.org/cwl/cwl#Workflow"
+            ],
+            "redirect": [
+                "https://w3id.org/cwl/cwl#CommandLineTool=CommandLineTool.html#CommandLineTool",
+                "https://w3id.org/cwl/cwl#DockerRequirement=CommandLineTool.html#DockerRequirement",
+                "https://w3id.org/cwl/cwl#CreateFileRequirement=CommandLineTool.html#CreateFileRequirement",
+                "https://w3id.org/cwl/cwl#EnvVarRequirement=CommandLineTool.html#EnvVarRequirement",
+                "https://w3id.org/cwl/cwl#ShellCommandRequirement=CommandLineTool.html#ShellCommandRequirement",
+                "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
+            ],
+            "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
+            "primtype": "#CWLType"
+        },
+        {
+            "source": {
+                "class": "File",
+                "path": "../draft-3/salad/schema_salad/metaschema/metaschema.yml",
+                "secondaryFiles": {"$import": "draft3-deps.json"}
+            },
+            "target": "draft-3/SchemaSalad.html",
+            "renderlist": [
+                "https://w3id.org/cwl/salad#Semantic_Annotations_for_Linked_Avro_Data",
+                "https://w3id.org/cwl/salad#SaladRecordSchema",
+                "https://w3id.org/cwl/salad#SaladEnumSchema",
+                "https://w3id.org/cwl/salad#Documentation"
+            ],
+            "redirect": [],
+            "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
+            "primtype": null
+        },
+        {
+            "source": {"$import": "userguide-input.json"},
+            "target": "draft-3/UserGuide.html",
+            "renderlist": [],
+            "redirect": [],
+            "brandlink": "index.html",
+            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
+            "primtype": null
+        }
+    ]

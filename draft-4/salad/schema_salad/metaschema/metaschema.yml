@@ -1,0 +1,452 @@
+$base: "https://w3id.org/cwl/salad#"
+
+$namespaces:
+  sld:  "https://w3id.org/cwl/salad#"
+  dct:  "http://purl.org/dc/terms/"
+  rdf:  "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+  xsd:  "http://www.w3.org/2001/XMLSchema#"
+
+$graph:
+
+- name: "Semantic_Annotations_for_Linked_Avro_Data"
+  type: documentation
+  doc:
+    - $include: salad.md
+    - $import: field_name.yml
+    - $import: ident_res.yml
+    - $import: link_res.yml
+    - $import: vocab_res.yml
+    - $include: import_include.md
+
+- name: "Link_Validation"
+  type: documentation
+  doc: |
+    # Link validation
+
+    Once a document has been preprocessed, an implementation may validate
+    links.  The link validation traversal may visit fields which the schema
+    designates as link fields and check that each URI references an existing
+    object in the current document, an imported document, file system, or
+    network resource.  Failure to validate links may be a fatal error.  Link
+    validation behavior for individual fields may be modified by `identity` and
+    `noLinkCheck` in the `jsonldPredicate` section of the field schema.
+
+
+- name: "Schema_validation"
+  type: documentation
+  doc: ""
+
+
+# - name: "JSON_LD_Context"
+#   type: documentation
+#   doc: |
+#     # Generating JSON-LD Context
+
+#     How to generate the json-ld context...
+
+
+- name: PrimitiveType
+  type: enum
+  symbols:
+    - "sld:null"
+    - "xsd:boolean"
+    - "xsd:int"
+    - "xsd:long"
+    - "xsd:float"
+    - "xsd:double"
+    - "xsd:string"
+  doc:
+    - |
+      Salad data types are based on Avro schema declarations.  Refer to the
+      [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
+      detailed information.
+    - "null: no value"
+    - "boolean: a binary value"
+    - "int: 32-bit signed integer"
+    - "long: 64-bit signed integer"
+    - "float: single precision (32-bit) IEEE 754 floating-point number"
+    - "double: double precision (64-bit) IEEE 754 floating-point number"
+    - "string: Unicode character sequence"
+
+
+- name: "Any"
+  type: enum
+  symbols: ["#Any"]
+  doc: |
+    The **Any** type validates for any non-null value.
+
+
+- name: JsonldPredicate
+  type: record
+  doc: |
+    Attached to a record field to define how the parent record field is handled for
+    URI resolution and JSON-LD context generation.
+  fields:
+    - name: _id
+      type: ["null", string]
+      jsonldPredicate:
+        _id: sld:_id
+        _type: "@id"
+        identity: true
+      doc: |
+        The predicate URI that this field corresponds to.
+        Corresponds to JSON-LD `@id` directive.
+    - name: _type
+      type: ["null", string]
+      doc: |
+        The context type hint, corresponds to JSON-LD `@type` directive.
+
+        * If the value of this field is `@id` and `identity` is false or
+        unspecified, the parent field must be resolved using the link
+        resolution rules.  If `identity` is true, the parent field must be
+        resolved using the identifier expansion rules.
+
+        * If the value of this field is `@vocab`, the parent field must be
+          resolved using the vocabulary resolution rules.
+
+    - name: _container
+      type: ["null", string]
+      doc: |
+        Structure hint, corresponds to JSON-LD `@container` directive.
+    - name: identity
+      type: ["null", boolean]
+      doc: |
+        If true and `_type` is `@id` this indicates that the parent field must
+        be resolved according to identity resolution rules instead of link
+        resolution rules.  In addition, the field value is considered an
+        assertion that the linked value exists; absence of an object in the loaded document
+        with the URI is not an error.
+    - name: noLinkCheck
+      type: ["null", boolean]
+      doc: |
+        If true, this indicates that link validation traversal must stop at
+        this field.  This field (it is is a URI) or any fields under it (if it
+        is an object or array) are not subject to link checking.
+    - name: mapSubject
+      type: ["null", string]
+      doc: |
+        If the value of the field is a JSON object, it must be transformed
+        into an array of JSON objects, where each key-value pair from the
+        source JSON object is a list item, the list items must be JSON objects,
+        and the key is assigned to the field specified by `mapSubject`.
+    - name: mapPredicate
+      type: ["null", string]
+      doc: |
+        Only applies if `mapSubject` is also provided.  If the value of the
+        field is a JSON object, it is transformed as described in `mapSubject`,
+        with the addition that when the value of a map item is not an object,
+        the item is transformed to a JSON object with the key assigned to the
+        field specified by `mapSubject` and the value assigned to the field
+        specified by `mapPredicate`.
+
+- name: SpecializeDef
+  type: record
+  fields:
+    - name: specializeFrom
+      type: string
+      doc: "The data type to be replaced"
+      jsonldPredicate:
+        _id: "sld:specializeFrom"
+        _type: "@id"
+
+    - name: specializeTo
+      type: string
+      doc: "The new data type to replace with"
+      jsonldPredicate:
+        _id: "sld:specializeTo"
+        _type: "@id"
+
+
+- name: NamedType
+  type: record
+  abstract: true
+  fields:
+    - name: name
+      type: string
+      jsonldPredicate: "@id"
+      doc: "The identifier for this type"
+
+
+- name: DocType
+  type: record
+  abstract: true
+  fields:
+    - name: doc
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: "A documentation string for this type, or an array of strings which should be concatenated."
+      jsonldPredicate: "sld:doc"
+
+    - name: docParent
+      type: ["null", string]
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for this type should appear in a subsection under `docParent`.
+      jsonldPredicate:
+        _id: "sld:docParent"
+        _type: "@id"
+
+    - name: docChild
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for `docChild` should appear in a subsection under this type.
+      jsonldPredicate:
+        _id: "sld:docChild"
+        _type: "@id"
+
+    - name: docAfter
+      type: ["null", string]
+      doc: |
+        Hint to indicate that during documentation generation, documentation
+        for this type should appear after the `docAfter` section at the same
+        level.
+      jsonldPredicate:
+        _id: "sld:docAfter"
+        _type: "@id"
+
+
+- name: SchemaDefinedType
+  type: record
+  extends: "#DocType"
+  doc: |
+    Abstract base for schema-defined types.
+  abstract: true
+  fields:
+    - name: jsonldPredicate
+      type:
+        - "null"
+        - string
+        - "#JsonldPredicate"
+      doc: |
+        Annotate this type with linked data context.
+      jsonldPredicate: "sld:jsonldPredicate"
+
+    - name: documentRoot
+      type: ["null", boolean]
+      doc: |
+        If true, indicates that the type is a valid at the document root.  At
+        least one type in a schema must be tagged with `documentRoot: true`.
+
+
+- name: RecordField
+  type: record
+  doc: "A field of a record."
+  fields:
+    - name: name
+      type: string
+      jsonldPredicate: "@id"
+      doc: |
+        The name of the field
+
+    - name: doc
+      type: ["null", string]
+      doc: |
+        A documentation string for this field
+      jsonldPredicate: "sld:doc"
+
+    - name: type
+      type:
+        - "#PrimitiveType"
+        - "#RecordSchema"
+        - "#EnumSchema"
+        - "#ArraySchema"
+        - string
+        - type: array
+          items:
+            - "#PrimitiveType"
+            - "#RecordSchema"
+            - "#EnumSchema"
+            - "#ArraySchema"
+            - string
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+      doc: |
+        The field type
+
+
+- name: SaladRecordField
+  type: record
+  extends: "#RecordField"
+  doc: "A field of a record."
+  fields:
+    - name: jsonldPredicate
+      type:
+        - "null"
+        - string
+        - "#JsonldPredicate"
+      doc: |
+        Annotate this type with linked data context.
+      jsonldPredicate: "sld:jsonldPredicate"
+
+- name: RecordSchema
+  type: record
+  fields:
+    - name: type
+      doc: "Must be `record`"
+      type:
+        name: Record_symbol
+        type: enum
+        symbols:
+          - "sld:record"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+
+    - name: "fields"
+      type:
+        - "null"
+        - type: "array"
+          items: "#RecordField"
+
+      jsonldPredicate: "sld:fields"
+      doc: "Defines the fields of the record."
+
+
+- name: SaladRecordSchema
+  type: record
+  extends: ["#NamedType", "#RecordSchema", "#SchemaDefinedType"]
+  documentRoot: true
+  specialize:
+    specializeFrom: "#RecordField"
+    specializeTo: "#SaladRecordField"
+  fields:
+    - name: abstract
+      type: ["null", boolean]
+      doc: |
+        If true, this record is abstract and may be used as a base for other
+        records, but is not valid on its own.
+
+    - name: extends
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        _id: "sld:extends"
+        _type: "@id"
+      doc: |
+        Indicates that this record inherits fields from one or more base records.
+
+    - name: specialize
+      type:
+        - "null"
+        - "#SpecializeDef"
+        - type: array
+          items: "#SpecializeDef"
+      doc: |
+        Only applies if `extends` is declared.  Apply type specialization using the
+        base record as a template.  For each field inherited from the base
+        record, replace any instance of the type `specializeFrom` with
+        `specializeTo`.
+
+
+- name: EnumSchema
+  type: record
+  doc: |
+    Define an enumerated type.
+  fields:
+    - name: type
+      doc: "Must be `enum`"
+      type:
+        name: Enum_symbol
+        type: enum
+        symbols:
+          - "sld:enum"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+
+    - name: "symbols"
+      type:
+        - type: "array"
+          items: "string"
+      jsonldPredicate:
+        _id: "sld:symbols"
+        _type: "@id"
+        identity: true
+      doc: "Defines the set of valid symbols."
+
+
+- name: SaladEnumSchema
+  type: record
+  extends: ["#EnumSchema", "#SchemaDefinedType"]
+  documentRoot: true
+  doc: |
+    Define an enumerated type.
+  fields:
+    - name: extends
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+      jsonldPredicate:
+        _id: "sld:extends"
+        _type: "@id"
+      doc: |
+        Indicates that this enum inherits symbols from a base enum.
+
+
+- name: ArraySchema
+  type: record
+  fields:
+    - name: type
+      doc: "Must be `array`"
+      type:
+        name: Array_symbol
+        type: enum
+        symbols:
+          - "sld:array"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+
+    - name: items
+      type:
+        - "#PrimitiveType"
+        - "#RecordSchema"
+        - "#EnumSchema"
+        - "#ArraySchema"
+        - string
+        - type: array
+          items:
+            - "#PrimitiveType"
+            - "#RecordSchema"
+            - "#EnumSchema"
+            - "#ArraySchema"
+            - string
+      jsonldPredicate:
+        _id: "sld:items"
+        _type: "@vocab"
+      doc: "Defines the type of the array elements."
+
+
+- name: Documentation
+  type: record
+  extends: ["#NamedType", "#DocType"]
+  documentRoot: true
+  doc: |
+    A documentation section.  This type exists to facilitate self-documenting
+    schemas but has no role in formal validation.
+  fields:
+    - name: type
+      doc: "Must be `documentation`"
+      type:
+        name: Documentation_symbol
+        type: enum
+        symbols:
+          - "sld:documentation"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"

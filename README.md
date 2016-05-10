@@ -20,6 +20,10 @@ The current stable specification is [draft 3](http://www.commonwl.org/draft-3/):
 
 http://www.commonwl.org/draft-3/
 
+The next work-in-progress specification is [draft 4](http://www.commonwl.org/draft-4/):
+
+http://www.commonwl.org/draft-4/
+
 Older drafts: [draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1), [draft-2](http://www.commonwl.org/draft-2/)
 
 ### Citation
@@ -48,7 +52,7 @@ Some of the software supporting running Common Workflow Language tools or workfl
   [Airflow wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/SciDAP)
 * [cwl2script](https://github.com/common-workflow-language/cwl2script),
   [cwl2script page](https://github.com/common-workflow-language/common-workflow-language/wiki/cwl2script)
-* [Apache Taverna](http://taverna.incubator.apache.org/), 
+* [Apache Taverna](http://taverna.incubator.apache.org/),
   [Apache Taverna wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Taverna)
 
 ## Examples

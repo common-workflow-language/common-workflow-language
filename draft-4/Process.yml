@@ -3,11 +3,10 @@ $base: "https://w3id.org/cwl/cwl#"
 $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
   sld: "https://w3id.org/cwl/salad#"
-  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
 
 $graph:
 
-- name: "Common Workflow Language, Draft 3"
+- name: "Common Workflow Language, Draft 4"
   type: documentation
   doc: {$include: concepts.md}
 
@@ -32,6 +31,7 @@ $graph:
     - cwl:draft-3.dev4
     - cwl:draft-3.dev5
     - cwl:draft-3
+    - cwl:draft-4.dev1
 
 - name: CWLType
   type: enum
@@ -108,6 +108,34 @@ $graph:
         File format ontologies may be provided in the "$schema" metadata at the
         root of the document.  If no ontologies are specified in `$schema`, the
         runtime may perform exact file format matches.
+
+
+- name: Directory
+  type: record
+  docParent: "#CWLType"
+  doc: |
+    Represents a directory to present to a command line tool. This could be a virtual
+    directory, made of files assembled from a number of concrete directories.
+  fields:
+    - name: class
+      type:
+        type: enum
+        name: Directory_class
+        symbols:
+          - cwl:Directory
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+      doc: Must be `Directory` to indicate this object describes a Directory.
+    - name: path
+      type: string
+      doc: The path to the directory.
+      jsonldPredicate:
+        "_id": "cwl:path"
+        "_type": "@id"
+    # - name: size
+    #   type: ["null", long]
+    #   doc: Optional directory size.
 
 
 - name: SchemaBase
@@ -451,7 +479,10 @@ $graph:
       type:
         type: array
         items: "#InputParameter"
-      jsonldPredicate: "cwl:inputs"
+      jsonldPredicate:
+        _id: "cwl:inputs"
+        mapSubject: id
+        mapPredicate: type
       doc: |
         Defines the input parameters of the process.  The process is ready to
         run when all required input parameters are associated with concrete
@@ -462,7 +493,10 @@ $graph:
       type:
         type: array
         items: "#OutputParameter"
-      jsonldPredicate: "cwl:outputs"
+      jsonldPredicate:
+        _id: "cwl:outputs"
+        mapSubject: id
+        mapPredicate: type
       doc: |
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
@@ -471,7 +505,9 @@ $graph:
         - "null"
         - type: array
           items: "#ProcessRequirement"
-      jsonldPredicate: "cwl:requirements"
+      jsonldPredicate:
+        _id: "cwl:requirements"
+        mapSubject: class
       doc: |
         Declares requirements that apply to either the runtime environment or the
         workflow engine that must be met in order to execute this process.  If
@@ -484,7 +520,6 @@ $graph:
         - "null"
         - type: array
           items: Any
-      jsonldPredicate: "cwl:hints"
       doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
@@ -493,6 +528,7 @@ $graph:
       jsonldPredicate:
         _id: cwl:hints
         noLinkCheck: true
+        mapSubject: class
     - name: label
       type:
         - "null"
