@@ -2,6 +2,11 @@
 class: CommandLineTool
 cwlVersion: "cwl:draft-3"
 
+description: |
+ Generic interface to run a Common Workflow Language tool or workflow from the
+ command line. To be implemented by each CWL implementation for use by users
+ and for testing conformance to the standard.
+
 inputs:
  - id: outdir
    type: string
