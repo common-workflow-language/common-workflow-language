@@ -21,9 +21,13 @@ inputs:
 
  - id: toolfile
    type: File
+   inputBinding:
+    - position: 1
 
  - id: jobfile
    type: File
+   inputBinding:
+    - position: 2
 
  - id: conformance-test
    type: bool
