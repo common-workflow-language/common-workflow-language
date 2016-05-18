@@ -20,7 +20,10 @@ inputs:
     - prefix: "--quiet"
 
  - id: toolfile
-   type: File
+   type: [ "null", File ]
+   description: |
+    The tool or workflow description to run. Optional if the jobfile has a
+    `cwl:tool` field to indicate the tool or workflow description to run.
    inputBinding:
     - position: 1
 
