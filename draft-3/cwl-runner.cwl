@@ -14,12 +14,12 @@ inputs:
    description: |
     Output directory, defaults to the current directory
    inputBinding:
-    - prefix: "--outdir"
+    prefix: "--outdir"
 
  - id: quiet
-   type: bool
+   type: boolean
    inputBinding:
-    - prefix: "--quiet"
+    prefix: "--quiet"
 
  - id: toolfile
    type: [ "null", File ]
@@ -27,30 +27,30 @@ inputs:
     The tool or workflow description to run. Optional if the jobfile has a
     `cwl:tool` field to indicate the tool or workflow description to run.
    inputBinding:
-    - position: 1
+    position: 1
 
  - id: jobfile
    type: File
    inputBinding:
-    - position: 2
+    position: 2
 
  - id: conformance-test
-   type: bool
+   type: boolean
    inputBinding:
-    - prefix: "--conformance-test"
+    prefix: "--conformance-test"
 
  - id: basedir
    type: string
    inputBinding:
-    - prefix: "--basedir"
+    prefix: "--basedir"
 
  - id: no-container
-   type: bool
+   type: boolean
    description: |
     Do not execute jobs in a Docker container, even when specified by the
     CommandLineTool
    inputBinding:
-    - prefix: "--no-container"
+    prefix: "--no-container"
 
  - id: tmp-outdir-prefix
    type: string
@@ -58,14 +58,21 @@ inputs:
     Path prefix for temporary directories. Useful for OS X so that boot2docker
     writes to /Users
    inputBinding:
-    - prefix: "--tmp-outdir-prefix"
+    prefix: "--tmp-outdir-prefix"
 
  - id: tmpdir-prefix
    type: string
    description: |
     Path prefix for temporary directories
    inputBinding:
-    - prefix: "--tmpdir-prefix"
+    prefix: "--tmpdir-prefix"
 
 baseCommand: cwl-runner
 
+stdout: output-object.json
+
+outputs:
+ - id: output-object
+   type: File
+   outputBinding:
+     glob: output-object.json
