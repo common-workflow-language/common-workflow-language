@@ -4,8 +4,8 @@ cwlVersion: "cwl:draft-3"
 
 description: |
  Generic interface to run a Common Workflow Language tool or workflow from the
- command line. To be implemented by each CWL implementation for use by users
- and for testing conformance to the standard.
+ command line. To be implemented by each CWL compliant execution platform for
+ testing conformance to the standard and optionally for use by users.
 
 inputs:
  - id: outdir
@@ -18,6 +18,7 @@ inputs:
 
  - id: quiet
    type: boolean
+   description: no diagnostic output
    inputBinding:
     prefix: "--quiet"
 
@@ -47,8 +48,7 @@ inputs:
  - id: no-container
    type: boolean
    description: |
-    Do not execute jobs in a Docker container, even when specified by the
-    CommandLineTool
+    Do not execute jobs in a Docker container, even when listed as a Requirement
    inputBinding:
     prefix: "--no-container"
 
