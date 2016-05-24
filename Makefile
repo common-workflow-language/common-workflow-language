@@ -155,7 +155,7 @@ diff-cover.html: coverage.xml
 
 ## test        : run the ${MODULE} test suite
 test: FORCE
-	python tests/test_examples.py 
+	python setup.py test
 
 sloccount.sc: ${PYSOURCES} Makefile
 	sloccount --duplicates --wide --details $^ > $@
@@ -169,8 +169,7 @@ list-author-emails:
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
 mypy: ${PYSOURCES}
-	MYPYPATH=typeshed/2.7 mypy --py2 schema_salad
-	#MYPYPATH=typeshed/2.7 mypy --py2  --disallow-untyped-calls schema_salad
+	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls schema_salad
 
 jenkins:
 	if ! test -d env ; then virtualenv env ; fi
