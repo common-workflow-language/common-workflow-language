@@ -17,6 +17,7 @@ from StringIO import StringIO
 from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
+from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import cast, Union, Tuple, Dict, Any, Callable, Iterable
 
@@ -159,6 +160,10 @@ class Loader(object):
                                      format=fmt)
                     break
                 except xml.sax.SAXParseException:  # type: ignore
+                    pass
+                except TypeError:
+                    pass
+                except BadSyntax:
                     pass
 
         for s, _, _ in self.graph.triples((None, RDF.type, RDF.Property)):
