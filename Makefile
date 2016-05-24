@@ -65,7 +65,7 @@ pep8: $(PYSOURCES)
 	pep8 --exclude=_version.py  --show-source --show-pep8 $^ || true
 
 pep8_report.txt: $(PYSOURCES)
-	pep8 --exclude=_version.py $^ > pep8_report.txt || true
+	pep8 --exclude=_version.py $^ > $@ || true
 
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
@@ -75,7 +75,7 @@ pep257: $(PYSOURCES)
 	pep257 --ignore=D100,D101,D102,D103 $^ || true
 
 pep257_report.txt: $(PYSOURCES)
-	pep257 setup.py $^ > pep257_report.txt 2>&1 || true
+	pep257 setup.py $^ > $@ 2>&1 || true
 
 diff_pep257_report: pep257_report.txt
 	diff-quality --violations=pep8 pep257_report.txt
@@ -96,7 +96,7 @@ pylint: $(PYSOURCES)
 
 pylint_report.txt: ${PYSOURCES}
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
-		$^ > pylint_report.txt || true
+		$^ > $@ || true
 
 diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
@@ -147,19 +147,18 @@ htmlcov/index.html: .coverage
 coverage-report: .coverage
 	coverage report
 
-diff-cover: coverage-gcovr.xml coverage.xml
-	diff-cover coverage-gcovr.xml coverage.xml
+diff-cover: coverage.xml
+	diff-cover $^
 
-diff-cover.html: coverage-gcovr.xml coverage.xml
-	diff-cover coverage-gcovr.xml coverage.xml \
-		--html-report diff-cover.html
+diff-cover.html: coverage.xml
+	diff-cover $^ --html-report $@
 
 ## test        : run the ${MODULE} test suite
 test: FORCE
-	python tests/test_examples.py 
+	python setup.py test
 
 sloccount.sc: ${PYSOURCES} Makefile
-	sloccount --duplicates --wide --details $^ > sloccount.sc
+	sloccount --duplicates --wide --details $^ > $@
 
 ## sloccount   : count lines of code
 sloccount: ${PYSOURCES} Makefile
@@ -170,13 +169,15 @@ list-author-emails:
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
 mypy: ${PYSOURCES}
-	MYPYPATH=typeshed/2.7 mypy --py2 schema_salad
-	#MYPYPATH=typeshed/2.7 mypy --py2  --disallow-untyped-calls schema_salad
+	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls schema_salad
 
 jenkins:
 	if ! test -d env ; then virtualenv env ; fi
 	. env/bin/activate ; \
-	${MAKE} install-dep coverage.html coverage.xml mypy pep257_report.txt \
+	${MAKE} install-dep coverage.html coverage.xml pep257_report.txt \
 		sloccount.sc pep8_report.txt pylint_report.txt
+	if ! test -d env3 ; then virtualenv -p python3 env3 ; fi
+	. env3/bin/activate ; \
+	pip install mypy-lang; ${MAKE} mypy
 
 FORCE:

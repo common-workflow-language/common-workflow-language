@@ -17,6 +17,7 @@ from StringIO import StringIO
 from .aslist import aslist
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
+from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import cast, Union, Tuple, Dict, Any, Callable, Iterable
 
@@ -160,6 +161,10 @@ class Loader(object):
                     break
                 except xml.sax.SAXParseException:  # type: ignore
                     pass
+                except TypeError:
+                    pass
+                except BadSyntax:
+                    pass
 
         for s, _, _ in self.graph.triples((None, RDF.type, RDF.Property)):
             self._add_properties(s)
@@ -268,9 +273,7 @@ class Loader(object):
         if not isinstance(ref, (str, unicode)):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = self.expand_url(cast(  # bug in mypy 0.3.1, fixed in 0.4-dev
-            Union[str, unicode], ref), base_url,
-            scoped=(obj is not None))
+        url = self.expand_url(ref, base_url, scoped=(obj is not None))
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -316,7 +319,7 @@ class Loader(object):
             return obj, metadata
 
     def resolve_all(self, document, base_url, file_base=None):
-        # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, str]]
+        # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, Any]]
         loader = self
         metadata = {}  # type: Dict[str, Any]
         if file_base is None:
@@ -526,13 +529,11 @@ class Loader(object):
         if isinstance(link, (str, unicode)):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
-                    if not self.check_file(cast(  # bug in mypy 0.3.1
-                            Union[str, unicode], link)):  # fixed in mypy 0.4-dev
+                    if not self.check_file(link):
                         raise validate.ValidationException(
                             "Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
-                if not self.check_file(cast(  # bug in mypy 0.3.1
-                        Union[str, unicode], link)):  # fixed in mypy 0.4-dev
+                if not self.check_file(link):
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):

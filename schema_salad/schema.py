@@ -159,7 +159,7 @@ def get_metaschema():
 
 
 def load_schema(schema_ref, cache=None):
-    # type: (Union[unicode, Dict[str, Any]], Dict) -> Tuple[ref_resolver.Loader, Union[avro.schema.Names, avro.schema.SchemaParseException], Dict[unicode, Any]]
+    # type: (Union[unicode, Dict[str, Any]], Dict) -> Tuple[ref_resolver.Loader, Union[avro.schema.Names, avro.schema.SchemaParseException], Dict[unicode, Any], ref_resolver.Loader]
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
     if cache is not None:
         metaschema_loader.cache = cache
@@ -330,12 +330,8 @@ def make_valid_avro(items, alltypes, found, union=False):
             ret.append(make_valid_avro(i, alltypes, found, union=union))
         return ret
     if union and isinstance(items, (str, unicode)):
-        if items in alltypes and avro_name(cast(  # bug in mypy 0.3.1, fixed in
-                Union[str, unicode], items)) not in found:  # 0.4-dev
-            return cast(Dict,
-                    make_valid_avro(alltypes[cast(  # bug in mypy 0.3.1, fixed
-                        # fixed in 0.4-dev
-                        Union[str, unicode], items)], alltypes, found,
+        if items in alltypes and avro_name(items) not in found:
+            return cast(Dict, make_valid_avro(alltypes[items], alltypes, found,
                         union=union))
         items = avro_name(items)  # type: ignore
         # bug in mypy 0.3.1, fixed in 0.4-dev
