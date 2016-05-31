@@ -20,7 +20,7 @@
     - |
       ```
 
-      Use a JSON object in a separate file to describe the input of a run:
+      Use a YAML object in a separate file to describe the input of a run:
 
       *echo-job.yml*
       ```
@@ -106,10 +106,11 @@
       Notice that "example_file", as a `File` type, must be provided as an
       object with the fields `class: File` and `path`.
 
-      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      Next, create a whale.txt and invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
 
       ```
+      $ touch whale.txt
       $ cwl-runner inp.cwl inp-job.yml
       [job 140020149614160] /home/example$ echo -f -i42 --example-string hello --file=/home/example/whale.txt
       -f -i42 --example-string hello --file=/home/example/whale.txt
@@ -218,9 +219,10 @@
     - |
       ```
 
-      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      Next, create a tar file for the example and invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
       ```
+      $ touch hello.txt && tar -cvf hello.tar hello.txt
       $ cwl-runner tar.cwl tar-job.yml
       [job 139868145165200] $ tar xf /home/example/hello.tar
       Final process status is success
@@ -308,9 +310,10 @@
     - |
       ```
 
-      Invoke `cwl-runner` with the tool wrapper and the input object on the
+      Create your input files and invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
       ```
+      $ rm hello.tar || true && touch goodbye.txt && tar -cvf hello.tar
       $ cwl-runner tar-param.cwl tar-param-job.yml
       [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
       Final process status is success
@@ -374,11 +377,12 @@
     - |
       ```
 
-      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      Provide a hello.js and invoke `cwl-runner` providing the tool wrapper and the input object
       on the command line:
 
       ```
-      $ cwl-runner example-docker.cwl example-docker-job.yml
+      $ echo "console.log(\"Hello World\");" > hello.js
+      $ cwl-runner docker.cwl docker-job.yml
       [job 140259721854416] /home/example$ docker run -i --volume=/home/example/hello.js:/var/lib/cwl/job369354770_examples/hello.js:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpDLs5hm:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp node:slim node /var/lib/cwl/job369354770_examples/hello.js
       Hello world!
       Final process status is success
@@ -417,11 +421,12 @@
     - |
       ```
 
-      Now invoke `cwl-runner` providing the tool wrapper and the input object
+      Now create a sample Java file and invoke `cwl-runner` providing the tool wrapper and the input object
       on the command line:
 
       ```
-      $ cwl-runner example-arguments.cwl example-arguments-job.yml
+      $ echo "public class Hello {}" > Hello.java
+      $ cwl-runner arguments.cwl arguments-job.yml
       [job 140051188854928] /home/example$ docker run -i --volume=/home/example/Hello.java:/var/lib/cwl/job710906416_example/Hello.java:ro --volume=/home/example:/var/spool/cwl:rw --volume=/tmp/tmpdlQDWi:/tmp:rw --workdir=/var/spool/cwl --read-only=true --net=none --user=1001 --rm --env=TMPDIR=/tmp java:7 javac -d /var/spool/cwl /var/lib/cwl/job710906416_examples/Hello.java
       Final process status is success
       {
