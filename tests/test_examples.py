@@ -97,16 +97,44 @@ class TestSchemas(unittest.TestCase):
             }
         }, "http://example2.com/")
 
-        self.assertEqual(ra["id"], "http://example2.com/#stuff")
+        self.assertEqual("http://example2.com/#stuff", ra["id"])
         for item in ra["inputs"]:
             if item["a"] == 2:
-                self.assertEquals(item["id"],
-                        'http://example2.com/#stuff/zing')
+                self.assertEquals('http://example2.com/#stuff/zing', item["id"])
             else:
-                self.assertEquals(item["id"],
-                        'http://example2.com/#stuff/zip')
-        self.assertEquals(ra['outputs'], ['http://example2.com/#stuff/out'])
-        self.assertEquals(ra['other'], {'n': 9})
+                self.assertEquals('http://example2.com/#stuff/zip', item["id"])
+        self.assertEquals(['http://example2.com/#stuff/out'], ra['outputs'])
+        self.assertEquals({'n': 9}, ra['other'])
+
+    def test_scoped_ref(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ldr.add_context({
+            "ref": {
+                "@type": "@id",
+                "scopedRef": True,
+            },
+            "id": "@id"})
+
+        ra, _ = ldr.resolve_all({
+            "id": "foo",
+            "blurb": {
+                "id": "bar",
+                "blurb": {
+                    "id": "baz",
+                    "ref": ["foo", "bar", "baz"]
+                }
+            }
+        }, "http://example2.com/")
+
+        self.assertEquals({'id': 'http://example2.com/#foo',
+                           'blurb': {
+                               'id': 'http://example2.com/#foo/bar',
+                               'blurb': {
+                                   'ref': ['http://example2.com/#foo',
+                                           'http://example2.com/#foo/bar',
+                                           'http://example2.com/#foo/bar/baz'],
+                                   'id': 'http://example2.com/#foo/bar/baz'}}},
+                          ra)
 
     def test_examples(self):
         self.maxDiff = None
@@ -115,7 +143,7 @@ class TestSchemas(unittest.TestCase):
                 "schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
                 src = ldr.resolve_all(
-                    yaml.load(src_fp, Loader=SafeLoader), "")[0]
+                    yaml.load(src_fp, Loader=SafeLoader), "", toplevel=False)[0]
             with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
                 proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)

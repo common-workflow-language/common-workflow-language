@@ -111,14 +111,14 @@ def main(argsl=None):  # type: (List[str]) -> int
         return 0
 
     # Validate links in the schema document
-    try:
-        metaschema_loader.validate_links(schema_doc)
-    except (validate.ValidationException) as e:
-        _logger.error("Schema `%s` failed link checking:\n%s",
-                      args.schema, e, exc_info=(e if args.debug else False))
-        _logger.debug("Index is %s", metaschema_loader.idx.keys())
-        _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
-        return 1
+    # try:
+    #     metaschema_loader.validate_links(schema_doc)
+    # except (validate.ValidationException) as e:
+    #     _logger.error("Schema `%s` failed link checking:\n%s",
+    #                   args.schema, e, exc_info=(e if args.debug else False))
+    #     _logger.debug("Index is %s", metaschema_loader.idx.keys())
+    #     _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
+    #     return 1
 
     # Validate the schema document against the metaschema
     try:
@@ -197,14 +197,14 @@ def main(argsl=None):  # type: (List[str]) -> int
         return 0
 
     # Validate links in the target document
-    try:
-        document_loader.validate_links(document)
-    except (validate.ValidationException) as e:
-        _logger.error("Document `%s` failed link checking:\n%s",
-                      args.document, e, exc_info=(e if args.debug else False))
-        _logger.debug("Index is %s", json.dumps(
-            document_loader.idx.keys(), indent=4))
-        return 1
+    # try:
+    #     document_loader.validate_links(document)
+    # except (validate.ValidationException) as e:
+    #     _logger.error("Document `%s` failed link checking:\n%s",
+    #                   args.document, e, exc_info=(e if args.debug else False))
+    #     _logger.debug("Index is %s", json.dumps(
+    #         document_loader.idx.keys(), indent=4))
+    #     return 1
 
     # Validate the schema document against the metaschema
     try:
