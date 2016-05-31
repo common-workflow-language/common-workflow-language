@@ -60,6 +60,10 @@ Some of the software supporting running Common Workflow Language tools or workfl
 * [Apache Taverna](http://taverna.incubator.apache.org/),
   [Apache Taverna wiki page](https://github.com/common-workflow-language/common-workflow-language/wiki/Taverna)
 
+We continuously run the CWL conformance tests on several implementations:
+
+https://ci.commonwl.org
+
 ## Examples
 
 [Github repository of example tools and workflows.](https://github.com/common-workflow-language/workflows)
