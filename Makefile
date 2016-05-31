@@ -180,6 +180,6 @@ jenkins:
 		sloccount.sc pep8_report.txt pylint_report.txt
 	if ! test -d env3 ; then virtualenv -p python3 env3 ; fi
 	. env3/bin/activate ; \
-	pip install mypy-lang; ${MAKE} mypy
+	pip install -U mypy-lang; ${MAKE} mypy
 
 FORCE:
