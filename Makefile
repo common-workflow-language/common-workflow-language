@@ -42,6 +42,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install --upgrade $(DEVPKGS)
+	pip install -r requirements.txt
 
 ## install     : install the ${MODULE} module and schema-salad-tool
 install: FORCE
