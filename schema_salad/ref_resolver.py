@@ -19,7 +19,7 @@ import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
-from typing import cast, Union, Tuple, Dict, Any, Callable, Iterable
+from typing import Any, AnyStr, Callable, cast, Dict, List, Iterable, Tuple, TypeVar, Union
 
 _logger = logging.getLogger("salad")
 
@@ -240,7 +240,7 @@ class Loader(object):
         _logger.debug("vocab is %s", self.vocab)
 
     def resolve_ref(self, ref, base_url=None, toplevel=True):
-        # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode]) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
+        # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode], bool) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
 
         obj = None  # type: Dict[str, Any]
@@ -323,7 +323,7 @@ class Loader(object):
             return obj, metadata
 
     def resolve_all(self, document, base_url, file_base=None, toplevel=True):
-        # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, Any]]
+        # type: (Any, Union[str, unicode], Union[str, unicode], bool) -> Tuple[Any, Dict[str, Any]]
         loader = self
         metadata = {}  # type: Dict[str, Any]
         if file_base is None:
@@ -531,8 +531,10 @@ class Loader(object):
         else:
             return False
 
+    FieldType = TypeVar('FieldType', unicode, List[str], Dict[str, Any])
+
     def validate_link(self, field, link, docid):
-        # type: (str, Union[str, unicode, List[str], Dict[str, Any]]) -> bool
+        # type: (AnyStr, FieldType, AnyStr) -> FieldType
         if field in self.nolinkcheck:
             return link
         if isinstance(link, (str, unicode)):
@@ -546,11 +548,10 @@ class Loader(object):
                     split = urlparse.urlsplit(docid)
                     sp = split.fragment.split("/")
                     while True:
-                        sp.append(link)
+                        sp.append(str(link))
                         url = urlparse.urlunsplit(
                             (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
                         if url in self.idx:
-                            print link, "is", url
                             return url
                         sp.pop()
                         if len(sp) == 0:
@@ -578,15 +579,17 @@ class Loader(object):
                                                "list, or a dict.")
         return link
 
-    def getid(self, d):  # type: (Any) -> Union[basestring, None]
+    def getid(self, d):  # type: (Any) -> Union[str, unicode]
         if isinstance(d, dict):
             for i in self.identifiers:
                 if i in d:
-                    if isinstance(d[i], basestring):
+                    if isinstance(d[i], (str, unicode)):
                         return d[i]
         return None
 
-    def validate_links(self, document, base_url):  # type: (Any) -> None
+    DocumentType = TypeVar('DocumentType')
+
+    def validate_links(self, document, base_url):  # type: (DocumentType, Union[str, unicode]) -> DocumentType
         docid = self.getid(document)
         if not docid:
             docid = base_url
@@ -611,7 +614,7 @@ class Loader(object):
 
         for key, val in iterator:
             try:
-                document[key] = self.validate_links(val, docid)
+                document[key] = self.validate_links(val, docid)  # type: ignore
             except validate.ValidationException as v:
                 if key not in self.nolinkcheck:
                     docid2 = self.getid(val)
