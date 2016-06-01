@@ -109,46 +109,55 @@ class TestSchemas(unittest.TestCase):
     def test_scoped_ref(self):
         ldr = schema_salad.ref_resolver.Loader({})
         ldr.add_context({
-            "ref": {
+            "scatter": {
                 "@type": "@id",
                 "scopedRef": True,
+            },
+            "source": {
+                "@type": "@id",
+                "scopedRef": True,
+            },
+            "in": {
+                "mapSubject": "id",
+                "mapPredicate": "source"
+            },
+            "inputs": {
+                "mapSubject": "id",
+                "mapPredicate": "type"
+            },
+            "steps": {
+                "mapSubject": "id"
             },
             "id": "@id"})
 
         ra, _ = ldr.resolve_all({
-            "id": "foo",
-            "blurb": {
-                "id": "bar",
-                "blurg": {
-                    "id": "quux",
-                    "blurb": {
-                        "id": "q2"
-                    }
-                },
-                "blurb": {
-                    "id": "baz",
-                    "ref": ["foo", "bar", "baz", "quux", "quux/q2"]
+            "inputs": {
+                "inp": "string"
+            },
+            "steps": {
+                "step1": {
+                    "in": {
+                        "echo_in": "inp"
+                    },
+                    "scatter": "echo_in"
                 }
             }
         }, "http://example2.com/")
 
-        self.assertEquals({'id': 'http://example2.com/#foo',
-                           'blurb': {
-                               'id': 'http://example2.com/#foo/bar',
-                               "blurg": {
-                                   "id": "http://example2.com/#foo/bar/quux",
-                                   "blurb": {
-                                       "id": "http://example2.com/#foo/bar/quux/q2"
-                                   }
-                               },
-                               'blurb': {
-                                   'ref': ['http://example2.com/#foo',
-                                           'http://example2.com/#foo/bar',
-                                           'http://example2.com/#foo/bar/baz',
-                                           'http://example2.com/#foo/bar/quux',
-                                           'http://example2.com/#foo/bar/quux/q2'],
-                                   'id': 'http://example2.com/#foo/bar/baz'}}},
-                          ra)
+        self.assertEquals({'inputs': [{
+                'id': 'http://example2.com/#inp',
+                'type': 'string'
+            }],
+            'steps': [{
+                    'id': 'http://example2.com/#step1',
+                    'scatter': 'http://example2.com/#step1/echo_in',
+                    'in': [{
+                            'id': 'http://example2.com/#step1/echo_in',
+                            'source': 'http://example2.com/#inp'
+                    }]
+                }]
+        }, ra)
+
 
     def test_examples(self):
         self.maxDiff = None

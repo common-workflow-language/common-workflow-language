@@ -382,7 +382,7 @@ class Loader(object):
                                 v = {loader.mapPredicate[idmapField]: v}
                             else:
                                 raise validate.ValidationException(
-                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
+                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate" % (k, v))
                         v[loader.idmap[idmapField]] = k
                         ls.append(v)
                     document[idmapField] = ls
@@ -545,16 +545,17 @@ class Loader(object):
                 if field in self.scoped_ref_fields:
                     split = urlparse.urlsplit(docid)
                     sp = split.fragment.split("/")
-                    while len(sp) > 0:
-                        sp.pop()
+                    while True:
                         sp.append(link)
                         url = urlparse.urlunsplit(
                             (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
                         if url in self.idx:
                             print link, "is", url
                             return url
-                        else:
-                            sp.pop()
+                        sp.pop()
+                        if len(sp) == 0:
+                            break
+                        sp.pop()
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
                 elif not self.check_file(link):
