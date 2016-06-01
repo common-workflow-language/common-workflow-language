@@ -119,9 +119,15 @@ class TestSchemas(unittest.TestCase):
             "id": "foo",
             "blurb": {
                 "id": "bar",
+                "blurg": {
+                    "id": "quux",
+                    "blurb": {
+                        "id": "q2"
+                    }
+                },
                 "blurb": {
                     "id": "baz",
-                    "ref": ["foo", "bar", "baz"]
+                    "ref": ["foo", "bar", "baz", "quux", "quux/q2"]
                 }
             }
         }, "http://example2.com/")
@@ -129,10 +135,18 @@ class TestSchemas(unittest.TestCase):
         self.assertEquals({'id': 'http://example2.com/#foo',
                            'blurb': {
                                'id': 'http://example2.com/#foo/bar',
+                               "blurg": {
+                                   "id": "http://example2.com/#foo/bar/quux",
+                                   "blurb": {
+                                       "id": "http://example2.com/#foo/bar/quux/q2"
+                                   }
+                               },
                                'blurb': {
                                    'ref': ['http://example2.com/#foo',
                                            'http://example2.com/#foo/bar',
-                                           'http://example2.com/#foo/bar/baz'],
+                                           'http://example2.com/#foo/bar/baz',
+                                           'http://example2.com/#foo/bar/quux',
+                                           'http://example2.com/#foo/bar/quux/q2'],
                                    'id': 'http://example2.com/#foo/bar/baz'}}},
                           ra)
 
