@@ -166,7 +166,7 @@ class TestSchemas(unittest.TestCase):
                 "schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
                 src = ldr.resolve_all(
-                    yaml.load(src_fp, Loader=SafeLoader), "", toplevel=False)[0]
+                    yaml.load(src_fp, Loader=SafeLoader), "", checklinks=False)[0]
             with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
                 proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)

@@ -239,7 +239,7 @@ class Loader(object):
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
 
-    def resolve_ref(self, ref, base_url=None, toplevel=True):
+    def resolve_ref(self, ref, base_url=None, checklinks=True):
         # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode], bool) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
 
@@ -301,7 +301,7 @@ class Loader(object):
             doc = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        obj, metadata = self.resolve_all(doc if doc else obj, doc_url, toplevel=toplevel)
+        obj, metadata = self.resolve_all(doc if doc else obj, doc_url, checklinks=checklinks)
 
         # Requested reference should be in the index now, otherwise it's a bad
         # reference
@@ -322,7 +322,7 @@ class Loader(object):
         except TypeError:
             return obj, metadata
 
-    def resolve_all(self, document, base_url, file_base=None, toplevel=True):
+    def resolve_all(self, document, base_url, file_base=None, checklinks=True):
         # type: (Any, Union[str, unicode], Union[str, unicode], bool) -> Tuple[Any, Dict[str, Any]]
         loader = self
         metadata = {}  # type: Dict[str, Any]
@@ -332,7 +332,7 @@ class Loader(object):
         if isinstance(document, dict):
             # Handle $import and $include
             if ('$import' in document or '$include' in document):
-                return self.resolve_ref(document, base_url=file_base, toplevel=toplevel)
+                return self.resolve_ref(document, base_url=file_base, checklinks=checklinks)
         elif isinstance(document, list):
             pass
         else:
@@ -368,7 +368,7 @@ class Loader(object):
             if "$graph" in document:
                 metadata = _copy_dict_without_key(document, "$graph")
                 document = document["$graph"]
-                metadata, _ = loader.resolve_all(metadata, base_url, file_base=file_base, toplevel=False)
+                metadata, _ = loader.resolve_all(metadata, base_url, file_base=file_base, checklinks=False)
 
         if isinstance(document, dict):
             for idmapField in loader.idmap:
@@ -433,7 +433,7 @@ class Loader(object):
             try:
                 for key, val in document.items():
                     document[key], _ = loader.resolve_all(
-                        val, base_url, file_base=file_base, toplevel=False)
+                        val, base_url, file_base=file_base, checklinks=False)
             except validate.ValidationException as v:
                 _logger.debug("loader is %s", id(loader))
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
@@ -445,7 +445,7 @@ class Loader(object):
                 while i < len(document):
                     val = document[i]
                     if isinstance(val, dict) and "$import" in val:
-                        l, _ = loader.resolve_ref(val, base_url=file_base, toplevel=False)
+                        l, _ = loader.resolve_ref(val, base_url=file_base, checklinks=False)
                         if isinstance(l, list):
                             del document[i]
                             for item in aslist(l):
@@ -456,7 +456,7 @@ class Loader(object):
                             i += 1
                     else:
                         document[i], _ = loader.resolve_all(
-                            val, base_url, file_base=file_base, toplevel=False)
+                            val, base_url, file_base=file_base, checklinks=False)
                         i += 1
             except validate.ValidationException as v:
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
@@ -469,7 +469,7 @@ class Loader(object):
                             metadata[identifer], base_url, scoped=True)
                         loader.idx[metadata[identifer]] = document
 
-        if toplevel:
+        if checklinks:
             self.validate_links(document, "")
 
         return document, metadata
