@@ -129,6 +129,9 @@ class TestSchemas(unittest.TestCase):
                 "mapSubject": "id",
                 "mapPredicate": "type"
             },
+            "outputs": {
+                "mapSubject": "id",
+            },
             "steps": {
                 "mapSubject": "id"
             },
@@ -137,6 +140,12 @@ class TestSchemas(unittest.TestCase):
         ra, _ = ldr.resolve_all({
             "inputs": {
                 "inp": "string"
+            },
+            "outputs": {
+                "out": {
+                    "type": "string",
+                    "source": "step2/out"
+                }
             },
             "steps": {
                 "step1": {
@@ -150,17 +159,22 @@ class TestSchemas(unittest.TestCase):
                     "in": {
                         "inp": "step1/out"
                     },
-                    "scatter": "inp"
+                    "scatter": "inp",
+                    "out": ["out"]
                 }
             }
         }, "http://example2.com/")
 
-        print yaml.dump(ra)
-
-        self.assertEquals({'inputs': [{
+        self.assertEquals(
+            {'inputs': [{
                 'id': 'http://example2.com/#inp',
                 'type': 'string'
             }],
+             'outputs': [{
+                'id': 'http://example2.com/#out',
+                 'type': 'string',
+                 'source': 'http://example2.com/#step2/out'
+             }],
             'steps': [{
                     'id': 'http://example2.com/#step1',
                     'scatter': 'http://example2.com/#step1/inp',
@@ -175,7 +189,8 @@ class TestSchemas(unittest.TestCase):
                     'in': [{
                             'id': 'http://example2.com/#step2/inp',
                             'source': 'http://example2.com/#step1/out'
-                    }]
+                    }],
+                    "out": ["http://example2.com/#step2/out"],
                 }]
         }, ra)
 

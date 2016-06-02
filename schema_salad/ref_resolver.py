@@ -208,7 +208,7 @@ class Loader(object):
                 self.identity_links.add(key)
             elif isinstance(value, dict) and value.get("@type") == "@id":
                 self.url_fields.add(key)
-                if value.get("refScope", False):
+                if "refScope" in value:
                     self.scoped_ref_fields[key] = value["refScope"]
                 if value.get("identity", False):
                     self.identity_links.add(key)
@@ -548,16 +548,14 @@ class Loader(object):
                 if field in self.scoped_ref_fields:
                     split = urlparse.urlsplit(docid)
                     sp = split.fragment.split("/")
-                    print field, self.scoped_ref_fields[field], sp
-                    if self.scoped_ref_fields[field] in ("grandparent"):
+                    n = self.scoped_ref_fields[field]
+                    while n > 0 and len(sp) > 0:
                         sp.pop()
-                    if self.scoped_ref_fields[field] in ("parent", "grandparent"):
-                        sp.pop()
+                        n -= 1
                     while True:
                         sp.append(str(link))
                         url = urlparse.urlunsplit(
                             (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
-                        print "trying", url, "field", field
                         if url in self.idx:
                             return url
                         sp.pop()
