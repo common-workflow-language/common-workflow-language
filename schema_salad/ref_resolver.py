@@ -94,7 +94,7 @@ class Loader(object):
             self.cache = {}
 
         self.url_fields = None  # type: Set[str]
-        self.scoped_ref_fields = None  # type: Dict[unicode, unicode]
+        self.scoped_ref_fields = None  # type: Dict[unicode, int]
         self.vocab_fields = None  # type: Set[str]
         self.identifiers = None  # type: Set[str]
         self.identity_links = None  # type: Set[str]
