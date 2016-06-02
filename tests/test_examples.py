@@ -111,15 +111,19 @@ class TestSchemas(unittest.TestCase):
         ldr.add_context({
             "scatter": {
                 "@type": "@id",
-                "scopedRef": True,
+                "refScope": 0,
             },
             "source": {
                 "@type": "@id",
-                "scopedRef": True,
+                "refScope": 2,
             },
             "in": {
                 "mapSubject": "id",
                 "mapPredicate": "source"
+            },
+            "out": {
+                "@type": "@id",
+                "identity": True
             },
             "inputs": {
                 "mapSubject": "id",
@@ -137,12 +141,21 @@ class TestSchemas(unittest.TestCase):
             "steps": {
                 "step1": {
                     "in": {
-                        "echo_in": "inp"
+                        "inp": "inp"
                     },
-                    "scatter": "echo_in"
+                    "out": ["out"],
+                    "scatter": "inp"
+                },
+                "step2": {
+                    "in": {
+                        "inp": "step1/out"
+                    },
+                    "scatter": "inp"
                 }
             }
         }, "http://example2.com/")
+
+        print yaml.dump(ra)
 
         self.assertEquals({'inputs': [{
                 'id': 'http://example2.com/#inp',
@@ -150,10 +163,18 @@ class TestSchemas(unittest.TestCase):
             }],
             'steps': [{
                     'id': 'http://example2.com/#step1',
-                    'scatter': 'http://example2.com/#step1/echo_in',
+                    'scatter': 'http://example2.com/#step1/inp',
                     'in': [{
-                            'id': 'http://example2.com/#step1/echo_in',
+                            'id': 'http://example2.com/#step1/inp',
                             'source': 'http://example2.com/#inp'
+                    }],
+                    "out": ["http://example2.com/#step1/out"],
+            }, {
+                    'id': 'http://example2.com/#step2',
+                    'scatter': 'http://example2.com/#step2/inp',
+                    'in': [{
+                            'id': 'http://example2.com/#step2/inp',
+                            'source': 'http://example2.com/#step1/out'
                     }]
                 }]
         }, ra)

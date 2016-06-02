@@ -94,7 +94,7 @@ class Loader(object):
             self.cache = {}
 
         self.url_fields = None  # type: Set[str]
-        self.scoped_ref_fields = None  # type: Set[str]
+        self.scoped_ref_fields = None  # type: Dict[unicode, unicode]
         self.vocab_fields = None  # type: Set[str]
         self.identifiers = None  # type: Set[str]
         self.identity_links = None  # type: Set[str]
@@ -187,7 +187,7 @@ class Loader(object):
                 "Refreshing context that already has stuff in it")
 
         self.url_fields = set()
-        self.scoped_ref_fields = set()
+        self.scoped_ref_fields = {}
         self.vocab_fields = set()
         self.identifiers = set()
         self.identity_links = set()
@@ -208,8 +208,8 @@ class Loader(object):
                 self.identity_links.add(key)
             elif isinstance(value, dict) and value.get("@type") == "@id":
                 self.url_fields.add(key)
-                if value.get("scopedRef", False):
-                    self.scoped_ref_fields.add(key)
+                if value.get("refScope", False):
+                    self.scoped_ref_fields[key] = value["refScope"]
                 if value.get("identity", False):
                     self.identity_links.add(key)
             elif isinstance(value, dict) and value.get("@type") == "@vocab":
@@ -376,7 +376,8 @@ class Loader(object):
                     "$import" not in document[idmapField] and
                     "$include" not in document[idmapField]):
                     ls = []
-                    for k, v in document[idmapField].items():
+                    for k in sorted(document[idmapField].keys()):
+                        v = document[idmapField][k]
                         if not isinstance(v, dict):
                             if idmapField in loader.mapPredicate:
                                 v = {loader.mapPredicate[idmapField]: v}
@@ -547,10 +548,16 @@ class Loader(object):
                 if field in self.scoped_ref_fields:
                     split = urlparse.urlsplit(docid)
                     sp = split.fragment.split("/")
+                    print field, self.scoped_ref_fields[field], sp
+                    if self.scoped_ref_fields[field] in ("grandparent"):
+                        sp.pop()
+                    if self.scoped_ref_fields[field] in ("parent", "grandparent"):
+                        sp.pop()
                     while True:
                         sp.append(str(link))
                         url = urlparse.urlunsplit(
                             (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
+                        print "trying", url, "field", field
                         if url in self.idx:
                             return url
                         sp.pop()

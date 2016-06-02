@@ -139,16 +139,17 @@ $graph:
         the item is transformed to a JSON object with the key assigned to the
         field specified by `mapSubject` and the value assigned to the field
         specified by `mapPredicate`.
-    - name: scopedRef
-      type: ["null", boolean]
+    - name: refScope
+      type:
+        - "null"
+        - int
       doc: |
-        If the field contains a relative reference, it must be resolved by
-        searching for valid document references in each successive parent
-        scope.  For example, a reference of "foo" in the context "#foo/bar/baz"
-        will first check for the existence of "#foo/bar/baz/foo", followed
-        by "#foo/bar/foo", then "#foo/foo" and then finally "#foo".  The first
-        valid URI in the search order shall be used as the fully resolved value
-        of the identifier.
+        Remove the specified number of layers from the containing identifer
+        scope and join with the field value to yield the identifier.  For
+        example, an identifer scope of `#foo/bar/baz`, `refScope: 0` and
+        identifier `quux` will yield `#foo/bar/baz/quux`.  `refScope: 1` will
+        yield `#foo/bar/quux`, `refScope: 2` will yield `#foo/quux` and so
+        forth.
 
 - name: SpecializeDef
   type: record
