@@ -139,6 +139,23 @@ $graph:
         the item is transformed to a JSON object with the key assigned to the
         field specified by `mapSubject` and the value assigned to the field
         specified by `mapPredicate`.
+    - name: refScope
+      type:
+        - "null"
+        - int
+      doc: |
+        If the field contains a relative reference, it must be resolved by
+        searching for valid document references in each successive parent scope
+        in the document fragment.  For example, a reference of `foo` in the
+        context `#foo/bar/baz` will first check for the existence of
+        `#foo/bar/baz/foo`, followed by `#foo/bar/foo`, then `#foo/foo` and
+        then finally `#foo`.  The first valid URI in the search order shall be
+        used as the fully resolved value of the identifier.  The value of the
+        refScope field is the specified number of levels from the containing
+        identifer scope before starting the search, so if `refScope: 2` then
+        "baz" and "bar" must be stripped to get the base `#foo` and search
+        `#foo/foo` and the `#foo`.  The last scope searched must be the top
+        level scope before determining if the identifier cannot be resolved.
 
 - name: SpecializeDef
   type: record

@@ -19,7 +19,7 @@ import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
-from typing import cast, Union, Tuple, Dict, Any, Callable, Iterable
+from typing import Any, AnyStr, Callable, cast, Dict, List, Iterable, Tuple, TypeVar, Union
 
 _logger = logging.getLogger("salad")
 
@@ -94,6 +94,7 @@ class Loader(object):
             self.cache = {}
 
         self.url_fields = None  # type: Set[str]
+        self.scoped_ref_fields = None  # type: Dict[unicode, int]
         self.vocab_fields = None  # type: Set[str]
         self.identifiers = None  # type: Set[str]
         self.identity_links = None  # type: Set[str]
@@ -186,6 +187,7 @@ class Loader(object):
                 "Refreshing context that already has stuff in it")
 
         self.url_fields = set()
+        self.scoped_ref_fields = {}
         self.vocab_fields = set()
         self.identifiers = set()
         self.identity_links = set()
@@ -206,6 +208,8 @@ class Loader(object):
                 self.identity_links.add(key)
             elif isinstance(value, dict) and value.get("@type") == "@id":
                 self.url_fields.add(key)
+                if "refScope" in value:
+                    self.scoped_ref_fields[key] = value["refScope"]
                 if value.get("identity", False):
                     self.identity_links.add(key)
             elif isinstance(value, dict) and value.get("@type") == "@vocab":
@@ -235,8 +239,8 @@ class Loader(object):
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
 
-    def resolve_ref(self, ref, base_url=None):
-        # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode]) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
+    def resolve_ref(self, ref, base_url=None, checklinks=True):
+        # type: (Union[Dict[str, Any], str, unicode], Union[str, unicode], bool) -> Tuple[Union[Dict[str, Any], str, unicode], Dict[str, Any]]
         base_url = base_url or 'file://%s/' % os.path.abspath('.')
 
         obj = None  # type: Dict[str, Any]
@@ -297,7 +301,7 @@ class Loader(object):
             doc = self.fetch(doc_url)
 
         # Recursively expand urls and resolve directives
-        obj, metadata = self.resolve_all(doc if doc else obj, doc_url)
+        obj, metadata = self.resolve_all(doc if doc else obj, doc_url, checklinks=checklinks)
 
         # Requested reference should be in the index now, otherwise it's a bad
         # reference
@@ -318,8 +322,8 @@ class Loader(object):
         except TypeError:
             return obj, metadata
 
-    def resolve_all(self, document, base_url, file_base=None):
-        # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, Any]]
+    def resolve_all(self, document, base_url, file_base=None, checklinks=True):
+        # type: (Any, Union[str, unicode], Union[str, unicode], bool) -> Tuple[Any, Dict[str, Any]]
         loader = self
         metadata = {}  # type: Dict[str, Any]
         if file_base is None:
@@ -328,7 +332,7 @@ class Loader(object):
         if isinstance(document, dict):
             # Handle $import and $include
             if ('$import' in document or '$include' in document):
-                return self.resolve_ref(document, file_base)
+                return self.resolve_ref(document, base_url=file_base, checklinks=checklinks)
         elif isinstance(document, list):
             pass
         else:
@@ -364,7 +368,7 @@ class Loader(object):
             if "$graph" in document:
                 metadata = _copy_dict_without_key(document, "$graph")
                 document = document["$graph"]
-                metadata, _ = loader.resolve_all(metadata, base_url, file_base)
+                metadata, _ = loader.resolve_all(metadata, base_url, file_base=file_base, checklinks=False)
 
         if isinstance(document, dict):
             for idmapField in loader.idmap:
@@ -372,13 +376,14 @@ class Loader(object):
                     "$import" not in document[idmapField] and
                     "$include" not in document[idmapField]):
                     ls = []
-                    for k, v in document[idmapField].items():
+                    for k in sorted(document[idmapField].keys()):
+                        v = document[idmapField][k]
                         if not isinstance(v, dict):
                             if idmapField in loader.mapPredicate:
                                 v = {loader.mapPredicate[idmapField]: v}
                             else:
                                 raise validate.ValidationException(
-                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
+                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate" % (k, v))
                         v[loader.idmap[idmapField]] = k
                         ls.append(v)
                     document[idmapField] = ls
@@ -412,6 +417,8 @@ class Loader(object):
                     del document[d]
 
             for d in loader.url_fields:
+                if d in self.scoped_ref_fields:
+                    continue
                 if d in document:
                     if isinstance(document[d], basestring):
                         document[d] = loader.expand_url(
@@ -427,7 +434,7 @@ class Loader(object):
             try:
                 for key, val in document.items():
                     document[key], _ = loader.resolve_all(
-                        val, base_url, file_base)
+                        val, base_url, file_base=file_base, checklinks=False)
             except validate.ValidationException as v:
                 _logger.debug("loader is %s", id(loader))
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
@@ -439,7 +446,7 @@ class Loader(object):
                 while i < len(document):
                     val = document[i]
                     if isinstance(val, dict) and "$import" in val:
-                        l, _ = loader.resolve_ref(val, file_base)
+                        l, _ = loader.resolve_ref(val, base_url=file_base, checklinks=False)
                         if isinstance(l, list):
                             del document[i]
                             for item in aslist(l):
@@ -450,7 +457,7 @@ class Loader(object):
                             i += 1
                     else:
                         document[i], _ = loader.resolve_all(
-                            val, base_url, file_base)
+                            val, base_url, file_base=file_base, checklinks=False)
                         i += 1
             except validate.ValidationException as v:
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
@@ -462,6 +469,9 @@ class Loader(object):
                         metadata[identifer] = loader.expand_url(
                             metadata[identifer], base_url, scoped=True)
                         loader.idx[metadata[identifer]] = document
+
+        if checklinks:
+            self.validate_links(document, "")
 
         return document, metadata
 
@@ -522,10 +532,12 @@ class Loader(object):
         else:
             return False
 
-    def validate_link(self, field, link):
-        # type: (str, Union[str, unicode, List[str], Dict[str, Any]]) -> bool
+    FieldType = TypeVar('FieldType', unicode, List[str], Dict[str, Any])
+
+    def validate_link(self, field, link, docid):
+        # type: (AnyStr, FieldType, AnyStr) -> FieldType
         if field in self.nolinkcheck:
-            return True
+            return link
         if isinstance(link, (str, unicode)):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
@@ -533,38 +545,59 @@ class Loader(object):
                         raise validate.ValidationException(
                             "Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
-                if not self.check_file(link):
+                if field in self.scoped_ref_fields:
+                    split = urlparse.urlsplit(docid)
+                    sp = split.fragment.split("/")
+                    n = self.scoped_ref_fields[field]
+                    while n > 0 and len(sp) > 0:
+                        sp.pop()
+                        n -= 1
+                    while True:
+                        sp.append(str(link))
+                        url = urlparse.urlunsplit(
+                            (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
+                        if url in self.idx:
+                            return url
+                        sp.pop()
+                        if len(sp) == 0:
+                            break
+                        sp.pop()
+                    raise validate.ValidationException(
+                        "Field `%s` contains undefined reference to `%s`" % (field, link))
+                elif not self.check_file(link):
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, list):
             errors = []
-            for i in link:
+            for n, i in enumerate(link):
                 try:
-                    self.validate_link(field, i)
+                    link[n] = self.validate_link(field, i, docid)
                 except validate.ValidationException as v:
                     errors.append(v)
             if errors:
                 raise validate.ValidationException(
                     "\n".join([str(e) for e in errors]))
         elif isinstance(link, dict):
-            self.validate_links(link)
+            self.validate_links(link, docid)
         else:
             raise validate.ValidationException("Link must be a str, unicode, "
                                                "list, or a dict.")
-        return True
+        return link
 
-    def getid(self, d):  # type: (Any) -> Union[basestring, None]
+    def getid(self, d):  # type: (Any) -> Union[str, unicode]
         if isinstance(d, dict):
             for i in self.identifiers:
                 if i in d:
-                    if isinstance(d[i], basestring):
+                    if isinstance(d[i], (str, unicode)):
                         return d[i]
         return None
 
-    def validate_links(self, document):  # type: (Any) -> None
+    DocumentType = TypeVar('DocumentType')
+
+    def validate_links(self, document, base_url):  # type: (DocumentType, Union[str, unicode]) -> DocumentType
         docid = self.getid(document)
-        if docid is None:
-            docid = ""
+        if not docid:
+            docid = base_url
 
         errors = []
         iterator = None  # type: Any
@@ -573,8 +606,8 @@ class Loader(object):
         elif isinstance(document, dict):
             try:
                 for d in self.url_fields:
-                    if d not in self.identity_links and d in document:
-                        self.validate_link(d, document[d])
+                    if d in document and d not in self.identity_links:
+                        document[d] = self.validate_link(d, document[d], docid)
             except validate.ValidationException as v:
                 errors.append(v)
             if hasattr(document, "iteritems"):
@@ -582,17 +615,17 @@ class Loader(object):
             else:
                 iterator = document.items()
         else:
-            return
+            return document
 
         for key, val in iterator:
             try:
-                self.validate_links(val)
+                document[key] = self.validate_links(val, docid)  # type: ignore
             except validate.ValidationException as v:
                 if key not in self.nolinkcheck:
-                    docid = self.getid(val)
-                    if docid:
+                    docid2 = self.getid(val)
+                    if docid2:
                         errors.append(validate.ValidationException(
-                            "While checking object `%s`\n%s" % (docid, validate.indent(str(v)))))
+                            "While checking object `%s`\n%s" % (docid2, validate.indent(str(v)))))
                     else:
                         if isinstance(key, basestring):
                             errors.append(validate.ValidationException(
@@ -607,7 +640,7 @@ class Loader(object):
                     "\n".join([str(e) for e in errors]))
             else:
                 raise errors[0]
-        return
+        return document
 
 
 def _copy_dict_without_key(from_dict, filtered_key):
