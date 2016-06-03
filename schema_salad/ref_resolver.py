@@ -318,6 +318,77 @@ class Loader(object):
         except TypeError:
             return obj, metadata
 
+    def _resolve_idmap(self, document, loader):
+        # Convert fields with mapSubject into lists
+        # use mapPredicate if the mapped value isn't a dict.
+        for idmapField in loader.idmap:
+            if (idmapField in document and isinstance(document[idmapField], dict) and
+                "$import" not in document[idmapField] and
+                "$include" not in document[idmapField]):
+                ls = []
+                for k, v in document[idmapField].items():
+                    if not isinstance(v, dict):
+                        if idmapField in loader.mapPredicate:
+                            v = {loader.mapPredicate[idmapField]: v}
+                        else:
+                            raise validate.ValidationException(
+                                "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
+                    v[loader.idmap[idmapField]] = k
+                    ls.append(v)
+                document[idmapField] = ls
+
+    def _resolve_identifier(self, document, loader, base_url):
+        # Expand identifier field (usually 'id') to resolve scope
+        for identifer in loader.identifiers:
+            if identifer in document:
+                if isinstance(document[identifer], basestring):
+                    document[identifer] = loader.expand_url(
+                        document[identifer], base_url, scoped=True)
+                    if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
+                        loader.idx[document[identifer]] = document
+                    base_url = document[identifer]
+                else:
+                    raise validate.ValidationException(
+                        "identifier field '%s' must be a string" % (document[identifer]))
+        return base_url
+
+    def _resolve_identity(self, document, loader, base_url):
+        # Resolve scope for identity fields (fields where the value is the
+        # identity of a standalone node, such as enum symbols)
+        for identifer in loader.identity_links:
+            if identifer in document and isinstance(document[identifer], list):
+                for n, v in enumerate(document[identifer]):
+                    if isinstance(document[identifer][n], basestring):
+                        document[identifer][n] = loader.expand_url(
+                            document[identifer][n], base_url, scoped=True)
+                        if document[identifer][n] not in loader.idx:
+                            loader.idx[document[identifer][
+                                n]] = document[identifer][n]
+
+    def _normalize_fields(self, document, loader):
+        # Normalize fields which are prefixed or full URIn to vocabulary terms
+        for d in document:
+            d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
+            if d != d2:
+                document[d2] = document[d]
+                del document[d]
+
+    def _resolve_uris(self, document, loader, base_url):
+        # Resolve remaining URLs based on document base
+        for d in loader.url_fields:
+            if d in document:
+                if isinstance(document[d], basestring):
+                    document[d] = loader.expand_url(
+                        document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
+                elif isinstance(document[d], list):
+                    document[d] = [
+                        loader.expand_url(
+                            url, base_url, scoped=False,
+                            vocab_term=(d in loader.vocab_fields))
+                        if isinstance(url, (str, unicode))
+                        else url for url in document[d]]
+
+
     def resolve_all(self, document, base_url, file_base=None):
         # type: (Any, Union[str, unicode], Union[str, unicode]) -> Tuple[Any, Dict[str, Any]]
         loader = self
@@ -367,62 +438,12 @@ class Loader(object):
                 metadata, _ = loader.resolve_all(metadata, base_url, file_base)
 
         if isinstance(document, dict):
-            for idmapField in loader.idmap:
-                if (idmapField in document and isinstance(document[idmapField], dict) and
-                    "$import" not in document[idmapField] and
-                    "$include" not in document[idmapField]):
-                    ls = []
-                    for k, v in document[idmapField].items():
-                        if not isinstance(v, dict):
-                            if idmapField in loader.mapPredicate:
-                                v = {loader.mapPredicate[idmapField]: v}
-                            else:
-                                raise validate.ValidationException(
-                                    "mapSubject '%s' value '%s' is not a dict and does not have a mapPredicate", k, v)
-                        v[loader.idmap[idmapField]] = k
-                        ls.append(v)
-                    document[idmapField] = ls
 
-            for identifer in loader.identifiers:
-                if identifer in document:
-                    if isinstance(document[identifer], basestring):
-                        document[identifer] = loader.expand_url(
-                            document[identifer], base_url, scoped=True)
-                        if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
-                            loader.idx[document[identifer]] = document
-                        base_url = document[identifer]
-                    else:
-                        raise validate.ValidationException(
-                            "identifier field '%s' must be a string" % (document[identifer]))
-
-            for identifer in loader.identity_links:
-                if identifer in document and isinstance(document[identifer], list):
-                    for n, v in enumerate(document[identifer]):
-                        if isinstance(document[identifer][n], basestring):
-                            document[identifer][n] = loader.expand_url(
-                                document[identifer][n], base_url, scoped=True)
-                            if document[identifer][n] not in loader.idx:
-                                loader.idx[document[identifer][
-                                    n]] = document[identifer][n]
-
-            for d in document:
-                d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
-                if d != d2:
-                    document[d2] = document[d]
-                    del document[d]
-
-            for d in loader.url_fields:
-                if d in document:
-                    if isinstance(document[d], basestring):
-                        document[d] = loader.expand_url(
-                            document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
-                    elif isinstance(document[d], list):
-                        document[d] = [
-                            loader.expand_url(
-                                url, base_url, scoped=False,
-                                vocab_term=(d in loader.vocab_fields))
-                            if isinstance(url, (str, unicode))
-                            else url for url in document[d]]
+            self._resolve_idmap(document, loader)
+            base_url = self._resolve_identifier(document, loader, base_url)
+            self._resolve_identity(document, loader, base_url)
+            self._normalize_fields(document, loader)
+            self._resolve_uris(document, loader, base_url)
 
             try:
                 for key, val in document.items():
