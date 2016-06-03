@@ -79,12 +79,12 @@ def get_metaschema():
             "@id": "https://w3id.org/cwl/salad#docAfter",
             "@type": "@id"
         },
-        "docParent": {
-            "@id": "https://w3id.org/cwl/salad#docParent",
-            "@type": "@id"
-        },
         "docChild": {
             "@id": "https://w3id.org/cwl/salad#docChild",
+            "@type": "@id"
+        },
+        "docParent": {
+            "@id": "https://w3id.org/cwl/salad#docParent",
             "@type": "@id"
         },
         "documentRoot": "https://w3id.org/cwl/salad#SchemaDefinedType/documentRoot",
@@ -105,12 +105,15 @@ def get_metaschema():
         },
         "jsonldPredicate": "sld:jsonldPredicate",
         "long": "http://www.w3.org/2001/XMLSchema#long",
+        "mapPredicate": "https://w3id.org/cwl/salad#JsonldPredicate/mapPredicate",
+        "mapSubject": "https://w3id.org/cwl/salad#JsonldPredicate/mapSubject",
         "name": "@id",
         "noLinkCheck": "https://w3id.org/cwl/salad#JsonldPredicate/noLinkCheck",
         "null": "https://w3id.org/cwl/salad#null",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "record": "https://w3id.org/cwl/salad#record",
+        "refScope": "https://w3id.org/cwl/salad#JsonldPredicate/refScope",
         "sld": "https://w3id.org/cwl/salad#",
         "specialize": "https://w3id.org/cwl/salad#SaladRecordSchema/specialize",
         "specializeFrom": {
@@ -129,8 +132,10 @@ def get_metaschema():
         },
         "type": {
             "@id": "https://w3id.org/cwl/salad#type",
-            "@type": "@vocab"
+            "@type": "@vocab",
+            "typeDSL": True
         },
+        "typeDSL": "https://w3id.org/cwl/salad#JsonldPredicate/typeDSL",
         "xsd": "http://www.w3.org/2001/XMLSchema#"
     })
 
