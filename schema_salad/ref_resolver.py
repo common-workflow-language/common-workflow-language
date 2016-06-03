@@ -364,6 +364,7 @@ class Loader(object):
                  "items": r}
         if m.group(3):
             r = ["null", r]
+        print t, "DSL to", r
         return r
 
     def _resolve_type_dsl(self, document, loader):
