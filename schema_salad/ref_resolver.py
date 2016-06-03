@@ -15,6 +15,7 @@ from . import validate
 import pprint
 from StringIO import StringIO
 from .aslist import aslist
+from .flatten import flatten
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 from rdflib.plugins.parsers.notation3 import BadSyntax
@@ -103,6 +104,7 @@ class Loader(object):
         self.rvocab = {}  # type: Dict[unicode, Any]
         self.idmap = None  # type: Dict[unicode, Any]
         self.mapPredicate = None  # type: Dict[unicode, Any]
+        self.type_dsl_fields = None # type: Set[str]
 
         self.add_context(ctx)
 
@@ -337,6 +339,32 @@ class Loader(object):
                     ls.append(v)
                 document[idmapField] = ls
 
+    def _type_dsl(self, t):
+        r = t
+        if "[]" in t:
+            r = {"type": "array",
+                 "items": t.replace("[]", "").replace("?", "")}
+        if t.endswith("?"):
+            r = ["null", r]
+        return r
+
+    def _resolve_type_dsl(self, document, loader):
+        for d in loader.type_dsl_fields:
+            if d in document:
+                if isinstance(document[d], basestring):
+                    document[d] = self._type_dsl(document[d])
+                elif isinstance(document[d], list):
+                    document[d] = [self._type_dsl(t) for t in document[d]]
+                if isinstance(document[d], list):
+                    document[d] = flatten(document[d])
+                seen = set()
+                uniq = []
+                for item in document[d]:
+                    if item not in seen:
+                        uniq.append(item)
+                    seen.add(item)
+                document[d] = uniq
+
     def _resolve_identifier(self, document, loader, base_url):
         # Expand identifier field (usually 'id') to resolve scope
         for identifer in loader.identifiers:
@@ -439,10 +467,11 @@ class Loader(object):
 
         if isinstance(document, dict):
 
+            self._normalize_fields(document, loader)
             self._resolve_idmap(document, loader)
+            self._type_dsl(document, loader)
             base_url = self._resolve_identifier(document, loader, base_url)
             self._resolve_identity(document, loader, base_url)
-            self._normalize_fields(document, loader)
             self._resolve_uris(document, loader, base_url)
 
             try:

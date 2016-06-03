@@ -139,6 +139,10 @@ $graph:
         the item is transformed to a JSON object with the key assigned to the
         field specified by `mapSubject` and the value assigned to the field
         specified by `mapPredicate`.
+    - name: typeDSL
+      type: ["null", boolean]
+      doc: |
+        Field must be expanded based on the the Schema Salad type DSL.
 
 - name: SpecializeDef
   type: record
