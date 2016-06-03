@@ -97,16 +97,103 @@ class TestSchemas(unittest.TestCase):
             }
         }, "http://example2.com/")
 
-        self.assertEqual(ra["id"], "http://example2.com/#stuff")
+        self.assertEqual("http://example2.com/#stuff", ra["id"])
         for item in ra["inputs"]:
             if item["a"] == 2:
-                self.assertEquals(item["id"],
-                        'http://example2.com/#stuff/zing')
+                self.assertEquals('http://example2.com/#stuff/zing', item["id"])
             else:
-                self.assertEquals(item["id"],
-                        'http://example2.com/#stuff/zip')
-        self.assertEquals(ra['outputs'], ['http://example2.com/#stuff/out'])
-        self.assertEquals(ra['other'], {'n': 9})
+                self.assertEquals('http://example2.com/#stuff/zip', item["id"])
+        self.assertEquals(['http://example2.com/#stuff/out'], ra['outputs'])
+        self.assertEquals({'n': 9}, ra['other'])
+
+    def test_scoped_ref(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ldr.add_context({
+            "scatter": {
+                "@type": "@id",
+                "refScope": 0,
+            },
+            "source": {
+                "@type": "@id",
+                "refScope": 2,
+            },
+            "in": {
+                "mapSubject": "id",
+                "mapPredicate": "source"
+            },
+            "out": {
+                "@type": "@id",
+                "identity": True
+            },
+            "inputs": {
+                "mapSubject": "id",
+                "mapPredicate": "type"
+            },
+            "outputs": {
+                "mapSubject": "id",
+            },
+            "steps": {
+                "mapSubject": "id"
+            },
+            "id": "@id"})
+
+        ra, _ = ldr.resolve_all({
+            "inputs": {
+                "inp": "string"
+            },
+            "outputs": {
+                "out": {
+                    "type": "string",
+                    "source": "step2/out"
+                }
+            },
+            "steps": {
+                "step1": {
+                    "in": {
+                        "inp": "inp"
+                    },
+                    "out": ["out"],
+                    "scatter": "inp"
+                },
+                "step2": {
+                    "in": {
+                        "inp": "step1/out"
+                    },
+                    "scatter": "inp",
+                    "out": ["out"]
+                }
+            }
+        }, "http://example2.com/")
+
+        self.assertEquals(
+            {'inputs': [{
+                'id': 'http://example2.com/#inp',
+                'type': 'string'
+            }],
+             'outputs': [{
+                'id': 'http://example2.com/#out',
+                 'type': 'string',
+                 'source': 'http://example2.com/#step2/out'
+             }],
+            'steps': [{
+                    'id': 'http://example2.com/#step1',
+                    'scatter': 'http://example2.com/#step1/inp',
+                    'in': [{
+                            'id': 'http://example2.com/#step1/inp',
+                            'source': 'http://example2.com/#inp'
+                    }],
+                    "out": ["http://example2.com/#step1/out"],
+            }, {
+                    'id': 'http://example2.com/#step2',
+                    'scatter': 'http://example2.com/#step2/inp',
+                    'in': [{
+                            'id': 'http://example2.com/#step2/inp',
+                            'source': 'http://example2.com/#step1/out'
+                    }],
+                    "out": ["http://example2.com/#step2/out"],
+                }]
+        }, ra)
+
 
     def test_examples(self):
         self.maxDiff = None
@@ -115,13 +202,34 @@ class TestSchemas(unittest.TestCase):
                 "schema_salad/metaschema/%s_schema.yml" % a)
             with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
                 src = ldr.resolve_all(
-                    yaml.load(src_fp, Loader=SafeLoader), "")[0]
+                    yaml.load(src_fp, Loader=SafeLoader), "", checklinks=False)[0]
             with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
                 proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)
 
     def test_yaml_float_test(self):
         self.assertEqual(yaml.load("float-test: 2e-10")["float-test"], 2e-10)
+
+    def test_typedsl_ref(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ldr.add_context({
+            "File": "http://example.com/File",
+            "null": "http://example.com/null",
+            "array": "http://example.com/array",
+            "type": {
+                "@type": "@vocab",
+                "typeDSL": True
+            }
+        })
+
+        ra, _ = ldr.resolve_all({"type": "File"}, "")
+        print ra
+        ra, _ = ldr.resolve_all({"type": "File?"}, "")
+        print ra
+        ra, _ = ldr.resolve_all({"type": "File[]"}, "")
+        print ra
+        ra, _ = ldr.resolve_all({"type": "File[]?"}, "")
+        print ra
 
 if __name__ == '__main__':
     unittest.main()
