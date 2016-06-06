@@ -93,7 +93,8 @@ def get_metaschema():
         "enum": "https://w3id.org/cwl/salad#enum",
         "extends": {
             "@id": "https://w3id.org/cwl/salad#extends",
-            "@type": "@id"
+            "@type": "@id",
+            "refScope": 0
         },
         "fields": "sld:fields",
         "float": "http://www.w3.org/2001/XMLSchema#float",
@@ -101,7 +102,8 @@ def get_metaschema():
         "int": "http://www.w3.org/2001/XMLSchema#int",
         "items": {
             "@id": "https://w3id.org/cwl/salad#items",
-            "@type": "@vocab"
+            "@type": "@vocab",
+            "refScope": 0
         },
         "jsonldPredicate": "sld:jsonldPredicate",
         "long": "http://www.w3.org/2001/XMLSchema#long",
@@ -133,7 +135,8 @@ def get_metaschema():
         "type": {
             "@id": "https://w3id.org/cwl/salad#type",
             "@type": "@vocab",
-            "typeDSL": True
+            "typeDSL": True,
+            "refScope": 0
         },
         "typeDSL": "https://w3id.org/cwl/salad#JsonldPredicate/typeDSL",
         "xsd": "http://www.w3.org/2001/XMLSchema#"

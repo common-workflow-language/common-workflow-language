@@ -139,7 +139,8 @@ class TestSchemas(unittest.TestCase):
 
         ra, _ = ldr.resolve_all({
             "inputs": {
-                "inp": "string"
+                "inp": "string",
+                "inp2": "string"
             },
             "outputs": {
                 "out": {
@@ -150,7 +151,9 @@ class TestSchemas(unittest.TestCase):
             "steps": {
                 "step1": {
                     "in": {
-                        "inp": "inp"
+                        "inp": "inp",
+                        "inp2": "#inp2",
+                        "inp3": ["inp", "inp2"]
                     },
                     "out": ["out"],
                     "scatter": "inp"
@@ -180,6 +183,9 @@ class TestSchemas(unittest.TestCase):
                     'scatter': 'http://example2.com/#step1/inp',
                     'in': [{
                             'id': 'http://example2.com/#step1/inp',
+                            'source': 'http://example2.com/#inp'
+                    }, {
+                            'id': 'http://example2.com/#step1/inp2',
                             'source': 'http://example2.com/#inp'
                     }],
                     "out": ["http://example2.com/#step1/out"],
@@ -223,13 +229,16 @@ class TestSchemas(unittest.TestCase):
         })
 
         ra, _ = ldr.resolve_all({"type": "File"}, "")
-        print ra
+        self.assertEqual({'type': 'File'}, ra)
+
         ra, _ = ldr.resolve_all({"type": "File?"}, "")
-        print ra
+        self.assertEqual({'type': ['null', 'File']}, ra)
+
         ra, _ = ldr.resolve_all({"type": "File[]"}, "")
-        print ra
+        self.assertEqual({'type': {'items': 'File', 'type': 'array'}}, ra)
+
         ra, _ = ldr.resolve_all({"type": "File[]?"}, "")
-        print ra
+        self.assertEqual({'type': ['null', {'items': 'File', 'type': 'array'}]}, ra)
 
 if __name__ == '__main__':
     unittest.main()

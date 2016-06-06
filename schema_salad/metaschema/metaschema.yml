@@ -194,10 +194,8 @@ $graph:
   fields:
     - name: doc
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       doc: "A documentation string for this type, or an array of strings which should be concatenated."
       jsonldPredicate: "sld:doc"
 
@@ -212,10 +210,8 @@ $graph:
 
     - name: docChild
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       doc: |
         Hint to indicate that during documentation generation, documentation
         for `docChild` should appear in a subsection under this type.
@@ -236,19 +232,18 @@ $graph:
 
 - name: SchemaDefinedType
   type: record
-  extends: "#DocType"
+  extends: DocType
   doc: |
     Abstract base for schema-defined types.
   abstract: true
   fields:
     - name: jsonldPredicate
       type:
-        - "null"
-        - string
-        - "#JsonldPredicate"
+        - string?
+        - JsonldPredicate?
       doc: |
         Annotate this type with linked data context.
-      jsonldPredicate: "sld:jsonldPredicate"
+      jsonldPredicate: sld:jsonldPredicate
 
     - name: documentRoot
       type: boolean?
@@ -259,7 +254,7 @@ $graph:
 
 - name: RecordField
   type: record
-  doc: "A field of a record."
+  doc: A field of a record.
   fields:
     - name: name
       type: string
@@ -275,36 +270,36 @@ $graph:
 
     - name: type
       type:
-        - "#PrimitiveType"
-        - "#RecordSchema"
-        - "#EnumSchema"
-        - "#ArraySchema"
+        - PrimitiveType
+        - RecordSchema
+        - EnumSchema
+        - ArraySchema
         - string
         - type: array
           items:
-            - "#PrimitiveType"
-            - "#RecordSchema"
-            - "#EnumSchema"
-            - "#ArraySchema"
+            - PrimitiveType
+            - RecordSchema
+            - EnumSchema
+            - ArraySchema
             - string
       jsonldPredicate:
-        _id: "sld:type"
+        _id: sld:type
         _type: "@vocab"
         typeDSL: true
+        refScope: 0
       doc: |
         The field type
 
 
 - name: SaladRecordField
   type: record
-  extends: "#RecordField"
+  extends: RecordField
   doc: "A field of a record."
   fields:
     - name: jsonldPredicate
       type:
-        - "null"
-        - string
-        - "#JsonldPredicate"
+        - string?
+        - JsonldPredicate?
       doc: |
         Annotate this type with linked data context.
       jsonldPredicate: "sld:jsonldPredicate"
@@ -323,19 +318,16 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
+        refScope: 0
     - name: "fields"
-      type:
-        - "null"
-        - type: "array"
-          items: "#RecordField"
-
+      type: RecordField[]?
       jsonldPredicate: "sld:fields"
       doc: "Defines the fields of the record."
 
 
 - name: SaladRecordSchema
   type: record
-  extends: ["#NamedType", "#RecordSchema", "#SchemaDefinedType"]
+  extends: [NamedType, RecordSchema, SchemaDefinedType]
   documentRoot: true
   specialize:
     specializeFrom: "#RecordField"
@@ -349,22 +341,19 @@ $graph:
 
     - name: extends
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
+        refScope: 0
       doc: |
         Indicates that this record inherits fields from one or more base records.
 
     - name: specialize
       type:
-        - "null"
-        - "#SpecializeDef"
-        - type: array
-          items: "#SpecializeDef"
+        - SpecializeDef?
+        - SpecializeDef[]?
       doc: |
         Only applies if `extends` is declared.  Apply type specialization using the
         base record as a template.  For each field inherited from the base
@@ -388,10 +377,9 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
+        refScope: 0
     - name: "symbols"
-      type:
-        - type: "array"
-          items: "string"
+      type: string[]
       jsonldPredicate:
         _id: "sld:symbols"
         _type: "@id"
@@ -401,20 +389,19 @@ $graph:
 
 - name: SaladEnumSchema
   type: record
-  extends: ["#EnumSchema", "#SchemaDefinedType"]
+  extends: [EnumSchema, SchemaDefinedType]
   documentRoot: true
   doc: |
     Define an enumerated type.
   fields:
     - name: extends
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
+        refScope: 0
       doc: |
         Indicates that this enum inherits symbols from a base enum.
 
@@ -433,29 +420,31 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
+        refScope: 0
     - name: items
       type:
-        - "#PrimitiveType"
-        - "#RecordSchema"
-        - "#EnumSchema"
-        - "#ArraySchema"
+        - PrimitiveType
+        - RecordSchema
+        - EnumSchema
+        - ArraySchema
         - string
         - type: array
           items:
-            - "#PrimitiveType"
-            - "#RecordSchema"
-            - "#EnumSchema"
-            - "#ArraySchema"
+            - PrimitiveType
+            - RecordSchema
+            - EnumSchema
+            - ArraySchema
             - string
       jsonldPredicate:
         _id: "sld:items"
         _type: "@vocab"
+        refScope: 0
       doc: "Defines the type of the array elements."
 
 
 - name: Documentation
   type: record
-  extends: ["#NamedType", "#DocType"]
+  extends: [NamedType, DocType]
   documentRoot: true
   doc: |
     A documentation section.  This type exists to facilitate self-documenting
@@ -472,3 +461,4 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
+        refScope: 0

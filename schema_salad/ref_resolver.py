@@ -110,7 +110,7 @@ class Loader(object):
 
         self.add_context(ctx)
 
-    def expand_url(self, url, base_url, scoped=False, vocab_term=False):
+    def expand_url(self, url, base_url, scoped_id=False, vocab_term=False, scoped_ref=None):
         # type: (Union[str, unicode], Union[str, unicode], bool, bool) -> Union[str, unicode]
         if url in ("@id", "@type"):
             return url
@@ -127,7 +127,7 @@ class Loader(object):
 
         if split.scheme or url.startswith("$(") or url.startswith("${"):
             pass
-        elif scoped and not split.fragment:
+        elif scoped_id and not split.fragment:
             splitbase = urlparse.urlsplit(base_url)
             frg = ""
             if splitbase.fragment:
@@ -136,6 +136,8 @@ class Loader(object):
                 frg = split.path
             url = urlparse.urlunsplit(
                 (splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
+        elif scoped_ref is not None and not split.fragment:
+            pass
         else:
             url = urlparse.urljoin(base_url, url)
 
@@ -219,6 +221,8 @@ class Loader(object):
             elif isinstance(value, dict) and value.get("@type") == "@vocab":
                 self.url_fields.add(key)
                 self.vocab_fields.add(key)
+                if "refScope" in value:
+                    self.scoped_ref_fields[key] = value["refScope"]
                 if value.get("typeDSL"):
                     self.type_dsl_fields.add(key)
             if isinstance(value, dict) and value.get("noLinkCheck"):
@@ -236,7 +240,7 @@ class Loader(object):
                 self.vocab[key] = value
 
         for k, v in self.vocab.items():
-            self.rvocab[self.expand_url(v, "", scoped=False)] = k
+            self.rvocab[self.expand_url(v, "", scoped_id=False)] = k
 
         _logger.debug("identifiers is %s", self.identifiers)
         _logger.debug("identity_links is %s", self.identity_links)
@@ -282,7 +286,7 @@ class Loader(object):
         if not isinstance(ref, (str, unicode)):
             raise ValueError("Must be string: `%s`" % str(ref))
 
-        url = self.expand_url(ref, base_url, scoped=(obj is not None))
+        url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
 
         # Has this reference been loaded already?
         if url in self.idx:
@@ -364,7 +368,6 @@ class Loader(object):
                  "items": r}
         if m.group(3):
             r = ["null", r]
-        print t, "DSL to", r
         return r
 
     def _resolve_type_dsl(self, document, loader):
@@ -391,7 +394,7 @@ class Loader(object):
             if identifer in document:
                 if isinstance(document[identifer], basestring):
                     document[identifer] = loader.expand_url(
-                        document[identifer], base_url, scoped=True)
+                        document[identifer], base_url, scoped_id=True)
                     if document[identifer] not in loader.idx or isinstance(loader.idx[document[identifer]], basestring):
                         loader.idx[document[identifer]] = document
                     base_url = document[identifer]
@@ -408,7 +411,7 @@ class Loader(object):
                 for n, v in enumerate(document[identifer]):
                     if isinstance(document[identifer][n], basestring):
                         document[identifer][n] = loader.expand_url(
-                            document[identifer][n], base_url, scoped=True)
+                            document[identifer][n], base_url, scoped_id=True)
                         if document[identifer][n] not in loader.idx:
                             loader.idx[document[identifer][
                                 n]] = document[identifer][n]
@@ -416,7 +419,7 @@ class Loader(object):
     def _normalize_fields(self, document, loader):
         # Normalize fields which are prefixed or full URIn to vocabulary terms
         for d in document:
-            d2 = loader.expand_url(d, "", scoped=False, vocab_term=True)
+            d2 = loader.expand_url(d, "", scoped_id=False, vocab_term=True)
             if d != d2:
                 document[d2] = document[d]
                 del document[d]
@@ -424,17 +427,18 @@ class Loader(object):
     def _resolve_uris(self, document, loader, base_url):
         # Resolve remaining URLs based on document base
         for d in loader.url_fields:
-            if d in self.scoped_ref_fields:
-                continue
             if d in document:
                 if isinstance(document[d], basestring):
                     document[d] = loader.expand_url(
-                        document[d], base_url, scoped=False, vocab_term=(d in loader.vocab_fields))
+                        document[d], base_url, scoped_id=False,
+                        vocab_term=(d in loader.vocab_fields),
+                        scoped_ref=self.scoped_ref_fields.get(d))
                 elif isinstance(document[d], list):
                     document[d] = [
                         loader.expand_url(
-                            url, base_url, scoped=False,
-                            vocab_term=(d in loader.vocab_fields))
+                            url, base_url, scoped_id=False,
+                            vocab_term=(d in loader.vocab_fields),
+                            scoped_ref=self.scoped_ref_fields.get(d))
                         if isinstance(url, (str, unicode))
                         else url for url in document[d]]
 
@@ -531,7 +535,7 @@ class Loader(object):
                 if identifer in metadata:
                     if isinstance(metadata[identifer], (str, unicode)):
                         metadata[identifer] = loader.expand_url(
-                            metadata[identifer], base_url, scoped=True)
+                            metadata[identifer], base_url, scoped_id=True)
                         loader.idx[metadata[identifer]] = document
 
         if checklinks:
@@ -598,6 +602,28 @@ class Loader(object):
 
     FieldType = TypeVar('FieldType', unicode, List[str], Dict[str, Any])
 
+    def validate_scoped(self, field, link, docid):
+        split = urlparse.urlsplit(docid)
+        sp = split.fragment.split("/")
+        n = self.scoped_ref_fields[field]
+        while n > 0 and len(sp) > 0:
+            sp.pop()
+            n -= 1
+        tried = []
+        while True:
+            sp.append(str(link))
+            url = urlparse.urlunsplit(
+                (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
+            tried.append(url)
+            if url in self.idx:
+                return url
+            sp.pop()
+            if len(sp) == 0:
+                break
+            sp.pop()
+        raise validate.ValidationException(
+            "Field `%s` contains undefined reference to `%s`, tried %s" % (field, link, tried))
+
     def validate_link(self, field, link, docid):
         # type: (AnyStr, FieldType, AnyStr) -> FieldType
         if field in self.nolinkcheck:
@@ -605,29 +631,14 @@ class Loader(object):
         if isinstance(link, (str, unicode)):
             if field in self.vocab_fields:
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
-                    if not self.check_file(link):
+                    if field in self.scoped_ref_fields:
+                        return self.validate_scoped(field, link, docid)
+                    elif not self.check_file(link):
                         raise validate.ValidationException(
                             "Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
                 if field in self.scoped_ref_fields:
-                    split = urlparse.urlsplit(docid)
-                    sp = split.fragment.split("/")
-                    n = self.scoped_ref_fields[field]
-                    while n > 0 and len(sp) > 0:
-                        sp.pop()
-                        n -= 1
-                    while True:
-                        sp.append(str(link))
-                        url = urlparse.urlunsplit(
-                            (split.scheme, split.netloc, split.path, split.query, "/".join(sp)))
-                        if url in self.idx:
-                            return url
-                        sp.pop()
-                        if len(sp) == 0:
-                            break
-                        sp.pop()
-                    raise validate.ValidationException(
-                        "Field `%s` contains undefined reference to `%s`" % (field, link))
+                    return self.validate_scoped(field, link, docid)
                 elif not self.check_file(link):
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
