@@ -1,19 +1,14 @@
 import pprint
 import avro.schema
-import yaml
 import sys
-try:
-    import urlparse
-except:
-    import urllib.parse as urlparse
-    basestring=str
-if sys.version_info >= (2,7):
-    import typing
+import urlparse
+from typing import Any
 
 class ValidationException(Exception):
     pass
 
-def validate(expected_schema, datum, identifiers=[], strict=False, foreign_properties=set()):
+def validate(expected_schema, datum, identifiers=set(), strict=False, foreign_properties=set()):
+    # type: (avro.schema.Schema, Any, Set[str], bool, Set[str]) -> bool
     try:
         return validate_ex(expected_schema, datum, identifiers, strict=strict, foreign_properties=foreign_properties)
     except ValidationException:
@@ -24,13 +19,13 @@ INT_MAX_VALUE = (1 << 31) - 1
 LONG_MIN_VALUE = -(1 << 63)
 LONG_MAX_VALUE = (1 << 63) - 1
 
-def indent(v, nolead=False):
+def indent(v, nolead=False):  # type: (str, bool) -> str
     if nolead:
         return v.splitlines()[0] + "\n".join(["  " + l for l in v.splitlines()[1:]])
     else:
         return "\n".join(["  " + l for l in v.splitlines()])
 
-def friendly(v):
+def friendly(v):  # type: (Any) -> Any
     if isinstance(v, avro.schema.NamedSchema):
         return v.name
     if isinstance(v, avro.schema.ArraySchema):
@@ -42,20 +37,28 @@ def friendly(v):
     else:
         return v
 
-def multi(v, q=""):
+def multi(v, q=""):  # type: (str, str) -> str
     if '\n' in v:
         return "%s%s%s\n" % (q, v, q)
     else:
         return "%s%s%s" % (q, v, q)
 
-def vpformat(datum):
+def vpformat(datum):  # type: (Any) -> str
     a = pprint.pformat(datum)
     if len(a) > 160:
         a = a[0:160] + "[...]"
     return a
 
-def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign_properties=set()):
+def validate_ex(expected_schema, datum, identifiers=None, strict=False,
+        foreign_properties=None):
+    # type: (avro.schema.Schema, Any, Set[str], bool, Set[str]) -> bool
     """Determine if a python datum is an instance of a schema."""
+
+    if not identifiers:
+        identifiers = set()
+
+    if not foreign_properties:
+        foreign_properties = set()
 
     schema_type = expected_schema.type
 
@@ -100,12 +103,12 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
             return True
         else:
             raise ValidationException("the value `%s` is not float or double" % vpformat(datum))
-    elif schema_type == 'fixed':
+    elif isinstance(expected_schema, avro.schema.FixedSchema):
         if isinstance(datum, str) and len(datum) == expected_schema.size:
             return True
         else:
             raise ValidationException("the value `%s` is not fixed" % vpformat(datum))
-    elif schema_type == 'enum':
+    elif isinstance(expected_schema, avro.schema.EnumSchema):
         if expected_schema.name == "Any":
             if datum is not None:
                 return True
@@ -115,7 +118,7 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
             return True
         else:
             raise ValidationException("the value `%s`\n is not a valid symbol in enum %s, expected one of %s" % (vpformat(datum), expected_schema.name, "'" + "', '".join(expected_schema.symbols) + "'"))
-    elif schema_type == 'array':
+    elif isinstance(expected_schema, avro.schema.ArraySchema):
         if isinstance(datum, list):
             for i, d in enumerate(datum):
                 try:
@@ -125,14 +128,14 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
             return True
         else:
             raise ValidationException("the value `%s` is not a list, expected list of %s" % (vpformat(datum), friendly(expected_schema.items)))
-    elif schema_type == 'map':
+    elif isinstance(expected_schema, avro.schema.MapSchema):
         if (isinstance(datum, dict) and
             False not in [isinstance(k, basestring) for k in datum.keys()] and
             False not in [validate(expected_schema.values, v, strict=strict) for v in datum.values()]):
             return True
         else:
             raise ValidationException("`%s` is not a valid map value, expected\n %s" % (vpformat(datum), vpformat(expected_schema.values)))
-    elif schema_type in ['union', 'error_union']:
+    elif isinstance(expected_schema, avro.schema.UnionSchema):
         if True in [validate(s, datum, identifiers, strict=strict) for s in expected_schema.schemas]:
             return True
         else:
@@ -144,7 +147,7 @@ def validate_ex(expected_schema, datum, identifiers=set(), strict=False, foreign
                     errors.append(str(e))
             raise ValidationException("the value %s is not a valid type in the union, expected one of:\n%s" % (multi(vpformat(datum), '`'), "\n".join(["- %s, but\n %s" % (friendly(expected_schema.schemas[i]), indent(multi(errors[i]))) for i in range(0, len(expected_schema.schemas))])))
 
-    elif schema_type in ['record', 'error', 'request']:
+    elif isinstance(expected_schema, avro.schema.RecordSchema):
         if not isinstance(datum, dict):
             raise ValidationException("`%s`\n is not a dict" % vpformat(datum))
 
