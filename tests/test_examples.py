@@ -172,6 +172,9 @@ class TestSchemas(unittest.TestCase):
             {'inputs': [{
                 'id': 'http://example2.com/#inp',
                 'type': 'string'
+            }, {
+                'id': 'http://example2.com/#inp2',
+                'type': 'string'
             }],
              'outputs': [{
                 'id': 'http://example2.com/#out',
@@ -186,7 +189,10 @@ class TestSchemas(unittest.TestCase):
                             'source': 'http://example2.com/#inp'
                     }, {
                             'id': 'http://example2.com/#step1/inp2',
-                            'source': 'http://example2.com/#inp'
+                            'source': 'http://example2.com/#inp2'
+                    }, {
+                            'id': 'http://example2.com/#step1/inp3',
+                            'source': ['http://example2.com/#inp', 'http://example2.com/#inp2']
                     }],
                     "out": ["http://example2.com/#step1/out"],
             }, {

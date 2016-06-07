@@ -94,7 +94,7 @@ def get_metaschema():
         "extends": {
             "@id": "https://w3id.org/cwl/salad#extends",
             "@type": "@id",
-            "refScope": 0
+            "refScope": 1
         },
         "fields": "sld:fields",
         "float": "http://www.w3.org/2001/XMLSchema#float",
@@ -103,7 +103,7 @@ def get_metaschema():
         "items": {
             "@id": "https://w3id.org/cwl/salad#items",
             "@type": "@vocab",
-            "refScope": 0
+            "refScope": 2
         },
         "jsonldPredicate": "sld:jsonldPredicate",
         "long": "http://www.w3.org/2001/XMLSchema#long",
@@ -135,8 +135,8 @@ def get_metaschema():
         "type": {
             "@id": "https://w3id.org/cwl/salad#type",
             "@type": "@vocab",
-            "typeDSL": True,
-            "refScope": 0
+            "refScope": 2,
+            "typeDSL": True
         },
         "typeDSL": "https://w3id.org/cwl/salad#JsonldPredicate/typeDSL",
         "xsd": "http://www.w3.org/2001/XMLSchema#"

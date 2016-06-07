@@ -286,7 +286,7 @@ $graph:
         _id: sld:type
         _type: "@vocab"
         typeDSL: true
-        refScope: 0
+        refScope: 2
       doc: |
         The field type
 
@@ -318,7 +318,7 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
-        refScope: 0
+        refScope: 2
     - name: "fields"
       type: RecordField[]?
       jsonldPredicate: "sld:fields"
@@ -346,7 +346,7 @@ $graph:
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
-        refScope: 0
+        refScope: 1
       doc: |
         Indicates that this record inherits fields from one or more base records.
 
@@ -377,7 +377,7 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
-        refScope: 0
+        refScope: 2
     - name: "symbols"
       type: string[]
       jsonldPredicate:
@@ -401,7 +401,7 @@ $graph:
       jsonldPredicate:
         _id: "sld:extends"
         _type: "@id"
-        refScope: 0
+        refScope: 1
       doc: |
         Indicates that this enum inherits symbols from a base enum.
 
@@ -420,7 +420,7 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
-        refScope: 0
+        refScope: 2
     - name: items
       type:
         - PrimitiveType
@@ -438,7 +438,7 @@ $graph:
       jsonldPredicate:
         _id: "sld:items"
         _type: "@vocab"
-        refScope: 0
+        refScope: 2
       doc: "Defines the type of the array elements."
 
 
@@ -461,4 +461,4 @@ $graph:
         _id: "sld:type"
         _type: "@vocab"
         typeDSL: true
-        refScope: 0
+        refScope: 2
