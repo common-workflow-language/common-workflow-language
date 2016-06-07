@@ -10,7 +10,7 @@ $graph:
   type: documentation
   doc: {$include: concepts.md}
 
-- $import: "salad/schema_salad/metaschema/metaschema.yml"
+- $import: "salad/schema_salad/metaschema/metaschema_base.yml"
 
 - name: BaseTypesDoc
   type: documentation
@@ -226,6 +226,8 @@ $graph:
       jsonldPredicate:
         "_id": "sld:type"
         "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
 

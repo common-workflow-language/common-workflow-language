@@ -53,7 +53,7 @@ $graph:
 
 - type: record
   name: ExpressionTool
-  extends: "#Process"
+  extends: Process
   documentRoot: true
   doc: |
     Execute an expression as a process step.
@@ -64,7 +64,7 @@ $graph:
         "_type": "@vocab"
       type: string
     - name: expression
-      type: [string, "#Expression"]
+      type: [string, Expression]
       doc: |
         The expression to execute.  The expression must return a JSON object which
         matches the output parameters of the ExpressionTool.
@@ -80,12 +80,30 @@ $graph:
 
 - name: WorkflowOutputParameter
   type: record
-  extends: ["#OutputParameter", "#Sink"]
+  extends: OutputParameter
   docParent: "#Workflow"
   doc: |
     Describe an output parameter of a workflow.  The parameter must be
     connected to one or more parameters defined in the workflow that will
     provide the value of the output parameter.
+  fields:
+    - name: outputSource
+      doc: |
+        Specifies one or more workflow parameters that supply the value of to
+        the output parameter.
+      jsonldPredicate:
+        "_id": "cwl:outputSource"
+        "_type": "@id"
+        refScope: 0
+      type:
+        - string?
+        - string[]?
+    - name: linkMerge
+      type: ["null", "#LinkMergeMethod"]
+      jsonldPredicate: "cwl:linkMerge"
+      doc: |
+        The method to use to merge multiple sources into a single array.
+        If not specified, the default method is "merge_nested".
 
 
 - name: Sink
@@ -99,13 +117,13 @@ $graph:
       jsonldPredicate:
         "_id": "cwl:source"
         "_type": "@id"
+        refScope: 2
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
     - name: linkMerge
-      type: ["null", "#LinkMergeMethod"]
+      type: LinkMergeMethod?
+      jsonldPredicate: "cwl:linkMerge"
       doc: |
         The method to use to merge multiple inbound links into a single array.
         If not specified, the default method is "merge_nested".
@@ -113,7 +131,7 @@ $graph:
 
 - type: record
   name: WorkflowStepInput
-  extends: "#Sink"
+  extends: Sink
   docParent: "#WorkflowStep"
   doc: |
     The input of a workflow step connects an upstream parameter (from the
@@ -278,9 +296,7 @@ $graph:
       jsonldPredicate: "@id"
       doc: "The unique identifier for this workflow step."
     - name: in
-      type:
-        type: array
-        items: "#WorkflowStepInput"
+      type: WorkflowStepInput[]
       jsonldPredicate:
         _id: "cwl:in"
         mapSubject: id
@@ -294,7 +310,7 @@ $graph:
     - name: out
       type:
         - type: array
-          items: [string, "#WorkflowStepOutput"]
+          items: [string, WorkflowStepOutput]
       jsonldPredicate:
         _id: "cwl:out"
         _type: "@id"
@@ -303,10 +319,7 @@ $graph:
         Defines the parameters representing the output of the process.  May be
         used to generate and/or validate the output object.
     - name: requirements
-      type:
-        - "null"
-        - type: array
-          items: "#ProcessRequirement"
+      type: ProcessRequirement[]?
       jsonldPredicate:
         _id: "cwl:requirements"
         mapSubject: class
@@ -318,10 +331,7 @@ $graph:
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
     - name: hints
-      type:
-        - "null"
-        - type: array
-          items: "Any"
+      type: Any[]?
       jsonldPredicate:
         _id: "cwl:hints"
         noLinkCheck: true
@@ -332,19 +342,15 @@ $graph:
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
     - name: label
-      type:
-        - "null"
-        - string
+      type: string?
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this process object."
     - name: description
-      type:
-        - "null"
-        - string
+      type: string?
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
     - name: run
-      type: [string, "#Process"]
+      type: [string, Process]
       jsonldPredicate:
         "_id": "cwl:run"
         "_type": "@id"
@@ -352,20 +358,17 @@ $graph:
         Specifies the process to run.
     - name: scatter
       type:
-        - "null"
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       jsonldPredicate:
         "_id": "cwl:scatter"
         "_type": "@id"
         "_container": "@list"
+        refScope: 0
     - name: scatterMethod
       doc: |
         Required if `scatter` is an array of more than one element.
-      type:
-        - "null"
-        - "#ScatterMethod"
+      type: ScatterMethod?
       jsonldPredicate:
         "_id": "cwl:scatterMethod"
         "_type": "@vocab"
@@ -445,28 +448,28 @@ $graph:
 
 - type: record
   name: SubworkflowFeatureRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Indicates that the workflow platform must support nested workflows in
     the `run` field of (WorkflowStep)(#WorkflowStep).
 
 - name: ScatterFeatureRequirement
   type: record
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Indicates that the workflow platform must support the `scatter` and
     `scatterMethod` fields of [WorkflowStep](#WorkflowStep).
 
 - name: MultipleInputFeatureRequirement
   type: record
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Indicates that the workflow platform must support multiple inbound data links
     listed in the `source` field of [WorkflowStepInput](#WorkflowStepInput).
 
 - type: record
   name: StepInputExpressionRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Indicate that the workflow platform must support the `valueFrom` field
     of [WorkflowStepInput](#WorkflowStepInput).
