@@ -418,6 +418,10 @@ def extend_and_specialize(items, loader):
                     add_dictlist(extended_by, avro_name(ex), ex_types[ex])
 
     for t in n:
+        if t.get("abstract") and t["name"] not in extended_by:
+            raise validate.ValidationException("%s is abstract but missing a concrete subtype" % t["name"])
+
+    for t in n:
         if "fields" in t:
             t["fields"] = replace_type(t["fields"], extended_by, loader, set())
 
