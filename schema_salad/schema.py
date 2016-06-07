@@ -25,6 +25,7 @@ from typing import Any, AnyStr, cast, Dict, List, Tuple, TypeVar, Union
 _logger = logging.getLogger("salad")
 
 salad_files = ('metaschema.yml',
+               'metaschema_base.yml',
                'salad.md',
                'field_name.yml',
                'import_include.md',
