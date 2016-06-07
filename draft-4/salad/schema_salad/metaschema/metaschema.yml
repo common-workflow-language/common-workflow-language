@@ -46,36 +46,7 @@ $graph:
 #     How to generate the json-ld context...
 
 
-- name: PrimitiveType
-  type: enum
-  symbols:
-    - "sld:null"
-    - "xsd:boolean"
-    - "xsd:int"
-    - "xsd:long"
-    - "xsd:float"
-    - "xsd:double"
-    - "xsd:string"
-  doc:
-    - |
-      Salad data types are based on Avro schema declarations.  Refer to the
-      [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
-      detailed information.
-    - "null: no value"
-    - "boolean: a binary value"
-    - "int: 32-bit signed integer"
-    - "long: 64-bit signed integer"
-    - "float: single precision (32-bit) IEEE 754 floating-point number"
-    - "double: double precision (64-bit) IEEE 754 floating-point number"
-    - "string: Unicode character sequence"
-
-
-- name: Any
-  type: enum
-  symbols: ["#Any"]
-  doc: |
-    The **Any** type validates for any non-null value.
-
+- $import: metaschema_base.yml
 
 - name: JsonldPredicate
   type: record
@@ -252,45 +223,6 @@ $graph:
         least one type in a schema must be tagged with `documentRoot: true`.
 
 
-- name: RecordField
-  type: record
-  doc: A field of a record.
-  fields:
-    - name: name
-      type: string
-      jsonldPredicate: "@id"
-      doc: |
-        The name of the field
-
-    - name: doc
-      type: string?
-      doc: |
-        A documentation string for this field
-      jsonldPredicate: "sld:doc"
-
-    - name: type
-      type:
-        - PrimitiveType
-        - RecordSchema
-        - EnumSchema
-        - ArraySchema
-        - string
-        - type: array
-          items:
-            - PrimitiveType
-            - RecordSchema
-            - EnumSchema
-            - ArraySchema
-            - string
-      jsonldPredicate:
-        _id: sld:type
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
-      doc: |
-        The field type
-
-
 - name: SaladRecordField
   type: record
   extends: RecordField
@@ -303,26 +235,6 @@ $graph:
       doc: |
         Annotate this type with linked data context.
       jsonldPredicate: "sld:jsonldPredicate"
-
-- name: RecordSchema
-  type: record
-  fields:
-    - name: type
-      doc: "Must be `record`"
-      type:
-        name: Record_symbol
-        type: enum
-        symbols:
-          - "sld:record"
-      jsonldPredicate:
-        _id: "sld:type"
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
-    - name: "fields"
-      type: RecordField[]?
-      jsonldPredicate: "sld:fields"
-      doc: "Defines the fields of the record."
 
 
 - name: SaladRecordSchema
@@ -361,32 +273,6 @@ $graph:
         `specializeTo`.
 
 
-- name: EnumSchema
-  type: record
-  doc: |
-    Define an enumerated type.
-  fields:
-    - name: type
-      doc: "Must be `enum`"
-      type:
-        name: Enum_symbol
-        type: enum
-        symbols:
-          - "sld:enum"
-      jsonldPredicate:
-        _id: "sld:type"
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
-    - name: "symbols"
-      type: string[]
-      jsonldPredicate:
-        _id: "sld:symbols"
-        _type: "@id"
-        identity: true
-      doc: "Defines the set of valid symbols."
-
-
 - name: SaladEnumSchema
   type: record
   extends: [EnumSchema, SchemaDefinedType]
@@ -404,42 +290,6 @@ $graph:
         refScope: 1
       doc: |
         Indicates that this enum inherits symbols from a base enum.
-
-
-- name: ArraySchema
-  type: record
-  fields:
-    - name: type
-      doc: "Must be `array`"
-      type:
-        name: Array_symbol
-        type: enum
-        symbols:
-          - "sld:array"
-      jsonldPredicate:
-        _id: "sld:type"
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
-    - name: items
-      type:
-        - PrimitiveType
-        - RecordSchema
-        - EnumSchema
-        - ArraySchema
-        - string
-        - type: array
-          items:
-            - PrimitiveType
-            - RecordSchema
-            - EnumSchema
-            - ArraySchema
-            - string
-      jsonldPredicate:
-        _id: "sld:items"
-        _type: "@vocab"
-        refScope: 2
-      doc: "Defines the type of the array elements."
 
 
 - name: Documentation
