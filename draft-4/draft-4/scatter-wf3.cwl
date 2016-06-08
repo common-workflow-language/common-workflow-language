@@ -42,7 +42,7 @@ $graph:
 
   outputs:
     out:
-      outputSource: echo_out
+      outputSource: step1/echo_out
       type:
         type: array
         items: string

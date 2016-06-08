@@ -8,7 +8,7 @@ inputs:
 outputs:
     out:
       type: File
-      source: "#step1/out"
+      outputSource: step1/out
 
 requirements:
   - class: SubworkflowFeatureRequirement
@@ -20,5 +20,5 @@ steps:
   step1:
     run: env-tool2.cwl
     in:
-      in: "#in"
+      in: in
     out: [out]

@@ -9,7 +9,7 @@ inputs:
 outputs:
   count_output:
     type: int
-    source: step2/output
+    outputSource: step2/output
 
 steps:
   step1:

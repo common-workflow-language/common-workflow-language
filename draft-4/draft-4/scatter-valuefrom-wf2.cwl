@@ -18,7 +18,7 @@ inputs:
       items: string
 outputs:
   out:
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
     type:
       type: array
       items:
