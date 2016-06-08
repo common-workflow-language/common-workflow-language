@@ -337,7 +337,7 @@ class Loader(object):
                     for k in sorted(idmapFieldValue.keys()):
                         val = idmapFieldValue[k]
                         v = None  # type: Dict[unicode, Any]
-                        if not isinstance(v, dict):
+                        if not isinstance(val, dict):
                             if idmapField in loader.mapPredicate:
                                 v = {loader.mapPredicate[idmapField]: val}
                             else:
