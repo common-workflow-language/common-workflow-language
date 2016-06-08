@@ -383,7 +383,7 @@ class RenderType(object):
 
 
 def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
-    # type: (List[Dict[str, Any]], IO[Any], str, Dict, str, str) -> None
+    # type: (List[Dict[unicode, Any]], IO[Any], str, Dict, str, str) -> None
     toc = ToC()
     toc.start_numbering = False
 
@@ -475,7 +475,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    s = []  # type: List[Dict[str, Any]]
+    s = []  # type: List[Dict[unicode, Any]]
     a = args.schema
     with open(a) as f:
         if a.endswith("md"):
