@@ -44,6 +44,12 @@
   tool: draft-4/cat3-tool.cwl
   doc: Test command line with stdout redirection
 
+- args: [egrep]
+  stderr: error.txt
+  job:
+  tool: draft-4/egrep-stderr.cwl
+  doc: Test command line with stdout redirection
+
 - args: [cat]
   job: draft-4/cat-job.json
   stdin: draft-4/hello.txt
