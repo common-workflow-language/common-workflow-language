@@ -4,20 +4,19 @@ cwlVersion: cwl:draft-4.dev2
 class: Workflow
 
 requirements:
-  - "$import": schemadef-type.yml
+  - $import: schemadef-type.yml
 
 inputs:
-  hello:
-    type: "schemadef-type.yml#HelloType"
+  hello: "schemadef-type.yml#HelloType"
 
 outputs:
   output:
     type: File
-    source: "#step1/output"
+    outputSource: step1/output
 
 steps:
   step1:
     in:
-      hello: "#hello"
+      hello: hello
     out: [output]
     run: schemadef-tool.cwl

@@ -33,15 +33,15 @@ steps:
   step1:
     in:
       echo_in1:
-        source: "#inp1"
+        source: inp1
         valueFrom: $(self.instr)
-      echo_in2: "#inp2"
+      echo_in2: inp2
       first:
-        source: "#inp1"
+        source: inp1
         valueFrom: "$(self[0].instr)"
     out: [echo_out]
 
-    scatter: ["#step1/echo_in1", "#step1/echo_in2"]
+    scatter: [echo_in1, echo_in2]
     scatterMethod: nested_crossproduct
     run:
       class: CommandLineTool

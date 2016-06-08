@@ -46,22 +46,22 @@ $graph:
     - class: StepInputExpressionRequirement
   steps:
     step1:
-      scatter: ["#main/step1/echo_in1", "#main/step1/echo_in2"]
+      scatter: [echo_in1, echo_in2]
       scatterMethod: dotproduct
       in:
         echo_in1:
-          source: "#main/inp1"
+          source: inp1
           valueFrom: $(self.instr)
-        echo_in2: "#main/inp2"
+        echo_in2: inp2
         first:
-          source: "#main/inp1"
+          source: inp1
           valueFrom: "$(self[0].instr)"
       out: [echo_out]
       run: "#echo"
 
   outputs:
     out:
-      source: "#main/step1/echo_out"
+      outputSource: step1/echo_out
       type:
         type: array
         items: string

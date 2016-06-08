@@ -11,13 +11,12 @@ inputs:
 outputs:
     count_output:
       type: int
-      source: "#step2/parseInt_output"
+      outputSource: step2/parseInt_output
 
 steps:
   step1:
     in:
-      wc_file1:
-        source: "#file1"
+      wc_file1: file1
     out: [wc_output]
     run:
       id: wc
@@ -36,7 +35,7 @@ steps:
 
   step2:
     in:
-      parseInt_file1: "#step1/wc_output"
+      parseInt_file1: step1/wc_output
     out: [parseInt_output]
     run:
       class: ExpressionTool

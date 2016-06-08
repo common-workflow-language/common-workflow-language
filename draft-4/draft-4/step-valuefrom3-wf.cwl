@@ -12,7 +12,7 @@ inputs:
 outputs:
   val:
     type: string
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
 
 steps:
   step1:
@@ -20,11 +20,11 @@ steps:
       id: echo
       class: CommandLineTool
       inputs:
-        - id: c
+        c:
           type: int
           inputBinding: {}
       outputs:
-        - id: echo_out
+        echo_out:
           type: string
           outputBinding:
             glob: "step1_out"
@@ -34,8 +34,8 @@ steps:
       stdout: step1_out
 
     in:
-      a: "#a"
-      b: "#b"
+      a: a
+      b: b
       c:
         valueFrom: "$(inputs.a + inputs.b)"
     out: [echo_out]

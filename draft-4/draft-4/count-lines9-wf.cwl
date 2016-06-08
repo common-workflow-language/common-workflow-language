@@ -7,7 +7,7 @@ inputs: []
 outputs:
   count_output:
     type: int
-    source: "#step2/output"
+    outputSource: step2/output
 
 steps:
   step1:
@@ -22,5 +22,5 @@ steps:
   step2:
     run: parseInt-tool.cwl
     in:
-      file1: "#step1/output"
+      file1: step1/output
     out: [output]

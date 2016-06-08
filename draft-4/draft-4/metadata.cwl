@@ -24,7 +24,7 @@ inputs:
     type: File
     inputBinding: {position: 1}
   numbering:
-    type: ["null", boolean]
+    type: boolean?
     inputBinding:
       position: 0
       prefix: -n

@@ -11,7 +11,6 @@ inputs:
     default: "the-default"
 
 outputs:
-  output:
-    type: int
+  output: int
 
 expression: "$({'output': (inputs.i1 == 'the-default' ? 1 : 2)})"

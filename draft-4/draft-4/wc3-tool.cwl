@@ -6,9 +6,11 @@ requirements:
   - class: InlineJavascriptRequirement
 
 inputs:
-    - { id: "#file1", type: {type: array, items: File}, inputBinding: {} }
+    file1:
+      type: File[]
+      inputBinding: {}
 outputs:
-    - id: "#output"
+    output:
       type: int
       outputBinding:
         glob: output.txt

@@ -7,20 +7,20 @@ requirements:
 
 inputs:
     file1:
-      type: {type: array, items: File}
+      type: File[]
     file2:
-      type: {type: array, items: File}
+      type: File[]
 
 outputs:
     count_output:
       type: int
-      source: "#step1/output"
+      outputSource: step1/output
 
 steps:
   step1:
     run: wc3-tool.cwl
     in:
       file1:
-        source: ["#file1", "#file2"]
+        source: [file1, file2]
         linkMerge: merge_flattened
     out: [output]

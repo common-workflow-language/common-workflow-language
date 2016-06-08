@@ -13,7 +13,7 @@ inputs:
 outputs:
   val:
     type: string
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
 
 steps:
   step1:
@@ -36,6 +36,6 @@ steps:
 
     in:
       c:
-        source: ["#a", "#b"]
+        source: [a, b]
         valueFrom: "$(self[0] + self[1])"
     out: [echo_out]

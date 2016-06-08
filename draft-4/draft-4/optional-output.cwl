@@ -19,7 +19,7 @@ outputs:
     secondaryFiles:
       - .idx
   optional_file:
-    type: ["null", File]
+    type: File?
     outputBinding:
       glob: bumble.txt
 baseCommand: cat

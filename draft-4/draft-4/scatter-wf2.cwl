@@ -3,14 +3,12 @@ cwlVersion: cwl:draft-4.dev2
 class: Workflow
 
 inputs:
-  inp1:
-    type: { type: array, items: string }
-  inp2:
-    type: { type: array, items: string }
+  inp1: string[]
+  inp2: string[]
 
 outputs:
   out:
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
     type:
       type: array
       items:
@@ -23,11 +21,11 @@ requirements:
 steps:
   step1:
     in:
-      echo_in1: "#inp1"
-      echo_in2: "#inp2"
+      echo_in1: inp1
+      echo_in2: inp2
     out: [echo_out]
 
-    scatter: ["#step1/echo_in1", "#step1/echo_in2"]
+    scatter: [echo_in1, echo_in2]
     scatterMethod: nested_crossproduct
     run:
       class: CommandLineTool

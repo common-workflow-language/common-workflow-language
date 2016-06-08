@@ -3,17 +3,13 @@ cwlVersion: cwl:draft-4.dev2
 
 inputs:
   ids:
-    type:
-      type: array
-      items: string
+    type: string[]
     inputBinding:
       position: 1
 
 outputs:
   files:
-    type:
-      type: array
-      items: File
+    type: File[]
     outputBinding:
       glob: $(inputs.ids)
 

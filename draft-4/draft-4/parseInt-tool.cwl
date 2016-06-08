@@ -11,7 +11,6 @@ inputs:
     inputBinding: { loadContents: true }
 
 outputs:
-  output:
-    type: int
+  output: int
 
 expression: "$({'output': parseInt(inputs.file1.contents)})"
