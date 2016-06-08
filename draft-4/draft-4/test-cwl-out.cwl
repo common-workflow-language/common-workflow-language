@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 requirements:
   - class: ShellCommandRequirement
   - class: DockerRequirement

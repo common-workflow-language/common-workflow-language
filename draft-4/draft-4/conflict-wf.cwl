@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 $graph:
 - id: echo
   class: CommandLineTool
@@ -41,35 +41,32 @@ $graph:
   id: collision
 
   inputs:
-    input_1:
-      type: string
-
-    input_2:
-      type: string
+    input_1: string
+    input_2: string
 
   outputs:
     fileout:
       type: File
-      source: "#collision/cat_step/fileout"
+      outputSource: cat_step/fileout
 
   steps:
     echo_1:
       run: "#echo"
       in:
-        text: "#collision/input_1"
+        text: input_1
       out: [fileout]
 
     echo_2:
       run: "#echo"
       in:
-        text: "#collision/input_2"
+        text: input_2
       out: [fileout]
 
     cat_step:
       run: "#cat"
       in:
         file1:
-          source: "#collision/echo_1/fileout"
+          source: echo_1/fileout
         file2:
-          source: "#collision/echo_2/fileout"
+          source: echo_2/fileout
       out: [fileout]

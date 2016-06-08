@@ -5,7 +5,7 @@ $schemas:
   - EDAM.owl
   - gx_edam.ttl
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 description: "Reverse each line using the `rev` command"
 
 inputs:

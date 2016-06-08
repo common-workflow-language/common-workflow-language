@@ -1,27 +1,22 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 class: Workflow
 inputs:
-  inp:
-    type:
-      type: array
-      items: string
+  inp: string[]
 outputs:
   out:
-    type:
-      type: array
-      items: string
-    source: "#step1/echo_out"
+    type: string[]
+    outputSource: step1/echo_out
 
 requirements:
   - class: ScatterFeatureRequirement
 
 steps:
-  - id: step1
+  step1:
     in:
-      echo_in: "#inp"
+      echo_in: inp
     out: [echo_out]
-    scatter: "#step1/echo_in"
+    scatter: echo_in
     run:
       class: CommandLineTool
       inputs:
