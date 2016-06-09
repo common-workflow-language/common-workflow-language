@@ -168,7 +168,7 @@ def get_metaschema():
 
 
 def load_schema(schema_ref, cache=None):
-    # type: (Union[unicode, Dict[str, Any]], Dict) -> Tuple[ref_resolver.Loader, Union[avro.schema.Names, avro.schema.SchemaParseException], Dict[unicode, Any], ref_resolver.Loader]
+    # type: (Union[unicode, Dict[unicode, Any]], Dict) -> Tuple[ref_resolver.Loader, Union[avro.schema.Names, avro.schema.SchemaParseException], Dict[unicode, Any], ref_resolver.Loader]
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
     if cache is not None:
         metaschema_loader.cache = cache
@@ -204,7 +204,7 @@ def load_and_validate(document_loader, avsc_names, document, strict):
 
 
 def validate_doc(schema_names, doc, loader, strict):
-    # type: (avro.schema.Names, Union[Dict[str, Any], List[Dict[str, Any]], str, unicode], ref_resolver.Loader, bool) -> None
+    # type: (avro.schema.Names, Union[Dict[unicode, Any], List[Dict[unicode, Any]], str, unicode], ref_resolver.Loader, bool) -> None
     has_root = False
     for r in schema_names.names.values():
         if ((hasattr(r, 'get_prop') and r.get_prop("documentRoot")) or (
