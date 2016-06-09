@@ -106,32 +106,32 @@ class Loader(object):
         self.rvocab = {}  # type: Dict[unicode, Any]
         self.idmap = None  # type: Dict[unicode, Any]
         self.mapPredicate = None  # type: Dict[unicode, unicode]
-        self.type_dsl_fields = None  # type: Set[str]
+        self.type_dsl_fields = None  # type: Set[unicode]
 
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped_id=False, vocab_term=False, scoped_ref=None):
-        # type: (Union[str, unicode], Union[str, unicode], bool, bool, int) -> Union[str, unicode]
-        if url in ("@id", "@type"):
+        # type: (unicode, unicode, bool, bool, int) -> unicode
+        if url in (u"@id", u"@type"):
             return url
 
         if vocab_term and url in self.vocab:
             return url
 
-        if self.vocab and ":" in url:
-            prefix = url.split(":")[0]
+        if self.vocab and u":" in url:
+            prefix = url.split(u":")[0]
             if prefix in self.vocab:
                 url = self.vocab[prefix] + url[len(prefix) + 1:]
 
         split = urlparse.urlsplit(url)
 
-        if split.scheme or url.startswith("$(") or url.startswith("${"):
+        if split.scheme or url.startswith(u"$(") or url.startswith(u"${"):
             pass
         elif scoped_id and not split.fragment:
             splitbase = urlparse.urlsplit(base_url)
-            frg = ""
+            frg = u""
             if splitbase.fragment:
-                frg = splitbase.fragment + "/" + split.path
+                frg = splitbase.fragment + u"/" + split.path
             else:
                 frg = split.path
             url = urlparse.urlunsplit(
