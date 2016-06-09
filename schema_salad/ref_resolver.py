@@ -158,7 +158,7 @@ class Loader(object):
                 self.url_fields.add(unicode(s))
         self.foreign_properties.add(s)
 
-    def add_namespaces(self, ns):  # type: (Dict[unicode, Any]) -> None
+    def add_namespaces(self, ns):  # type: (Dict[unicode, unicode]) -> None
         self.vocab.update(ns)
 
     def add_schemas(self, ns, base_url):

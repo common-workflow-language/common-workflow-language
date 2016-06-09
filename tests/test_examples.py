@@ -51,7 +51,6 @@ class TestSchemas(unittest.TestCase):
                                      "schema_salad/metaschema/metaschema.yml"]))
 
     def test_avro_regression(self):
-        return
         self.assertEqual(0, schema_salad.main.main(argsl=["tests/Process.yml"]))
 
     def test_jsonld_ctx(self):
