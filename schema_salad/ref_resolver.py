@@ -106,7 +106,7 @@ class Loader(object):
         self.rvocab = {}  # type: Dict[unicode, Any]
         self.idmap = None  # type: Dict[unicode, Any]
         self.mapPredicate = None  # type: Dict[unicode, unicode]
-        self.type_dsl_fields = None # type: Set[str]
+        self.type_dsl_fields = None  # type: Set[str]
 
         self.add_context(ctx)
 
@@ -359,36 +359,37 @@ class Loader(object):
                         ls.append(v)
                     document[idmapField] = ls
 
-    typeDSLregex = re.compile(r"^([^[?]+)(\[\])?(\?)?$")
+    typeDSLregex = re.compile(ur"^([^[?]+)(\[\])?(\?)?$")
 
     def _type_dsl(self, t):
-        # type: (Any) -> Any
-        r = t
+        # type: (Union[unicode, Dict, List]) -> Union[unicode, Dict[unicode, unicode], List[Union[unicode, Dict[unicode, unicode]]]]
         if not isinstance(t, (str, unicode)):
             return t
 
         m = Loader.typeDSLregex.match(t)
         if not m:
             return t
-        r = m.group(1)
+        first = m.group(1)
+        second = third = None
         if m.group(2):
-            r = {"type": "array",
-                 "items": r}
+            second = {u"type": u"array",
+                 u"items": first}
         if m.group(3):
-            r = ["null", r]
-        return r
+            third = [u"null", second or first]
+        return third or second or first
 
     def _resolve_type_dsl(self, document, loader):
-        # type: (Dict[unicode, Union[unicode, List[unicode]]], Loader) -> None
+        # type: (Dict[unicode, Union[unicode, Dict[unicode, unicode], List]], Loader) -> None
         for d in loader.type_dsl_fields:
             if d in document:
-                if isinstance(document[d], (str, unicode)):
-                    document[d] = self._type_dsl(document[d])
-                elif isinstance(document[d], list):
-                    document[d] = [self._type_dsl(t) for t in document[d]]
-
-                if isinstance(document[d], list):
-                    document[d] = flatten(document[d])
+                datum = document[d]
+                if isinstance(datum, (str, unicode)):
+                    document[d] = self._type_dsl(datum)
+                elif isinstance(datum, list):
+                    document[d] = [self._type_dsl(t) for t in datum]
+                datum2 = document[d]
+                if isinstance(datum2, list):
+                    document[d] = flatten(datum2)
                     seen = []  # type: List[unicode]
                     uniq = []
                     for item in document[d]:
