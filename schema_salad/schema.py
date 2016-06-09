@@ -193,7 +193,7 @@ def load_schema(schema_ref, cache=None):
     return document_loader, avsc_names, schema_metadata, metaschema_loader
 
 def load_and_validate(document_loader, avsc_names, document, strict):
-    # type: (ref_resolver.Loader, avro.schema.Names, Union[Dict[unicode, Any], unicode], bool) -> Tuple[Any, Dict[str, Any]]
+    # type: (ref_resolver.Loader, avro.schema.Names, Union[Dict[unicode, Any], unicode], bool) -> Tuple[Any, Dict[unicode, Any]]
     if isinstance(document, dict):
         data, metadata = document_loader.resolve_all(document, document["id"])
     else:
@@ -204,11 +204,11 @@ def load_and_validate(document_loader, avsc_names, document, strict):
 
 
 def validate_doc(schema_names, doc, loader, strict):
-    # type: (avro.schema.Names, Union[Dict[unicode, Any], List[Dict[unicode, Any]], str, unicode], ref_resolver.Loader, bool) -> None
+    # type: (avro.schema.Names, Union[Dict[unicode, Any], List[Dict[unicode, Any]], unicode], ref_resolver.Loader, bool) -> None
     has_root = False
     for r in schema_names.names.values():
-        if ((hasattr(r, 'get_prop') and r.get_prop("documentRoot")) or (
-                "documentRoot" in r.props)):
+        if ((hasattr(r, 'get_prop') and r.get_prop(u"documentRoot")) or (
+                u"documentRoot" in r.props)):
             has_root = True
             break
 
@@ -228,8 +228,8 @@ def validate_doc(schema_names, doc, loader, strict):
         errors = []
         success = False
         for r in schema_names.names.values():
-            if ((hasattr(r, "get_prop") and r.get_prop("documentRoot")) or (
-                    "documentRoot" in r.props)):
+            if ((hasattr(r, "get_prop") and r.get_prop(u"documentRoot")) or (
+                    u"documentRoot" in r.props)):
                 try:
                     validate.validate_ex(
                         r, item, loader.identifiers, strict, foreign_properties=loader.foreign_properties)
@@ -237,7 +237,7 @@ def validate_doc(schema_names, doc, loader, strict):
                     break
                 except validate.ValidationException as e:
                     if hasattr(r, "get_prop"):
-                        name = r.get_prop("name")
+                        name = r.get_prop(u"name")
                     elif hasattr(r, "name"):
                         name = r.name
                     errors.append("Could not validate as `%s` because\n%s" % (
