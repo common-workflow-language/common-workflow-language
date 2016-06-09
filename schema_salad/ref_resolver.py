@@ -111,7 +111,7 @@ class Loader(object):
         self.add_context(ctx)
 
     def expand_url(self, url, base_url, scoped_id=False, vocab_term=False, scoped_ref=None):
-        # type: (Union[str, unicode], Union[str, unicode], bool, bool, bool) -> Union[str, unicode]
+        # type: (Union[str, unicode], Union[str, unicode], bool, bool, int) -> Union[str, unicode]
         if url in ("@id", "@type"):
             return url
 
@@ -362,6 +362,7 @@ class Loader(object):
     typeDSLregex = re.compile(r"^([^[?]+)(\[\])?(\?)?$")
 
     def _type_dsl(self, t):
+        # type: (Any) -> Any
         r = t
         if not isinstance(t, (str, unicode)):
             return t
@@ -378,6 +379,7 @@ class Loader(object):
         return r
 
     def _resolve_type_dsl(self, document, loader):
+        # type: (Dict[unicode, Union[unicode, List[unicode]]], Loader) -> None
         for d in loader.type_dsl_fields:
             if d in document:
                 if isinstance(document[d], (str, unicode)):
@@ -387,7 +389,7 @@ class Loader(object):
 
                 if isinstance(document[d], list):
                     document[d] = flatten(document[d])
-                    seen = []
+                    seen = []  # type: List[unicode]
                     uniq = []
                     for item in document[d]:
                         if item not in seen:
@@ -402,7 +404,7 @@ class Loader(object):
             if identifer in document:
                 if isinstance(document[identifer], basestring):
                     document[identifer] = loader.expand_url(
-                        document[identifer], base_url, scoped=True)
+                        document[identifer], base_url, scoped_id=True)
                     if (document[identifer] not in loader.idx
                             or isinstance(
                                 loader.idx[document[identifer]], basestring)):
@@ -618,6 +620,7 @@ class Loader(object):
     FieldType = TypeVar('FieldType', unicode, List[str], Dict[str, Any])
 
     def validate_scoped(self, field, link, docid):
+        # type: (unicode, unicode, unicode) -> unicode
         split = urlparse.urlsplit(docid)
         sp = split.fragment.split("/")
         n = self.scoped_ref_fields[field]
