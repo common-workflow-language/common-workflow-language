@@ -1,5 +1,4 @@
-- args:
-  job: draft-3/bwa-mem-job.json
+- job: draft-3/bwa-mem-job.json
   tool: draft-3/bwa-mem-tool.cwl
   output:
     args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
@@ -493,7 +492,7 @@
   doc: |
     Test parameter evaluation, with support for JS expressions
 
-- args: [cat, draft-3/hello.txt]
+- output: {}
   job: draft-3/cat-job.json
   tool: draft-3/metadata.cwl
   doc: Test metadata
