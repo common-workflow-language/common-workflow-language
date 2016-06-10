@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 class: Workflow
 
 inputs:
@@ -18,7 +18,7 @@ inputs:
       items: string
 outputs:
   out:
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
     type:
       type: array
       items:
@@ -33,15 +33,15 @@ steps:
   step1:
     in:
       echo_in1:
-        source: "#inp1"
+        source: inp1
         valueFrom: $(self.instr)
-      echo_in2: "#inp2"
+      echo_in2: inp2
       first:
-        source: "#inp1"
+        source: inp1
         valueFrom: "$(self[0].instr)"
     out: [echo_out]
 
-    scatter: ["#step1/echo_in1", "#step1/echo_in2"]
+    scatter: [echo_in1, echo_in2]
     scatterMethod: nested_crossproduct
     run:
       class: CommandLineTool

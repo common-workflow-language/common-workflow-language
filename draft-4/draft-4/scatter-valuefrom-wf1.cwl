@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 class: Workflow
 inputs:
   inp:
@@ -16,7 +16,7 @@ outputs:
     type:
       type: array
       items: string
-    source: "#step1/echo_out"
+    outputSource: step1/echo_out
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -26,13 +26,13 @@ steps:
   step1:
     in:
       echo_in:
-        source: "#inp"
+        source: inp
         valueFrom: $(self.instr)
       first:
-        source: "#inp"
+        source: inp
         valueFrom: "$(self[0].instr)"
     out: [echo_out]
-    scatter: "#step1/echo_in"
+    scatter: echo_in
     run:
       class: CommandLineTool
       inputs:

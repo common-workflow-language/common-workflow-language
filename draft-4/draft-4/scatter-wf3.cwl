@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 $graph:
 
 - id: echo
@@ -26,25 +26,23 @@ $graph:
 - id: main
   class: Workflow
   inputs:
-    inp1:
-      type: { type: array, items: string }
-    inp2:
-      type: { type: array, items: string }
+    inp1: string[]
+    inp2: string[]
   requirements:
     - class: ScatterFeatureRequirement
   steps:
     step1:
-      scatter: ["#main/step1/echo_in1", "#main/step1/echo_in2"]
+      scatter: [echo_in1, echo_in2]
       scatterMethod: flat_crossproduct
       in:
-        echo_in1: "#main/inp1"
-        echo_in2: "#main/inp2"
+        echo_in1: inp1
+        echo_in2: inp2
       out: [echo_out]
       run: "#echo"
 
   outputs:
     out:
-      source: "#main/step1/echo_out"
+      outputSource: step1/echo_out
       type:
         type: array
         items: string

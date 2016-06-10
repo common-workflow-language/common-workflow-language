@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: "cwl:draft-4.dev1"
+cwlVersion: "cwl:draft-4.dev2"
 description: "Print the contents of a file to stdout using 'cat' running in a docker container."
 hints:
   DockerRequirement:
@@ -19,7 +19,7 @@ outputs:
     secondaryFiles:
       - .idx
   optional_file:
-    type: ["null", File]
+    type: File?
     outputBinding:
       glob: bumble.txt
 baseCommand: cat

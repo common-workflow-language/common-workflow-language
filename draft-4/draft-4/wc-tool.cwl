@@ -1,13 +1,15 @@
 #!/usr/bin/env cwl-runner
 
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 
 inputs:
-  - { id: file1, type: File }
+  file1: File
 
-"outputs":
-  - { id: output, type: File,  outputBinding: { glob: output } }
+outputs:
+  output:
+    type: File
+    outputBinding: { glob: output }
 
 baseCommand: [wc]
 

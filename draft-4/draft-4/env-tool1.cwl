@@ -1,8 +1,7 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 inputs:
-  in:
-    type: string
+  in: string
 outputs:
   out:
     type: File

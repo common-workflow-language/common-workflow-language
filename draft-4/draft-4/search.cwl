@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 $graph:
 - id: index
   class: CommandLineTool
@@ -76,10 +76,10 @@ $graph:
   outputs:
     outfile:
       type: File
-      source: "#main/search/result"
+      outputSource: search/result
     indexedfile:
       type: File
-      source: "#main/index/result"
+      outputSource: index/result
 
   steps:
     index:

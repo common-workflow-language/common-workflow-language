@@ -1,9 +1,9 @@
 import sys
-if sys.version_info >= (2,7):
-    import typing
+from typing import Any, Tuple
 
 # http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html
 def flatten(l, ltypes=(list, tuple)):
+    # type: (Any, Any) -> Any
     if l is None:
         return []
     if not isinstance(l, ltypes):
@@ -21,4 +21,4 @@ def flatten(l, ltypes=(list, tuple)):
             else:
                 l[i:i + 1] = l[i]
         i += 1
-    return ltype(l)
+    return ltype(l)  # type: ignore

@@ -3,7 +3,7 @@
 #
 class: Workflow
 description: "Reverse the lines in a document, then sort those lines."
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 
 # Requirements & hints specify prerequisites and extensions to the workflow.
 # In this example, DockerRequirement specifies a default Docker container
@@ -37,7 +37,7 @@ inputs:
 outputs:
   output:
     type: File
-    source: "#sorted/output"
+    outputSource: sorted/output
     description: "The output with the lines reversed and sorted."
 
 # The "steps" array lists the executable steps that make up the workflow.
@@ -53,13 +53,13 @@ outputs:
 steps:
   rev:
     in:
-      input: "#input"
+      input: input
     out: [output]
     run: revtool.cwl
 
   sorted:
     in:
-      input: "#rev/output"
-      reverse: "#reverse_sort"
+      input: rev/output
+      reverse: reverse_sort
     out: [output]
     run: sorttool.cwl

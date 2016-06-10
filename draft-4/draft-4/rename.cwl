@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 baseCommand: "true"
 requirements:
   CreateFileRequirement:
@@ -7,10 +7,8 @@ requirements:
       - filename: $(inputs.newname)
         fileContent: $(inputs.srcfile)
 inputs:
-  srcfile:
-    type: File
-  newname:
-    type: string
+  srcfile: File
+  newname: string
 outputs:
   outfile:
     type: File

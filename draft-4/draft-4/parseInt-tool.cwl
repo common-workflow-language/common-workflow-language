@@ -3,7 +3,7 @@
 class: ExpressionTool
 requirements:
   - class: InlineJavascriptRequirement
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 
 inputs:
   file1:
@@ -11,7 +11,6 @@ inputs:
     inputBinding: { loadContents: true }
 
 outputs:
-  output:
-    type: int
+  output: int
 
 expression: "$({'output': parseInt(inputs.file1.contents)})"

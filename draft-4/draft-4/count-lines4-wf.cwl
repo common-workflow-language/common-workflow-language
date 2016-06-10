@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 
 inputs:
     file1:
@@ -10,8 +10,8 @@ inputs:
 
 outputs:
     count_output:
-      type: {type: array, items: int}
-      source: "#step1/output"
+      type: int[]
+      outputSource: step1/output
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -20,7 +20,7 @@ requirements:
 steps:
   step1:
     run: wc2-tool.cwl
-    scatter: "#step1/file1"
+    scatter: file1
     in:
-      file1: ["#file1", "#file2"]
+      file1: [file1, file2]
     out: [output]

@@ -70,6 +70,6 @@ provides for robust support of inline documentation.
 .. _JSON-LD: http://json-ld.org
 .. _Avro: http://avro.apache.org
 .. _metaschema: https://github.com/common-workflow-language/schema_salad/blob/master/schema_salad/metaschema/metaschema.yml
-.. _specification: https://common-workflow-language.github.io/draft-3/SchemaSalad.html
+.. _specification: http://www.commonwl.org/draft-3/SchemaSalad.html
 .. _Language: https://github.com/common-workflow-language/common-workflow-language/blob/master/draft-3/CommandLineTool.yml
 .. _RDF: https://www.w3.org/RDF/

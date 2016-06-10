@@ -3,14 +3,12 @@
 class: ExpressionTool
 requirements:
   - class: InlineJavascriptRequirement
-cwlVersion: cwl:draft-4.dev1
+cwlVersion: cwl:draft-4.dev2
 
 inputs:
-  i1:
-    type: Any
+  i1: Any
 
 outputs:
-  output:
-    type: int
+  output: int
 
 expression: "$({'output': (inputs.i1 == 'the-default' ? 1 : 2)})"
