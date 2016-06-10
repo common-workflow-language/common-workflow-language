@@ -15,16 +15,16 @@ class TestSchemas(unittest.TestCase):
         l = schema_salad.ref_resolver.Loader({})
 
         ra, _ = l.resolve_all({
-            "$schemas": ["tests/EDAM.owl"],
-            "$namespaces": {"edam": "http://edamontology.org/"},
-            "edam:has_format": "edam:format_1915"
+            u"$schemas": [u"tests/EDAM.owl"],
+            u"$namespaces": {u"edam": u"http://edamontology.org/"},
+            u"edam:has_format": u"edam:format_1915"
         }, "")
 
-        self.assertEqual(ra, {
-            "$schemas": ["tests/EDAM.owl"],
-            "$namespaces": {"edam": "http://edamontology.org/"},
-            'http://edamontology.org/has_format': 'http://edamontology.org/format_1915'
-        })
+        self.assertEqual({
+            u"$schemas": [u"tests/EDAM.owl"],
+            u"$namespaces": {u"edam": u"http://edamontology.org/"},
+            u'http://edamontology.org/has_format': u'http://edamontology.org/format_1915'
+        }, ra)
 
     # def test_domain(self):
     #     l = schema_salad.ref_resolver.Loader({})
@@ -46,9 +46,12 @@ class TestSchemas(unittest.TestCase):
     #     })
 
     def test_self_validate(self):
-        schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml"])
-        schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml",
-                                     "schema_salad/metaschema/metaschema.yml"])
+        self.assertEqual(0, schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml"]))
+        self.assertEqual(0, schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml",
+                                     "schema_salad/metaschema/metaschema.yml"]))
+
+    def test_avro_regression(self):
+        self.assertEqual(0, schema_salad.main.main(argsl=["tests/Process.yml"]))
 
     def test_jsonld_ctx(self):
         ldr, _, _, _ = schema_salad.schema.load_schema({

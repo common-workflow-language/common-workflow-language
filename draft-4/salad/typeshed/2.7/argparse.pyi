@@ -123,7 +123,7 @@ class _ActionsContainer:
     def set_defaults(self, **kwargs): ...
     def get_default(self, dest): ...
     def add_argument(self,
-        *args: str,
+        *args: Union[str, unicode],
         action: Union[str, Action] = ...,
         nargs: str = ...,
         const: Any = ...,

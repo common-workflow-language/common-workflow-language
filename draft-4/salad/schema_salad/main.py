@@ -23,7 +23,7 @@ register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
 
 def printrdf(workflow, wf, ctx, sr):
-    # type: (str, Union[Dict[Any, Any], str, unicode], Dict[str, Any], str) -> None
+    # type: (str, Union[List, Dict[Any, Any], str, unicode], Dict[unicode, Any], str) -> None
     g = Graph().parse(data=json.dumps(wf), format='json-ld',
                       location=workflow, context=ctx)
     print(g.serialize(format=sr))
@@ -140,7 +140,12 @@ def main(argsl=None):  # type: (List[str]) -> int
 
     # Make the Avro validation that will be used to validate the target
     # document
-    (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc, document_loader)
+    if isinstance(schema_doc, list):
+        (avsc_names, avsc_obj) = schema.make_avro_schema(
+            schema_doc, document_loader)
+    else:
+        _logger.error("Schema `%s` must be a list.", args.schema)
+        return 1
 
     if isinstance(avsc_names, Exception):
         _logger.error("Schema `%s` error:\n%s", args.schema,

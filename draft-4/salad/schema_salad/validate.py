@@ -8,7 +8,7 @@ class ValidationException(Exception):
     pass
 
 def validate(expected_schema, datum, identifiers=set(), strict=False, foreign_properties=set()):
-    # type: (avro.schema.Schema, Any, Set[str], bool, Set[str]) -> bool
+    # type: (avro.schema.Schema, Any, Set[unicode], bool, Set[unicode]) -> bool
     try:
         return validate_ex(expected_schema, datum, identifiers, strict=strict, foreign_properties=foreign_properties)
     except ValidationException:
@@ -51,7 +51,7 @@ def vpformat(datum):  # type: (Any) -> str
 
 def validate_ex(expected_schema, datum, identifiers=None, strict=False,
         foreign_properties=None):
-    # type: (avro.schema.Schema, Any, Set[str], bool, Set[str]) -> bool
+    # type: (avro.schema.Schema, Any, Set[unicode], bool, Set[unicode]) -> bool
     """Determine if a python datum is an instance of a schema."""
 
     if not identifiers:
