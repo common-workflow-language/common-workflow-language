@@ -4,17 +4,26 @@ class: CommandLineTool
 cwlVersion: cwl:draft-4.dev2
 
 inputs:
-  reference:
+  - id: reference
     type: File
     inputBinding: { position: 2 }
 
-  reads:
+  - id: reads
     type:
       type: array
       items: File
       inputBinding: { prefix: "-YYY" }
     inputBinding: { position: 3, prefix: "-XXX" }
 
+  - id: "#args.py"
+    type: File
+    default:
+      class: File
+      path: args.py
+    inputBinding:
+      position: -1
+
 outputs: []
 
-baseCommand: [bwa, mem]
+baseCommand: python
+arguments: ["bwa", "mem"]

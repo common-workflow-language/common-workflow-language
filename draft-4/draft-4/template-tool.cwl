@@ -11,9 +11,14 @@ requirements:
   - class: CreateFileRequirement
     fileDef:
       - filename: foo.txt
-        fileContent: $(t("The file is <%= inputs.file1.path %>\n"))
+        fileContent: >
+          $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
 inputs:
   - id: file1
     type: File
-outputs: []
+outputs:
+  - id: foo
+    type: File
+    outputBinding:
+      glob: foo.txt
 baseCommand: [cat, foo.txt]
