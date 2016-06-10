@@ -156,7 +156,7 @@ class Loader(object):
                 u"http://www.w3.org/2000/01/rdf-schema#Literal")
             if not literal:
                 self.url_fields.add(unicode(s))
-        self.foreign_properties.add(s)
+        self.foreign_properties.add(unicode(s))
 
     def add_namespaces(self, ns):  # type: (Dict[unicode, unicode]) -> None
         self.vocab.update(ns)
