@@ -5,10 +5,6 @@ cwlVersion: cwl:draft-3
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
-    dockerPull: images.sbgenomics.com/rabix/bwa
-    dockerImageId: 9d3b9b0359cf
-
   - class: ResourceRequirement
     coresMin: 4
 
@@ -34,14 +30,28 @@ inputs:
       prefix: -I
       itemSeparator: ","
 
+  - id: args.py
+    type: File
+    default:
+      class: File
+      path: args.py
+    inputBinding:
+      position: -1
+
 outputs:
   - id: sam
-    type: File
+    type: ["null", File]
     outputBinding: { glob: output.sam }
+  - id: args
+    type:
+      type: array
+      items: string
 
-baseCommand: [bwa, mem]
+baseCommand: python
 
 arguments:
+  - bwa
+  - mem
   - valueFrom: $(runtime.cores)
     position: 1
     prefix: -t

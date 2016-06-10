@@ -15,6 +15,15 @@ inputs:
       inputBinding: { prefix: "-YYY" }
     inputBinding: { position: 3, prefix: "-XXX" }
 
+  - id: "#args.py"
+    type: File
+    default:
+      class: File
+      path: args.py
+    inputBinding:
+      position: -1
+
 outputs: []
 
-baseCommand: [bwa, mem]
+baseCommand: python
+arguments: ["bwa", "mem"]
