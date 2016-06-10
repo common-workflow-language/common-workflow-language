@@ -1,63 +1,52 @@
-- args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3', draft-2/rabix/tests/test-files/chr20.fa,
-    draft-2/rabix/tests/test-files/example_human_Illumina.pe_1.fastq, draft-2/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+- args:
   job: draft-2/bwa-mem-job.json
-  stdout: output.sam
   tool: draft-2/bwa-mem-tool.cwl
+  output:
+    args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
+      chr20.fa,
+      example_human_Illumina.pe_1.fastq,
+      example_human_Illumina.pe_2.fastq]
   doc: General test of command line generation
 
-- args: [bwa, mem, draft-2/rabix/tests/test-files/chr20.fa,
-    "-XXX",
-    "-YYY", draft-2/rabix/tests/test-files/example_human_Illumina.pe_1.fastq,
-    "-YYY", draft-2/rabix/tests/test-files/example_human_Illumina.pe_2.fastq]
+- output:
+    args: [bwa, mem, chr20.fa,
+      "-XXX",
+      "-YYY", example_human_Illumina.pe_1.fastq,
+      "-YYY", example_human_Illumina.pe_2.fastq]
   job: draft-2/bwa-mem-job.json
   tool: draft-2/binding-test.cwl
   doc: Test nested prefixes with arrays
 
-- args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
+- output:
+    args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
     '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
     '16', map2, --max-seed-hits, '-1', --max-seq-length, '20', --min-seq-length, '10']
   job: draft-2/tmap-job.json
-  stdin: draft-2/reads.fastq
-  stdout: output.sam
   tool: draft-2/tmap-tool.cwl
-  doc: Test nested command line bindings and stdin/stdout redirection
+  doc: Test nested command line bindings
 
-- args: [cat, draft-2/hello.txt]
+- output:
+    args: [cat, hello.txt]
   job: draft-2/cat-job.json
-  tool: draft-2/cat1-tool.cwl
+  tool: draft-2/cat1-testcli.cwl
   doc: Test command line with optional input (missing)
 
-- args: [cat, -n, draft-2/hello.txt]
+- output:
+    args: [cat, -n, hello.txt]
   job: draft-2/cat-n-job.json
-  tool: draft-2/cat1-tool.cwl
+  tool: draft-2/cat1-testcli.cwl
   doc: Test command line with optional input (provided)
 
-- args: [cat]
-  job: draft-2/cat-job.json
-  stdin: draft-2/hello.txt
-  tool: draft-2/cat2-tool.cwl
-  doc: Test command line with stdin redirection
-
-- args: [cat, draft-2/hello.txt]
-  job: draft-2/cat-job.json
-  stdout: output.txt
-  tool: draft-2/cat3-tool.cwl
-  doc: Test command line with stdout redirection
-
-- args: [cat]
-  job: draft-2/cat-job.json
-  stdin: draft-2/hello.txt
-  stdout: output.txt
-  tool: draft-2/cat4-tool.cwl
-  doc: Test command line with stdin and stdout redirection
-
-- args: [cat, foo.txt]
-  createfiles: {foo.txt: 'The file is draft-2/hello.txt
-
-      '}
+- output:
+    "foo": {
+        "checksum": "sha1$63da67422622fbf9251a046d7a34b7ea0fd4fead",
+        "class": "File",
+        "path": "foo.txt",
+        "size": 22
+    }
   job: draft-2/cat-job.json
   tool: draft-2/template-tool.cwl
-  doc: Test CreateFileRequirement ExpressionEngineRequirement.engineConfig features
+  doc: Test CreateFileRequirement ExpressionEngineRequirement.engineConfig feature
 
 - job: draft-2/cat-job.json
   output:

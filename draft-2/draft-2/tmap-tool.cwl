@@ -16,7 +16,18 @@
                 "type": "array",
                 "items": "Stage"
             }
+        },
+        {
+        id: "#args.py",
+        type: File,
+        default: {
+          class: File,
+          path: args.py
+        },
+        inputBinding: {
+          position: -1
         }
+      }
     ],
     "outputs": [
         {
@@ -24,7 +35,7 @@
             "outputBinding": {
                 "glob": "output.sam"
             },
-            "type": "File"
+            "type": ["null", "File"]
         }
     ],
     "requirements": [
@@ -233,10 +244,6 @@
             ]
         }
     ]}],
-    "baseCommand": ["tmap", "mapall"],
-    "stdin": {
-      "engine": "cwl:JsonPointer",
-      "script": "job/reads/path"
-      },
-    "stdout": "output.sam"
+    "baseCommand": "python",
+    "arguments": ["tmap", "mapall"]
 }

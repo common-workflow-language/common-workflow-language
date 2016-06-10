@@ -1,18 +1,18 @@
 {
     "reference": {
         "class": "File",
-        "path": "rabix/tests/test-files/chr20.fa",
+        "path": "chr20.fa",
         "size": 123,
         "checksum": "sha1$hash"
     },
     "reads": [
         {
             "class": "File",
-            "path": "rabix/tests/test-files/example_human_Illumina.pe_1.fastq"
+            "path": "example_human_Illumina.pe_1.fastq"
         },
         {
             "class": "File",
-            "path": "rabix/tests/test-files/example_human_Illumina.pe_2.fastq"
+            "path": "example_human_Illumina.pe_2.fastq"
         }
     ],
     "min_std_max_min": [

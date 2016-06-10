@@ -4,11 +4,6 @@ class: CommandLineTool
 requirements:
   - import: node-engine.cwl
 
-hints:
-  - class: DockerRequirement
-    dockerPull: images.sbgenomics.com/rabix/bwa
-    dockerImageId: 9d3b9b0359cf
-
 inputs:
   - id: "#reference"
     type: File
@@ -31,14 +26,28 @@ inputs:
       prefix: "-I"
       itemSeparator: ","
 
+  - id: "#args.py"
+    type: File
+    default:
+      class: File
+      path: args.py
+    inputBinding:
+      position: -1
+
 outputs:
   - id: "#sam"
-    type: "File"
+    type: ["null", "File"]
     outputBinding: { "glob": "output.sam" }
+  - id: "#args"
+    type:
+      type: array
+      items: string
 
-baseCommand: ["bwa", "mem"]
+baseCommand: python
 
 arguments:
+  - "bwa"
+  - "mem"
   - valueFrom:
       engine: "node-engine.cwl"
       script: "$job.allocatedResources.cpu"
