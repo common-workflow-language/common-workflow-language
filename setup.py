@@ -41,7 +41,7 @@ install_requires.append("avro")  # TODO: remove me once cwltool is
 extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
-      version='1.12',
+      version='1.11',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
