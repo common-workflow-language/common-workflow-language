@@ -39,9 +39,11 @@ $graph:
   extends: "sld:PrimitiveType"
   symbols:
     - cwl:File
+    - cwl:Directory
   doc:
     - "Extends primitive types with the concept of a file as a first class type."
     - "File: A File object"
+    - "Directory: A Directory object"
 
 - name: File
   type: record
@@ -111,12 +113,23 @@ $graph:
         runtime may perform exact file format matches.
 
 
+- name: Dirent
+  type: record
+  fields:
+    - name: basename
+      type: string
+      jsonldPredicate:
+        "_id": cwl:name
+    - name: entry
+      type: [File, Directory]
+
+
 - name: Directory
   type: record
   docParent: "#CWLType"
   doc: |
     Represents a directory to present to a command line tool. This could be a virtual
-    directory, made of files assembled from a number of concrete directories.
+    directory, made of files assembled from multiple locations.
   fields:
     - name: class
       type:
@@ -125,18 +138,22 @@ $graph:
         symbols:
           - cwl:Directory
       jsonldPredicate:
-        "_id": "@type"
-        "_type": "@vocab"
+        _id: "@type"
+        _type: "@vocab"
       doc: Must be `Directory` to indicate this object describes a Directory.
     - name: path
       type: string
       doc: The path to the directory.
       jsonldPredicate:
-        "_id": "cwl:path"
-        "_type": "@id"
-    # - name: size
-    #   type: ["null", long]
-    #   doc: Optional directory size.
+        _id: "cwl:path"
+        _type: "@id"
+    - name: listing
+      type: Dirent[]
+      doc: List of files or subdirectories contained in this directory
+      jsonldPredicate:
+        _id: "cwl:listing"
+        mapSubject: basename
+        mapPredicate: entry
 
 
 - name: SchemaBase
