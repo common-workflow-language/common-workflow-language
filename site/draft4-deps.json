@@ -12,6 +12,10 @@
             "class": "File"
         },
         {
+            "path": "../draft-4/salad/schema_salad/metaschema/metaschema_base.yml",
+            "class": "File"
+        },
+        {
             "path": "../draft-4/salad/schema_salad/metaschema/salad.md",
             "class": "File"
         },
