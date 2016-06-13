@@ -138,6 +138,36 @@ $graph:
     #   type: ["null", long]
     #   doc: Optional directory size.
 
+- name: stdout
+  type: record
+  doc: |
+    Only valid as a `type` for an output.
+
+    The following
+    ```
+    outputs:
+       an_output_name:
+       type: stdout
+
+    stdout: a_stdout_file
+    ```
+    is equivalent to
+    ```
+    outputs:
+       an_output_name:
+         type: File
+         outputBinding:
+           glob: a_stdout_file
+
+    stdout: a_stdout_file
+    ```
+
+    If there is no `stdout` name provided, a random filename will be created.
+
+
+- name: stderr
+  type: record
+  doc: Only valid as a `type` for an output.
 
 - name: SchemaBase
   type: record
@@ -213,6 +243,8 @@ $graph:
       type:
         - "null"
         - "#CWLType"
+        - "#stdout"
+        - "#stderr"
         - "sld:RecordSchema"
         - "sld:EnumSchema"
         - "sld:ArraySchema"
