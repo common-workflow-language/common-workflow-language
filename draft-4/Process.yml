@@ -167,7 +167,29 @@ $graph:
 
 - name: stderr
   type: record
-  doc: Only valid as a `type` for an output.
+  doc: |
+    Only valid as a `type` for an output.
+
+    The following
+    ```
+    outputs:
+       an_output_name:
+       type: stderr
+
+    stderr: a_stderr_file
+    ```
+    is equivalent to
+    ```
+    outputs:
+       an_output_name:
+         type: File
+         outputBinding:
+           glob: a_stderr_file
+
+    stderr: a_stderr_file
+    ```
+
+    If there is no `stderr` name provided, a random filename will be created.
 
 - name: SchemaBase
   type: record
