@@ -425,7 +425,7 @@ $graph:
       type:
         - "null"
         - type: array
-          items: [string, "#CommandLineBinding"]
+          items: [string, "#Expression", "#CommandLineBinding"]
       jsonldPredicate:
         "_id": "cwl:arguments"
         "_container": "@list"
