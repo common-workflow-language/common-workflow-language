@@ -382,7 +382,86 @@ $graph:
       specializeTo: "#CommandOutputArraySchema"
     - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
+  fields:
+    - name: type
+      type:
+        - "null"
+        - "#CWLType"
+        - "#stdout"
+        - "#stderr"
+        - "sld:RecordSchema"
+        - "sld:EnumSchema"
+        - "sld:ArraySchema"
+        - string
+        - type: array
+          items:
+            - "#CWLType"
+            - "sld:RecordSchema"
+            - "sld:EnumSchema"
+            - "sld:ArraySchema"
+            - string
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
 
+- name: stdout
+  type: enum
+  symbols: [ "cwl:stdout" ]
+  docParent: "#CommandOutputParameter"
+  doc: |
+    Only valid as a `type` for an output.
+
+    The following
+    ```
+    outputs:
+       an_output_name:
+       type: stdout
+
+    stdout: a_stdout_file
+    ```
+    is equivalent to
+    ```
+    outputs:
+       an_output_name:
+         type: File
+         outputBinding:
+           glob: a_stdout_file
+
+    stdout: a_stdout_file
+    ```
+
+    If there is no `stdout` name provided, a random filename will be created.
+
+
+- name: stderr
+  type: enum
+  symbols: [ "cwl:stderr" ]
+  docParent: "#CommandOutputParameter"
+  doc: |
+    Only valid as a `type` for an output.
+
+    The following
+    ```
+    outputs:
+       an_output_name:
+       type: stderr
+
+    stderr: a_stderr_file
+    ```
+    is equivalent to
+    ```
+    outputs:
+       an_output_name:
+         type: File
+         outputBinding:
+           glob: a_stderr_file
+    ```
+
+    If there is no `stderr` name provided, a random filename will be created.
 
 - type: record
   name: CommandLineTool
@@ -436,6 +515,7 @@ $graph:
         standard input stream.
     - name: stderr
       type: ["null", string, "#Expression"]
+      jsonldPredicate: "https://w3id.org/cwl/cwl#stderr"
       doc: |
         Capture the command's standard error stream to a file written to
         the designated output directory.
@@ -448,6 +528,7 @@ $graph:
         characters (such as the path separator `/`) it is an error.
     - name: stdout
       type: ["null", string, "#Expression"]
+      jsonldPredicate: "https://w3id.org/cwl/cwl#stdout"
       doc: |
         Capture the command's standard output stream to a file written to
         the designated output directory.
