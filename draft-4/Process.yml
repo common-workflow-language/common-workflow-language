@@ -138,8 +138,9 @@ $graph:
     #   type: ["null", long]
     #   doc: Optional directory size.
 
-- name: stdout
-  type: record
+- name: CWLStdOut
+  type: enum
+  symbols: [ stdout ]
   doc: |
     Only valid as a `type` for an output.
 
@@ -165,8 +166,9 @@ $graph:
     If there is no `stdout` name provided, a random filename will be created.
 
 
-- name: stderr
-  type: record
+- name: CWLStdErr
+  type: enum
+  symbols: [ stderr ]
   doc: |
     Only valid as a `type` for an output.
 
@@ -265,8 +267,8 @@ $graph:
       type:
         - "null"
         - "#CWLType"
-        - "https://w3id.org/cwl/cwl#stdout"
-        - "https://w3id.org/cwl/cwl#stderr"
+        - "#CWLStdOut"
+        - "#CWLStdErr"
         - "sld:RecordSchema"
         - "sld:EnumSchema"
         - "sld:ArraySchema"
