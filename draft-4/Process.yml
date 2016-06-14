@@ -265,8 +265,8 @@ $graph:
       type:
         - "null"
         - "#CWLType"
-        - "#stdout"
-        - "#stderr"
+        - "https://w3id.org/cwl/cwl#stdout"
+        - "https://w3id.org/cwl/cwl#stderr"
         - "sld:RecordSchema"
         - "sld:EnumSchema"
         - "sld:ArraySchema"

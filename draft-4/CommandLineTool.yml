@@ -434,7 +434,7 @@ $graph:
       doc: |
         A path to a file whose contents must be piped into the command's
         standard input stream.
-    - name: stderr
+    - name: "https://w3id.org/cwl/cwl#CommandLineTool/stderr"
       type: ["null", string, "#Expression"]
       doc: |
         Capture the command's standard error stream to a file written to
