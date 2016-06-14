@@ -434,8 +434,9 @@ $graph:
       doc: |
         A path to a file whose contents must be piped into the command's
         standard input stream.
-    - name: "https://w3id.org/cwl/cwl#CommandLineTool/stderr"
+    - name: stderr
       type: ["null", string, "#Expression"]
+      jsonldPredicate: "https://w3id.org/cwl/cwl#stderr"
       doc: |
         Capture the command's standard error stream to a file written to
         the designated output directory.
@@ -448,6 +449,7 @@ $graph:
         characters (such as the path separator `/`) it is an error.
     - name: stdout
       type: ["null", string, "#Expression"]
+      jsonldPredicate: "https://w3id.org/cwl/cwl#stdout"
       doc: |
         Capture the command's standard output stream to a file written to
         the designated output directory.

@@ -140,7 +140,7 @@ $graph:
 
 - name: CWLStdOut
   type: enum
-  symbols: [ stdout ]
+  symbols: [ "cwl:stdout" ]
   doc: |
     Only valid as a `type` for an output.
 
@@ -168,7 +168,7 @@ $graph:
 
 - name: CWLStdErr
   type: enum
-  symbols: [ stderr ]
+  symbols: [ "cwl:stderr" ]
   doc: |
     Only valid as a `type` for an output.
 
