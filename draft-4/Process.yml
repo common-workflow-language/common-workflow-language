@@ -378,29 +378,6 @@ $graph:
     - specializeFrom: "sld:ArraySchema"
       specializeTo: "#InputArraySchema"
   fields:
-    - name: type
-      type:
-        - "null"
-        - "#CWLType"
-        - "sld:RecordSchema"
-        - "sld:EnumSchema"
-        - "sld:ArraySchema"
-        - string
-        - type: array
-          items:
-            - "#CWLType"
-            - "sld:RecordSchema"
-            - "sld:EnumSchema"
-            - "sld:ArraySchema"
-            - string
-      jsonldPredicate:
-        "_id": "sld:type"
-        "_type": "@vocab"
-        refScope: 2
-        typeDSL: True
-      doc: |
-        Specify valid types of data that may be assigned to this parameter.
-
     - name: id
       type: string
       jsonldPredicate: "@id"
