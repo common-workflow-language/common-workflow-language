@@ -424,7 +424,8 @@ $graph:
   symbols: [ "cwl:stdout" ]
   docParent: "#CommandOutputParameter"
   doc: |
-    Only valid as a `type` for an output.
+    Only valid as a `type` for a `CommandLineTool` output with no
+    `outputBinding` set.
 
     The following
     ```
@@ -453,7 +454,8 @@ $graph:
   symbols: [ "cwl:stderr" ]
   docParent: "#CommandOutputParameter"
   doc: |
-    Only valid as a `type` for an output.
+    Only valid as a `type` for a `CommandLineTool` output with no
+    `outputBinding` set.
 
     The following
     ```
