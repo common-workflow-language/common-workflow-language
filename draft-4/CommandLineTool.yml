@@ -368,18 +368,11 @@ $graph:
     - specializeFrom: "#InputBinding"
       specializeTo: "#CommandLineBinding"
 
-
 - type: record
   name: CommandOutputParameter
   extends: "#OutputParameter"
   doc: An output parameter for a CommandLineTool.
   specialize:
-    - specializeFrom: "#OutputRecordSchema"
-      specializeTo: "#CommandOutputRecordSchema"
-    - specializeFrom: "#OutputEnumSchema"
-      specializeTo: "#CommandOutputEnumSchema"
-    - specializeFrom: "#OutputArraySchema"
-      specializeTo: "#CommandOutputArraySchema"
     - specializeFrom: "#OutputBinding"
       specializeTo: "#CommandOutputBinding"
   fields:
@@ -389,16 +382,16 @@ $graph:
         - "#CWLType"
         - "#stdout"
         - "#stderr"
-        - "sld:RecordSchema"
-        - "sld:EnumSchema"
-        - "sld:ArraySchema"
+        - "#CommandOutputRecordSchema"
+        - "#CommandOutputEnumSchema"
+        - "#CommandOutputArraySchema"
         - string
         - type: array
           items:
             - "#CWLType"
-            - "sld:RecordSchema"
-            - "sld:EnumSchema"
-            - "sld:ArraySchema"
+            - "#CommandOutputRecordSchema"
+            - "#CommandOutputEnumSchema"
+            - "#CommandOutputArraySchema"
             - string
       jsonldPredicate:
         "_id": "sld:type"
@@ -413,7 +406,8 @@ $graph:
   symbols: [ "cwl:stdout" ]
   docParent: "#CommandOutputParameter"
   doc: |
-    Only valid as a `type` for an output.
+    Only valid as a `type` for a `CommandLineTool` output with no
+    `outputBinding` set.
 
     The following
     ```
@@ -442,7 +436,8 @@ $graph:
   symbols: [ "cwl:stderr" ]
   docParent: "#CommandOutputParameter"
   doc: |
-    Only valid as a `type` for an output.
+    Only valid as a `type` for a `CommandLineTool` output with no
+    `outputBinding` set.
 
     The following
     ```
