@@ -277,6 +277,8 @@ $graph:
       specializeTo: "#InputEnumSchema"
     - specializeFrom: "sld:ArraySchema"
       specializeTo: "#InputArraySchema"
+    - specializeFrom: "sld:PrimitiveType"
+      specializeTo: "#CWLType"
   fields:
     - name: inputBinding
       type: [ "null", "#InputBinding" ]
@@ -310,6 +312,8 @@ $graph:
       specializeTo: "#InputEnumSchema"
     - specializeFrom: "sld:ArraySchema"
       specializeTo: "#InputArraySchema"
+    - specializeFrom: "sld:PrimitiveType"
+      specializeTo: "#CWLType"
   fields:
     - name: inputBinding
       type: [ "null", "#InputBinding" ]
@@ -326,6 +330,8 @@ $graph:
       specializeTo: "#OutputEnumSchema"
     - specializeFrom: "sld:ArraySchema"
       specializeTo: "#OutputArraySchema"
+    - specializeFrom: "sld:PrimitiveType"
+      specializeTo: "#CWLType"
   fields:
     - name: outputBinding
       type: [ "null", "#OutputBinding" ]
@@ -361,6 +367,8 @@ $graph:
       specializeTo: "#OutputEnumSchema"
     - specializeFrom: "sld:ArraySchema"
       specializeTo: "#OutputArraySchema"
+    - specializeFrom: "sld:PrimitiveType"
+      specializeTo: "#CWLType"
   fields:
     - name: outputBinding
       type: [ "null", "#OutputBinding" ]
@@ -416,13 +424,6 @@ $graph:
 - name: OutputParameter
   type: record
   extends: "#Parameter"
-  specialize:
-    - specializeFrom: "sld:RecordSchema"
-      specializeTo: "#OutputRecordSchema"
-    - specializeFrom: "sld:EnumSchema"
-      specializeTo: "#OutputEnumSchema"
-    - specializeFrom: "sld:ArraySchema"
-      specializeTo: "#OutputArraySchema"
   fields:
     - name: id
       type: string
