@@ -1,0 +1,3 @@
+indir:
+  class: Directory
+  path: testdir

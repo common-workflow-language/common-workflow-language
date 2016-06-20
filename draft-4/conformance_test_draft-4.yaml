@@ -647,3 +647,50 @@
   }
   tool: "draft-4/conflict-wf.cwl#collision"
   doc: Test workflow two input files with same name.
+
+- job: draft-4/dir-job.yml
+  output:
+    "outlist": {
+        "size": 20,
+        "path": "output.txt",
+        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+        "class": "File"
+    }
+  tool: draft-4/dir.cwl
+  doc: Test directory input
+
+- job: draft-4/dir-job.yml
+  output:
+    "outlist": {
+        "size": 20,
+        "path": "output.txt",
+        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+        "class": "File"
+    }
+  tool: draft-4/dir2.cwl
+  doc: Test directory input in Docker
+
+- job: draft-4/dir3-job.yml
+  output:
+    "outdir": {
+        "class": "Directory",
+        "hostfs": true,
+        "listing": [
+            {
+                "basename": "hello.txt",
+                "entry": {
+                    "class": "File",
+                    "path": "hello.txt"
+                }
+            },
+            {
+                "basename": "goodbye.txt",
+                "entry": {
+                    "class": "File",
+                    "path": "goodbye.txt"
+                }
+            }
+        ],
+    }
+  tool: draft-4/dir3.cwl
+  doc: Test directory input in Docker
