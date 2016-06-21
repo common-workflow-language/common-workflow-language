@@ -41,7 +41,10 @@
         "checksum": "sha1$63da67422622fbf9251a046d7a34b7ea0fd4fead",
         "class": "File",
         "path": "foo.txt",
-        "size": 22
+        "size": 22,
+        "basename": "foo.txt",
+        "nameext": ".txt",
+        "nameroot": "foo"
     }
   job: draft-4/cat-job.json
   tool: draft-4/template-tool.cwl
@@ -54,6 +57,9 @@
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
+      basename: output.txt
+      nameext: .txt
+      nameroot: output
   tool: draft-4/cat3-tool.cwl
   doc: Test command execution in Docker with stdout redirection
 
@@ -64,6 +70,9 @@
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
+      basename: output.txt
+      nameext: .txt
+      nameroot: output
   tool: draft-4/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
 
@@ -109,6 +118,9 @@
       checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
       path: output
       size: 15
+      basename: output
+      nameext: ""
+      nameroot: output
   tool: draft-4/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
@@ -179,6 +191,9 @@
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       path: out
       size: 15
+      basename: out
+      nameext: ""
+      nameroot: out
   tool: draft-4/env-tool1.cwl
   doc: Test EnvVarRequirement
 
@@ -224,6 +239,9 @@
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       path: out
       size: 15
+      basename: out
+      nameext: ""
+      nameroot: out
   tool: draft-4/env-wf1.cwl
   doc: Test requirement priority
 
@@ -234,6 +252,9 @@
       checksum: sha1$cdc1e84968261d6a7575b5305945471f8be199b6
       path: out
       size: 9
+      basename: out
+      nameext: ""
+      nameroot: out
   tool: draft-4/env-wf2.cwl
   doc: Test requirements override hints
 
@@ -249,6 +270,9 @@
       checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
       path: output.txt
       size: 1111
+      basename: output.txt
+      nameext: .txt
+      nameroot: output
   tool: draft-4/revsort.cwl
   doc: Test sample workflows from the specification
 
@@ -259,6 +283,9 @@
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       path: output.txt
       size: 13
+      basename: output.txt
+      nameext: .txt
+      nameroot: output
   tool: draft-4/cat5-tool.cwl
   doc: Test unknown hints are ignored.
 
@@ -269,30 +296,51 @@
       checksum: sha1$e2dc9daaef945ac15f01c238ed2f1660f60909a0
       path: result.txt
       size: 142
+      basename: result.txt
+      nameext: .txt
+      nameroot: result
     indexedfile: {
         "path": "input.txt",
+        "basename": "input.txt",
+        "nameext": ".txt",
+        "nameroot": "input",
         "class": "File",
         "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
         "secondaryFiles": [
             {
                 "path": "input.txt.idx1",
-                "class": "File"
+                "class": "File",
+                "basename": "input.txt.idx1",
+                "nameext": ".idx1",
+                "nameroot": "input.txt",
             },
             {
                 "path": "input.idx2",
-                "class": "File"
+                "class": "File",
+                "basename": "input.idx2",
+                "nameext": ".idx2",
+                "nameroot": "input",
             },
             {
                 "path": "input.txt.idx3",
-                "class": "File"
+                "class": "File",
+                "basename": "input.txt.idx3",
+                "nameext": ".idx3",
+                "nameroot": "input.txt",
             },
             {
                 "path": "input.txt.idx4",
-                "class": "File"
+                "class": "File",
+                "basename": "input.txt.idx4",
+                "nameext": ".idx4",
+                "nameroot": "input.txt",
             },
             {
                 "path": "input.txt.idx5",
-                "class": "File"
+                "class": "File",
+                "basename": "input.txt.idx5",
+                "nameext": ".idx5",
+                "nameroot": "input.txt",
             }
         ],
         "size": 1111
@@ -309,6 +357,9 @@
       checksum: sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376
       path: fish.txt
       size: 1111
+      basename: fish.txt
+      nameext: .txt
+      nameroot: fish
   tool: draft-4/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
@@ -327,6 +378,9 @@
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
+        basename: output.txt
+        nameext: .txt
+        nameroot: output
   tool: draft-4/schemadef-tool.cwl
   doc: |
     Test SchemaDefRequirement definition used in tool parameter
@@ -338,6 +392,9 @@
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
+        basename: output.txt
+        nameext: .txt
+        nameroot: output
   tool: draft-4/schemadef-wf.cwl
   doc: |
     Test SchemaDefRequirement definition used in workflow parameter
@@ -542,6 +599,9 @@
         size: 13
         class: "File"
         checksum: "sha1$47a013e660d408619d894b20806b1d5086aab03b"
+        basename: output.txt
+        nameext: .txt
+        nameroot: output
   doc: |
     Test optional output file and optional secondaryFile on output.
 
@@ -674,7 +734,6 @@
   output:
     "outdir": {
         "class": "Directory",
-        "hostfs": true,
         "listing": [
             {
                 "basename": "hello.txt",
