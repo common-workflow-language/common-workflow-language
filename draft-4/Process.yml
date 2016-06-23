@@ -230,7 +230,6 @@ $graph:
         mapSubject: basename
         mapPredicate: entry
 
-
 - name: SchemaBase
   type: record
   abstract: true
@@ -301,29 +300,6 @@ $graph:
     Define an input or output parameter to a process.
 
   fields:
-    - name: type
-      type:
-        - "null"
-        - "#CWLType"
-        - "sld:RecordSchema"
-        - "sld:EnumSchema"
-        - "sld:ArraySchema"
-        - string
-        - type: array
-          items:
-            - "#CWLType"
-            - "sld:RecordSchema"
-            - "sld:EnumSchema"
-            - "sld:ArraySchema"
-            - string
-      jsonldPredicate:
-        "_id": "sld:type"
-        "_type": "@vocab"
-        refScope: 2
-        typeDSL: True
-      doc: |
-        Specify valid types of data that may be assigned to this parameter.
-
     - name: label
       type:
         - "null"
@@ -486,13 +462,6 @@ $graph:
 - name: InputParameter
   type: record
   extends: "#Parameter"
-  specialize:
-    - specializeFrom: "sld:RecordSchema"
-      specializeTo: "#InputRecordSchema"
-    - specializeFrom: "sld:EnumSchema"
-      specializeTo: "#InputEnumSchema"
-    - specializeFrom: "sld:ArraySchema"
-      specializeTo: "#InputArraySchema"
   fields:
     - name: id
       type: string
@@ -513,6 +482,28 @@ $graph:
         The default value for this parameter if not provided in the input
         object.
 
+    - name: type
+      type:
+        - "null"
+        - "#CWLType"
+        - "#InputRecordSchema"
+        - "#InputEnumSchema"
+        - "#InputArraySchema"
+        - string
+        - type: array
+          items:
+            - "#CWLType"
+            - "#InputRecordSchema"
+            - "#InputEnumSchema"
+            - "#InputArraySchema"
+            - string
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
 
 - name: OutputParameter
   type: record

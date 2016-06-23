@@ -50,10 +50,39 @@ $graph:
 
     - {$include: concepts.md}
 
+- name: ExpressionToolOutputParameter
+  type: record
+  extends: Parameter
+  fields:
+    - name: type
+      type:
+        - "null"
+        - "#CWLType"
+        - "sld:RecordSchema"
+        - "sld:EnumSchema"
+        - "sld:ArraySchema"
+        - string
+        - type: array
+          items:
+            - "#CWLType"
+            - "sld:RecordSchema"
+            - "sld:EnumSchema"
+            - "sld:ArraySchema"
+            - string
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
 
 - type: record
   name: ExpressionTool
   extends: Process
+  specialize:
+    - specializeFrom: "#OutputParameter"
+      specializeTo: "#ExpressionToolOutputParameter"
   documentRoot: true
   doc: |
     Execute an expression as a process step.
@@ -104,6 +133,28 @@ $graph:
       doc: |
         The method to use to merge multiple sources into a single array.
         If not specified, the default method is "merge_nested".
+    - name: type
+      type:
+        - "null"
+        - "#CWLType"
+        - "#OutputRecordSchema"
+        - "#OutputEnumSchema"
+        - "#OutputArraySchema"
+        - string
+        - type: array
+          items:
+            - "#CWLType"
+            - "#OutputRecordSchema"
+            - "#OutputEnumSchema"
+            - "#OutputArraySchema"
+            - string
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
 
 
 - name: Sink
