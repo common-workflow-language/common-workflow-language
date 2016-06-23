@@ -64,7 +64,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
     - name: location
-      type: string?
+      type: string
       doc: |
         A URI that identifies the file resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -178,10 +178,10 @@ $graph:
 - name: Dirent
   type: record
   fields:
-    - name: basename
+    - name: entryname
       type: string
       jsonldPredicate:
-        "_id": cwl:name
+        "_id": cwl:entryname
     - name: entry
       type: [File, Directory]
 
