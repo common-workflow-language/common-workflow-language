@@ -60,20 +60,82 @@ $graph:
         symbols:
           - cwl:File
       jsonldPredicate:
-        "_id": "@type"
-        "_type": "@vocab"
+        _id: "@type"
+        _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
+    - name: location
+      type: string?
+      doc: |
+        A URI that identifies the file resource.  This may be a relative
+        reference, in which case it must be resolved using the base URI of the
+        document.  The location may refer to a local or remote resource; the
+        implementation must use the URI to retrieve file content.  If an
+        implementation is unable to retrieve the file content stored at a
+        remote resource (due to unsupported protocol, access denied, or other
+        issue) it must signal an error.
+      jsonldPredicate:
+        _id: "@id"
+        _type: "@id"
     - name: path
-      type: string
-      doc: The path to the file.
+      type: string?
+      doc: |
+        The local path where the File is made available prior to executing a
+        CommandLineTool.  This field must not be used in any other context.  The
+        command line tool being executed must be able to to access the file at
+        `path` using the POSIX `open(2)` syscall.
       jsonldPredicate:
         "_id": "cwl:path"
         "_type": "@id"
+    - name: basename
+      type: string?
+      doc: |
+        The base name of the file, that is, the path component following the
+        final slash in the path.
+
+        The implementation must set this field based on the value of `path`
+        prior to evaluating parameter references or expressions in a
+        CommandLineTool document.  This field must not be used in any other
+        context.
+    - name: dirname
+      type: string?
+      doc: |
+        The name of the directory containing file, that is, the path leading up
+        to the final slash in the path such that `dirname + '/' + basename =
+        path`.
+
+        The implementation must set this field based on the value of `path`
+        prior to evaluating parameter references or expressions in a
+        CommandLineTool document.  This field must not be used in any other
+        context.
+    - name: nameroot
+      type: string?
+      doc: |
+        The basename root such that `nameroot + nameext == basename`, and
+        `nameext` is empty or begins with a period and contains at most one
+        period.  Leading periods on the basename are ignored; a basename of
+        `.cshrc` will have a nameroot of `.cshrc`.
+
+        The implementation must set this field based on the value of `path`
+        prior to evaluating parameter references or expressions in a
+        CommandLineTool document.  This field must not be used in any other
+        context.
+    - name: nameext
+      type: string?
+      doc: |
+        The basename extension such that `nameroot + nameext == basename`, and
+        `nameext` is empty or begins with a period and contains at most one
+        period.  Leading periods on the basename are ignored; a basename of
+        `.cshrc` will have an empty `nameext`.
+
+        The implementation must set this field based on the value of `path`
+        prior to evaluating parameter references or expressions in a
+        CommandLineTool document.  This field must not be used in any other
+        context.
     - name: checksum
       type: ["null", string]
       doc: |
         Optional hash code for validating file integrity.  Currently must be in the form
-        "sha1$ + hexidecimal string" using the SHA-1 algorithm.
+        "sha1$ + hexadecimal string" using the SHA-1 algorithm.
     - name: size
       type: ["null", long]
       doc: Optional file size.
@@ -141,6 +203,10 @@ $graph:
         _id: "@type"
         _type: "@vocab"
       doc: Must be `Directory` to indicate this object describes a Directory.
+    - name: id
+      type: string
+      doc: A URI used to identify the directory.
+      jsonldPredicate: "@id"
     - name: path
       type: string?
       doc: The path to the directory.
