@@ -203,10 +203,19 @@ $graph:
         _id: "@type"
         _type: "@vocab"
       doc: Must be `Directory` to indicate this object describes a Directory.
-    - name: id
+    - name: location
       type: string
-      doc: A URI used to identify the directory.
-      jsonldPredicate: "@id"
+      doc: |
+        A URI that identifies the directory resource.  This may be a relative
+        reference, in which case it must be resolved using the base URI of the
+        document.  The location may refer to a local or remote resource.  If
+        the `listing` field is not set, the implementation must use the URI to
+        retrieve directory listing.  If an implementation is unable to retrieve
+        the file content stored at a remote resource (due to unsupported
+        protocol, access denied, or other issue) it must signal an error.
+      jsonldPredicate:
+        _id: "@id"
+        _type: "@id"
     - name: path
       type: string?
       doc: The path to the directory.
