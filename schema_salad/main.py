@@ -24,8 +24,7 @@ register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
 def printrdf(workflow, wf, ctx, sr):
     # type: (str, Union[List, Dict[Any, Any], str, unicode], Dict[unicode, Any], str) -> None
-    g = Graph().parse(data=json.dumps(wf), format='json-ld',
-                      location=workflow, context=ctx)
+    g = jsonld_context.makerdf(workflow, wf, ctx)
     print(g.serialize(format=sr))
 
 
