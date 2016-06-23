@@ -33,6 +33,7 @@ $graph:
     - cwl:draft-3
     - cwl:draft-4.dev1
     - cwl:draft-4.dev2
+    - cwl:draft-4.dev3
 
 - name: CWLType
   type: enum
