@@ -97,7 +97,11 @@ def get_metaschema():
             "@type": "@id",
             "refScope": 1
         },
-        "fields": "sld:fields",
+        "fields": {
+            "@id": "sld:fields",
+            "mapSubject": "name",
+            "mapPredicate": "type"
+        },
         "float": "http://www.w3.org/2001/XMLSchema#float",
         "identity": "https://w3id.org/cwl/salad#JsonldPredicate/identity",
         "int": "http://www.w3.org/2001/XMLSchema#int",
