@@ -1,11 +1,11 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 
 inputs:
     file1:
       type: File
-      default: {class: File, path: hello.txt}
+      default: {class: File, location: hello.txt}
 outputs:
     count_output:
       type: int

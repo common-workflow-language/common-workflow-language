@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 requirements:
   - class: ShellCommandRequirement
 inputs:

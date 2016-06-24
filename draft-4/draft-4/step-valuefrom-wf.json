@@ -2,7 +2,7 @@
     "in": {
         "file1": {
             "class": "File",
-            "path": "whale.txt"
+            "location": "whale.txt"
         }
     }
 }

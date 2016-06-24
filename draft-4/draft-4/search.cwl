@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 $graph:
 - id: index
   class: CommandLineTool
@@ -19,7 +19,7 @@ $graph:
       type: File
       default:
         class: File
-        path: index.py
+        location: index.py
       inputBinding:
         position: 0
   outputs:
@@ -54,7 +54,7 @@ $graph:
       type: File
       default:
         class: File
-        path: search.py
+        location: search.py
       inputBinding:
         position: 0
     term:

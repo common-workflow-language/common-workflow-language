@@ -2,11 +2,11 @@
     "file1": [
         {
             "class": "File",
-            "path": "whale.txt"
+            "location": "whale.txt"
         },
         {
             "class": "File",
-            "path": "hello.txt"
+            "location": "hello.txt"
         }
     ]
 }

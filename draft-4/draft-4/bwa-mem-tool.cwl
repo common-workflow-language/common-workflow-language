@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: draft-4.dev2
+cwlVersion: draft-4.dev3
 
 class: CommandLineTool
 
@@ -34,7 +34,7 @@ inputs:
     type: File
     default:
       class: File
-      path: args.py
+      location: args.py
     inputBinding:
       position: -1
 

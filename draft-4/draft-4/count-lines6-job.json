@@ -2,21 +2,21 @@
     "file1": [
         {
             "class": "File",
-            "path": "whale.txt"
+            "location": "whale.txt"
         },
         {
             "class": "File",
-            "path": "whale.txt"
+            "location": "whale.txt"
         }
     ],
     "file2": [
         {
             "class": "File",
-            "path": "hello.txt"
+            "location": "hello.txt"
         },
         {
             "class": "File",
-            "path": "hello.txt"
+            "location": "hello.txt"
         }
     ]
 }

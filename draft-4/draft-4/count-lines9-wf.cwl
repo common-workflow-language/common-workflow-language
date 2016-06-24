@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 
 inputs: []
 
@@ -16,7 +16,7 @@ steps:
       file1:
         default:
           class: File
-          path: whale.txt
+          location: whale.txt
     out: [output]
 
   step2:

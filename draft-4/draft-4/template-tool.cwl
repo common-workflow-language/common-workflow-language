@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 class: CommandLineTool
 requirements:
   - class: DockerRequirement

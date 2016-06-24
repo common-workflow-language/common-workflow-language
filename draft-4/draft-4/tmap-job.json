@@ -1,7 +1,7 @@
 {
     "reads": {
         "class": "File",
-        "path": "reads.fastq"
+        "location": "reads.fastq"
     },
     "stages": [
         {

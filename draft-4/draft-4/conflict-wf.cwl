@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 $graph:
 - id: echo
   class: CommandLineTool
