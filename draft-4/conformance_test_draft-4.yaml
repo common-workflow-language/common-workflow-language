@@ -719,14 +719,14 @@
         "class": "Directory",
         "listing": [
             {
-                "basename": "hello.txt",
+                "entryname": "hello.txt",
                 "entry": {
                     "class": "File",
                     "location": "hello.txt"
                 }
             },
             {
-                "basename": "goodbye.txt",
+                "entryname": "goodbye.txt",
                 "entry": {
                     "class": "File",
                     "location": "goodbye.txt"

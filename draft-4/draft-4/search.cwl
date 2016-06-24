@@ -30,9 +30,9 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.path+".idx3")'
-        - '$({"path": self.path+".idx4", "class": "File"})'
-        - '${ return self.path+".idx5"; }'
+        - '$(self.location+".idx3")'
+        - '$({"location": self.location+".idx4", "class": "File"})'
+        - '${ return self.location+".idx5"; }'
 
 - id: search
   class: CommandLineTool
@@ -47,9 +47,9 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.path+".idx3")'
-        - '$({"path": self.path+".idx4", "class": "File"})'
-        - '${ return self.path+".idx5"; }'
+        - '$(self.location+".idx3")'
+        - '$({"location": self.location+".idx4", "class": "File"})'
+        - '${ return self.location+".idx5"; }'
     search.py:
       type: File
       default:
