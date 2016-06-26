@@ -626,6 +626,27 @@ $graph:
         Docker container.
 
 
+- type: record
+  name: LooseDependencyHint
+  extends: "#ProcessRequirement"
+  doc: |
+    If a CommandLineTool is executed by a platform that is not configured to use
+    Docker, this dependency can annotate hints about the software that should
+    be configured in the environment of the defined process.
+
+    Absolute portability between platforms should be achieved with Docker, this
+    mechanism provides an inexact and imprecise fallback. The inexact nature of these
+    hints is due to this standard not specifying the base operating environment of
+    the process or how the that environment is to be configured as a result of these
+    hints. The imprecise nature of these hints is due to the `name` and `version`
+    fields being unstructured and not namespaced.
+  fields:
+    - name: name
+      type: ["string"]
+      doc: "The name of the software to be configured."
+    - name: "version"
+      type: ["null", "string"]
+      doc: "The (optional) version of the software to configured."
 
 - name: CreateFileRequirement
   type: record
