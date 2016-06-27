@@ -145,6 +145,7 @@ $graph:
         - "null"
         - type: array
           items: "#File"
+        - Directory
       jsonldPredicate: "cwl:secondaryFiles"
       doc: |
         A list of additional files that are associated with the primary file
