@@ -62,19 +62,21 @@ boolean, array, or object.
 A **document** is a file containing a serialized object, or an array of objects.
 
 A **process** is a basic unit of computation which accepts input data,
-performs some computation, and produces output data.
+performs some computation, and produces output data. Examples include
+CommandLineTools, Workflows, and ExpressionTools.
 
-An **input object** is an object describing the inputs to a invocation of process.
+An **input object** is an object describing the inputs to a invocation of
+process.
 
-An **output object** is an object describing the output of an invocation of a process.
+An **output object** is an object describing the output of an invocation of a
+process.
 
 An **input schema** describes the valid format (required fields, data types)
 for an input object.
 
 An **output schema** describes the valid format for a output object.
 
-**Metadata** is information about workflows, tools, or input items that is
-not used directly in the computation.
+**Metadata** is information about workflows, tools, or input items.
 
 ## Syntax
 
@@ -140,8 +142,9 @@ form a directed graph, and independent steps may run concurrently.
 A **runtime environment** is the actual hardware and software environment when
 executing a command line tool.  It includes, but is not limited to, the
 hardware architecture, hardware resources, operating system, software runtime
-(if applicable, such as the Python interpreter or the JVM), libraries, modules,
-packages, utilities, and data files required to run the tool.
+(if applicable, such as the specific Python interpreter or the specific Java
+virtual machine), libraries, modules, packages, utilities, and data files
+required to run the tool.
 
 A **workflow platform** is a specific hardware and software implementation
 capable of interpreting CWL documents and executing the processes specified by
@@ -201,7 +204,7 @@ warning if a hint cannot be satisfied.
 
 Requirements are inherited.  A requirement specified in a Workflow applies
 to all workflow steps; a requirement specified on a workflow step will
-apply to the process implementation.
+apply to the process implementation of that step and any of its substeps.
 
 If the same process requirement appears at different levels of the
 workflow, the most specific instance of the requirement is used, that is,
@@ -223,7 +226,7 @@ field permitting the pseudo-type `Expression`, as specified by this document.
 Conforming implementations must support parameter references.  Parameter
 references use the following subset of
 [Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
-syntax.
+syntax but they are designed to not require a Javascript engine for evaluation.
 
 In the following BNF grammar, character classes and grammar rules are denoted
 in '{}', '-' denotes exclusion from a character class, '(())' denotes grouping,
@@ -232,12 +235,12 @@ one or more repeats, all other characters are literal values.
 
 <p>
 <table class="table">
-<tr><td>symbol::   </td><td>{Unicode alphanumeric}+</td></tr>
-<tr><td>singleq::  </td><td>[' (( {character - '} | \' ))* ']</td></tr>
-<tr><td>doubleq::  </td><td>[" (( {character - "} | \" ))* "]</td></tr>
-<tr><td>index::    </td><td>[ {decimal digit}+ ]</td></tr>
-<tr><td>segment::  </td><td>. {symbol} | {singleq} | {doubleq} | {index}</td></tr>
-<tr><td>parameter::</td><td>$( {symbol} {segment}*)</td></tr>
+<tr><td>symbol::             </td><td>{Unicode alphanumeric}+</td></tr>
+<tr><td>singleq::            </td><td>[' (( {character - '} | \' ))* ']</td></tr>
+<tr><td>doubleq::            </td><td>[" (( {character - "} | \" ))* "]</td></tr>
+<tr><td>index::              </td><td>[ {decimal digit}+ ]</td></tr>
+<tr><td>segment::            </td><td>. {symbol} | {singleq} | {doubleq} | {index}</td></tr>
+<tr><td>parameter reference::</td><td>$( {symbol} {segment}*)</td></tr>
 </table>
 </p>
 
