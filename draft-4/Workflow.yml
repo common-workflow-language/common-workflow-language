@@ -52,22 +52,22 @@ $graph:
 
 - name: ExpressionToolOutputParameter
   type: record
-  extends: Parameter
+  extends: OutputParameter
   fields:
     - name: type
       type:
         - "null"
         - "#CWLType"
-        - "sld:RecordSchema"
-        - "sld:EnumSchema"
-        - "sld:ArraySchema"
+        - "#OutputRecordSchema"
+        - "#OutputEnumSchema"
+        - "#OutputArraySchema"
         - string
         - type: array
           items:
             - "#CWLType"
-            - "sld:RecordSchema"
-            - "sld:EnumSchema"
-            - "sld:ArraySchema"
+            - "#OutputRecordSchema"
+            - "#OutputEnumSchema"
+            - "#OutputArraySchema"
             - string
       jsonldPredicate:
         "_id": "sld:type"
