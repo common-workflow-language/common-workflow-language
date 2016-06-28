@@ -186,7 +186,8 @@ $graph:
         "_id": cwl:entryname
     - name: entry
       type: [File, Directory]
-
+      jsonldPredicate:
+        "_id": cwl:entry
 
 - name: Directory
   type: record
@@ -229,7 +230,7 @@ $graph:
       doc: List of files or subdirectories contained in this directory
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: basename
+        mapSubject: entryname
         mapPredicate: entry
 
 - name: SchemaBase

@@ -626,11 +626,39 @@ $graph:
         Docker container.
 
 
+- name: DirentExt
+  type: record
+  fields:
+    - name: entryname
+      type: [string, Expression]
+      jsonldPredicate:
+        "_id": cwl:entryname
+    - name: entry
+      type: [string, Expression]
+        "_id": cwl:entry
+
+
+- name: InitialWorkDirRequirement
+  type: record
+  extends: ProcessRequirement
+  fields:
+    - name: listing
+      type:
+        - type: array
+          items: DirentExt
+        - Expression
+      jsonldPredicate:
+        _id: "cwl:listing"
+        mapSubject: entryname
+        mapPredicate: entry
+
 
 - name: CreateFileRequirement
   type: record
   extends: "#ProcessRequirement"
   doc: |
+    *Deprecated*, superceded by InitialWorkDirRequirement.
+
     Define a list of files that must be created by the workflow
     platform in the designated output directory prior to executing the command
     line tool.  See `FileDef` for details.
