@@ -7,10 +7,9 @@ $graph:
     - valueFrom: input.txt
       position: 1
   requirements:
-    - class: CreateFileRequirement
-      fileDef:
-        - filename: input.txt
-          fileContent: $(inputs.file)
+    - class: InitialWorkDirRequirement
+      listing:
+        input.txt: $(inputs.file)
     - class: InlineJavascriptRequirement
 
   inputs:

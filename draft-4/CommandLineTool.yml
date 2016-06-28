@@ -632,10 +632,11 @@ $graph:
     - name: entryname
       type: [string, Expression]
       jsonldPredicate:
-        "_id": cwl:entryname
+        _id: cwl:entryname
     - name: entry
       type: [string, Expression]
-        "_id": cwl:entry
+      jsonldPredicate:
+        _id: cwl:entry
 
 
 - name: InitialWorkDirRequirement

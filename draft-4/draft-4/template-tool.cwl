@@ -9,9 +9,8 @@ requirements:
       - { $include: underscore.js }
       - "var t = function(s) { return _.template(s)({'inputs': inputs}); };"
   - class: CreateFileRequirement
-    fileDef:
-      - filename: foo.txt
-        fileContent: >
+    listing:
+      foo.txt: >
           $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
 inputs:
   - id: file1
