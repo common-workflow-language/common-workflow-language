@@ -646,6 +646,7 @@ $graph:
       type:
         - type: array
           items: DirentExt
+        - string
         - Expression
       jsonldPredicate:
         _id: "cwl:listing"
