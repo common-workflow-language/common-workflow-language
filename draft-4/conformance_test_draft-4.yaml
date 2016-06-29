@@ -736,3 +736,27 @@
     }
   tool: draft-4/dir3.cwl
   doc: Test directory input in Docker
+
+- job: draft-4/dir4-job.yml
+  output:
+    "outlist": {
+        "size": 20,
+        "location": "output.txt",
+        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+        "class": "File"
+    }
+  tool: draft-4/dir4.cwl
+  doc: Test directories in secondaryFiles
+
+- job: draft-4/dir-job.yml
+  output: {
+    "outlist": {
+        "checksum": "sha1$907a866a3e0b7f1fc5a2222531c5fb9063704438",
+        "path": "/home/peter/work/common-workflow-language/draft-4/draft-4/output.txt",
+        "size": 33,
+        "location": "file:///home/peter/work/common-workflow-language/draft-4/draft-4/output.txt",
+        "class": "File"
+    }
+  }
+  tool: draft-4/dir5.cwl
+  doc: Test dynamic initial work dir
