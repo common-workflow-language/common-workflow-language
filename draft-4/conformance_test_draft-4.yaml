@@ -77,28 +77,39 @@
   tool: draft-4/cat3-tool-mediumcut.cwl
   doc: Test command execution in Docker with stdout redirection
 
-# - args: [egrep]
-#   stderr: error.txt
-#   job:
-#   tool: draft-4/egrep-stderr.cwl
-#   doc: Test command line with stderr redirection
+- job:
+  output: {
+    "output_file": {
+        "checksum": "sha1$cec7b8746a78c42060c96505887449bca0142976",
+        "size": 84,
+        "location": "error.txt",
+        "class": "File"
+    }
+  }
+  tool: draft-4/egrep-stderr.cwl
+  doc: Test command line with stderr redirection
 
-# - args: [egrep]
-#   job:
-#   tool: draft-4/egrep-stderr-shortcut.cwl
-#   doc: Test command line with stderr redirection, brief syntax
+- job:
+  output: {
+    "output_file": {
+        "checksum": "sha1$cec7b8746a78c42060c96505887449bca0142976",
+        "size": 84,
+        "location": "",
+        "class": "File"
+    }
+  }
+  tool: draft-4/egrep-stderr-shortcut.cwl
+  doc: Test command line with stderr redirection, brief syntax
 
-# - args: [egrep]
-#   stderr: std.err
-#   output:
-#     output_file:
-#       class: File
-#       size: 84
-#       checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
-#       location: std.err
-#   job:
-#   tool: draft-4/egrep-stderr-mediumcut.cwl
-#   doc: Test command line with stderr redirection, named brief syntax
+- output:
+    output_file:
+      class: File
+      size: 84
+      checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
+      location: std.err
+  job:
+  tool: draft-4/egrep-stderr-mediumcut.cwl
+  doc: Test command line with stderr redirection, named brief syntax
 
 - job: draft-4/cat-job.json
   output:
