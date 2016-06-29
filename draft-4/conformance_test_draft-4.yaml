@@ -771,3 +771,15 @@
   }
   tool: draft-4/dir5.cwl
   doc: Test dynamic initial work dir
+
+- job: draft-4/stagefile-job.yml
+  output: {
+    "outfile": {
+        "checksum": "sha1$2d6c5e4430c4b200227cc77d3b0025082505ee19",
+        "size": 1107,
+        "location": "whale.txt",
+        "class": "File"
+    }
+  }
+  tool: draft-4/stagefile.cwl
+  doc: Test writable staged files.
