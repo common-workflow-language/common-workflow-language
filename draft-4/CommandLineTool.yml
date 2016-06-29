@@ -646,7 +646,7 @@ $graph:
     - name: listing
       type:
         - type: array
-          items: DirentExt
+          items: [File, DirentExt]
         - string
         - Expression
       jsonldPredicate:

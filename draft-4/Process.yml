@@ -225,7 +225,10 @@ $graph:
         _id: "cwl:path"
         _type: "@id"
     - name: listing
-      type: Dirent[]?
+      type:
+        - "null"
+        - type: array
+          items: [File, Dirent]
       doc: List of files or subdirectories contained in this directory
       jsonldPredicate:
         _id: "cwl:listing"
