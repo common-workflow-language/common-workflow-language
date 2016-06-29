@@ -79,30 +79,6 @@ $graph:
     - {$include: concepts.md}
     - {$include: invocation.md}
 
-- type: record
-  name: FileDef
-  doc: |
-    Define a file that must be placed in the designated output directory
-    prior to executing the command line tool.  May be the result of executing
-    an expression, such as building a configuration file from a template.
-  fields:
-    - name: "filename"
-      type: ["string", "#Expression"]
-      doc: "The name of the file to create in the output directory."
-    - name: "fileContent"
-      type: ["string", "#Expression"]
-      doc: |
-        If the value is a string literal or an expression which evaluates to a
-        string, a new file must be created with the string as the file contents.
-
-        If the value is an expression that evaluates to a File object, this
-        indicates the referenced file should be added to the designated output
-        directory prior to executing the tool.
-
-        Files added in this way may be read-only, and may be provided
-        by bind mounts or file system links to avoid
-        unnecessary copying of the input file.
-
 
 - type: record
   name: EnvironmentDef
@@ -628,20 +604,53 @@ $graph:
 
 - name: DirentExt
   type: record
+  doc: |
+    Define a file or subdirectory that must be placed in the designated output
+    directory prior to executing the command line tool.  May be the result of
+    executing an expression, such as building a configuration file from a
+    template.
   fields:
     - name: entryname
       type: [string, Expression]
       jsonldPredicate:
         _id: cwl:entryname
+      doc: |
+        The name of the file or subdirectory to create in the output directory.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
         _id: cwl:entry
+      doc: |
+        If the value is a string literal or an expression which evaluates to a
+        string, a new file must be created with the string as the file contents.
 
+        If the value is an expression that evaluates to a `File` object, this
+        indicates the referenced file should be added to the designated output
+        directory prior to executing the tool.
+
+        If the value is an expression that evaluates to a `Dirent` object, this
+        indicates that the File or Directory in `entry` should be added to the
+        designated output directory with the name in `entryname`.
+
+        If `writable` is false, the file may be made available using a bind
+        mount or file system link to avoid unnecessary copying of the input
+        file.
+    - name: writable
+      type: boolean?
+      doc: |
+        If true, the file or directory must be writable by the tool.  Changes
+        to the file or directory must be isolated and not visible by any other
+        CommandLineTool process.  This may be implemented by making a copy of
+        the original file or directory.  Default false (files and directories
+        read-only by default).
 
 - name: InitialWorkDirRequirement
   type: record
   extends: ProcessRequirement
+  doc:
+    Define a list of files and subdirectories that must be created by the
+    workflow platform in the designated output directory prior to executing the
+    command line tool.
   fields:
     - name: listing
       type:
@@ -653,24 +662,12 @@ $graph:
         _id: "cwl:listing"
         mapSubject: entryname
         mapPredicate: entry
+      doc: |
+        The list of files or subdirectories that must be placed in the
+        designated output directory prior to executing the command line tool.
 
-
-- name: CreateFileRequirement
-  type: record
-  extends: "#ProcessRequirement"
-  doc: |
-    *Deprecated*, superceded by InitialWorkDirRequirement.
-
-    Define a list of files that must be created by the workflow
-    platform in the designated output directory prior to executing the command
-    line tool.  See `FileDef` for details.
-  fields:
-    - name: fileDef
-      type:
-        type: "array"
-        items: "#FileDef"
-      doc: The list of files.
-
+        May be an expression.  If so, the expression return value must validate
+        as `{type: array, items: [File, Dirent]}`.
 
 - name: EnvVarRequirement
   type: record
