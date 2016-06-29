@@ -738,13 +738,14 @@
   doc: Test directory input in Docker
 
 - job: draft-4/dir4-job.yml
-  output:
+  output: {
     "outlist": {
-        "size": 20,
+        "checksum": "sha1$2ab6f189e84753c05a23413fbf6b6fbf4c53489f",
+        "size": 90,
         "location": "output.txt",
-        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
         "class": "File"
     }
+  }
   tool: draft-4/dir4.cwl
   doc: Test directories in secondaryFiles
 
@@ -752,9 +753,8 @@
   output: {
     "outlist": {
         "checksum": "sha1$907a866a3e0b7f1fc5a2222531c5fb9063704438",
-        "path": "/home/peter/work/common-workflow-language/draft-4/draft-4/output.txt",
         "size": 33,
-        "location": "file:///home/peter/work/common-workflow-language/draft-4/draft-4/output.txt",
+        "location": "output.txt",
         "class": "File"
     }
   }

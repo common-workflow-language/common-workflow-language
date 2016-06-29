@@ -4,7 +4,7 @@ inf:
   secondaryFiles:
     - class: File
       location: index.py
-    - entryname: testdir
+    - entryname: xtestdir
       entry:
         class: Directory
         location: testdir
