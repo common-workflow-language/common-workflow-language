@@ -2,7 +2,7 @@ class: CommandLineTool
 cwlVersion: cwl:draft-4.dev3
 baseCommand: "true"
 requirements:
-  CreateFileRequirement:
+  InitialWorkDirRequirement:
     listing:
       - entryname: $(inputs.newname)
         entry: $(inputs.srcfile)
