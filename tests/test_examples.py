@@ -2,8 +2,11 @@ import unittest
 import schema_salad.ref_resolver
 import schema_salad.main
 import schema_salad.schema
+from schema_salad.jsonld_context import makerdf
 import rdflib
 import ruamel.yaml as yaml
+import json
+
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
@@ -248,6 +251,76 @@ class TestSchemas(unittest.TestCase):
 
         ra, _ = ldr.resolve_all({"type": "File[]?"}, "")
         self.assertEqual({'type': ['null', {'items': 'File', 'type': 'array'}]}, ra)
+
+    def test_scoped_id(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ctx = {
+            "id": "@id",
+            "location": {
+                "@id": "@id",
+                "@type": "@id"
+            },
+            "bar": "http://example.com/bar",
+            "ex": "http://example.com/"
+        }
+        ldr.add_context(ctx)
+
+        ra, _ = ldr.resolve_all({
+            "id": "foo",
+            "bar": {
+                "id": "baz"
+            }
+        }, "http://example.com")
+        self.assertEqual({'id': 'http://example.com/#foo',
+                          'bar': {
+                              'id': 'http://example.com/#foo/baz'},
+                      }, ra)
+
+        g = makerdf(None, ra, ctx)
+        print(g.serialize(format="n3"))
+
+        ra, _ = ldr.resolve_all({
+            "location": "foo",
+            "bar": {
+                "location": "baz"
+            }
+        }, "http://example.com", checklinks=False)
+        self.assertEqual({'location': 'http://example.com/foo',
+                          'bar': {
+                              'location': 'http://example.com/baz'},
+                      }, ra)
+
+        g = makerdf(None, ra, ctx)
+        print(g.serialize(format="n3"))
+
+        ra, _ = ldr.resolve_all({
+            "id": "foo",
+            "bar": {
+                "location": "baz"
+            }
+        }, "http://example.com", checklinks=False)
+        self.assertEqual({'id': 'http://example.com/#foo',
+                          'bar': {
+                              'location': 'http://example.com/baz'},
+                      }, ra)
+
+        g = makerdf(None, ra, ctx)
+        print(g.serialize(format="n3"))
+
+        ra, _ = ldr.resolve_all({
+            "location": "foo",
+            "bar": {
+                "id": "baz"
+            }
+        }, "http://example.com", checklinks=False)
+        self.assertEqual({'location': 'http://example.com/foo',
+                          'bar': {
+                              'id': 'http://example.com/#baz'},
+                      }, ra)
+
+        g = makerdf(None, ra, ctx)
+        print(g.serialize(format="n3"))
+
 
 if __name__ == '__main__':
     unittest.main()

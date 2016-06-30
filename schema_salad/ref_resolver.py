@@ -135,8 +135,9 @@ class Loader(object):
                 frg = splitbase.fragment + u"/" + split.path
             else:
                 frg = split.path
+            pt = splitbase.path if splitbase.path else "/"
             url = urlparse.urlunsplit(
-                (splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, frg))
+                (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
         elif scoped_ref is not None and not split.fragment:
             pass
         else:
