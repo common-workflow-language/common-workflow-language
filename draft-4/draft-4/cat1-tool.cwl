@@ -5,6 +5,8 @@ description: "Print the contents of a file to stdout using 'cat' running in a do
 hints:
   DockerRequirement:
     dockerPull: debian:wheezy
+  SoftwareRequirement:
+    name: cat
 inputs:
   file1:
     type: File

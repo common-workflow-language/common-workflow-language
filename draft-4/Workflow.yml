@@ -255,10 +255,12 @@ $graph:
         the value of the parameter(s) specified in the `source` field, or
         null if there is no `source` field.
 
-        The value of `inputs` in the parameter reference or expression is the
-        input object to the workflow step after assigning the `source` values,
-        but before evaluating any step with `valueFrom`.  The order of
-        evaluating `valueFrom` among step input parameters is undefined.
+        The value of `inputs` in the parameter reference or expression must be
+        the input object to the workflow step after assigning the `source`
+        values and then scattering.  The order of evaluating `valueFrom` among
+        step input parameters is undefined and the result of evaluating
+        `valueFrom` on a parameter must not be visible to evaluation of
+        `valueFrom` on other parameters.
 
 
 - type: record
@@ -502,7 +504,7 @@ $graph:
   extends: ProcessRequirement
   doc: |
     Indicates that the workflow platform must support nested workflows in
-    the `run` field of (WorkflowStep)(#WorkflowStep).
+    the `run` field of [WorkflowStep](#WorkflowStep).
 
 - name: ScatterFeatureRequirement
   type: record

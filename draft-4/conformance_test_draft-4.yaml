@@ -64,6 +64,7 @@
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location:
+      path: Any
       size: 13
   doc: Test command execution in Docker with simplified syntax stdout redirection
 
@@ -88,6 +89,12 @@
   }
   tool: draft-4/egrep-stderr.cwl
   doc: Test command line with stderr redirection
+  output:
+    output_file:
+      class: File
+      checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
+      size: 84
+      path: error.txt
 
 - job:
   output: {
@@ -100,6 +107,12 @@
   }
   tool: draft-4/egrep-stderr-shortcut.cwl
   doc: Test command line with stderr redirection, brief syntax
+  output:
+    output_file:
+      class: File
+      checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
+      size: 84
+      path: Any
 
 - output:
     output_file:
@@ -689,6 +702,12 @@
     out: ["foo one one three", "foo one two four"]
   tool: "draft-4/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
+
+- job: draft-4/scatter-valuefrom-job1.json
+  output:
+    out: ["foo one one", "foo two two", "foo three three", "foo four four"]
+  tool: draft-4/scatter-valuefrom-wf5.cwl
+  doc: Test workflow scatter with single scatter parameter and valueFrom on step input
 
 - job: draft-4/conflict-job.json
   output: {
