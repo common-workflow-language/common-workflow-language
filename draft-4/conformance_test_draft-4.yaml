@@ -673,6 +673,12 @@
   tool: "draft-4/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
 
+- job: draft-4/scatter-valuefrom-job1.json
+  output:
+    out: ["foo one one", "foo two two", "foo three three", "foo four four"]
+  tool: draft-4/scatter-valuefrom-wf5.cwl
+  doc: Test workflow scatter with single scatter parameter and valueFrom on step input
+
 - job: draft-4/conflict-job.json
   output: {
     "fileout": {
