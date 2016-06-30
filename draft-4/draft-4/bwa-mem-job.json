@@ -1,18 +1,18 @@
 {
     "reference": {
         "class": "File",
-        "path": "chr20.fa",
+        "location": "chr20.fa",
         "size": 123,
         "checksum": "sha1$hash"
     },
     "reads": [
         {
             "class": "File",
-            "path": "example_human_Illumina.pe_1.fastq"
+            "location": "example_human_Illumina.pe_1.fastq"
         },
         {
             "class": "File",
-            "path": "example_human_Illumina.pe_2.fastq"
+            "location": "example_human_Illumina.pe_2.fastq"
         }
     ],
     "min_std_max_min": [

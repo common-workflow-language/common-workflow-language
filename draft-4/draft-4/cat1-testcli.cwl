@@ -1,7 +1,7 @@
 #!/usr/bin/env cwl-runner
 {
     "class": "CommandLineTool",
-    "cwlVersion": "cwl:draft-4.dev2",
+    "cwlVersion": "cwl:draft-4.dev3",
     "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
     "inputs": [
         {
@@ -22,7 +22,7 @@
         type: File,
         default: {
           class: File,
-          path: args.py
+          location: args.py
         },
         inputBinding: {
           position: -1

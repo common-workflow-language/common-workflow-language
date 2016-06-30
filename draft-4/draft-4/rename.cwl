@@ -1,11 +1,11 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 baseCommand: "true"
 requirements:
-  CreateFileRequirement:
-    fileDef:
-      - filename: $(inputs.newname)
-        fileContent: $(inputs.srcfile)
+  InitialWorkDirRequirement:
+    listing:
+      - entryname: $(inputs.newname)
+        entry: $(inputs.srcfile)
 inputs:
   srcfile: File
   newname: string

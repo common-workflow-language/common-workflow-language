@@ -6,7 +6,7 @@ $schemas:
   - foaf.rdf
   - dcterms.rdf
 
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 class: CommandLineTool
 description: "Print the contents of a file to stdout using 'cat' running in a docker container."
 

@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-4.dev2
+cwlVersion: cwl:draft-4.dev3
 $graph:
 - id: index
   class: CommandLineTool
@@ -7,10 +7,9 @@ $graph:
     - valueFrom: input.txt
       position: 1
   requirements:
-    - class: CreateFileRequirement
-      fileDef:
-        - filename: input.txt
-          fileContent: $(inputs.file)
+    - class: InitialWorkDirRequirement
+      listing:
+        input.txt: $(inputs.file)
     - class: InlineJavascriptRequirement
 
   inputs:
@@ -19,7 +18,7 @@ $graph:
       type: File
       default:
         class: File
-        path: index.py
+        location: index.py
       inputBinding:
         position: 0
   outputs:
@@ -30,9 +29,9 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.path+".idx3")'
-        - '$({"path": self.path+".idx4", "class": "File"})'
-        - '${ return self.path+".idx5"; }'
+        - '$(self.location+".idx3")'
+        - '$({"location": self.location+".idx4", "class": "File"})'
+        - '${ return self.location+".idx5"; }'
 
 - id: search
   class: CommandLineTool
@@ -47,14 +46,14 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.path+".idx3")'
-        - '$({"path": self.path+".idx4", "class": "File"})'
-        - '${ return self.path+".idx5"; }'
+        - '$(self.location+".idx3")'
+        - '$({"location": self.location+".idx4", "class": "File"})'
+        - '${ return self.location+".idx5"; }'
     search.py:
       type: File
       default:
         class: File
-        path: search.py
+        location: search.py
       inputBinding:
         position: 0
     term:
