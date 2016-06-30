@@ -626,6 +626,44 @@ $graph:
         Docker container.
 
 
+- type: record
+  name: SoftwareRequirement
+  extends: "#ProcessRequirement"
+  doc: |
+    Software that should be configured in the environment of the defined
+    process.
+
+    While absolute portability between platforms can be achieved with container
+    technologies like Docker, this mechanism provides an inexact and imprecise
+    fallback. The inexact nature is due to this standard not specifying the
+    base operating environment of the process or how the that environment is to
+    be configured as a result of these hints. The imprecise nature of these
+    hints is due to the `name` and `version` fields being unstructured and not
+    namespaced. The optional `identifier` field is recommended so that users
+    and platforms can distinguish between software that has the same name.
+  fields:
+    - name: spec
+      type:
+        type: array
+        items: SoftwareSpec
+      doc: "The list of software to be configured."
+
+- name: SoftwareSpec
+  type: record
+  fields:
+    - name: name
+      type: string
+      doc: "The name of the software to be configured."
+      jsonldPredicate: "@id"
+    - name: "version"
+      type: string?
+      doc: "The (optional) version of the software to configured."
+    - name: "identifier"
+      type: string?
+      doc: |
+        The (optional) identifier of the software to be configured. Should be a
+        IRI such as an [RRID](http://www.identifiers.org/rrid/SCR_001156).
+        Example: `http://identifiers.org/rrid/RRID:SCR_001156`
 
 - name: CreateFileRequirement
   type: record
