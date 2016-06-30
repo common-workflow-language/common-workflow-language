@@ -177,6 +177,7 @@ def salad_to_jsonld_context(j, schema_ctx):
     return (context, g)
 
 def fix_jsonld_ids(obj, ids):
+    # type: (Union[Dict[unicode, Any], List[Dict[unicode, Any]]], List[unicode]) -> None
     if isinstance(obj, dict):
         for i in ids:
             if i in obj:
@@ -184,8 +185,8 @@ def fix_jsonld_ids(obj, ids):
         for v in obj.values():
             fix_jsonld_ids(v, ids)
     if isinstance(obj, list):
-        for i in obj:
-            fix_jsonld_ids(i, ids)
+        for entry in obj:
+            fix_jsonld_ids(entry, ids)
 
 def makerdf(workflow, wf, ctx):
     # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType) -> Graph

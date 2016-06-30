@@ -23,7 +23,7 @@ register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
 
 def printrdf(workflow, wf, ctx, sr):
-    # type: (str, Union[List, Dict[Any, Any], str, unicode], Dict[unicode, Any], str) -> None
+    # type: (str, Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Dict[unicode, Any], str) -> None
     g = jsonld_context.makerdf(workflow, wf, ctx)
     print(g.serialize(format=sr))
 
@@ -209,8 +209,12 @@ def main(argsl=None):  # type: (List[str]) -> int
 
     # Optionally convert the document to RDF
     if args.print_rdf:
-        printrdf(args.document, document, schema_ctx, args.rdf_serializer)
-        return 0
+        if isinstance(document, (dict, list)):
+            printrdf(args.document, document, schema_ctx, args.rdf_serializer)
+            return 0
+        else:
+            print("Document must be a dictionary or list.")
+            return 1
 
     if args.print_metadata:
         print(json.dumps(doc_metadata, indent=4))
