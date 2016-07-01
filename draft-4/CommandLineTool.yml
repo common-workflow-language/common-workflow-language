@@ -41,9 +41,16 @@ $graph:
       This specification represents the fourth milestone of the CWL group.
       Since draft-3, this draft introduces the following changes and additions:
 
-        * Preliminary support for initialWorkDir & the Directory type
+        * The [Directory](#Directory) type.
         * "id: name" is now just "name"; "class: Classname" is now just
-          "Classtname".
+          "Classname".
+        * [InitialWorkDirRequirement](#InitialWorkDirRequirement): list of
+          files and subdirectories to be present in the output directory prior
+          to execution.
+        * Shortcuts for specifying the standard [output](#stdout) and/or
+          [error](#stderr) streams as a (streamable) File output.
+        * SoftwareRequirement: a lightweight method of describing software
+          dependencies
 
       ## Purpose
 
