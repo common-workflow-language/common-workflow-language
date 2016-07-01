@@ -9,31 +9,28 @@ from . import makedoc
 import json
 from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
-import yaml
 import os
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
+import urlparse
 
 from .ref_resolver import Loader
 from . import validate
-if sys.version_info >= (2,7):
-    import typing
+from typing import Any, Dict, List, Union
 
 _logger = logging.getLogger("salad")
 
 from rdflib.plugin import register, Parser
-import rdflib_jsonld.parser
 register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
+
 def printrdf(workflow, wf, ctx, sr):
-    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow, context=ctx)
+    # type: (str, Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Dict[unicode, Any], str) -> None
+    g = jsonld_context.makerdf(workflow, wf, ctx)
     print(g.serialize(format=sr))
 
-def main(args=None):
-    if args is None:
-        args = sys.argv[1:]
+
+def main(argsl=None):  # type: (List[str]) -> int
+    if argsl is None:
+        argsl = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--rdf-serializer",
@@ -41,15 +38,23 @@ def main(args=None):
                         default="turtle")
 
     exgroup = parser.add_mutually_exclusive_group()
-    exgroup.add_argument("--print-jsonld-context", action="store_true", help="Print JSON-LD context for schema")
-    exgroup.add_argument("--print-rdfs", action="store_true", help="Print RDF schema")
-    exgroup.add_argument("--print-avro", action="store_true", help="Print Avro schema")
+    exgroup.add_argument("--print-jsonld-context", action="store_true",
+                         help="Print JSON-LD context for schema")
+    exgroup.add_argument(
+        "--print-rdfs", action="store_true", help="Print RDF schema")
+    exgroup.add_argument("--print-avro", action="store_true",
+                         help="Print Avro schema")
 
-    exgroup.add_argument("--print-rdf", action="store_true", help="Print corresponding RDF graph for document")
-    exgroup.add_argument("--print-pre", action="store_true", help="Print document after preprocessing")
-    exgroup.add_argument("--print-index", action="store_true", help="Print node index")
-    exgroup.add_argument("--print-metadata", action="store_true", help="Print document metadata")
-    exgroup.add_argument("--version", action="store_true", help="Print version")
+    exgroup.add_argument("--print-rdf", action="store_true",
+                         help="Print corresponding RDF graph for document")
+    exgroup.add_argument("--print-pre", action="store_true",
+                         help="Print document after preprocessing")
+    exgroup.add_argument(
+        "--print-index", action="store_true", help="Print node index")
+    exgroup.add_argument("--print-metadata",
+                         action="store_true", help="Print document metadata")
+    exgroup.add_argument("--version", action="store_true",
+                         help="Print version")
 
     exgroup = parser.add_mutually_exclusive_group()
     exgroup.add_argument("--strict", action="store_true", help="Strict validation (unrecognized or out of place fields are error)",
@@ -58,14 +63,17 @@ def main(args=None):
                          default=True, dest="strict")
 
     exgroup = parser.add_mutually_exclusive_group()
-    exgroup.add_argument("--verbose", action="store_true", help="Default logging")
-    exgroup.add_argument("--quiet", action="store_true", help="Only print warnings and errors.")
-    exgroup.add_argument("--debug", action="store_true", help="Print even more logging")
+    exgroup.add_argument("--verbose", action="store_true",
+                         help="Default logging")
+    exgroup.add_argument("--quiet", action="store_true",
+                         help="Only print warnings and errors.")
+    exgroup.add_argument("--debug", action="store_true",
+                         help="Print even more logging")
 
     parser.add_argument("schema", type=str)
     parser.add_argument("document", type=str, nargs="?", default=None)
 
-    args = parser.parse_args(args)
+    args = parser.parse_args(argsl)
 
     if args.quiet:
         _logger.setLevel(logging.WARN)
@@ -89,7 +97,16 @@ def main(args=None):
     if not urlparse.urlparse(schema_uri)[0]:
         schema_uri = "file://" + os.path.abspath(schema_uri)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
-    schema_doc, schema_metadata = metaschema_loader.resolve_all(schema_raw_doc, schema_uri)
+
+    try:
+        schema_doc, schema_metadata = metaschema_loader.resolve_all(
+            schema_raw_doc, schema_uri)
+    except (validate.ValidationException) as e:
+        _logger.error("Schema `%s` failed link checking:\n%s",
+                      args.schema, e, exc_info=(e if args.debug else False))
+        _logger.debug("Index is %s", metaschema_loader.idx.keys())
+        _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
+        return 1
 
     # Optionally print the schema after ref resolution
     if not args.document and args.print_pre:
@@ -100,20 +117,13 @@ def main(args=None):
         print(json.dumps(metaschema_loader.idx.keys(), indent=4))
         return 0
 
-    # Validate links in the schema document
-    try:
-        metaschema_loader.validate_links(schema_doc)
-    except (validate.ValidationException) as e:
-        _logger.error("Schema `%s` failed link checking:\n%s", args.schema, e, exc_info=(e if args.debug else False))
-        _logger.debug("Index is %s", metaschema_loader.idx.keys())
-        _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
-        return 1
-
     # Validate the schema document against the metaschema
     try:
-        schema.validate_doc(metaschema_names, schema_doc, metaschema_loader, args.strict)
+        schema.validate_doc(metaschema_names, schema_doc,
+                            metaschema_loader, args.strict)
     except validate.ValidationException as e:
-        _logger.error("While validating schema `%s`:\n%s" % (args.schema, str(e)))
+        _logger.error("While validating schema `%s`:\n%s" %
+                      (args.schema, str(e)))
         return 1
 
     # Get the json-ld context and RDFS representation from the schema
@@ -127,11 +137,18 @@ def main(args=None):
     # Create the loader that will be used to load the target document.
     document_loader = Loader(schema_ctx)
 
-    # Make the Avro validation that will be used to validate the target document
-    (avsc_names, avsc_obj) = schema.make_avro_schema(schema_doc, document_loader)
+    # Make the Avro validation that will be used to validate the target
+    # document
+    if isinstance(schema_doc, list):
+        (avsc_names, avsc_obj) = schema.make_avro_schema(
+            schema_doc, document_loader)
+    else:
+        _logger.error("Schema `%s` must be a list.", args.schema)
+        return 1
 
     if isinstance(avsc_names, Exception):
-        _logger.error("Schema `%s` error:\n%s", args.schema, avsc_names, exc_info=(avsc_names if args.debug else False))
+        _logger.error("Schema `%s` error:\n%s", args.schema,
+                      avsc_names, exc_info=(avsc_names if args.debug else False))
         if args.print_avro:
             print(json.dumps(avsc_obj, indent=4))
         return 1
@@ -168,7 +185,8 @@ def main(args=None):
             doc = "file://" + os.path.abspath(uri)
         document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:
-        _logger.error("Document `%s` failed validation:\n%s", args.document, e, exc_info=(e if args.debug else False))
+        _logger.error("Document `%s` failed validation:\n%s",
+                      args.document, e, exc_info=(e if args.debug else False))
         return 1
 
     # Optionally print the document after ref resolution
@@ -180,25 +198,23 @@ def main(args=None):
         print(json.dumps(document_loader.idx.keys(), indent=4))
         return 0
 
-    # Validate links in the target document
-    try:
-        document_loader.validate_links(document)
-    except (validate.ValidationException) as e:
-        _logger.error("Document `%s` failed link checking:\n%s", args.document, e, exc_info=(e if args.debug else False))
-        _logger.debug("Index is %s", json.dumps(document_loader.idx.keys(), indent=4))
-        return 1
-
     # Validate the schema document against the metaschema
     try:
-        schema.validate_doc(avsc_names, document, document_loader, args.strict)
+        schema.validate_doc(avsc_names, document,
+                            document_loader, args.strict)
     except validate.ValidationException as e:
-        _logger.error("While validating document `%s`:\n%s" % (args.document, str(e)))
+        _logger.error("While validating document `%s`:\n%s" %
+                      (args.document, str(e)))
         return 1
 
     # Optionally convert the document to RDF
     if args.print_rdf:
-        printrdf(args.document, document, schema_ctx, args.rdf_serializer)
-        return 0
+        if isinstance(document, (dict, list)):
+            printrdf(args.document, document, schema_ctx, args.rdf_serializer)
+            return 0
+        else:
+            print("Document must be a dictionary or list.")
+            return 1
 
     if args.print_metadata:
         print(json.dumps(doc_metadata, indent=4))

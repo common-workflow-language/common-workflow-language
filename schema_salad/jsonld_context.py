@@ -1,6 +1,11 @@
+import collections
 import shutil
 import json
-import yaml
+import ruamel.yaml as yaml
+try:
+    from ruamel.yaml import CSafeLoader as SafeLoader
+except ImportError:
+    from ruamel.yaml import SafeLoader  # type: ignore
 import os
 import subprocess
 import copy
@@ -11,62 +16,74 @@ import rdflib
 from rdflib import Graph, URIRef
 import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
-    unicode=str
-    basestring=str
+import urlparse
 import logging
 from .aslist import aslist
-if sys.version_info >= (2,7):
-    import typing
+from typing import Any, cast, Dict, Iterable, Tuple, Union
+from .ref_resolver import Loader
 
 _logger = logging.getLogger("salad")
 
+
 def pred(datatype, field, name, context, defaultBase, namespaces):
+    # type: (Dict[str, Union[Dict, str]], Dict, str, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace]) -> Union[Dict, str]
     split = urlparse.urlsplit(name)
 
-    v = None
+    vee = None  # type: Union[str, unicode]
 
     if split.scheme:
-        v = name
-        (ns, ln) = rdflib.namespace.split_uri(unicode(v))
+        vee = name
+        (ns, ln) = rdflib.namespace.split_uri(unicode(vee))
         name = ln
         if ns[0:-1] in namespaces:
-            v = unicode(namespaces[ns[0:-1]][ln])
-        _logger.debug("name, v %s %s", name, v)
+            vee = unicode(namespaces[ns[0:-1]][ln])
+        _logger.debug("name, v %s %s", name, vee)
+
+    v = None  # type: Any
 
     if field and "jsonldPredicate" in field:
         if isinstance(field["jsonldPredicate"], dict):
             v = {}
             for k, val in field["jsonldPredicate"].items():
-                v[("@"+k[1:] if k.startswith("_") else k)] = val
+                v[("@" + k[1:] if k.startswith("_") else k)] = val
         else:
             v = field["jsonldPredicate"]
     elif "jsonldPredicate" in datatype:
-        for d in datatype["jsonldPredicate"]:
-            if d["symbol"] == name:
-                v = d["predicate"]
+        if isinstance(datatype["jsonldPredicate"], collections.Iterable):
+            for d in datatype["jsonldPredicate"]:
+                if isinstance(d, dict):
+                    if d["symbol"] == name:
+                        v = d["predicate"]
+                else:
+                    raise Exception(
+                        "entries in the jsonldPredicate List must be "
+                        "Dictionaries")
+        else:
+            raise Exception("jsonldPredicate must be a List of Dictionaries.")
     # if not v:
     #     if field and "jsonldPrefix" in field:
     #         defaultBase = field["jsonldPrefix"]
     #     elif "jsonldPrefix" in datatype:
     #         defaultBase = datatype["jsonldPrefix"]
 
-    if not v:
-        v = defaultBase + name
+    ret = v or vee
+
+    if not ret:
+        ret = defaultBase + name
 
     if name in context:
-        if context[name] != v:
-            raise Exception("Predicate collision on %s, '%s' != '%s'" % (name, context[name], v))
+        if context[name] != ret:
+            raise Exception("Predicate collision on %s, '%s' != '%s'" %
+                            (name, context[name], ret))
     else:
-        _logger.debug("Adding to context '%s' %s (%s)", name, v, type(v))
-        context[name] = v
+        _logger.debug("Adding to context '%s' %s (%s)", name, ret, type(ret))
+        context[name] = ret
 
-    return v
+    return ret
+
 
 def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
+    # type: (Dict[str, Any], Graph, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace], str) -> None
     if t["type"] == "record":
         recordname = t["name"]
 
@@ -86,12 +103,14 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
             predicate = "%s:%s" % (defaultPrefix, recordname)
 
         if context.get(recordname, predicate) != predicate:
-            raise Exception("Predicate collision on '%s', '%s' != '%s'" % (recordname, context[t["name"]], predicate))
+            raise Exception("Predicate collision on '%s', '%s' != '%s'" % (
+                recordname, context[recordname], predicate))
 
         if not recordname:
             raise Exception()
 
-        _logger.debug("Adding to context '%s' %s (%s)", recordname, predicate, type(predicate))
+        _logger.debug("Adding to context '%s' %s (%s)",
+                      recordname, predicate, type(predicate))
         context[recordname] = predicate
 
         for i in t.get("fields", []):
@@ -119,7 +138,8 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
                 # TODO generate range from datatype.
 
             if isinstance(i["type"], dict) and "name" in i["type"]:
-                process_type(i["type"], g, context, defaultBase, namespaces, defaultPrefix)
+                process_type(i["type"], g, context, defaultBase,
+                             namespaces, defaultPrefix)
 
         if "extends" in t:
             for e in aslist(t["extends"]):
@@ -132,22 +152,23 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
 
 def salad_to_jsonld_context(j, schema_ctx):
-    context = {}
+    # type: (Iterable, Dict[str, Any]) -> Tuple[Loader.ContextType, Graph]
+    context = {}  # type: Loader.ContextType
     namespaces = {}
     g = Graph()
     defaultPrefix = ""
 
-    for k,v in schema_ctx.items():
+    for k, v in schema_ctx.items():
         context[k] = v
         namespaces[k] = rdflib.namespace.Namespace(v)
 
     if "@base" in context:
-        defaultBase = context["@base"]
+        defaultBase = cast(str, context["@base"])
         del context["@base"]
     else:
         defaultBase = ""
 
-    for k,v in namespaces.items():
+    for k, v in namespaces.items():
         g.bind(k, v)
 
     for t in j:
@@ -155,8 +176,51 @@ def salad_to_jsonld_context(j, schema_ctx):
 
     return (context, g)
 
-if __name__ == "__main__":
-    with open(sys.argv[1]) as f:
-        j = yaml.load(f)
-        (ctx, g) = salad_to_jsonld_context(j)
-        print(json.dumps(ctx, indent=4, sort_keys=True))
+def fix_jsonld_ids(obj, ids):
+    # type: (Union[Dict[unicode, Any], List[Dict[unicode, Any]]], List[unicode]) -> None
+    if isinstance(obj, dict):
+        for i in ids:
+            if i in obj:
+                obj["@id"] = obj[i]
+        for v in obj.values():
+            fix_jsonld_ids(v, ids)
+    if isinstance(obj, list):
+        for entry in obj:
+            fix_jsonld_ids(entry, ids)
+
+def makerdf(workflow, wf, ctx):
+    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType) -> Graph
+    prefixes = {}
+    idfields = []
+    for k,v in ctx.iteritems():
+        if isinstance(v, dict):
+            url = v["@id"]
+        else:
+            url = v
+        if url == "@id":
+            idfields.append(k)
+        doc_url, frg = urlparse.urldefrag(url)
+        if "/" in frg:
+            p, _ = frg.split("/")
+            prefixes[p] = u"%s#%s/" % (doc_url, p)
+
+    if isinstance(wf, list):
+        wf = {
+            "@context": ctx,
+            "@graph": wf
+        }
+    else:
+        wf["@context"] = ctx
+
+    fix_jsonld_ids(wf, idfields)
+
+    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
+
+    # Bug in json-ld loader causes @id fields to be added to the graph
+    for s,p,o in g.triples((None, URIRef("@id"), None)):
+        g.remove((s, p, o))
+
+    for k2,v2 in prefixes.iteritems():
+        g.namespace_manager.bind(k2, v2)
+
+    return g
