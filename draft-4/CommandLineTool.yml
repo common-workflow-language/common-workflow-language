@@ -385,15 +385,33 @@ $graph:
     is equivalent to
     ```
     outputs:
-       an_output_name:
-         type: File
-         outputBinding:
-           glob: a_stdout_file
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: a_stdout_file
 
     stdout: a_stdout_file
     ```
 
     If there is no `stdout` name provided, a random filename will be created.
+    For example, the following
+    ```
+    outputs:
+      an_output_name:
+        type: stdout
+    ```
+    is equivalent to
+    ```
+    outputs:
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: random_stdout_filenameABCDEFG
+
+    stdout: random_stdout_filenameABCDEFG
+    ```
 
 
 - name: stderr
@@ -407,21 +425,42 @@ $graph:
     The following
     ```
     outputs:
-       an_output_name:
-       type: stderr
+      an_output_name:
+      type: stderr
 
     stderr: a_stderr_file
     ```
     is equivalent to
     ```
     outputs:
-       an_output_name:
-         type: File
-         outputBinding:
-           glob: a_stderr_file
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: a_stderr_file
+
+    stderr: a_stderr_file
     ```
 
     If there is no `stderr` name provided, a random filename will be created.
+    For example, the following
+    ```
+    outputs:
+      an_output_name:
+        type: stderr
+    ```
+    is equivalent to
+    ```
+    outputs:
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: random_stderr_filenameABCDEFG
+
+    stderr: random_stderr_filenameABCDEFG
+    ```
+
 
 - type: record
   name: CommandLineTool
