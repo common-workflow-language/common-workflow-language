@@ -10,6 +10,9 @@
 
 **Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)
 
+**Internationalized Resource Identifiers (IRIs)**:
+https://tools.ietf.org/html/rfc3987
+
 **Portable Operating System Interface (POSIX.1-2008)**: http://pubs.opengroup.org/onlinepubs/9699919799/
 
 **Resource Description Framework (RDF)**: http://www.w3.org/RDF/
@@ -376,7 +379,7 @@ platform's CWL implementation.
 
 A CWL input object document may similarly begin with `#!/usr/bin/env
 cwl-runner` and be marked as executable.  In this case, the input object
-must include the field `cwl:tool` supplying a URI to the default CWL
+must include the field `cwl:tool` supplying a IRI to the default CWL
 document that should be executed using the fields of the input object as
 input parameters.
 
