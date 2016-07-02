@@ -345,7 +345,8 @@ class RenderType(object):
                 rfrg = schema.avro_name(i["name"])
                 tr = "<td><code>%s</code></td><td>%s</td><td>%s</td>"\
                     "<td>%s</td>" % (
-                        rfrg, self.typefmt(tp, self.redirects), opt,
+                        rfrg, self.typefmt(tp, self.redirects),
+                        "Optional" if opt else "Required",
                         mistune.markdown(desc))
                 if opt:
                     required.append(tr)
