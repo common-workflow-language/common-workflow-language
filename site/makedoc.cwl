@@ -1,46 +1,42 @@
-cwlVersion: "cwl:draft-3"
+cwlVersion: draft-4.dev3
 class: CommandLineTool
 requirements:
   - class: InlineJavascriptRequirement
     expressionLib:
       - $include: cwlpath.js
 inputs:
-  - id: source
+  source:
     type: File
     inputBinding: {position: 1}
-  - id: renderlist
+  renderlist:
     type:
       - "null"
       - type: array
         items: string
         inputBinding: {prefix: "--only"}
     inputBinding: {position: 2}
-  - id: redirect
+  redirect:
     type:
       - "null"
       - type: array
         items: string
         inputBinding: {prefix: "--redirect"}
     inputBinding: {position: 2}
-  - id: brand
+  brand:
     type: string
     inputBinding: {prefix: "--brand"}
-  - id: brandlink
+  brandlink:
     type: string
     inputBinding: {prefix: "--brandlink"}
-  - id: target
+  target:
     type: string
-  - id: primtype
+  primtype:
     type: ["null", string]
     inputBinding: {prefix: "--primtype"}
 outputs:
-  - id: out
-    type: File
+  out:
+    type: Directory
     outputBinding:
-      glob: $(inputs.target)
-  - id: targetdir
-    type: string
-    outputBinding:
-      outputEval: $(cwl.path.dirname(inputs.target))
+      glob: .
 baseCommand: [python, "-mschema_salad.makedoc"]
 stdout: $(inputs.target)

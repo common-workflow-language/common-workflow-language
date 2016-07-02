@@ -1,64 +1,52 @@
 class: CommandLineTool
-cwlVersion: draft-3
+cwlVersion: draft-4.dev3
 requirements:
   - class: ShellCommandRequirement
   - class: InlineJavascriptRequirement
     expressionLib:
       - $include: cwlpath.js
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerFile: |
       FROM debian:8
       RUN apt-get update && \
           DEBIAN_FRONTEND=noninteractive apt-get -yq install w3c-linkchecker \
     dockerImageId: commonworkflowlanguage/checklink
-
-inputs:
-  - id: inp
-    type:
-      type: array
-      items: File
-  - id: dirs
-    type:
-      type: array
-      items: string
-  - id: target
-    type: string
-outputs:
-  - id: out
-    type: File
-    outputBinding:
-      glob: $(inputs.target)
-baseCommand: []
-arguments:
-  - "mkdir"
-  - "-p"
-  - valueFrom: |
+  InitialWorkDirRequirement:
+    listing: |
       ${
         var r = [];
         for (var i=0; i < inputs.dirs.length; i++) {
           if (inputs.dirs[i] != "") {
-            r.push(inputs.dirs[i]);
+            r.push({
+              "entryname": inputs.dirs[i],
+              "entry": {
+                "class": "Directory",
+                "listing": [inputs.inp[i]]
+              }
+            });
+          } else {
+            r.push(inputs.inp[i]);
           }
         }
         return r;
       }
-  - {valueFrom: "&&", shellQuote: false}
-  - valueFrom: |
-      ${
-        var r = [];
-        for (var i=0; i < inputs.inp.length; i++) {
-            if (i > 0) {
-              r.push("&&");
-            }
-            r.push("ln");
-            r.push("-s");
-            r.push(inputs.inp[i].path);
-            r.push(runtime.outdir + "/" + inputs.dirs[i]);
-        }
-        return r;
-      }
-  - {valueFrom: "&&", shellQuote: false}
+
+inputs:
+  inp:
+    type:
+      type: array
+      items: Directory
+  target:
+    type: string
+outputs:
+  out:
+    type: File
+    outputBinding:
+      glob: $(inputs.target)
+
+baseCommand: []
+arguments:
   - "checklink"
   - "-X(http.*|mailto:.*)"
   - "-q"
@@ -66,7 +54,11 @@ arguments:
       ${
         var r = [];
         for (var i=0; i < inputs.inp.length; i++) {
-          r.push(cwl.path.basename(inputs.inp[i].path));
+          if (inputs.dirs[i] != "") {
+            r.push(inputs.dirs[i] + "/" + inputs.inp[i].basename);
+          } else {
+            r.push(inputs.inp[i].basename);
+          }
         }
         return r;
       }

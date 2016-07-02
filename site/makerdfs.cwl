@@ -1,13 +1,12 @@
-cwlVersion: "cwl:draft-3"
+cwlVersion: draft-4.dev3
 class: CommandLineTool
 inputs:
-  - id: schema
+  schema:
     type: File
     inputBinding: {position: 1}
-  - id: target
-    type: string
+  target: string
 outputs:
-  - id: out
+  out:
     type: File
     outputBinding:
       glob: $(inputs.target)
