@@ -125,8 +125,8 @@ Once the command line is built and the runtime environment is created, the
 actual tool is executed.
 
 The standard error stream and standard output stream (unless redirected by
-setting `stdout`) may be captured by platform logging facilities for
-storage and reporting.
+setting `stdout` or `stderr`) may be captured by platform logging facilities
+for storage and reporting.
 
 Tools may be multithreaded or spawn child processes; however, when the
 parent process exits, the tool is considered finished regardless of whether
