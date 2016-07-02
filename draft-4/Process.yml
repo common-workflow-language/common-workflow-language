@@ -715,8 +715,7 @@ $graph:
       doc: "A long, human-readable description of this process object."
     - name: cwlVersion
       type:
-        - "null"
-        - "#CWLVersions"
+        - CWLVersions
       doc: "CWL document version"
       jsonldPredicate:
         "_id": "cwl:cwlVersion"
