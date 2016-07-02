@@ -211,7 +211,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `Directory` to indicate this object describes a Directory.
     - name: location
-      type: string
+      type: string?
       doc: |
         A URI that identifies the directory resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -221,6 +221,10 @@ $graph:
         unable to retrieve the directory listing stored at a remote resource (due to
         unsupported protocol, access denied, or other issue) it must signal an
         error.
+
+        If the `location' field is not provided, the `listing` field must be
+        provided.  The implementation must generate an internal identifier for
+        the `location` field.
 
         If the `path` field is provided but the `location` field is not, an
         implementation may assign the value of the `path` field to `location`,
