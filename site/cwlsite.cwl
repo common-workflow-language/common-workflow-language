@@ -31,9 +31,8 @@ inputs:
 
 outputs:
   doc_out:
-    type: File[]
-    outputSource: [docs/out, brandimg]
-    linkMerge: merge_flattened
+    type: File
+    outputSource: merge/dir
   report:
     type: File
     outputSource: report/out
@@ -50,8 +49,6 @@ requirements:
   - class: SubworkflowFeatureRequirement
   - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
-    expressionLib:
-      - $include: cwlpath.js
 
 hints:
   - class: DockerRequirement
@@ -90,10 +87,25 @@ steps:
     out: [out, targetdir]
     run:  makedoc.cwl
 
+  merge:
+    in:
+      primary:
+        source: docs/out
+        valueFrom: $(self[0])
+      secondary:
+        source: [docs/out, brandimg]
+        linkMerge: merge_flattened
+        valueFrom: $(self.slice(1))
+      dirs:
+        source: [docs/targetdir, empty]
+        linkMerge: merge_flattened
+        valueFrom: $(self.slice(1))
+    out: [dir]
+    run: mergesecondary.cwl
+
   report:
     in:
-      inp: { source: [docs/out, brandimg], linkMerge: merge_flattened }
-      dirs: { source: [docs/targetdir, empty], linkMerge: merge_flattened }
+      inp: merge/dir
       target: { default: "linkchecker-report.txt"}
     out: [out]
     run: linkchecker.cwl

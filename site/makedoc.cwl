@@ -35,8 +35,19 @@ inputs:
     inputBinding: {prefix: "--primtype"}
 outputs:
   out:
-    type: Directory
+    type: File
     outputBinding:
-      glob: .
+      glob: $(inputs.target)
+  targetdir:
+    type: string
+    outputBinding:
+      outputEval: |
+        ${
+          var m = inputs.target.match(/^([^/]+)\/[^/]/);
+          if (m)
+            return m[1];
+          else
+            return "";
+        }
 baseCommand: [python, "-mschema_salad.makedoc"]
 stdout: $(inputs.target)
