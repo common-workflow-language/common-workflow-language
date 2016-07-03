@@ -36,12 +36,6 @@ outputs:
   report:
     type: File
     outputSource: report/out
-  context:
-    type: File[]
-    outputSource: context/out
-  rdfs:
-    type: File[]
-    outputSource: rdfs/out
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -61,7 +55,7 @@ steps:
       schemas: schemas
       schema: { valueFrom: $(inputs.schemas.schema_in) }
       target: { valueFrom: $(inputs.schemas.rdfs_target) }
-    out: [out]
+    out: [out, targetdir]
     run: makerdfs.cwl
 
   context:
@@ -69,8 +63,8 @@ steps:
     in:
       schemas: schemas
       schema: { valueFrom: $(inputs.schemas.schema_in) }
-      target: { valueFrom: $(inputs.schemas.rdfs_target) }
-    out: [out]
+      target: { valueFrom: $(inputs.schemas.context_target) }
+    out: [out, targetdir]
     run: makecontext.cwl
 
   docs:
@@ -93,11 +87,11 @@ steps:
         source: docs/out
         valueFrom: $(self[0])
       secondary:
-        source: [docs/out, brandimg]
+        source: [docs/out, rdfs/out, context/out, brandimg]
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
       dirs:
-        source: [docs/targetdir, empty]
+        source: [docs/targetdir, rdfs/targetdir, context/targetdir, empty]
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
     out: [dir]

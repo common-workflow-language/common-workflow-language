@@ -6,9 +6,10 @@ inputs:
     inputBinding: {position: 1}
   target: string
 outputs:
-  out:
-    type: File
+  out: stdout
+  targetdir:
+    type: string
     outputBinding:
-      glob: $(inputs.target)
+      outputEval: $(inputs.target.match(/^([^/]+)\/[^/]/)[1])
 baseCommand: [python, "-mschema_salad", "--print-rdfs"]
 stdout: $(inputs.target)

@@ -1,15 +1,15 @@
-cwlVersion: "cwl:draft-3"
+cwlVersion: draft-4.dev3
 class: CommandLineTool
 inputs:
-  - id: schema
+  schema:
     type: File
     inputBinding: {position: 1}
-  - id: target
-    type: string
+  target: string
 outputs:
-  - id: out
-    type: File
+  out: stdout
+  targetdir:
+    type: string
     outputBinding:
-      glob: $(inputs.target)
+      outputEval: $(inputs.target.match(/^([^/]+)\/[^/]/)[1])
 baseCommand: [python, "-mschema_salad", "--print-jsonld-context"]
 stdout: $(inputs.target)

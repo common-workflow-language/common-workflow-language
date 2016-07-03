@@ -34,10 +34,7 @@ inputs:
     type: ["null", string]
     inputBinding: {prefix: "--primtype"}
 outputs:
-  out:
-    type: File
-    outputBinding:
-      glob: $(inputs.target)
+  out: stdout
   targetdir:
     type: string
     outputBinding:
