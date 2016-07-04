@@ -275,8 +275,6 @@ $graph:
         Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: entryname
-        mapPredicate: entry
 
 - name: SchemaBase
   type: record
