@@ -1,140 +1,146 @@
 {
     "secondaryFiles": [
         {
+            "basename": "userguide-intro.md", 
             "class": "File", 
             "location": "../draft-3/userguide-intro.md"
         }, 
         {
-            "entry": {
-                "class": "Directory", 
-                "listing": [
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/1st-tool.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/echo-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/inp.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/inp-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/tar.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/tar-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/stdout.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/echo-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/tar-param.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/tar-param-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/docker.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/docker-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/arguments.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/arguments-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/array-inputs.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/array-inputs-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/array-outputs.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/array-outputs-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/record.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/record-job1.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/record-job2.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/record-job2.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/env.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/echo-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/expression.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/createfile.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/echo-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/linkfile.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/arguments-job.yml"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/1st-workflow.cwl"
-                    }, 
-                    {
-                        "class": "File", 
-                        "location": "../draft-3/examples/1st-workflow-job.yml"
-                    }
-                ]
-            }, 
-            "entryname": "examples"
+            "basename": "examples", 
+            "location": "_:acab810d-f57a-41f6-a875-0b0ad729fd1a", 
+            "class": "Directory", 
+            "listing": [
+                {
+                    "basename": "record-job1.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/record-job1.yml"
+                }, 
+                {
+                    "basename": "expression.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/expression.cwl"
+                }, 
+                {
+                    "basename": "array-outputs-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/array-outputs-job.yml"
+                }, 
+                {
+                    "basename": "tar-param.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/tar-param.cwl"
+                }, 
+                {
+                    "basename": "inp-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/inp-job.yml"
+                }, 
+                {
+                    "basename": "1st-workflow-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/1st-workflow-job.yml"
+                }, 
+                {
+                    "basename": "record-job2.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/record-job2.yml"
+                }, 
+                {
+                    "basename": "echo-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/echo-job.yml"
+                }, 
+                {
+                    "basename": "array-outputs.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/array-outputs.cwl"
+                }, 
+                {
+                    "basename": "array-inputs-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/array-inputs-job.yml"
+                }, 
+                {
+                    "basename": "1st-workflow.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/1st-workflow.cwl"
+                }, 
+                {
+                    "basename": "docker.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/docker.cwl"
+                }, 
+                {
+                    "basename": "stdout.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/stdout.cwl"
+                }, 
+                {
+                    "basename": "docker-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/docker-job.yml"
+                }, 
+                {
+                    "basename": "tar.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/tar.cwl"
+                }, 
+                {
+                    "basename": "createfile.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/createfile.cwl"
+                }, 
+                {
+                    "basename": "1st-tool.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/1st-tool.cwl"
+                }, 
+                {
+                    "basename": "env.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/env.cwl"
+                }, 
+                {
+                    "basename": "arguments-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/arguments-job.yml"
+                }, 
+                {
+                    "basename": "tar-param-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/tar-param-job.yml"
+                }, 
+                {
+                    "basename": "array-inputs.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/array-inputs.cwl"
+                }, 
+                {
+                    "basename": "inp.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/inp.cwl"
+                }, 
+                {
+                    "basename": "arguments.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/arguments.cwl"
+                }, 
+                {
+                    "basename": "linkfile.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/linkfile.cwl"
+                }, 
+                {
+                    "basename": "record.cwl", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/record.cwl"
+                }, 
+                {
+                    "basename": "tar-job.yml", 
+                    "class": "File", 
+                    "location": "../draft-3/examples/tar-job.yml"
+                }
+            ]
         }
     ], 
     "class": "File", 
