@@ -690,8 +690,6 @@ $graph:
         - Expression
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: entryname
-        mapPredicate: entry
       doc: |
         The list of files or subdirectories that must be placed in the
         designated output directory prior to executing the command line tool.
