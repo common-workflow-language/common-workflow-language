@@ -630,23 +630,48 @@ $graph:
         IRI such as an [RRID](http://www.identifiers.org/rrid/SCR_001156).
         Example: `http://identifiers.org/rrid/RRID:SCR_001156`
 
-- name: FileExt
+- name: Dirent
   type: record
-  extends: File
+  doc: |
+    Define a file or subdirectory that must be placed in the designated output
+    directory prior to executing the command line tool.  May be the result of
+    executing an expression, such as building a configuration file from a
+    template.
   fields:
-    writable:
-      type: boolean?
-      doc: If true, the File must be writable.
-      jsonldPredicate: "cwl:writable"
+    - name: entryname
+      type: [string, Expression]
+      jsonldPredicate:
+        _id: cwl:entryname
+      doc: |
+        The name of the file or subdirectory to create in the output directory.
+    - name: entry
+      type: [string, Expression]
+      jsonldPredicate:
+        _id: cwl:entry
+      doc: |
+        If the value is a string literal or an expression which evaluates to a
+        string, a new file must be created with the string as the file contents.
 
-- name: DirectoryExt
-  type: record
-  extends: Directory
-  fields:
-    writable:
+        If the value is an expression that evaluates to a `File` object, this
+        indicates the referenced file should be added to the designated output
+        directory prior to executing the tool.
+
+        If the value is an expression that evaluates to a `Dirent` object, this
+        indicates that the File or Directory in `entry` should be added to the
+        designated output directory with the name in `entryname`.
+
+        If `writable` is false, the file may be made available using a bind
+        mount or file system link to avoid unnecessary copying of the input
+        file.
+    - name: writable
       type: boolean?
-      doc: If true, the Directory must be writable.
-      jsonldPredicate: "cwl:writable"
+      doc: |
+        If true, the file or directory must be writable by the tool.  Changes
+        to the file or directory must be isolated and not visible by any other
+        CommandLineTool process.  This may be implemented by making a copy of
+        the original file or directory.  Default false (files and directories
+        read-only by default).
+
 
 - name: InitialWorkDirRequirement
   type: record
@@ -659,17 +684,20 @@ $graph:
     - name: listing
       type:
         - type: array
-          items: [FileExt, DirectoryExt, string, Expression]
+          items: [File, Directory, Dirent, string, Expression]
         - string
         - Expression
       jsonldPredicate:
         _id: "cwl:listing"
+        mapSubject: entryname
+        mapPredicate: entry
       doc: |
         The list of files or subdirectories that must be placed in the
         designated output directory prior to executing the command line tool.
 
         May be an expression.  If so, the expression return value must validate
         as `{type: array, items: [File, Directory]}`.
+
 
 - name: EnvVarRequirement
   type: record

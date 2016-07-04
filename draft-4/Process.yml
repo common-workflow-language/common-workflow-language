@@ -65,7 +65,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
     - name: location
-      type: ["null", string, Expression]
+      type: string?
       doc: |
         A URI that identifies the file resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -82,8 +82,6 @@ $graph:
         If the `path` field is provided but the `location` field is not, an
         implementation may assign the value of the `path` field to `location`,
         then follow the rules above.
-
-        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate:
         _id: "@id"
         _type: "@id"
@@ -104,7 +102,7 @@ $graph:
         "_id": "cwl:path"
         "_type": "@id"
     - name: basename
-      type: [string, Expression]
+      type: string
       doc: |
         The base name of the file, that is, the name of the file without any
         leading directory path.  The base name must not contain a slash `/`.
@@ -117,8 +115,6 @@ $graph:
         When this file is made available to a CommandLineTool, it must be named
         with `basename`, i.e. the final component of the `path` field must match
         `basename`.
-
-        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate: "cwl:basename"
     - name: dirname
       type: string?
@@ -194,7 +190,7 @@ $graph:
         root of the document.  If no ontologies are specified in `$schema`, the
         runtime may perform exact file format matches.
     - name: contents
-      type: ["null", string, Expression]
+      type: string?
       doc: |
         File contents literal.  Maximum of 64 KiB.
 
@@ -258,7 +254,7 @@ $graph:
         _id: "cwl:path"
         _type: "@id"
     - name: basename
-      type: [string, Expression]
+      type: string
       doc: |
         The base name of the directory, that is, the name of the file without any
         leading directory path.  The base name must not contain a slash `/`.
@@ -271,16 +267,12 @@ $graph:
         When this file is made available to a CommandLineTool, it must be named
         with `basename`, i.e. the final component of the `path` field must match
         `basename`.
-
-        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate: "cwl:basename"
     - name: listing
       type:
         - "null"
         - type: array
           items: [File, Directory]
-        - string
-        - Expression
       doc: |
         List of files or subdirectories contained in this directory.  The name
         of each file or subdirectory is determined by the `basename` field of
@@ -289,8 +281,6 @@ $graph:
         `Directory` object share the same `basename`, this must be treated as
         equivalent to a single subdirectory with the listings recursively
         merged.
-
-        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate:
         _id: "cwl:listing"
 
