@@ -10,8 +10,9 @@ requirements:
       - "var t = function(s) { return _.template(s)({'inputs': inputs}); };"
   - class: InitialWorkDirRequirement
     listing:
-      foo.txt: >
-          $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
+      - class: File
+        basename: foo.txt
+        contents: $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
 inputs:
   - id: file1
     type: File

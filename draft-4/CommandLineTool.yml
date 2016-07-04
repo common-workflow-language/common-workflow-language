@@ -630,6 +630,23 @@ $graph:
         IRI such as an [RRID](http://www.identifiers.org/rrid/SCR_001156).
         Example: `http://identifiers.org/rrid/RRID:SCR_001156`
 
+- name: FileExt
+  type: record
+  extends: File
+  fields:
+    writable:
+      type: boolean?
+      doc: If true, the File must be writable.
+
+- name: DirectoryExt
+  type: record
+  extends: Directory
+  fields:
+    writable:
+      type: boolean?
+      doc: If true, the Directory must be writable.
+
+
 - name: InitialWorkDirRequirement
   type: record
   extends: ProcessRequirement
@@ -641,13 +658,11 @@ $graph:
     - name: listing
       type:
         - type: array
-          items: [File, Directory]
+          items: [FileExt, DirectoryExt, string, Expression]
         - string
         - Expression
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: entryname
-        mapPredicate: entry
       doc: |
         The list of files or subdirectories that must be placed in the
         designated output directory prior to executing the command line tool.

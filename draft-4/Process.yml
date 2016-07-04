@@ -65,7 +65,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
     - name: location
-      type: string
+      type: [string, Expression]
       doc: |
         A URI that identifies the file resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -82,6 +82,8 @@ $graph:
         If the `path` field is provided but the `location` field is not, an
         implementation may assign the value of the `path` field to `location`,
         then follow the rules above.
+
+        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate:
         _id: "@id"
         _type: "@id"
@@ -102,7 +104,7 @@ $graph:
         "_id": "cwl:path"
         "_type": "@id"
     - name: basename
-      type: string
+      type: [string, Expression]
       doc: |
         The base name of the file, that is, the name of the file without any
         leading directory path.  The base name must not contain a slash `/`.
@@ -115,6 +117,8 @@ $graph:
         When this file is made available to a CommandLineTool, it must be named
         with `basename`, i.e. the final component of the `path` field must match
         `basename`.
+
+        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
     - name: dirname
       type: string?
       doc: |
@@ -189,9 +193,19 @@ $graph:
         root of the document.  If no ontologies are specified in `$schema`, the
         runtime may perform exact file format matches.
     - name: contents
-      type: string?
+      type: ["null", string, Expression]
       doc: |
-        content
+        File contents literal.  Maximum of 64 KiB.
+
+        If neither `location` nor `path` is provided, `contents` must be
+        non-null.  The implementation must assign a unique identifier for the
+        `location` field.  When the file is staged as input to CommandLineTool,
+        the value of `contents` must be written to a file.
+
+        If `loadContents` of `Binding` is true and `location` is valid, the
+        implementation must read up to the first 64 KiB of text from the file
+        and place it in the "contents" field.
+
 
 - name: Directory
   type: record
@@ -247,6 +261,8 @@ $graph:
         - "null"
         - type: array
           items: [File, Directory]
+        - string
+        - Expression
       doc: |
         List of files or subdirectories contained in this directory.  The name
         of each file or subdirectory is determined by the `basename` field of
@@ -255,6 +271,8 @@ $graph:
         `Directory` object share the same `basename`, this must be treated as
         equivalent to a single subdirectory with the listings recursively
         merged.
+
+        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
       jsonldPredicate:
         _id: "cwl:listing"
         mapSubject: entryname
