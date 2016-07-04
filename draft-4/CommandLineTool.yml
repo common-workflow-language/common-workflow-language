@@ -639,11 +639,12 @@ $graph:
     template.
   fields:
     - name: entryname
-      type: [string, Expression]
+      type: ["null", string, Expression]
       jsonldPredicate:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
+        If `entry` is a File or Directory, this overrides `basename`.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
