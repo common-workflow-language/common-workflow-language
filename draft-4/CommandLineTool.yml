@@ -637,6 +637,7 @@ $graph:
     writable:
       type: boolean?
       doc: If true, the File must be writable.
+      jsonldPredicate: "cwl:writable"
 
 - name: DirectoryExt
   type: record
@@ -645,7 +646,7 @@ $graph:
     writable:
       type: boolean?
       doc: If true, the Directory must be writable.
-
+      jsonldPredicate: "cwl:writable"
 
 - name: InitialWorkDirRequirement
   type: record
