@@ -9,7 +9,8 @@ $graph:
   requirements:
     - class: InitialWorkDirRequirement
       listing:
-        input.txt: $(inputs.file)
+        - entryname: input.txt
+          entry: $(inputs.file)
     - class: InlineJavascriptRequirement
 
   inputs:

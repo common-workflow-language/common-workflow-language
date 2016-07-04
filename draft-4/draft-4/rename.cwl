@@ -4,7 +4,8 @@ baseCommand: "true"
 requirements:
   InitialWorkDirRequirement:
     listing:
-      $(inputs.newname): $(inputs.srcfile.location)
+      - entryname: $(inputs.newname)
+        entry: $(inputs.srcfile)
 inputs:
   srcfile: File
   newname: string
