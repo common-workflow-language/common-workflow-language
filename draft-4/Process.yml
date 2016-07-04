@@ -119,6 +119,7 @@ $graph:
         `basename`.
 
         Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
+      jsonldPredicate: "cwl:basename"
     - name: dirname
       type: string?
       doc: |
@@ -272,7 +273,7 @@ $graph:
         `basename`.
 
         Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
-
+      jsonldPredicate: "cwl:basename"
     - name: listing
       type:
         - "null"
