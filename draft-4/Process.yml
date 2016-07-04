@@ -65,7 +65,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
     - name: location
-      type: [string, Expression]
+      type: ["null", string, Expression]
       doc: |
         A URI that identifies the file resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -256,6 +256,23 @@ $graph:
       jsonldPredicate:
         _id: "cwl:path"
         _type: "@id"
+    - name: basename
+      type: [string, Expression]
+      doc: |
+        The base name of the directory, that is, the name of the file without any
+        leading directory path.  The base name must not contain a slash `/`.
+
+        If not provided, the implementation must set this field based on the
+        `location` field by taking the final path component after parsing
+        `location` as an IRI.  If `basename` is provided, it is not required to
+        match the value from `location`.
+
+        When this file is made available to a CommandLineTool, it must be named
+        with `basename`, i.e. the final component of the `path` field must match
+        `basename`.
+
+        Must be evaluated as an expression only when appearing in InitialWorkDirRequirement.
+
     - name: listing
       type:
         - "null"
