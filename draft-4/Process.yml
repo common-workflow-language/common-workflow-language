@@ -102,7 +102,7 @@ $graph:
         "_id": "cwl:path"
         "_type": "@id"
     - name: basename
-      type: string
+      type: string?
       doc: |
         The base name of the file, that is, the name of the file without any
         leading directory path.  The base name must not contain a slash `/`.
@@ -254,7 +254,7 @@ $graph:
         _id: "cwl:path"
         _type: "@id"
     - name: basename
-      type: string
+      type: string?
       doc: |
         The base name of the directory, that is, the name of the file without any
         leading directory path.  The base name must not contain a slash `/`.
