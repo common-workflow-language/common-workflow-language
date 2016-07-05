@@ -630,7 +630,7 @@ $graph:
         IRI such as an [RRID](http://www.identifiers.org/rrid/SCR_001156).
         Example: `http://identifiers.org/rrid/RRID:SCR_001156`
 
-- name: DirentExt
+- name: Dirent
   type: record
   doc: |
     Define a file or subdirectory that must be placed in the designated output
@@ -639,11 +639,12 @@ $graph:
     template.
   fields:
     - name: entryname
-      type: [string, Expression]
+      type: ["null", string, Expression]
       jsonldPredicate:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
+        If `entry` is a File or Directory, this overrides `basename`.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
@@ -672,6 +673,7 @@ $graph:
         the original file or directory.  Default false (files and directories
         read-only by default).
 
+
 - name: InitialWorkDirRequirement
   type: record
   extends: ProcessRequirement
@@ -683,19 +685,18 @@ $graph:
     - name: listing
       type:
         - type: array
-          items: [File, DirentExt]
+          items: [File, Directory, Dirent, string, Expression]
         - string
         - Expression
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: entryname
-        mapPredicate: entry
       doc: |
         The list of files or subdirectories that must be placed in the
         designated output directory prior to executing the command line tool.
 
         May be an expression.  If so, the expression return value must validate
-        as `{type: array, items: [File, Dirent]}`.
+        as `{type: array, items: [File, Directory]}`.
+
 
 - name: EnvVarRequirement
   type: record

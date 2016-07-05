@@ -1,126 +1,90 @@
+
 [
         {
-            "path": "../draft-4/Process.yml",
-            "class": "File"
+            "secondaryFiles": [
+                {
+                    "basename": "concepts.md",
+                    "class": "File",
+                    "location": "../draft-4/concepts.md"
+                },
+                {
+                    "basename": "salad",
+                    "location": "_:4a097285-861e-42ac-9322-20244d69dc96",
+                    "class": "Directory",
+                    "listing": [
+                        {
+                            "basename": "schema_salad",
+                            "location": "_:31c5c0f1-dfcb-4a68-a5e1-063d03e85d3a",
+                            "class": "Directory",
+                            "listing": [
+                                {
+                                    "basename": "metaschema",
+                                    "location": "_:8d932277-54ee-49f7-b7b3-007108151ed4",
+                                    "class": "Directory",
+                                    "listing": [
+                                        {
+                                            "basename": "metaschema_base.yml",
+                                            "class": "File",
+                                            "location": "../draft-4/salad/schema_salad/metaschema/metaschema_base.yml"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "basename": "Process.yml",
+            "class": "File",
+            "location": "../draft-4/Process.yml"
         },
         {
-            "path": "../draft-4/concepts.md",
-            "class": "File"
+            "secondaryFiles": [
+                {
+                    "basename": "contrib.md",
+                    "class": "File",
+                    "location": "../draft-4/contrib.md"
+                },
+                {
+                    "basename": "concepts.md",
+                    "class": "File",
+                    "location": "../draft-4/concepts.md"
+                },
+                {
+                    "basename": "invocation.md",
+                    "class": "File",
+                    "location": "../draft-4/invocation.md"
+                },
+                {
+                    "basename": "intro.md",
+                    "class": "File",
+                    "location": "../draft-4/intro.md"
+                }
+            ],
+            "basename": "CommandLineTool.yml",
+            "class": "File",
+            "location": "../draft-4/CommandLineTool.yml"
         },
         {
-            "path": "../draft-4/salad/schema_salad/metaschema/metaschema.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/metaschema_base.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/salad.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/field_name.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/field_name_schema.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/field_name_src.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/field_name_proc.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/ident_res.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/ident_res_schema.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/ident_res_src.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/ident_res_proc.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/link_res.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/link_res_schema.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/link_res_src.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/link_res_proc.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/vocab_res.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/vocab_res_schema.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/vocab_res_src.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/vocab_res_proc.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/salad/schema_salad/metaschema/import_include.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/CommandLineTool.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/contrib.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/intro.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/concepts.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/invocation.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/Workflow.yml",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/contrib.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/intro.md",
-            "class": "File"
-        },
-        {
-            "path": "../draft-4/concepts.md",
-            "class": "File"
+            "secondaryFiles": [
+                {
+                    "basename": "contrib.md",
+                    "class": "File",
+                    "location": "../draft-4/contrib.md"
+                },
+                {
+                    "basename": "concepts.md",
+                    "class": "File",
+                    "location": "../draft-4/concepts.md"
+                },
+                {
+                    "basename": "intro.md",
+                    "class": "File",
+                    "location": "../draft-4/intro.md"
+                }
+            ],
+            "basename": "Workflow.yml",
+            "class": "File",
+            "location": "../draft-4/Workflow.yml"
         }
     ]

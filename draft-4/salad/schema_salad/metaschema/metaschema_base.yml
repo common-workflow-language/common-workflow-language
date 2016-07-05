@@ -43,19 +43,19 @@ $graph:
   type: record
   doc: A field of a record.
   fields:
-    - name: name
+    name:
       type: string
       jsonldPredicate: "@id"
       doc: |
         The name of the field
 
-    - name: doc
+    doc:
       type: string?
       doc: |
         A documentation string for this field
       jsonldPredicate: "sld:doc"
 
-    - name: type
+    type:
       type:
         - PrimitiveType
         - RecordSchema
@@ -81,7 +81,7 @@ $graph:
 - name: RecordSchema
   type: record
   fields:
-    - name: type
+    type:
       doc: "Must be `record`"
       type:
         name: Record_symbol
@@ -93,9 +93,12 @@ $graph:
         _type: "@vocab"
         typeDSL: true
         refScope: 2
-    - name: "fields"
+    fields:
       type: RecordField[]?
-      jsonldPredicate: "sld:fields"
+      jsonldPredicate:
+        _id: sld:fields
+        mapSubject: name
+        mapPredicate: type
       doc: "Defines the fields of the record."
 
 
@@ -104,7 +107,7 @@ $graph:
   doc: |
     Define an enumerated type.
   fields:
-    - name: type
+    type:
       doc: "Must be `enum`"
       type:
         name: Enum_symbol
@@ -116,7 +119,7 @@ $graph:
         _type: "@vocab"
         typeDSL: true
         refScope: 2
-    - name: "symbols"
+    symbols:
       type: string[]
       jsonldPredicate:
         _id: "sld:symbols"
@@ -128,7 +131,7 @@ $graph:
 - name: ArraySchema
   type: record
   fields:
-    - name: type
+    type:
       doc: "Must be `array`"
       type:
         name: Array_symbol
@@ -140,7 +143,7 @@ $graph:
         _type: "@vocab"
         typeDSL: true
         refScope: 2
-    - name: items
+    items:
       type:
         - PrimitiveType
         - RecordSchema

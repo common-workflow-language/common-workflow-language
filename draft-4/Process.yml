@@ -65,7 +65,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `File` to indicate this object describes a file.
     - name: location
-      type: string
+      type: string?
       doc: |
         A URI that identifies the file resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -74,6 +74,10 @@ $graph:
         implementation is unable to retrieve the file content stored at a
         remote resource (due to unsupported protocol, access denied, or other
         issue) it must signal an error.
+
+        If the `location' field is not provided, the `contents` field must be
+        provided.  The implementation must assign a unique identifier for
+        the `location` field.
 
         If the `path` field is provided but the `location` field is not, an
         implementation may assign the value of the `path` field to `location`,
@@ -84,24 +88,34 @@ $graph:
     - name: path
       type: string?
       doc: |
-        The local path where the File is made available prior to executing a
-        CommandLineTool.  This must be set by the implementation.  This field
+        The local host path where the File is available when a CommandLineTool is
+        executed.  This field must be set by the implementation.  The final
+        path component must match the value of `basename`.  This field
         must not be used in any other context.  The command line tool being
         executed must be able to to access the file at `path` using the POSIX
         `open(2)` syscall.
+
+        As a special case, if the `path` field is provided but the `location`
+        field is not, an implementation may assign the value of the `path`
+        field to `location`, and remove the `path` field.
       jsonldPredicate:
         "_id": "cwl:path"
         "_type": "@id"
     - name: basename
       type: string?
       doc: |
-        The base name of the file, that is, the path component following the
-        final slash in the path.
+        The base name of the file, that is, the name of the file without any
+        leading directory path.  The base name must not contain a slash `/`.
 
-        The implementation must set this field based on the value of `path`
-        prior to evaluating parameter references or expressions in a
-        CommandLineTool document.  This field must not be used in any other
-        context.
+        If not provided, the implementation must set this field based on the
+        `location` field by taking the final path component after parsing
+        `location` as an IRI.  If `basename` is provided, it is not required to
+        match the value from `location`.
+
+        When this file is made available to a CommandLineTool, it must be named
+        with `basename`, i.e. the final component of the `path` field must match
+        `basename`.
+      jsonldPredicate: "cwl:basename"
     - name: dirname
       type: string?
       doc: |
@@ -121,10 +135,8 @@ $graph:
         period.  Leading periods on the basename are ignored; a basename of
         `.cshrc` will have a nameroot of `.cshrc`.
 
-        The implementation must set this field based on the value of `path`
-        prior to evaluating parameter references or expressions in a
-        CommandLineTool document.  This field must not be used in any other
-        context.
+        The implementation must set this field automatically based on the value
+        of `basename` prior to evaluating parameter references or expressions.
     - name: nameext
       type: string?
       doc: |
@@ -133,10 +145,8 @@ $graph:
         period.  Leading periods on the basename are ignored; a basename of
         `.cshrc` will have an empty `nameext`.
 
-        The implementation must set this field based on the value of `path`
-        prior to evaluating parameter references or expressions in a
-        CommandLineTool document.  This field must not be used in any other
-        context.
+        The implementation must set this field automatically based on the value
+        of `basename` prior to evaluating parameter references or expressions.
     - name: checksum
       type: ["null", string]
       doc: |
@@ -149,7 +159,7 @@ $graph:
       type:
         - "null"
         - type: array
-          items: [File, Dirent]
+          items: [File, Directory]
       jsonldPredicate: "cwl:secondaryFiles"
       doc: |
         A list of additional files that are associated with the primary file
@@ -179,26 +189,26 @@ $graph:
         File format ontologies may be provided in the "$schema" metadata at the
         root of the document.  If no ontologies are specified in `$schema`, the
         runtime may perform exact file format matches.
+    - name: contents
+      type: string?
+      doc: |
+        File contents literal.  Maximum of 64 KiB.
 
+        If neither `location` nor `path` is provided, `contents` must be
+        non-null.  The implementation must assign a unique identifier for the
+        `location` field.  When the file is staged as input to CommandLineTool,
+        the value of `contents` must be written to a file.
 
-- name: Dirent
-  type: record
-  fields:
-    - name: entryname
-      type: string
-      jsonldPredicate:
-        "_id": cwl:entryname
-    - name: entry
-      type: [File, Directory]
-      jsonldPredicate:
-        "_id": cwl:entry
+        If `loadContents` of `inputBinding` or `outputBinding` is true and
+        `location` is valid, the implementation must read up to the first 64
+        KiB of text from the file and place it in the "contents" field.
+
 
 - name: Directory
   type: record
   docParent: "#CWLType"
   doc: |
-    Represents a directory to present to a command line tool. This could be a virtual
-    directory, made of files assembled from multiple locations.
+    Represents a directory to present to a command line tool.
   fields:
     - name: class
       type:
@@ -211,7 +221,7 @@ $graph:
         _type: "@vocab"
       doc: Must be `Directory` to indicate this object describes a Directory.
     - name: location
-      type: string
+      type: string?
       doc: |
         A URI that identifies the directory resource.  This may be a relative
         reference, in which case it must be resolved using the base URI of the
@@ -221,6 +231,10 @@ $graph:
         unable to retrieve the directory listing stored at a remote resource (due to
         unsupported protocol, access denied, or other issue) it must signal an
         error.
+
+        If the `location' field is not provided, the `listing` field must be
+        provided.  The implementation must assign a unique identifier for
+        the `location` field.
 
         If the `path` field is provided but the `location` field is not, an
         implementation may assign the value of the `path` field to `location`,
@@ -239,16 +253,36 @@ $graph:
       jsonldPredicate:
         _id: "cwl:path"
         _type: "@id"
+    - name: basename
+      type: string?
+      doc: |
+        The base name of the directory, that is, the name of the file without any
+        leading directory path.  The base name must not contain a slash `/`.
+
+        If not provided, the implementation must set this field based on the
+        `location` field by taking the final path component after parsing
+        `location` as an IRI.  If `basename` is provided, it is not required to
+        match the value from `location`.
+
+        When this file is made available to a CommandLineTool, it must be named
+        with `basename`, i.e. the final component of the `path` field must match
+        `basename`.
+      jsonldPredicate: "cwl:basename"
     - name: listing
       type:
         - "null"
         - type: array
-          items: [File, Dirent]
-      doc: List of files or subdirectories contained in this directory
+          items: [File, Directory]
+      doc: |
+        List of files or subdirectories contained in this directory.  The name
+        of each file or subdirectory is determined by the `basename` field of
+        each `File` or `Directory` object.  It is an error if a `File` shares a
+        `basename` with any other entry in `listing`.  If two or more
+        `Directory` object share the same `basename`, this must be treated as
+        equivalent to a single subdirectory with the listings recursively
+        merged.
       jsonldPredicate:
         _id: "cwl:listing"
-        mapSubject: entryname
-        mapPredicate: entry
 
 - name: SchemaBase
   type: record

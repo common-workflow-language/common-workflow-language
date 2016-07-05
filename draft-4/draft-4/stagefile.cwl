@@ -3,8 +3,7 @@ cwlVersion: draft-4.dev3
 requirements:
   InitialWorkDirRequirement:
     listing:
-      - entryname: $(inputs.infile.basename)
-        entry: $(inputs.infile)
+      - entry: $(inputs.infile)
         writable: true
 inputs:
   infile: File
