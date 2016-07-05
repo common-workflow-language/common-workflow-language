@@ -199,9 +199,9 @@ $graph:
         `location` field.  When the file is staged as input to CommandLineTool,
         the value of `contents` must be written to a file.
 
-        If `loadContents` of `Binding` is true and `location` is valid, the
-        implementation must read up to the first 64 KiB of text from the file
-        and place it in the "contents" field.
+        If `loadContents` of `inputBinding` or `outputBinding` is true and
+        `location` is valid, the implementation must read up to the first 64
+        KiB of text from the file and place it in the "contents" field.
 
 
 - name: Directory
