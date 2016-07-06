@@ -108,6 +108,10 @@ An implementation must resolve [$import](SchemaSalad.html#Import) and
 [$include](SchemaSalad.html#Import) directives as described in the
 [Schema Salad specification](SchemaSalad.html).
 
+Another transformation defined in Schema salad is simplification of data type definitions.
+Type `<T>` ending with `?` should be transformed to `[<T>, "null"]`.
+Type `<T>` ending with `[]` should be transformed to `{"type": "array", "items": <T>}`
+
 ## Extensions and Metadata
 
 Input metadata (for example, a lab sample identifier) may be represented within
