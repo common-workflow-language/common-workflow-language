@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: cwl:v1.0.dev4
+cwlVersion: v1.0.dev4
 description: "Reverse each line using the `rev` command then sort."
 requirements:
   - class: ShellCommandRequirement
