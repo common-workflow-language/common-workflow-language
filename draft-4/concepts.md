@@ -391,7 +391,9 @@ input parameters.
 To discover CWL documents look in the following locations:
 
 `/usr/share/commonwl/`
+
 `/usr/local/share/commonwl/`
+
 `$XDG_DATA_HOME/commonwl/` (usually `$HOME/.local/share/commonwl`)
 
 `$XDF_DATA_HOME` is from the [XDG Base Directory
