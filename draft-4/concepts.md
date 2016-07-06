@@ -376,3 +376,14 @@ cwl-runner` and be marked as executable.  In this case, the input object
 must include the field `cwl:tool` supplying a URI to the default CWL
 document that should be executed using the fields of the input object as
 input parameters.
+
+## Discovering CWL documents on a local filesystem
+
+To discover CWL documents look in the following locations:
+
+`/usr/share/commonwl/`
+`/usr/local/share/commonwl/`
+`$XDG_DATA_HOME/commonwl/` (usually `$HOME/.local/share/commonwl`)
+
+`$XDF_DATA_HOME` is from the [XDG Base Directory
+Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html)
