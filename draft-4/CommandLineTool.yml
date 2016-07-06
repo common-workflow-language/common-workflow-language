@@ -41,9 +41,16 @@ $graph:
       This specification represents the fourth milestone of the CWL group.
       Since draft-3, this draft introduces the following changes and additions:
 
-        * Preliminary support for initialWorkDir & the Directory type
+        * The [Directory](#Directory) type.
         * "id: name" is now just "name"; "class: Classname" is now just
-          "Classtname".
+          "Classname".
+        * [InitialWorkDirRequirement](#InitialWorkDirRequirement): list of
+          files and subdirectories to be present in the output directory prior
+          to execution.
+        * Shortcuts for specifying the standard [output](#stdout) and/or
+          [error](#stderr) streams as a (streamable) File output.
+        * SoftwareRequirement: a lightweight method of describing software
+          dependencies
 
       ## Purpose
 
@@ -385,15 +392,33 @@ $graph:
     is equivalent to
     ```
     outputs:
-       an_output_name:
-         type: File
-         outputBinding:
-           glob: a_stdout_file
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: a_stdout_file
 
     stdout: a_stdout_file
     ```
 
     If there is no `stdout` name provided, a random filename will be created.
+    For example, the following
+    ```
+    outputs:
+      an_output_name:
+        type: stdout
+    ```
+    is equivalent to
+    ```
+    outputs:
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: random_stdout_filenameABCDEFG
+
+    stdout: random_stdout_filenameABCDEFG
+    ```
 
 
 - name: stderr
@@ -407,21 +432,42 @@ $graph:
     The following
     ```
     outputs:
-       an_output_name:
-       type: stderr
+      an_output_name:
+      type: stderr
 
     stderr: a_stderr_file
     ```
     is equivalent to
     ```
     outputs:
-       an_output_name:
-         type: File
-         outputBinding:
-           glob: a_stderr_file
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: a_stderr_file
+
+    stderr: a_stderr_file
     ```
 
     If there is no `stderr` name provided, a random filename will be created.
+    For example, the following
+    ```
+    outputs:
+      an_output_name:
+        type: stderr
+    ```
+    is equivalent to
+    ```
+    outputs:
+      an_output_name:
+        type: File
+        streamable: true
+        outputBinding:
+          glob: random_stderr_filenameABCDEFG
+
+    stderr: random_stderr_filenameABCDEFG
+    ```
+
 
 - type: record
   name: CommandLineTool

@@ -22,11 +22,12 @@ $graph:
     - |
       # Abstract
 
-      A Workflow is an analysis task represented by a directed graph describing
-      a sequence of operations that transform an input data set to output.
-      This specification defines the Common Workflow Language (CWL) Workflow
-      description, a vendor-neutral standard for representing workflows
-      intended to be portable across a variety of computing platforms.
+      One way to define a workflow is: an analysis task represented by a
+      directed graph describing a sequence of operations that transform an
+      input data set to output. This specification defines the Common Workflow
+      Language (CWL) Workflow description, a vendor-neutral standard for
+      representing workflows intended to be portable across a variety of
+      computing platforms.
 
     - {$include: intro.md}
 
@@ -85,7 +86,7 @@ $graph:
       specializeTo: "#ExpressionToolOutputParameter"
   documentRoot: true
   doc: |
-    Execute an expression as a process step.
+    Execute an expression as a Workflow step.
   fields:
     - name: "class"
       jsonldPredicate:
@@ -164,7 +165,7 @@ $graph:
     - name: source
       doc: |
         Specifies one or more workflow parameters that will provide input to
-        the underlying process parameter.
+        the underlying step parameter.
       jsonldPredicate:
         "_id": "cwl:source"
         "_type": "@id"
@@ -187,7 +188,7 @@ $graph:
   doc: |
     The input of a workflow step connects an upstream parameter (from the
     workflow inputs, or the outputs of other workflows steps) with the input
-    parameters of the underlying process.
+    parameters of the underlying step.
 
     ## Input object
 
@@ -296,9 +297,9 @@ $graph:
   docParent: "#Workflow"
   doc: |
     A workflow step is an executable element of a workflow.  It specifies the
-    underlying process implementation (such as `CommandLineTool`) in the `run`
-    field and connects the input and output parameters of the underlying
-    process to workflow parameters.
+    underlying process implementation (such as `CommandLineTool` or another
+    `Workflow`) in the `run` field and connects the input and output parameters
+    of the underlying process to workflow parameters.
 
     # Scatter/gather
 
@@ -436,15 +437,15 @@ $graph:
     specializeTo: "#WorkflowOutputParameter"
   doc: |
     A workflow describes a set of **steps** and the **dependencies** between
-    those processes.  When a process produces output that will be consumed by a
-    second process, the first process is a dependency of the second process.
+    those steps.  When a step produces output that will be consumed by a
+    second step, the first step is a dependency of the second step.
 
     When there is a dependency, the workflow engine must execute the preceeding
-    process and wait for it to successfully produce output before executing the
-    dependent process.  If two processes are defined in the workflow graph that
-    are not directly or indirectly dependent, these processes are
-    **independent**, and may execute in any order or execute concurrently.  A
-    workflow is complete when all steps have been executed.
+    step and wait for it to successfully produce output before executing the
+    dependent step.  If two steps are defined in the workflow graph that
+    are not directly or indirectly dependent, these steps are **independent**,
+    and may execute in any order or execute concurrently.  A workflow is
+    complete when all steps have been executed.
 
     Dependencies between parameters are expressed using the `source` field on
     [workflow step input parameters](#WorkflowStepInput) and [workflow output
@@ -458,21 +459,21 @@ $graph:
 
     ## Workflow success and failure
 
-    A completed process must result in one of `success`, `temporaryFailure` or
-    `permanentFailure` states.  An implementation may choose to retry a process
+    A completed step must result in one of `success`, `temporaryFailure` or
+    `permanentFailure` states.  An implementation may choose to retry a step
     execution which resulted in `temporaryFailure`.  An implementation may
     choose to either continue running other steps of a workflow, or terminate
     immediately upon `permanentFailure`.
 
-    * If any step of a workflow execution results in `permanentFailure`, then the
-    workflow status is `permanentFailure`.
+    * If any step of a workflow execution results in `permanentFailure`, then
+    the workflow status is `permanentFailure`.
 
     * If one or more steps result in `temporaryFailure` and all other steps
     complete `success` or are not executed, then the workflow status is
     `temporaryFailure`.
 
-    * If all workflow steps are executed and complete with `success`, then the workflow
-    status is `success`.
+    * If all workflow steps are executed and complete with `success`, then the
+    workflow status is `success`.
 
     # Extensions
 

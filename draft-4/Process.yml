@@ -67,10 +67,10 @@ $graph:
     - name: location
       type: string?
       doc: |
-        A URI that identifies the file resource.  This may be a relative
-        reference, in which case it must be resolved using the base URI of the
+        An IRI that identifies the file resource.  This may be a relative
+        reference, in which case it must be resolved using the base IRI of the
         document.  The location may refer to a local or remote resource; the
-        implementation must use the URI to retrieve file content.  If an
+        implementation must use the IRI to retrieve file content.  If an
         implementation is unable to retrieve the file content stored at a
         remote resource (due to unsupported protocol, access denied, or other
         issue) it must signal an error.
@@ -98,6 +98,14 @@ $graph:
         As a special case, if the `path` field is provided but the `location`
         field is not, an implementation may assign the value of the `path`
         field to `location`, and remove the `path` field.
+        
+        If the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)
+        (`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\`, `"`, `'`,
+        `<space>`, `<tab>`, and `<newline>`) or characters
+        [not allowed](http://www.iana.org/assignments/idna-tables-6.3.0/idna-tables-6.3.0.xhtml)
+        for [Internationalized Domain Names for Applications](https://tools.ietf.org/html/rfc6452)
+        then implementations may terminate the process with a
+        `permanentFailure`.
       jsonldPredicate:
         "_id": "cwl:path"
         "_type": "@id"
@@ -175,7 +183,7 @@ $graph:
         _type: "@id"
         identity: true
       doc: |
-        The format of the file.  This must be a URI of a concept node that
+        The format of the file.  This must be a IRI of a concept node that
         represents the file format, preferrably defined within an ontology.
         If no ontology is available, file formats may be tested by exact match.
 
@@ -223,11 +231,11 @@ $graph:
     - name: location
       type: string?
       doc: |
-        A URI that identifies the directory resource.  This may be a relative
-        reference, in which case it must be resolved using the base URI of the
+        An IRI that identifies the directory resource.  This may be a relative
+        reference, in which case it must be resolved using the base IRI of the
         document.  The location may refer to a local or remote resource.  If
         the `listing` field is not set, the implementation must use the
-        location URI to retrieve directory listing.  If an implementation is
+        location IRI to retrieve directory listing.  If an implementation is
         unable to retrieve the directory listing stored at a remote resource (due to
         unsupported protocol, access denied, or other issue) it must signal an
         error.
@@ -250,6 +258,14 @@ $graph:
         must not be used in any other context.  The command line tool being
         executed must be able to to access the directory at `path` using the POSIX
         `opendir(2)` syscall.
+        
+        If the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)
+        (`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\`, `"`, `'`,
+        `<space>`, `<tab>`, and `<newline>`) or characters
+        [not allowed](http://www.iana.org/assignments/idna-tables-6.3.0/idna-tables-6.3.0.xhtml)
+        for [Internationalized Domain Names for Applications](https://tools.ietf.org/html/rfc6452)
+        then implementations may terminate the process with a
+        `permanentFailure`.
       jsonldPredicate:
         _id: "cwl:path"
         _type: "@id"
@@ -349,7 +365,7 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        For input parameters, this must be one or more URIs of a concept nodes
+        For input parameters, this must be one or more IRIs of a concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
@@ -683,8 +699,7 @@ $graph:
       doc: "A long, human-readable description of this process object."
     - name: cwlVersion
       type:
-        - "null"
-        - "#CWLVersions"
+        - CWLVersions
       doc: "CWL document version"
       jsonldPredicate:
         "_id": "cwl:cwlVersion"
@@ -715,7 +730,7 @@ $graph:
   doc: |
     This field consists of an array of type definitions which must be used when
     interpreting the `inputs` and `outputs` fields.  When a `type` field
-    contain a URI, the implementation must check if the type is defined in
+    contain a IRI, the implementation must check if the type is defined in
     `schemaDefs` and use that definition.  If the type is not found in
     `schemaDefs`, it is an error.  The entries in `schemaDefs` must be
     processed in the order listed such that later schema definitions may refer
