@@ -691,9 +691,10 @@ $graph:
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
     - name: cwlVersion
-      type:
-        - CWLVersions
-      doc: "CWL document version"
+      type: CWLVersions?
+      doc: |
+        CWL document version. Always required at the document root. Not
+        required for a Process embedded inside another Process.
       jsonldPredicate:
         "_id": "cwl:cwlVersion"
         "_type": "@vocab"
