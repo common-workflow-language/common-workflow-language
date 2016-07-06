@@ -592,14 +592,6 @@ $graph:
     Process requirements are the primary mechanism for specifying extensions to
     the CWL core specification.
 
-  fields:
-    - name: "class"
-      type: "string"
-      doc: "The specific requirement type."
-      jsonldPredicate:
-        "_id": "@type"
-        "_type": "@vocab"
-
 
 - type: record
   name: Process
@@ -698,6 +690,12 @@ $graph:
     If this requirement is not present, the workflow platform must not perform expression
     interpolatation.
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'InlineJavascriptRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: expressionLib
       type:
         - "null"
@@ -721,6 +719,12 @@ $graph:
     processed in the order listed such that later schema definitions may refer
     to earlier schema definitions.
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'SchemaDefRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: types
       type:
         type: array

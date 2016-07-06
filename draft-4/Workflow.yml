@@ -505,6 +505,13 @@ $graph:
   doc: |
     Indicates that the workflow platform must support nested workflows in
     the `run` field of [WorkflowStep](#WorkflowStep).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'SubworkflowFeatureRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
 
 - name: ScatterFeatureRequirement
   type: record
@@ -512,6 +519,13 @@ $graph:
   doc: |
     Indicates that the workflow platform must support the `scatter` and
     `scatterMethod` fields of [WorkflowStep](#WorkflowStep).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'ScatterFeatureRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
 
 - name: MultipleInputFeatureRequirement
   type: record
@@ -519,6 +533,13 @@ $graph:
   doc: |
     Indicates that the workflow platform must support multiple inbound data links
     listed in the `source` field of [WorkflowStepInput](#WorkflowStepInput).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'MultipleInputFeatureRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
 
 - type: record
   name: StepInputExpressionRequirement
@@ -526,3 +547,10 @@ $graph:
   doc: |
     Indicate that the workflow platform must support the `valueFrom` field
     of [WorkflowStepInput](#WorkflowStepInput).
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'StepInputExpressionRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"

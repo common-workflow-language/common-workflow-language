@@ -565,6 +565,12 @@ $graph:
     environment as defined by Docker.
 
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'DockerRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: dockerPull
       type: ["null", "string"]
       doc: "Specify a Docker image to retrieve using `docker pull`."
@@ -607,6 +613,12 @@ $graph:
     namespaced. The optional `identifier` field is recommended so that users
     and platforms can distinguish between software that has the same name.
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'SoftwareRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: spec
       type:
         type: array
@@ -682,6 +694,12 @@ $graph:
     workflow platform in the designated output directory prior to executing the
     command line tool.
   fields:
+    - name: "class"
+      type: "string"
+      doc: "InitialWorkDirRequirement"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: listing
       type:
         - type: array
@@ -705,6 +723,12 @@ $graph:
     Define a list of environment variables which will be set in the
     execution environment of the tool.  See `EnvironmentDef` for details.
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'EnvVarRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: envDef
       type:
         type: "array"
@@ -726,6 +750,13 @@ $graph:
     contains `shellQuote: false`.  If `shellQuote: false` is specified, the
     argument is joined into the command string without quoting, which allows
     the use of shell metacharacters such as `|` for pipes.
+  fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'ShellCommandRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
 
 
 - type: record
@@ -754,6 +785,12 @@ $graph:
     If neither "min" nor "max" is specified for a resource, an implementation may provide a default.
 
   fields:
+    - name: "class"
+      type: "string"
+      doc: "Always 'ResourceRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
     - name: coresMin
       type: ["null", long, string, "#Expression"]
       doc: Minimum reserved number of CPU cores
