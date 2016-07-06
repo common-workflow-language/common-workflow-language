@@ -1,5 +1,5 @@
 class: CommandLineTool
-cwlVersion: draft-4.dev3
+cwlVersion: v1.0.dev4
 requirements:
   - class: ShellCommandRequirement
   - class: InitialWorkDirRequirement

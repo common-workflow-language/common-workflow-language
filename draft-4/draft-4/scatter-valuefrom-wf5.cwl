@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: cwl:draft-4.dev3
+cwlVersion: cwl:v1.0.dev4
 class: Workflow
 inputs:
   inp:

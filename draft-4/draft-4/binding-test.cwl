@@ -1,7 +1,7 @@
 #!/usr/bin/env cwl-runner
 
 class: CommandLineTool
-cwlVersion: cwl:draft-4.dev3
+cwlVersion: cwl:v1.0.dev4
 
 inputs:
   - id: reference
