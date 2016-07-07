@@ -2,7 +2,7 @@
 # demonstrating command line flags.
 class: CommandLineTool
 doc: "Sort lines using the `sort` command"
-cwlVersion: v1.0.dev4
+cwlVersion: v1.0
 
 # This example is similar to the previous one, with an additional input
 # parameter called "reverse".  It is a boolean parameter, which is
