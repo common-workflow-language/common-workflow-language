@@ -17,8 +17,8 @@ $graph:
   doc: |
     ## Base types
   docChild:
-    - CWLType
-    - Process
+    - "#CWLType"
+    - "#Process"
 
 - type: enum
   name: CWLVersion
@@ -49,7 +49,7 @@ $graph:
 
 - name: File
   type: record
-  docParent: CWLType
+  docParent: "#CWLType"
   doc: |
     Represents a file (or group of files if `secondaryFiles` is specified) that
     must be accessible by tools using standard POSIX file system call API such as
@@ -216,7 +216,7 @@ $graph:
 
 - name: Directory
   type: record
-  docParent: CWLType
+  docParent: "#CWLType"
   doc: |
     Represents a directory to present to a command line tool.
   fields:
@@ -322,17 +322,6 @@ $graph:
     Define an input or output parameter to a process.
 
   fields:
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this parameter object."
-
-    - name: description
-      type:
-        - "null"
-        - string
-      jsonldPredicate: "rdfs:comment"
-      doc: "A long, human-readable description of this parameter object."
     - name: secondaryFiles
       type:
         - "null"
@@ -519,8 +508,8 @@ $graph:
 
 - name: OutputRecordSchema
   type: record
-  extends: ["sld:RecordSchema", OutputSchema]
-  docParent: OutputParameter
+  extends: ["sld:RecordSchema", "#OutputSchema"]
+  docParent: "#OutputParameter"
   specialize:
     - specializeFrom: "sld:RecordField"
       specializeTo: OutputRecordField
@@ -529,7 +518,7 @@ $graph:
 - name: OutputEnumSchema
   type: record
   extends: ["sld:EnumSchema", OutputSchema]
-  docParent: OutputParameter
+  docParent: "#OutputParameter"
   fields:
     - name: outputBinding
       type: OutputBinding?
@@ -538,7 +527,7 @@ $graph:
 - name: OutputArraySchema
   type: record
   extends: ["sld:ArraySchema", OutputSchema]
-  docParent: OutputParameter
+  docParent: "#OutputParameter"
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: OutputRecordSchema

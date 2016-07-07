@@ -94,16 +94,16 @@ $graph:
     by the workflow platform when executing the command line tool.  May be the
     result of executing an expression, such as getting a parameter from input.
   fields:
-    - name: "envName"
-      type: "string"
+    - name: envName
+      type: string
       doc: The environment variable name
-    - name: "envValue"
-      type: ["string", "#Expression"]
+    - name: envValue
+      type: [string, Expression]
       doc: The environment variable value
 
 - type: record
   name: CommandLineBinding
-  extends: "#InputBinding"
+  extends: InputBinding
   doc: |
 
     When listed under `inputBinding` in the input schema, the term
@@ -138,28 +138,28 @@ $graph:
       - **null**: Add nothing.
 
   fields:
-    - name: "position"
-      type: ["null", "int"]
+    - name: position
+      type: int?
       doc: "The sorting key.  Default position is 0."
-    - name: "prefix"
-      type: [ "null", "string"]
+    - name: prefix
+      type: string?
       doc: "Command line prefix to add before the value."
-    - name: "separate"
-      type: ["null", boolean]
+    - name: separate
+      type: boolean?
       doc: |
         If true (default), then the prefix and value must be added as separate
         command line arguments; if false, prefix and value must be concatenated
         into a single command line argument.
-    - name: "itemSeparator"
-      type: ["null", "string"]
+    - name: itemSeparator
+      type: string?
       doc: |
         Join the array elements into a single string with the elements
         separated by by `itemSeparator`.
-    - name: "valueFrom"
+    - name: valueFrom
       type:
         - "null"
-        - "string"
-        - "#Expression"
+        - string
+        - Expression
       jsonldPredicate: "cwl:valueFrom"
       doc: |
         If `valueFrom` is a constant string value, use this as the value and
@@ -174,7 +174,7 @@ $graph:
         When a binding is part of the `CommandLineTool.arguments` field,
         the `valueFrom` field is required.
     - name: shellQuote
-      type: ["null", boolean]
+      type: boolean?
       doc: |
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
@@ -182,7 +182,7 @@ $graph:
 
 - type: record
   name: CommandOutputBinding
-  extends: "#OutputBinding"
+  extends: OutputBinding
   doc: |
     Describes how to generate an output parameter based on the files produced
     by a CommandLineTool.
@@ -198,7 +198,7 @@ $graph:
       type:
         - "null"
         - string
-        - "#Expression"
+        - Expression
         - type: array
           items: string
       doc: |
@@ -221,7 +221,7 @@ $graph:
       type:
         - "null"
         - string
-        - "#Expression"
+        - Expression
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
         specified, the value of `self` must be an array containing file objects
@@ -234,136 +234,136 @@ $graph:
 
 - name: CommandInputRecordField
   type: record
-  extends: "#InputRecordField"
+  extends: InputRecordField
   specialize:
-    - specializeFrom: "#InputRecordSchema"
-      specializeTo: "#CommandInputRecordSchema"
-    - specializeFrom: "#InputEnumSchema"
-      specializeTo: "#CommandInputEnumSchema"
-    - specializeFrom: "#InputArraySchema"
-      specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#InputBinding"
-      specializeTo: "#CommandLineBinding"
+    - specializeFrom: InputRecordSchema
+      specializeTo: CommandInputRecordSchema
+    - specializeFrom: InputEnumSchema
+      specializeTo: CommandInputEnumSchema
+    - specializeFrom: InputArraySchema
+      specializeTo: CommandInputArraySchema
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 
 - name: CommandInputRecordSchema
   type: record
-  extends: "#InputRecordSchema"
+  extends: InputRecordSchema
   specialize:
-    - specializeFrom: "#InputRecordField"
-      specializeTo: "#CommandInputRecordField"
+    - specializeFrom: InputRecordField
+      specializeTo: CommandInputRecordField
 
 
 - name: CommandInputEnumSchema
   type: record
-  extends: "#InputEnumSchema"
+  extends: InputEnumSchema
   specialize:
-    - specializeFrom: "#InputBinding"
-      specializeTo: "#CommandLineBinding"
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 
 - name: CommandInputArraySchema
   type: record
-  extends: "#InputArraySchema"
+  extends: InputArraySchema
   specialize:
-    - specializeFrom: "#InputRecordSchema"
-      specializeTo: "#CommandInputRecordSchema"
-    - specializeFrom: "#InputEnumSchema"
-      specializeTo: "#CommandInputEnumSchema"
-    - specializeFrom: "#InputArraySchema"
-      specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#InputBinding"
-      specializeTo: "#CommandLineBinding"
+    - specializeFrom: InputRecordSchema
+      specializeTo: CommandInputRecordSchema
+    - specializeFrom: InputEnumSchema
+      specializeTo: CommandInputEnumSchema
+    - specializeFrom: InputArraySchema
+      specializeTo: CommandInputArraySchema
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 
 - name: CommandOutputRecordField
   type: record
-  extends: "#OutputRecordField"
+  extends: OutputRecordField
   specialize:
-    - specializeFrom: "#OutputRecordSchema"
-      specializeTo: "#CommandOutputRecordSchema"
-    - specializeFrom: "#OutputEnumSchema"
-      specializeTo: "#CommandOutputEnumSchema"
-    - specializeFrom: "#OutputArraySchema"
-      specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#OutputBinding"
-      specializeTo: "#CommandOutputBinding"
+    - specializeFrom: OutputRecordSchema
+      specializeTo: CommandOutputRecordSchema
+    - specializeFrom: OutputEnumSchema
+      specializeTo: CommandOutputEnumSchema
+    - specializeFrom: OutputArraySchema
+      specializeTo: CommandOutputArraySchema
+    - specializeFrom: OutputBinding
+      specializeTo: CommandOutputBinding
 
 
 - name: CommandOutputRecordSchema
   type: record
-  extends: "#OutputRecordSchema"
+  extends: OutputRecordSchema
   specialize:
-    - specializeFrom: "#OutputRecordField"
-      specializeTo: "#CommandOutputRecordField"
+    - specializeFrom: OutputRecordField
+      specializeTo: CommandOutputRecordField
 
 
 - name: CommandOutputEnumSchema
   type: record
-  extends: "#OutputEnumSchema"
+  extends: OutputEnumSchema
   specialize:
-    - specializeFrom: "#OutputRecordSchema"
-      specializeTo: "#CommandOutputRecordSchema"
-    - specializeFrom: "#OutputEnumSchema"
-      specializeTo: "#CommandOutputEnumSchema"
-    - specializeFrom: "#OutputArraySchema"
-      specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#OutputBinding"
-      specializeTo: "#CommandOutputBinding"
+    - specializeFrom: OutputRecordSchema
+      specializeTo: CommandOutputRecordSchema
+    - specializeFrom: OutputEnumSchema
+      specializeTo: CommandOutputEnumSchema
+    - specializeFrom: OutputArraySchema
+      specializeTo: CommandOutputArraySchema
+    - specializeFrom: OutputBinding
+      specializeTo: CommandOutputBinding
 
 
 - name: CommandOutputArraySchema
   type: record
-  extends: "#OutputArraySchema"
+  extends: OutputArraySchema
   specialize:
-    - specializeFrom: "#OutputRecordSchema"
-      specializeTo: "#CommandOutputRecordSchema"
-    - specializeFrom: "#OutputEnumSchema"
-      specializeTo: "#CommandOutputEnumSchema"
-    - specializeFrom: "#OutputArraySchema"
-      specializeTo: "#CommandOutputArraySchema"
-    - specializeFrom: "#OutputBinding"
-      specializeTo: "#CommandOutputBinding"
+    - specializeFrom: OutputRecordSchema
+      specializeTo: CommandOutputRecordSchema
+    - specializeFrom: OutputEnumSchema
+      specializeTo: CommandOutputEnumSchema
+    - specializeFrom: OutputArraySchema
+      specializeTo: CommandOutputArraySchema
+    - specializeFrom: OutputBinding
+      specializeTo: CommandOutputBinding
 
 
 - type: record
   name: CommandInputParameter
-  extends: "#InputParameter"
+  extends: InputParameter
   doc: An input parameter for a CommandLineTool.
   specialize:
-    - specializeFrom: "#InputRecordSchema"
-      specializeTo: "#CommandInputRecordSchema"
-    - specializeFrom: "#InputEnumSchema"
-      specializeTo: "#CommandInputEnumSchema"
-    - specializeFrom: "#InputArraySchema"
-      specializeTo: "#CommandInputArraySchema"
-    - specializeFrom: "#InputBinding"
-      specializeTo: "#CommandLineBinding"
+    - specializeFrom: InputRecordSchema
+      specializeTo: CommandInputRecordSchema
+    - specializeFrom: InputEnumSchema
+      specializeTo: CommandInputEnumSchema
+    - specializeFrom: InputArraySchema
+      specializeTo: CommandInputArraySchema
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 - type: record
   name: CommandOutputParameter
-  extends: "#OutputParameter"
+  extends: OutputParameter
   doc: An output parameter for a CommandLineTool.
   specialize:
-    - specializeFrom: "#OutputBinding"
-      specializeTo: "#CommandOutputBinding"
+    - specializeFrom: OutputBinding
+      specializeTo: CommandOutputBinding
   fields:
     - name: type
       type:
         - "null"
-        - "#CWLType"
-        - "#stdout"
-        - "#stderr"
-        - "#CommandOutputRecordSchema"
-        - "#CommandOutputEnumSchema"
-        - "#CommandOutputArraySchema"
+        - CWLType
+        - stdout
+        - stderr
+        - CommandOutputRecordSchema
+        - CommandOutputEnumSchema
+        - CommandOutputArraySchema
         - string
         - type: array
           items:
-            - "#CWLType"
-            - "#CommandOutputRecordSchema"
-            - "#CommandOutputEnumSchema"
-            - "#CommandOutputArraySchema"
+            - CWLType
+            - CommandOutputRecordSchema
+            - CommandOutputEnumSchema
+            - CommandOutputArraySchema
             - string
       jsonldPredicate:
         "_id": "sld:type"
@@ -471,18 +471,18 @@ $graph:
 
 - type: record
   name: CommandLineTool
-  extends: "#Process"
+  extends: Process
   documentRoot: true
   specialize:
-    - specializeFrom: "#InputParameter"
-      specializeTo: "#CommandInputParameter"
-    - specializeFrom: "#OutputParameter"
-      specializeTo: "#CommandOutputParameter"
+    - specializeFrom: InputParameter
+      specializeTo: CommandInputParameter
+    - specializeFrom: OutputParameter
+      specializeTo: CommandOutputParameter
   doc: |
     This defines the schema of the CWL Command Line Tool Description document.
 
   fields:
-    - name: "class"
+    - name: class
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
@@ -510,17 +510,17 @@ $graph:
       type:
         - "null"
         - type: array
-          items: [string, "#Expression", "#CommandLineBinding"]
+          items: [string, Expression, CommandLineBinding]
       jsonldPredicate:
         "_id": "cwl:arguments"
         "_container": "@list"
     - name: stdin
-      type: ["null", string, "#Expression"]
+      type: ["null", string, Expression]
       doc: |
         A path to a file whose contents must be piped into the command's
         standard input stream.
     - name: stderr
-      type: ["null", string, "#Expression"]
+      type: ["null", string, Expression]
       jsonldPredicate: "https://w3id.org/cwl/cwl#stderr"
       doc: |
         Capture the command's standard error stream to a file written to
@@ -533,7 +533,7 @@ $graph:
         return value is not a string, or the resulting path contains illegal
         characters (such as the path separator `/`) it is an error.
     - name: stdout
-      type: ["null", string, "#Expression"]
+      type: ["null", string, Expression]
       jsonldPredicate: "https://w3id.org/cwl/cwl#stdout"
       doc: |
         Capture the command's standard output stream to a file written to
@@ -546,28 +546,19 @@ $graph:
         return value is not a string, or the resulting path contains illegal
         characters (such as the path separator `/`) it is an error.
     - name: successCodes
-      type:
-        - "null"
-        - type: array
-          items: int
+      type: int[]?
       doc: |
         Exit codes that indicate the process completed successfully.
 
     - name: temporaryFailCodes
-      type:
-        - "null"
-        - type: array
-          items: int
+      type: int[]?
       doc: |
         Exit codes that indicate the process failed due to a possibly
         temporary condition, where excuting the process with the same
         runtime environment and inputs may produce different results.
 
     - name: permanentFailCodes
-      type:
-        - "null"
-        - type: array
-          items: int
+      type: int[]?
       doc:
         Exit codes that indicate the process failed due to a permanent logic
         error, where excuting the process with the same runtime environment and
@@ -576,7 +567,7 @@ $graph:
 
 - type: record
   name: DockerRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Indicates that a workflow component should be run in a
     [Docker](http://docker.com) container, and specifies how to fetch or build
@@ -611,33 +602,33 @@ $graph:
     environment as defined by Docker.
 
   fields:
-    - name: "class"
-      type: "string"
+    - name: class
+      type: string
       doc: "Always 'DockerRequirement'"
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
     - name: dockerPull
-      type: ["null", "string"]
+      type: string?
       doc: "Specify a Docker image to retrieve using `docker pull`."
-    - name: "dockerLoad"
-      type: ["null", "string"]
+    - name: dockerLoad
+      type: string?
       doc: "Specify a HTTP URL from which to download a Docker image using `docker load`."
     - name: dockerFile
-      type: ["null", "string"]
+      type: string?
       doc: "Supply the contents of a Dockerfile which will be built using `docker build`."
     - name: dockerImport
-      type: ["null", "string"]
+      type: string?
       doc: "Provide HTTP URL to download and gunzip a Docker images using `docker import."
     - name: dockerImageId
-      type: ["null", "string"]
+      type: string?
       doc: |
         The image id that will be used for `docker run`.  May be a
         human-readable image name or the image identifier hash.  May be skipped
         if `dockerPull` is specified, in which case the `dockerPull` image id
         must be used.
     - name: dockerOutputDirectory
-      type: ["null", "string"]
+      type: string?
       doc: |
         Set the designated output directory to a specific location inside the
         Docker container.
@@ -645,21 +636,19 @@ $graph:
 
 - type: record
   name: SoftwareRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     A list of software packages that should be configured in the environment of
     the defined process.
   fields:
-    - name: "class"
-      type: "string"
+    - name: class
+      type: string
       doc: "Always 'SoftwareRequirement'"
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
     - name: packages
-      type:
-        type: array
-        items: SoftwarePackage
+      type: SoftwarePackage?
       doc: "The list of software to be configured."
       jsonldPredicate:
         mapSubject: name
@@ -672,7 +661,7 @@ $graph:
       type: string
       doc: "The common name of the software to be configured."
       jsonldPredicate: "@id"
-    - name: "version"
+    - name: version
       type: string[]?
       doc: "The (optional) version of the software to configured."
     - name: specs
@@ -744,9 +733,9 @@ $graph:
     workflow platform in the designated output directory prior to executing the
     command line tool.
   fields:
-    - name: "class"
-      type: "string"
-      doc: "InitialWorkDirRequirement"
+    - name: class
+      type: string
+      doc: InitialWorkDirRequirement
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
@@ -768,21 +757,19 @@ $graph:
 
 - name: EnvVarRequirement
   type: record
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Define a list of environment variables which will be set in the
     execution environment of the tool.  See `EnvironmentDef` for details.
   fields:
-    - name: "class"
-      type: "string"
+    - name: class
+      type: string
       doc: "Always 'EnvVarRequirement'"
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
     - name: envDef
-      type:
-        type: "array"
-        items: "#EnvironmentDef"
+      type: EnvironmentDef[]
       doc: The list of environment variables.
       jsonldPredicate:
         mapSubject: envName
@@ -791,7 +778,7 @@ $graph:
 
 - type: record
   name: ShellCommandRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Modify the behavior of CommandLineTool to generate a single string
     containing a shell command line.  Each item in the argument list must be
@@ -801,8 +788,8 @@ $graph:
     argument is joined into the command string without quoting, which allows
     the use of shell metacharacters such as `|` for pipes.
   fields:
-    - name: "class"
-      type: "string"
+    - name: class
+      type: string
       doc: "Always 'ShellCommandRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -811,7 +798,7 @@ $graph:
 
 - type: record
   name: ResourceRequirement
-  extends: "#ProcessRequirement"
+  extends: ProcessRequirement
   doc: |
     Specify basic hardware resource requirements.
 
@@ -835,40 +822,40 @@ $graph:
     If neither "min" nor "max" is specified for a resource, an implementation may provide a default.
 
   fields:
-    - name: "class"
-      type: "string"
+    - name: class
+      type: string
       doc: "Always 'ResourceRequirement'"
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
     - name: coresMin
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Minimum reserved number of CPU cores
 
     - name: coresMax
-      type: ["null", int, string, "#Expression"]
+      type: ["null", int, string, Expression]
       doc: Maximum reserved number of CPU cores
 
     - name: ramMin
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Minimum reserved RAM in mebibytes (2**20)
 
     - name: ramMax
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Maximum reserved RAM in mebibytes (2**20)
 
     - name: tmpdirMin
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
 
     - name: tmpdirMax
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
 
     - name: outdirMin
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
 
     - name: outdirMax
-      type: ["null", long, string, "#Expression"]
+      type: ["null", long, string, Expression]
       doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
