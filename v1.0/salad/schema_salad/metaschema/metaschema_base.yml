@@ -43,19 +43,19 @@ $graph:
   type: record
   doc: A field of a record.
   fields:
-    name:
+    - name: name
       type: string
       jsonldPredicate: "@id"
       doc: |
         The name of the field
 
-    doc:
+    - name: doc
       type: string?
       doc: |
         A documentation string for this field
       jsonldPredicate: "rdfs:comment"
 
-    type:
+    - name: type
       type:
         - PrimitiveType
         - RecordSchema
