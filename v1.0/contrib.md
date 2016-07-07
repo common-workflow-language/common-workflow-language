@@ -1,7 +1,8 @@
 Authors:
 
 * Peter Amstutz <peter.amstutz@curoverse.com>, Arvados Project, Curoverse
-* Michael R. Crusoe <crusoe@ucdavis.edu>, University of California, Davis
+* Michael R. Crusoe <michael.crusoe@gmail.com>, Common Workflow Language
+  project
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
 Contributers:
