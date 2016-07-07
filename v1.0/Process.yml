@@ -129,7 +129,7 @@ $graph:
       type: string?
       doc: |
         The name of the directory containing file, that is, the path leading up
-        to the final slash in the path such that `dirname + '/' + basename =
+        to the final slash in the path such that `dirname + '/' + basename ==
         path`.
 
         The implementation must set this field based on the value of `path`
@@ -141,8 +141,9 @@ $graph:
       doc: |
         The basename root such that `nameroot + nameext == basename`, and
         `nameext` is empty or begins with a period and contains at most one
-        period.  Leading periods on the basename are ignored; a basename of
-        `.cshrc` will have a nameroot of `.cshrc`.
+        period.  For the purposess of path splitting leading periods on the
+        basename are ignored; a basename of `.cshrc` will have a nameroot of
+        `.cshrc`.
 
         The implementation must set this field automatically based on the value
         of `basename` prior to evaluating parameter references or expressions.
