@@ -7,7 +7,7 @@ baseCommand: javac
 
 requirements:
   - class: InlineJavascriptRequirement
-  - class: InitialWorkDirRequirirement
+  - class: InitialWorkDirRequirement
     listing:
       - $(inputs.src)
 
@@ -16,7 +16,7 @@ inputs:
     type: File
     inputBinding:
       position: 1
-      valueFrom: $(inputs.src.basename)
+      valueFrom: $(self.basename)
 
 outputs:
   classfile:

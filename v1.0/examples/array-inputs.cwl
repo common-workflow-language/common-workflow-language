@@ -2,9 +2,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 inputs:
   filesA:
-    type:
-      type: array
-      items: string
+    type: string[]
     inputBinding:
       prefix: -A
       position: 1
@@ -20,9 +18,7 @@ inputs:
       position: 2
 
   filesC:
-    type:
-      type: array
-      items: string
+    type: string[]
     inputBinding:
       prefix: -C=
       itemSeparator: ","

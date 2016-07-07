@@ -7,18 +7,18 @@ inputs:
 outputs:
   classout:
     type: File
-    outputSource: "#compile/classfile"
+    outputSource: compile/classfile
 
 steps:
   untar:
     run: tar-param.cwl
-    inputs:
+    in:
       tarfile: inp
       extractfile: ex
-    outputs: [example_out]
+    out: [example_out]
 
   compile:
     run: arguments.cwl
-    inputs:
+    in:
       src: untar/example_out
-    outputs: [classfile]
+    out: [classfile]

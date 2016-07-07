@@ -8,5 +8,5 @@ inputs:
     inputBinding:
       position: 1
 outputs:
-  - id: output
+  output:
     type: stdout

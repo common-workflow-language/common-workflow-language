@@ -11,7 +11,7 @@ Options:
   -l    List tests
 EOF
 
-DRAFT=draft-3
+DRAFT=v1.0
 TEST_N=""
 RUNNER=cwl-runner
 PLATFORM=$(uname -s)

@@ -2,24 +2,24 @@ cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: echo
 inputs:
-  - id: example_flag
+  example_flag:
     type: boolean
     inputBinding:
       position: 1
       prefix: -f
-  - id: example_string
+  example_string:
     type: string
     inputBinding:
       position: 3
       prefix: --example-string
-  - id: example_int
+  example_int:
     type: int
     inputBinding:
       position: 2
       prefix: -i
       separate: false
-  - id: example_file
-    type: ["null", File]
+  example_file:
+    type: File?
     inputBinding:
       prefix: --file=
       separate: false

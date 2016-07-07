@@ -3,10 +3,11 @@ cwlVersion: v1.0
 baseCommand: ["cat", "example.conf"]
 
 requirements:
-  InitialWorkDirRequirirement:
+  InitialWorkDirRequirement:
     listing:
-      example.conf: |
-        CONFIGVAR=$(inputs.message)
+      - entryname: example.conf
+        entry: |
+          CONFIGVAR=$(inputs.message)
 
 inputs:
   message: string
