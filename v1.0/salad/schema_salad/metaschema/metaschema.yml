@@ -265,7 +265,6 @@ $graph:
 
     - name: specialize
       type:
-        - SpecializeDef?
         - SpecializeDef[]?
       doc: |
         Only applies if `extends` is declared.  Apply type specialization using the
