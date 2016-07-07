@@ -638,7 +638,7 @@ $graph:
   extends: ProcessRequirement
   doc: |
     A list of software packages that should be configured in the environment of
-    the defined proce ss.
+    the defined process.
   fields:
     - name: class
       type: string
