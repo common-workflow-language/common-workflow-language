@@ -3,7 +3,7 @@
 class: ExpressionTool
 requirements:
   - class: InlineJavascriptRequirement
-cwlVersion: v1.0.dev4
+cwlVersion: v1.0
 
 inputs:
   file1:
