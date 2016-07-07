@@ -378,8 +378,8 @@ $graph:
   extends: "#Process"
   documentRoot: true
   specialize:
-    specializeFrom: "#OutputParameter"
-    specializeTo: "#WorkflowOutputParameter"
+    - specializeFrom: "#OutputParameter"
+      specializeTo: "#WorkflowOutputParameter"
   doc: |
     A workflow describes a set of **steps** and the **dependencies** between
     those processes.  When a process produces output that will be consumed by a

@@ -4,7 +4,7 @@ $schemas:
   - EDAM.owl
 class: CommandLineTool
 cwlVersion: v1.0
-description: "Reverse each line using the `rev` command"
+doc: "Reverse each line using the `rev` command"
 
 inputs:
   input:

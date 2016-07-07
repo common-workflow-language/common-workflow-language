@@ -3,7 +3,7 @@
 #
 class: CommandLineTool
 cwlVersion: v1.0
-description: "Reverse each line using the `rev` command"
+doc: "Reverse each line using the `rev` command"
 
 # The "inputs" array defines the structure of the input object that describes
 # the inputs to the underlying program.  Here, there is one input field

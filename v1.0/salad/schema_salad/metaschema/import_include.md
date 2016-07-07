@@ -110,3 +110,67 @@ This becomes:
   }
 }
 ```
+
+
+## Mixin
+
+During preprocessing traversal, an implementation must resolve `$mixin`
+directives.  An `$mixin` directive is an object consisting of the field
+`$mixin` specifying resource by URI string.  If there are additional fields in
+the `$mixin` object, these fields override fields in the object which is loaded
+from the `$mixin` URI.
+
+The URI string must be resolved to an absolute URI using the link resolution
+rules described previously.  Implementations must support loading from `file`,
+`http` and `https` resources.  The URI referenced by `$mixin` must be loaded
+and recursively preprocessed as a Salad document.  The external imported
+document must inherit the context of the importing document, however the file
+URI for processing the imported document must be the URI used to retrieve the
+imported document.  The `$mixin` URI must not include a document fragment.
+
+Once loaded and processed, the `$mixin` node is replaced in the document
+structure by the object or array yielded from the import operation.
+
+URIs may reference document fragments which refer to specific an object in
+the target document.  This indicates that the `$mixin` node must be
+replaced by only the object with the appropriate fragment identifier.
+
+It is a fatal error if an import directive refers to an external resource
+or resource fragment which does not exist or is not accessible.
+
+### Mixin example
+
+mixin.yml:
+```
+{
+  "hello": "world",
+  "carrot": "orange"
+}
+
+```
+
+parent.yml:
+```
+{
+  "form": {
+    "bar": {
+      "$mixin": "mixin.yml"
+      "carrot": "cake"
+      }
+  }
+}
+
+```
+
+This becomes:
+
+```
+{
+  "form": {
+    "bar": {
+      "hello": "world",
+      "carrot": "cake"
+    }
+  }
+}
+```

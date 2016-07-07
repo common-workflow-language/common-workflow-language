@@ -2,7 +2,7 @@ $namespaces:
   edam: "http://edamontology.org/"
 cwlVersion: v1.0
 class: CommandLineTool
-description: "Reverse each line using the `rev` command"
+doc: "Reverse each line using the `rev` command"
 inputs:
   input:
     type: File

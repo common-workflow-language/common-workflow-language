@@ -302,8 +302,8 @@ $graph:
   extends: ["#NamedType", "#RecordSchema", "#SchemaDefinedType"]
   documentRoot: true
   specialize:
-    specializeFrom: "#RecordField"
-    specializeTo: "#SaladRecordField"
+    - specializeFrom: "#RecordField"
+      specializeTo: "#SaladRecordField"
   fields:
     - name: abstract
       type: ["null", boolean]

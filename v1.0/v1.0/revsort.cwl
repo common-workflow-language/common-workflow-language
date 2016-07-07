@@ -2,7 +2,7 @@
 # This is a two-step workflow which uses "revtool" and "sorttool" defined above.
 #
 class: Workflow
-description: "Reverse the lines in a document, then sort those lines."
+doc: "Reverse the lines in a document, then sort those lines."
 cwlVersion: v1.0
 
 # Requirements & hints specify prerequisites and extensions to the workflow.
@@ -22,11 +22,11 @@ hints:
 inputs:
   input:
     type: File
-    description: "The input file to be processed."
+    doc: "The input file to be processed."
   reverse_sort:
     type: boolean
     default: true
-    description: "If true, reverse (decending) sort"
+    doc: "If true, reverse (decending) sort"
 
 # The "outputs" array defines the structure of the output object that describes
 # the outputs of the workflow.
@@ -38,7 +38,7 @@ outputs:
   output:
     type: File
     outputSource: sorted/output
-    description: "The output with the lines reversed and sorted."
+    doc: "The output with the lines reversed and sorted."
 
 # The "steps" array lists the executable steps that make up the workflow.
 # The tool to execute each step is listed in the "run" field.

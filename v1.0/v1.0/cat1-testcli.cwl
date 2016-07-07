@@ -2,7 +2,7 @@
 {
     "class": "CommandLineTool",
     "cwlVersion": "v1.0",
-    "description": "Print the contents of a file to stdout using 'cat' running in a docker container.",
+    "doc": "Print the contents of a file to stdout using 'cat' running in a docker container.",
     "inputs": [
         {
             "id": "file1",
