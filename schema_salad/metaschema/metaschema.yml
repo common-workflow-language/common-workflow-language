@@ -140,6 +140,7 @@ $graph:
       jsonldPredicate:
         _id: "sld:specializeFrom"
         _type: "@id"
+        refScope: 1
 
     - name: specializeTo
       type: string
@@ -147,6 +148,7 @@ $graph:
       jsonldPredicate:
         _id: "sld:specializeTo"
         _type: "@id"
+        refScope: 1
 
 
 - name: NamedType
@@ -242,8 +244,7 @@ $graph:
   extends: [NamedType, RecordSchema, SchemaDefinedType]
   documentRoot: true
   specialize:
-    specializeFrom: "#RecordField"
-    specializeTo: "#SaladRecordField"
+    RecordField: SaladRecordField
   fields:
     - name: abstract
       type: boolean?
@@ -271,7 +272,10 @@ $graph:
         base record as a template.  For each field inherited from the base
         record, replace any instance of the type `specializeFrom` with
         `specializeTo`.
-
+      jsonldPredicate:
+        _id: "sld:specialize"
+        mapSubject: specializeFrom
+        mapPredicate: specializeTo
 
 - name: SaladEnumSchema
   type: record
