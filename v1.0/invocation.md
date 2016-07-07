@@ -50,9 +50,9 @@ elements.  Strings are sorted lexicographically based on UTF-8 encoding.
 
 All files listed in the input object must be made available in the runtime
 environment.  The implementation may use a shared or distributed file
-system or transfer files via explicit download.  Implementations may choose
-not to provide access to files not explicitly specified in the input object
-or process requirements.
+system or transfer files via explicit download to the host.  Implementations
+may choose not to provide access to files not explicitly specified in the input
+object or process requirements.
 
 Output files produced by tool execution must be written to the **designated
 output directory**.  The initial current working directory when executing
