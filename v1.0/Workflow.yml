@@ -399,7 +399,7 @@ $graph:
       type: string?
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this process object."
-    - name: description
+    - name: doc
       type: string?
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
@@ -433,8 +433,8 @@ $graph:
   extends: "#Process"
   documentRoot: true
   specialize:
-    specializeFrom: "#OutputParameter"
-    specializeTo: "#WorkflowOutputParameter"
+    - specializeFrom: "#OutputParameter"
+      specializeTo: "#WorkflowOutputParameter"
   doc: |
     A workflow describes a set of **steps** and the **dependencies** between
     those steps.  When a step produces output that will be consumed by a

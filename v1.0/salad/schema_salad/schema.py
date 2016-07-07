@@ -98,9 +98,9 @@ def get_metaschema():
             "refScope": 1
         },
         "fields": {
-            "@id": "sld:fields",
-            "mapSubject": "name",
-            "mapPredicate": "type"
+            "@id": "https://w3id.org/cwl/salad#fields",
+            "mapPredicate": "type",
+            "mapSubject": "name"
         },
         "float": "http://www.w3.org/2001/XMLSchema#float",
         "identity": "https://w3id.org/cwl/salad#JsonldPredicate/identity",
@@ -122,14 +122,20 @@ def get_metaschema():
         "record": "https://w3id.org/cwl/salad#record",
         "refScope": "https://w3id.org/cwl/salad#JsonldPredicate/refScope",
         "sld": "https://w3id.org/cwl/salad#",
-        "specialize": "https://w3id.org/cwl/salad#SaladRecordSchema/specialize",
+        "specialize": {
+            "@id": "https://w3id.org/cwl/salad#specialize",
+            "mapPredicate": "specializeTo",
+            "mapSubject": "specializeFrom"
+        },
         "specializeFrom": {
             "@id": "https://w3id.org/cwl/salad#specializeFrom",
-            "@type": "@id"
+            "@type": "@id",
+            "refScope": 1
         },
         "specializeTo": {
             "@id": "https://w3id.org/cwl/salad#specializeTo",
-            "@type": "@id"
+            "@type": "@id",
+            "refScope": 1
         },
         "string": "http://www.w3.org/2001/XMLSchema#string",
         "symbols": {

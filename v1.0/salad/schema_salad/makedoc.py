@@ -213,17 +213,27 @@ class RenderType(object):
                  ("docAfter" not in f))):
                 self.render_type(f, 1)
 
-    def typefmt(self, tp, redirects, nbsp=False):
-        # type: (Any, Dict[str, str], bool) -> Union[str, unicode]
+    def typefmt(self, tp, redirects, nbsp=False, jsonldPredicate=None):
+        # type: (Any, Dict[str, str], bool, Dict[str, str]) -> Union[str, unicode]
         global primitiveType
         if isinstance(tp, list):
             if nbsp and len(tp) <= 3:
-                return "&nbsp;|&nbsp;".join([self.typefmt(n, redirects) for n in tp])
+                return "&nbsp;|&nbsp;".join([self.typefmt(n, redirects, jsonldPredicate=jsonldPredicate) for n in tp])
             else:
                 return " | ".join([self.typefmt(n, redirects) for n in tp])
         if isinstance(tp, dict):
             if tp["type"] == "https://w3id.org/cwl/salad#array":
-                return "array&lt;%s&gt;" % (self.typefmt(tp["items"], redirects, nbsp=True))
+                ar = "array&lt;%s&gt;" % (self.typefmt(tp["items"], redirects, nbsp=True))
+                if jsonldPredicate and "mapSubject" in jsonldPredicate:
+                    if "mapPredicate" in jsonldPredicate:
+                        ar += " | map&lt;%s.%s,&nbsp;%s.%s&gt" % (self.typefmt(tp["items"], redirects),
+                                                           jsonldPredicate["mapSubject"],
+                                                           self.typefmt(tp["items"], redirects),
+                                                           jsonldPredicate["mapPredicate"])
+                    ar += " | map&lt;%s.%s,&nbsp;%s&gt" % (self.typefmt(tp["items"], redirects),
+                                                          jsonldPredicate["mapSubject"],
+                                                          self.typefmt(tp["items"], redirects))
+                return ar
             if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
                 frg = schema.avro_name(tp["name"])
                 if tp["name"] in redirects:
@@ -345,7 +355,9 @@ class RenderType(object):
                 rfrg = schema.avro_name(i["name"])
                 tr = "<td><code>%s</code></td><td>%s</td><td>%s</td>"\
                     "<td>%s</td>" % (
-                        rfrg, self.typefmt(tp, self.redirects), opt,
+                        rfrg, self.typefmt(tp, self.redirects,
+                                           jsonldPredicate=i.get("jsonldPredicate")),
+                        "Optional" if opt else "Required",
                         mistune.markdown(desc))
                 if opt:
                     required.append(tr)

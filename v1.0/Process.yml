@@ -99,7 +99,7 @@ $graph:
         As a special case, if the `path` field is provided but the `location`
         field is not, an implementation may assign the value of the `path`
         field to `location`, and remove the `path` field.
-        
+
         If the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)
         (`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\`, `"`, `'`,
         `<space>`, `<tab>`, and `<newline>`) or characters
@@ -260,7 +260,7 @@ $graph:
         must not be used in any other context.  The command line tool being
         executed must be able to to access the directory at `path` using the POSIX
         `opendir(2)` syscall.
-        
+
         If the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)
         (`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\`, `"`, `'`,
         `<space>`, `<tab>`, and `<newline>`) or characters
@@ -305,6 +305,13 @@ $graph:
 - name: SchemaBase
   type: record
   abstract: true
+  fields:
+    - name: label
+      type:
+        - "null"
+        - string
+      jsonldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this object."
 
 
 - name: Parameter
@@ -315,19 +322,6 @@ $graph:
     Define an input or output parameter to a process.
 
   fields:
-    - name: label
-      type:
-        - "null"
-        - string
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this parameter object."
-
-    - name: description
-      type:
-        - "null"
-        - string
-      jsonldPredicate: "rdfs:comment"
-      doc: "A long, human-readable description of this parameter object."
     - name: secondaryFiles
       type:
         - "null"
@@ -384,6 +378,13 @@ $graph:
         sequentially without seeking.  An implementation may use this flag to
         indicate whether it is valid to stream file contents using a named
         pipe.  Default: `false`.
+
+    - name: doc
+      type:
+        - string?
+        - string[]?
+      doc: "A documentation string for this type, or an array of strings which should be concatenated."
+      jsonldPredicate: "rdfs:comment"
 
 
 - type: enum
@@ -446,6 +447,10 @@ $graph:
     - name: inputBinding
       type: [ "null", "#InputBinding" ]
       jsonldPredicate: "cwl:inputBinding"
+    - name: label
+      type: string?
+      jsonldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this process object."
 
 
 - name: InputRecordSchema
@@ -685,7 +690,7 @@ $graph:
         - string
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this process object."
-    - name: description
+    - name: doc
       type:
         - "null"
         - string

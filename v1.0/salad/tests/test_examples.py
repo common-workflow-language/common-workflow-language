@@ -6,6 +6,7 @@ from schema_salad.jsonld_context import makerdf
 import rdflib
 import ruamel.yaml as yaml
 import json
+import os
 
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
@@ -321,6 +322,34 @@ class TestSchemas(unittest.TestCase):
         g = makerdf(None, ra, ctx)
         print(g.serialize(format="n3"))
 
+
+    def test_mixin(self):
+        ldr = schema_salad.ref_resolver.Loader({})
+        ra = ldr.resolve_ref({"$mixin": "mixin.yml", "one": "five"},
+                             base_url="file://"+os.getcwd()+"/tests/")
+        self.assertEqual({'id': 'four', 'one': 'five'}, ra[0])
+
+        ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
+        base_url="file://"+os.getcwd()+"/tests/"
+        ra = ldr.resolve_all([{
+            "id": "a",
+            "m": {"$mixin": "mixin.yml"}
+        }, {
+            "id": "b",
+            "m": {"$mixin": "mixin.yml"}
+        }], base_url=base_url)
+        self.assertEqual([{
+            'id': base_url+'#a',
+            'm': {
+                'id': base_url+u'#a/four',
+                'one': 'two'
+            },
+        }, {
+            'id': base_url+'#b',
+            'm': {
+                'id': base_url+u'#b/four',
+                'one': 'two'}
+        }], ra[0])
 
 if __name__ == '__main__':
     unittest.main()
