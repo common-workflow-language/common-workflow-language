@@ -168,7 +168,7 @@ $graph:
         - string?
         - string[]?
       doc: "A documentation string for this type, or an array of strings which should be concatenated."
-      jsonldPredicate: "sld:doc"
+      jsonldPredicate: "rdfs:comment"
 
     - name: docParent
       type: string?

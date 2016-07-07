@@ -53,7 +53,7 @@ $graph:
       type: string?
       doc: |
         A documentation string for this field
-      jsonldPredicate: "sld:doc"
+      jsonldPredicate: "rdfs:comment"
 
     type:
       type:
