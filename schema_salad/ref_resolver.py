@@ -7,6 +7,7 @@ import collections
 import requests
 import urlparse
 import re
+import copy
 import ruamel.yaml as yaml
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
@@ -259,17 +260,18 @@ class Loader(object):
 
         obj = None  # type: Dict[unicode, Any]
         inc = False
+        mixin = None
 
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, dict):
             obj = ref
-            if u"$import" in ref:
+            if u"$import" in obj:
                 if len(obj) == 1:
                     ref = obj[u"$import"]
                     obj = None
                 else:
                     raise ValueError(
-                        "'$import' must be the only field in %s" % (str(obj)))
+                        u"'$import' must be the only field in %s" % (str(obj)))
             elif u"$include" in obj:
                 if len(obj) == 1:
                     ref = obj[u"$include"]
@@ -277,7 +279,11 @@ class Loader(object):
                     obj = None
                 else:
                     raise ValueError(
-                        "'$include' must be the only field in %s" % (str(obj)))
+                        u"'$include' must be the only field in %s" % (str(obj)))
+            elif u"$mixin" in obj:
+                ref = obj[u"$mixin"]
+                mixin = obj
+                obj = None
             else:
                 ref = None
                 for identifier in self.identifiers:
@@ -286,15 +292,15 @@ class Loader(object):
                         break
                 if not ref:
                     raise ValueError(
-                        "Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
+                        u"Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
 
         if not isinstance(ref, (str, unicode)):
-            raise ValueError("Must be string: `%s`" % str(ref))
+            raise ValueError(u"Must be string: `%s`" % str(ref))
 
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
 
         # Has this reference been loaded already?
-        if url in self.idx:
+        if url in self.idx and (not mixin):
             return self.idx[url], {}
 
         # "$include" directive means load raw text
@@ -309,14 +315,25 @@ class Loader(object):
         else:
             # Load structured document
             doc_url, frg = urlparse.urldefrag(url)
-            if doc_url in self.idx:
+            if doc_url in self.idx and (not mixin):
+                # If the base document is in the index, it was already loaded,
+                # so if we didn't find the reference earlier then it must not
+                # exist.
                 raise validate.ValidationException(
-                    "Reference `#%s` not found in file `%s`." % (frg, doc_url))
-            doc = self.fetch(doc_url)
+                    u"Reference `#%s` not found in file `%s`." % (frg, doc_url))
+            doc = self.fetch(doc_url, inject_ids=(not mixin))
 
         # Recursively expand urls and resolve directives
-        resolved_obj, metadata = self.resolve_all(
-            doc if doc else obj, doc_url, checklinks=checklinks)
+        if mixin:
+            doc = copy.deepcopy(doc)
+            doc.update(mixin)
+            del doc["$mixin"]
+            url = None
+            resolved_obj, metadata = self.resolve_all(
+                doc, base_url, file_base=doc_url, checklinks=checklinks)
+        else:
+            resolved_obj, metadata = self.resolve_all(
+                doc if doc else obj, doc_url, checklinks=checklinks)
 
         # Requested reference should be in the index now, otherwise it's a bad
         # reference
@@ -477,6 +494,8 @@ class Loader(object):
             # Handle $import and $include
             if (u'$import' in document or u'$include' in document):
                 return self.resolve_ref(document, base_url=file_base, checklinks=checklinks)
+            elif u'$mixin' in document:
+                return self.resolve_ref(document, base_url=base_url, checklinks=checklinks)
         elif isinstance(document, list):
             pass
         else:
@@ -534,7 +553,7 @@ class Loader(object):
                     document[key], _ = loader.resolve_all(
                         val, base_url, file_base=file_base, checklinks=False)
             except validate.ValidationException as v:
-                _logger.debug("loader is %s", id(loader))
+                _logger.warn("loader is %s", id(loader), exc_info=v)
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
                     id(loader), file_base, key, validate.indent(str(v))))
 
@@ -543,7 +562,7 @@ class Loader(object):
             try:
                 while i < len(document):
                     val = document[i]
-                    if isinstance(val, dict) and u"$import" in val:
+                    if isinstance(val, dict) and (u"$import" in val or u"$mixin" in val):
                         l, _ = loader.resolve_ref(val, base_url=file_base, checklinks=False)
                         if isinstance(l, list):  # never true?
                             del document[i]
@@ -558,6 +577,7 @@ class Loader(object):
                             val, base_url, file_base=file_base, checklinks=False)
                         i += 1
             except validate.ValidationException as v:
+                _logger.warn("failed", exc_info=v)
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
                     id(loader), file_base, i, validate.indent(str(v))))
 
@@ -601,7 +621,7 @@ class Loader(object):
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
-    def fetch(self, url):  # type: (unicode) -> Any
+    def fetch(self, url, inject_ids=True):  # type: (unicode, bool) -> Any
         if url in self.idx:
             return self.idx[url]
         try:
@@ -614,7 +634,7 @@ class Loader(object):
             result = yaml.load(textIO, Loader=SafeLoader)
         except yaml.parser.ParserError as e:  # type: ignore
             raise validate.ValidationException("Syntax error %s" % (e))
-        if isinstance(result, dict) and self.identifiers:
+        if isinstance(result, dict) and inject_ids and self.identifiers:
             for identifier in self.identifiers:
                 if identifier not in result:
                     result[identifier] = url
