@@ -446,6 +446,10 @@ $graph:
     - name: inputBinding
       type: [ "null", "#InputBinding" ]
       jsonldPredicate: "cwl:inputBinding"
+    - name: label
+      type: string?
+      jsonldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this process object."
 
 
 - name: InputRecordSchema
