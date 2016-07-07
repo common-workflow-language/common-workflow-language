@@ -1,11 +1,11 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: node
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: node:slim
 inputs:
-  - id: src
+  src:
     type: File
     inputBinding:
       position: 1

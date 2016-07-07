@@ -1,26 +1,25 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: java:7
 baseCommand: javac
 
 requirements:
   - class: InlineJavascriptRequirement
-  - class: CreateFileRequirement
-    fileDef:
-      - filename: $(inputs.src.path.split('/').slice(-1)[0])
-        fileContent: $(inputs.src)
+  - class: InitialWorkDirRequirirement
+    listing:
+      - $(inputs.src)
 
 inputs:
-  - id: src
+  src:
     type: File
     inputBinding:
       position: 1
-      valueFrom: $(inputs.src.path.split('/').slice(-1)[0])
+      valueFrom: $(inputs.src.basename)
 
 outputs:
-  - id: classfile
+  classfile:
     type: File
     outputBinding:
       glob: "*.class"

@@ -1,13 +1,13 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: [tar, xf]
 inputs:
-  - id: tarfile
+  tarfile:
     type: File
     inputBinding:
       position: 1
 outputs:
-  - id: example_out
+  example_out:
     type: File
     outputBinding:
       glob: hello.txt

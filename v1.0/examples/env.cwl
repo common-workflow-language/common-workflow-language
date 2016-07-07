@@ -1,12 +1,10 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: env
 requirements:
-  - class: EnvVarRequirement
+  EnvVarRequirement:
     envDef:
-      - envName: HELLO
-        envValue: $(inputs.message)
+      HELLO: $(inputs.message)
 inputs:
-  - id: message
-    type: string
+  message: string
 outputs: []

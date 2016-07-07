@@ -1,8 +1,8 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: echo
 inputs:
-  - id: message
+  message:
     type: string
     inputBinding:
       position: 1

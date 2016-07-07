@@ -1,21 +1,19 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 label: Example trivial wrapper for Java 7 compiler
 baseCommand: javac
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: java:7
 baseCommand: javac
-arguments:
-  - prefix: "-d"
-    valueFrom: $(runtime.outdir)
+arguments: ["-d", $(runtime.outdir)]
 inputs:
-  - id: src
+  src:
     type: File
     inputBinding:
       position: 1
 outputs:
-  - id: classfile
+  classfile:
     type: File
     outputBinding:
       glob: "*.class"

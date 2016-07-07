@@ -1,15 +1,15 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: touch
 inputs:
-  - id: touchfiles
+  touchfiles:
     type:
       type: array
       items: string
     inputBinding:
       position: 1
 outputs:
-  - id: output
+  output:
     type:
       type: array
       items: File

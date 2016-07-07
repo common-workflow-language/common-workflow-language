@@ -1,31 +1,24 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: Workflow
 inputs:
-  - id: inp
-    type: File
-  - id: ex
-    type: string
+  inp: File
+  ex: string
 
 outputs:
-  - id: classout
+  classout:
     type: File
-    source: "#compile/classfile"
+    outputSource: "#compile/classfile"
 
 steps:
-  - id: untar
+  untar:
     run: tar-param.cwl
     inputs:
-      - id: tarfile
-        source: "#inp"
-      - id: extractfile
-        source: "#ex"
-    outputs:
-      - id: example_out
+      tarfile: inp
+      extractfile: ex
+    outputs: [example_out]
 
-  - id: compile
+  compile:
     run: arguments.cwl
     inputs:
-      - id: src
-        source: "#untar/example_out"
-    outputs:
-      - id: classfile
+      src: untar/example_out
+    outputs: [classfile]

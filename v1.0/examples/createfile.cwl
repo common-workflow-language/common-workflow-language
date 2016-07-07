@@ -1,15 +1,13 @@
 class: CommandLineTool
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 baseCommand: ["cat", "example.conf"]
 
 requirements:
-  - class: CreateFileRequirement
-    fileDef:
-      - filename: example.conf
-        fileContent: |
-          CONFIGVAR=$(inputs.message)
+  InitialWorkDirRequirirement:
+    listing:
+      example.conf: |
+        CONFIGVAR=$(inputs.message)
 
 inputs:
-  - id: message
-    type: string
+  message: string
 outputs: []

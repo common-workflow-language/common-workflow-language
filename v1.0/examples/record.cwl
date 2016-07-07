@@ -1,32 +1,32 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 inputs:
-  - id: dependent_parameters
+  dependent_parameters:
     type:
       type: record
       name: dependent_parameters
       fields:
-        - name: itemA
+        itemA:
           type: string
           inputBinding:
             prefix: -A
-        - name: itemB
+        itemB:
           type: string
           inputBinding:
             prefix: -B
-  - id: exclusive_parameters
+  exclusive_parameters:
     type:
       - type: record
         name: itemC
         fields:
-          - name: itemC
+          itemC:
             type: string
             inputBinding:
               prefix: -C
       - type: record
         name: itemD
         fields:
-          - name: itemD
+          itemD:
             type: string
             inputBinding:
               prefix: -D

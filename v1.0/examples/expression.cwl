@@ -1,4 +1,4 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: echo
 
@@ -8,11 +8,12 @@ requirements:
 inputs: []
 outputs: []
 arguments:
-  - valueFrom: $(1+1)
-    prefix: -A
-  - valueFrom: $("/foo/bar/baz".split('/').slice(-1)[0])
-    prefix: -B
-  - valueFrom: |
+  - prefix: -A
+    valueFrom: $(1+1)
+  - prefix: -B
+    valueFrom: $("/foo/bar/baz".split('/').slice(-1)[0])
+  - prefix: -C
+    valueFrom: |
       ${
         var r = [];
         for (var i = 10; i >= 1; i--) {
@@ -20,4 +21,3 @@ arguments:
         }
         return r;
       }
-    prefix: -C

@@ -1,7 +1,7 @@
-cwlVersion: cwl:draft-3
+cwlVersion: v1.0
 class: CommandLineTool
 inputs:
-  - id: filesA
+  filesA:
     type:
       type: array
       items: string
@@ -9,7 +9,7 @@ inputs:
       prefix: -A
       position: 1
 
-  - id: filesB
+  filesB:
     type:
       type: array
       items: string
@@ -19,7 +19,7 @@ inputs:
     inputBinding:
       position: 2
 
-  - id: filesC
+  filesC:
     type:
       type: array
       items: string
