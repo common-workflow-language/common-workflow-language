@@ -5,105 +5,105 @@
                 {
                     "basename": "link_res_schema.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/link_res_schema.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/link_res_schema.yml"
                 }, 
                 {
                     "basename": "link_res_src.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/link_res_src.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/link_res_src.yml"
                 }, 
                 {
                     "basename": "link_res_proc.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/link_res_proc.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/link_res_proc.yml"
                 }
             ], 
             "basename": "link_res.yml", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/link_res.yml"
+            "location": "../v1.0/salad/schema_salad/metaschema/link_res.yml"
         }, 
         {
             "basename": "salad.md", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/salad.md"
+            "location": "../v1.0/salad/schema_salad/metaschema/salad.md"
         }, 
         {
             "basename": "metaschema_base.yml", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/metaschema_base.yml"
+            "location": "../v1.0/salad/schema_salad/metaschema/metaschema_base.yml"
         }, 
         {
             "basename": "import_include.md", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/import_include.md"
+            "location": "../v1.0/salad/schema_salad/metaschema/import_include.md"
         }, 
         {
             "secondaryFiles": [
                 {
                     "basename": "field_name_src.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/field_name_src.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/field_name_src.yml"
                 }, 
                 {
                     "basename": "field_name_schema.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/field_name_schema.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/field_name_schema.yml"
                 }, 
                 {
                     "basename": "field_name_proc.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/field_name_proc.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/field_name_proc.yml"
                 }
             ], 
             "basename": "field_name.yml", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/field_name.yml"
+            "location": "../v1.0/salad/schema_salad/metaschema/field_name.yml"
         }, 
         {
             "secondaryFiles": [
                 {
                     "basename": "ident_res_proc.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/ident_res_proc.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/ident_res_proc.yml"
                 }, 
                 {
                     "basename": "ident_res_schema.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/ident_res_schema.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/ident_res_schema.yml"
                 }, 
                 {
                     "basename": "ident_res_src.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/ident_res_src.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/ident_res_src.yml"
                 }
             ], 
             "basename": "ident_res.yml", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/ident_res.yml"
+            "location": "../v1.0/salad/schema_salad/metaschema/ident_res.yml"
         }, 
         {
             "secondaryFiles": [
                 {
                     "basename": "vocab_res_schema.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/vocab_res_schema.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/vocab_res_schema.yml"
                 }, 
                 {
                     "basename": "vocab_res_proc.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/vocab_res_proc.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/vocab_res_proc.yml"
                 }, 
                 {
                     "basename": "vocab_res_src.yml", 
                     "class": "File", 
-                    "location": "../draft-4/salad/schema_salad/metaschema/vocab_res_src.yml"
+                    "location": "../v1.0/salad/schema_salad/metaschema/vocab_res_src.yml"
                 }
             ], 
             "basename": "vocab_res.yml", 
             "class": "File", 
-            "location": "../draft-4/salad/schema_salad/metaschema/vocab_res.yml"
+            "location": "../v1.0/salad/schema_salad/metaschema/vocab_res.yml"
         }
     ], 
     "class": "File", 
-    "location": "../draft-4/salad/schema_salad/metaschema/metaschema.yml"
+    "location": "../v1.0/salad/schema_salad/metaschema/metaschema.yml"
 }

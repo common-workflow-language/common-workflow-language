@@ -1,5 +1,5 @@
 class: ExpressionTool
-cwlVersion: draft-4.dev3
+cwlVersion: v1.0.dev4
 inputs:
   primary: File
   secondary: File[]

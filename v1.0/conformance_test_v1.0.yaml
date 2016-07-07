@@ -1,5 +1,5 @@
-- job: draft-4/bwa-mem-job.json
-  tool: draft-4/bwa-mem-tool.cwl
+- job: v1.0/bwa-mem-job.json
+  tool: v1.0/bwa-mem-tool.cwl
   output:
     args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
       chr20.fa,
@@ -12,28 +12,28 @@
       "-XXX",
       "-YYY", example_human_Illumina.pe_1.fastq,
       "-YYY", example_human_Illumina.pe_2.fastq]
-  job: draft-4/bwa-mem-job.json
-  tool: draft-4/binding-test.cwl
+  job: v1.0/bwa-mem-job.json
+  tool: v1.0/binding-test.cwl
   doc: Test nested prefixes with arrays
 
 - output:
     args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
     '20', stage2, map1, --max-seq-length, '20', --min-seq-length, '10', --seed-length,
     '16', map2, --max-seed-hits, '-1', --max-seq-length, '20', --min-seq-length, '10']
-  job: draft-4/tmap-job.json
-  tool: draft-4/tmap-tool.cwl
+  job: v1.0/tmap-job.json
+  tool: v1.0/tmap-tool.cwl
   doc: Test nested command line bindings
 
 - output:
     args: [cat, hello.txt]
-  job: draft-4/cat-job.json
-  tool: draft-4/cat1-testcli.cwl
+  job: v1.0/cat-job.json
+  tool: v1.0/cat1-testcli.cwl
   doc: Test command line with optional input (missing)
 
 - output:
     args: [cat, -n, hello.txt]
-  job: draft-4/cat-n-job.json
-  tool: draft-4/cat1-testcli.cwl
+  job: v1.0/cat-n-job.json
+  tool: v1.0/cat1-testcli.cwl
   doc: Test command line with optional input (provided)
 
 - output:
@@ -43,22 +43,22 @@
         "location": "foo.txt",
         "size": 22
     }
-  job: draft-4/cat-job.json
-  tool: draft-4/template-tool.cwl
+  job: v1.0/cat-job.json
+  tool: v1.0/template-tool.cwl
   doc: Test CreateFileRequirement ExpressionEngineRequirement.engineConfig feature
 
-- job: draft-4/cat-job.json
+- job: v1.0/cat-job.json
   output:
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location: output.txt
       size: 13
-  tool: draft-4/cat3-tool.cwl
+  tool: v1.0/cat3-tool.cwl
   doc: Test command execution in Docker with stdout redirection
 
-- job: draft-4/cat-job.json
-  tool: draft-4/cat3-tool-shortcut.cwl
+- job: v1.0/cat-job.json
+  tool: v1.0/cat3-tool-shortcut.cwl
   output:
     output_file:
       class: File
@@ -67,18 +67,18 @@
       size: 13
   doc: Test command execution in Docker with simplified syntax stdout redirection
 
-- job: draft-4/cat-job.json
+- job: v1.0/cat-job.json
   output:
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location: cat-out
       size: 13
-  tool: draft-4/cat3-tool-mediumcut.cwl
+  tool: v1.0/cat3-tool-mediumcut.cwl
   doc: Test command execution in Docker with stdout redirection
 
 - job:
-  tool: draft-4/egrep-stderr.cwl
+  tool: v1.0/egrep-stderr.cwl
   doc: Test command line with stderr redirection
   output:
     output_file:
@@ -88,7 +88,7 @@
       location: error.txt
 
 - job:
-  tool: draft-4/egrep-stderr-shortcut.cwl
+  tool: v1.0/egrep-stderr-shortcut.cwl
   doc: Test command line with stderr redirection, brief syntax
   output:
     output_file:
@@ -104,215 +104,215 @@
       checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
       location: std.err
   job:
-  tool: draft-4/egrep-stderr-mediumcut.cwl
+  tool: v1.0/egrep-stderr-mediumcut.cwl
   doc: Test command line with stderr redirection, named brief syntax
 
-- job: draft-4/cat-job.json
+- job: v1.0/cat-job.json
   output:
     output_txt:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location: output.txt
       size: 13
-  tool: draft-4/cat4-tool.cwl
+  tool: v1.0/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
 
-- job: draft-4/empty.json
-  tool: draft-4/null-expression1-tool.cwl
+- job: v1.0/empty.json
+  tool: v1.0/null-expression1-tool.cwl
   output:
     output: 1
   doc: Test default usage of Any in expressions.
 
-- job: draft-4/null-expression1-job.json
-  tool: draft-4/null-expression1-tool.cwl
+- job: v1.0/null-expression1-job.json
+  tool: v1.0/null-expression1-tool.cwl
   output:
     output: 2
   doc: Test explicitly passing null to Any type inputs with default values.
 
-- job: draft-4/null-expression2-job.json
-  tool: draft-4/null-expression1-tool.cwl
+- job: v1.0/null-expression2-job.json
+  tool: v1.0/null-expression1-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any with a default value.
 
 ## TODO: Upgrade framework to allow specifying negative tests.
-# - job: draft-4/empty.json
-#   tool: draft-4/null-expression2-tool.cwl
+# - job: v1.0/empty.json
+#   tool: v1.0/null-expression2-tool.cwl
 #   failure: true
 #   doc: Test Any without defaults can be unspecified.
 
-# - job: draft-4/null-expression1-job.json
-#   tool: draft-4/null-expression2-tool.cwl
+# - job: v1.0/null-expression1-job.json
+#   tool: v1.0/null-expression2-tool.cwl
 #   failure: true
 #   doc: Test explicitly passing null to Any type without a default value.
 
-- job: draft-4/null-expression2-job.json
-  tool: draft-4/null-expression2-tool.cwl
+- job: v1.0/null-expression2-job.json
+  tool: v1.0/null-expression2-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any without a default value.
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output:
     output:
       class: File
       checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
       location: output
       size: 15
-  tool: draft-4/wc-tool.cwl
+  tool: v1.0/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
-- job: draft-4/parseInt-job.json
+- job: v1.0/parseInt-job.json
   output: {output: 42}
-  tool: draft-4/parseInt-tool.cwl
+  tool: v1.0/parseInt-tool.cwl
   doc: Test ExpressionTool with Docker-based expression engine
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output: {output: 16}
-  tool: draft-4/wc2-tool.cwl
+  tool: v1.0/wc2-tool.cwl
   doc: Test outputEval to transform output
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output: {count_output: 16}
-  tool: draft-4/count-lines1-wf.cwl
+  tool: v1.0/count-lines1-wf.cwl
   doc: Test two step workflow with imported tools
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output: {count_output: 16}
-  tool: draft-4/count-lines2-wf.cwl
+  tool: v1.0/count-lines2-wf.cwl
   doc: Test two step workflow with inline tools
 
-- job: draft-4/count-lines3-job.json
+- job: v1.0/count-lines3-job.json
   output:
     count_output: [16, 1]
-  tool: draft-4/count-lines3-wf.cwl
+  tool: v1.0/count-lines3-wf.cwl
   doc: Test single step workflow with Scatter step
 
-- job: draft-4/count-lines4-job.json
+- job: v1.0/count-lines4-job.json
   output:
     count_output: [16, 1]
-  tool: draft-4/count-lines4-wf.cwl
+  tool: v1.0/count-lines4-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, default merge behavior
 
-- job: draft-4/count-lines6-job.json
+- job: v1.0/count-lines6-job.json
   output:
     count_output: [32, 2]
-  tool: draft-4/count-lines6-wf.cwl
+  tool: v1.0/count-lines6-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, nested merge behavior
 
-- job: draft-4/count-lines6-job.json
+- job: v1.0/count-lines6-job.json
   output:
     count_output: 34
-  tool: draft-4/count-lines7-wf.cwl
+  tool: v1.0/count-lines7-wf.cwl
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, flattened merge behavior
 
-- job: draft-4/empty.json
+- job: v1.0/empty.json
   output: {count_output: 1}
-  tool: draft-4/count-lines5-wf.cwl
+  tool: v1.0/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (missing)
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output: {count_output: 16}
-  tool: draft-4/count-lines5-wf.cwl
+  tool: v1.0/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (provided)
 
-- job: draft-4/env-job.json
+- job: v1.0/env-job.json
   output:
     out:
       class: File
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       location: out
       size: 15
-  tool: draft-4/env-tool1.cwl
+  tool: v1.0/env-tool1.cwl
   doc: Test EnvVarRequirement
 
-- job: draft-4/scatter-job1.json
+- job: v1.0/scatter-job1.json
   output:
     out: ["foo one", "foo two", "foo three", "foo four"]
-  tool: draft-4/scatter-wf1.cwl
+  tool: v1.0/scatter-wf1.cwl
   doc: Test workflow scatter with single scatter parameter
 
-- job: draft-4/scatter-job2.json
+- job: v1.0/scatter-job2.json
   output:
     out: [["foo one three", "foo one four"], ["foo two three", "foo two four"]]
-  tool: draft-4/scatter-wf2.cwl
+  tool: v1.0/scatter-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method
 
-- job: draft-4/scatter-job2.json
+- job: v1.0/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
-  tool: "draft-4/scatter-wf3.cwl#main"
+  tool: "v1.0/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
 
-- job: draft-4/scatter-job2.json
+- job: v1.0/scatter-job2.json
   output:
     out: ["foo one three", "foo two four"]
-  tool: "draft-4/scatter-wf4.cwl#main"
+  tool: "v1.0/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
-- tool: draft-4/echo-tool.cwl
-  job: draft-4/env-job.json
+- tool: v1.0/echo-tool.cwl
+  job: v1.0/env-job.json
   output:
     {"out": "hello test env\n"}
   doc: Test Any type input parameter
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output: {count_output: 16}
-  tool: draft-4/count-lines8-wf.cwl
+  tool: v1.0/count-lines8-wf.cwl
   doc: Test nested workflow
 
-- job: draft-4/env-job.json
+- job: v1.0/env-job.json
   output:
     out:
       class: File
       checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
       location: out
       size: 15
-  tool: draft-4/env-wf1.cwl
+  tool: v1.0/env-wf1.cwl
   doc: Test requirement priority
 
-- job: draft-4/env-job.json
+- job: v1.0/env-job.json
   output:
     out:
       class: File
       checksum: sha1$cdc1e84968261d6a7575b5305945471f8be199b6
       location: out
       size: 9
-  tool: draft-4/env-wf2.cwl
+  tool: v1.0/env-wf2.cwl
   doc: Test requirements override hints
 
-- job: draft-4/empty.json
+- job: v1.0/empty.json
   output: {count_output: 16}
-  tool: draft-4/count-lines9-wf.cwl
+  tool: v1.0/count-lines9-wf.cwl
   doc: Test default value on input parameter
 
-- job: draft-4/revsort-job.json
+- job: v1.0/revsort-job.json
   output:
     output:
       class: File
       checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
       location: output.txt
       size: 1111
-  tool: draft-4/revsort.cwl
+  tool: v1.0/revsort.cwl
   doc: Test sample workflows from the specification
 
-- job: draft-4/cat-job.json
+- job: v1.0/cat-job.json
   output:
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location: output.txt
       size: 13
-  tool: draft-4/cat5-tool.cwl
+  tool: v1.0/cat5-tool.cwl
   doc: Test unknown hints are ignored.
 
-- job: draft-4/search-job.json
+- job: v1.0/search-job.json
   output:
     outfile:
       class: File
@@ -347,52 +347,52 @@
         ],
         "size": 1111
     }
-  tool: "draft-4/search.cwl#main"
+  tool: "v1.0/search.cwl#main"
   doc: |
     Test CreateFileRequirement linking input files and capturing secondaryFiles
     on input and output.
 
-- job: draft-4/rename-job.json
+- job: v1.0/rename-job.json
   output:
     outfile:
       class: File
       checksum: sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376
       location: fish.txt
       size: 1111
-  tool: draft-4/rename.cwl
+  tool: v1.0/rename.cwl
   doc: |
     Test CreateFileRequirement with expression in filename.
 
-- job: draft-4/wc-job.json
+- job: v1.0/wc-job.json
   output:
     output: 16
-  tool: draft-4/wc4-tool.cwl
+  tool: v1.0/wc4-tool.cwl
   doc: |
     Test inline expressions
 
-- job: draft-4/schemadef-job.json
+- job: v1.0/schemadef-job.json
   output:
     output:
         location: output.txt
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
-  tool: draft-4/schemadef-tool.cwl
+  tool: v1.0/schemadef-tool.cwl
   doc: |
     Test SchemaDefRequirement definition used in tool parameter
 
-- job: draft-4/schemadef-job.json
+- job: v1.0/schemadef-job.json
   output:
     output:
         location: output.txt
         size: 12
         class: File
         checksum: "sha1$f12e6cfe70f3253f70b0dbde17c692e7fb0f1e5e"
-  tool: draft-4/schemadef-wf.cwl
+  tool: v1.0/schemadef-wf.cwl
   doc: |
     Test SchemaDefRequirement definition used in workflow parameter
 
-- job: draft-4/empty.json
+- job: v1.0/empty.json
   output: {
     "t1": {
         "bar": {
@@ -463,11 +463,11 @@
     "t8": "zab1",
     "t9": 2
     }
-  tool: draft-4/params.cwl
+  tool: v1.0/params.cwl
   doc: |
     Test parameter evaluation, no support for JS expressions
 
-- job: draft-4/empty.json
+- job: v1.0/empty.json
   output: {
     "t1": {
         "bar": {
@@ -538,16 +538,16 @@
     "t8": "zab1",
     "t9": 2
     }
-  tool: draft-4/params2.cwl
+  tool: v1.0/params2.cwl
   doc: |
     Test parameter evaluation, with support for JS expressions
 
 - output: {}
-  job: draft-4/cat-job.json
-  tool: draft-4/metadata.cwl
+  job: v1.0/cat-job.json
+  tool: v1.0/metadata.cwl
   doc: Test metadata
 
-- job: draft-4/formattest-job.json
+- job: v1.0/formattest-job.json
   output:
     output:
         "location": "output.txt"
@@ -555,11 +555,11 @@
         "size": 1111
         "class": "File"
         "checksum": "sha1$97fe1b50b4582cebc7d853796ebd62e3e163aa3f"
-  tool: draft-4/formattest.cwl
+  tool: v1.0/formattest.cwl
   doc: |
     Test simple format checking.
 
-- job: draft-4/formattest2-job.json
+- job: v1.0/formattest2-job.json
   output:
     output:
         "location": "output.txt"
@@ -567,11 +567,11 @@
         "size": 12010
         "class": "File"
         "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
-  tool: draft-4/formattest2.cwl
+  tool: v1.0/formattest2.cwl
   doc: |
     Test format checking against ontology using subclassOf.
 
-- job: draft-4/formattest2-job.json
+- job: v1.0/formattest2-job.json
   output:
     output:
         "location": "output.txt"
@@ -579,12 +579,12 @@
         "size": 12010
         "class": "File"
         "checksum": "sha1$971d88faeda85a796752ecf752b7e2e34f1337ce"
-  tool: draft-4/formattest3.cwl
+  tool: v1.0/formattest3.cwl
   doc: |
     Test format checking against ontology using equivalentClass.
 
-- tool: draft-4/optional-output.cwl
-  job: draft-4/cat-job.json
+- tool: v1.0/optional-output.cwl
+  job: v1.0/cat-job.json
   output:
     optional_file: null
     output_file:
@@ -595,22 +595,22 @@
   doc: |
     Test optional output file and optional secondaryFile on output.
 
-- job: draft-4/step-valuefrom-wf.json
+- job: v1.0/step-valuefrom-wf.json
   output: {count_output: 16}
-  tool: draft-4/step-valuefrom-wf.cwl
+  tool: v1.0/step-valuefrom-wf.cwl
   doc: Test valueFrom on workflow step.
 
-- job: draft-4/step-valuefrom-job.json
+- job: v1.0/step-valuefrom-job.json
   output: {val: "3\n"}
-  tool: draft-4/step-valuefrom2-wf.cwl
+  tool: v1.0/step-valuefrom2-wf.cwl
   doc: Test valueFrom on workflow step with multiple sources
 
-- job: draft-4/step-valuefrom-job.json
+- job: v1.0/step-valuefrom-job.json
   output: {val: "3\n"}
-  tool: draft-4/step-valuefrom3-wf.cwl
+  tool: v1.0/step-valuefrom3-wf.cwl
   doc: Test valueFrom on workflow step referencing other inputs
 
-- job: draft-4/record-output-job.json
+- job: v1.0/record-output-job.json
   output:
     "orec": {
         "ofoo": {
@@ -626,20 +626,20 @@
             "checksum": "sha1$aeb3d11bdf536511649129f4077d5cda6a324118"
         }
     }
-  tool: draft-4/record-output.cwl
+  tool: v1.0/record-output.cwl
   doc: Test record type output binding.
 
-- job: draft-4/empty.json
+- job: v1.0/empty.json
   output: {
     "foo": {
         "location": "foo",
         "class": "File"
     }
   }
-  tool: draft-4/test-cwl-out.cwl
+  tool: v1.0/test-cwl-out.cwl
   doc: Test support for reading cwl.output.json when running in Docker container
 
-- job: draft-4/abc.json
+- job: v1.0/abc.json
   output:
     files: [{
         "location": "a",
@@ -659,40 +659,40 @@
         "class": "File",
         "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
     }]
-  tool: draft-4/glob-expr-list.cwl
+  tool: v1.0/glob-expr-list.cwl
   doc: Test support for returning multiple glob patterns from expression
 
-- job: draft-4/scatter-valuefrom-job1.json
+- job: v1.0/scatter-valuefrom-job1.json
   output:
     out: ["foo one one", "foo one two", "foo one three", "foo one four"]
-  tool: draft-4/scatter-valuefrom-wf1.cwl
+  tool: v1.0/scatter-valuefrom-wf1.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
 
-- job: draft-4/scatter-valuefrom-job2.json
+- job: v1.0/scatter-valuefrom-job2.json
   output:
     out: [["foo one one three", "foo one one four"], ["foo one two three", "foo one two four"]]
-  tool: draft-4/scatter-valuefrom-wf2.cwl
+  tool: v1.0/scatter-valuefrom-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method and valueFrom on step input
 
-- job: draft-4/scatter-valuefrom-job2.json
+- job: v1.0/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one one four", "foo one two three", "foo one two four"]
-  tool: "draft-4/scatter-valuefrom-wf3.cwl#main"
+  tool: "v1.0/scatter-valuefrom-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method and valueFrom on step input
 
-- job: draft-4/scatter-valuefrom-job2.json
+- job: v1.0/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one two four"]
-  tool: "draft-4/scatter-valuefrom-wf4.cwl#main"
+  tool: "v1.0/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
 
-- job: draft-4/scatter-valuefrom-job1.json
+- job: v1.0/scatter-valuefrom-job1.json
   output:
     out: ["foo one one", "foo two two", "foo three three", "foo four four"]
-  tool: draft-4/scatter-valuefrom-wf5.cwl
+  tool: v1.0/scatter-valuefrom-wf5.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
 
-- job: draft-4/conflict-job.json
+- job: v1.0/conflict-job.json
   output: {
     "fileout": {
         "location": "out.txt",
@@ -701,10 +701,10 @@
         "size": 25
     }
   }
-  tool: "draft-4/conflict-wf.cwl#collision"
+  tool: "v1.0/conflict-wf.cwl#collision"
   doc: Test workflow two input files with same name.
 
-- job: draft-4/dir-job.yml
+- job: v1.0/dir-job.yml
   output:
     "outlist": {
         "size": 20,
@@ -712,10 +712,10 @@
         "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
         "class": "File"
     }
-  tool: draft-4/dir.cwl
+  tool: v1.0/dir.cwl
   doc: Test directory input
 
-- job: draft-4/dir-job.yml
+- job: v1.0/dir-job.yml
   output:
     "outlist": {
         "size": 20,
@@ -723,10 +723,10 @@
         "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
         "class": "File"
     }
-  tool: draft-4/dir2.cwl
+  tool: v1.0/dir2.cwl
   doc: Test directory input in Docker
 
-- job: draft-4/dir3-job.yml
+- job: v1.0/dir3-job.yml
   output:
     "outdir": {
         "class": "Directory",
@@ -741,10 +741,10 @@
             }
         ],
     }
-  tool: draft-4/dir3.cwl
+  tool: v1.0/dir3.cwl
   doc: Test directory input in Docker
 
-- job: draft-4/dir4-job.yml
+- job: v1.0/dir4-job.yml
   output: {
     "outlist": {
         "checksum": "sha1$2ab6f189e84753c05a23413fbf6b6fbf4c53489f",
@@ -753,10 +753,10 @@
         "class": "File"
     }
   }
-  tool: draft-4/dir4.cwl
+  tool: v1.0/dir4.cwl
   doc: Test directories in secondaryFiles
 
-- job: draft-4/dir-job.yml
+- job: v1.0/dir-job.yml
   output: {
     "outlist": {
         "checksum": "sha1$907a866a3e0b7f1fc5a2222531c5fb9063704438",
@@ -765,10 +765,10 @@
         "class": "File"
     }
   }
-  tool: draft-4/dir5.cwl
+  tool: v1.0/dir5.cwl
   doc: Test dynamic initial work dir
 
-- job: draft-4/stagefile-job.yml
+- job: v1.0/stagefile-job.yml
   output: {
     "outfile": {
         "checksum": "sha1$2d6c5e4430c4b200227cc77d3b0025082505ee19",
@@ -777,15 +777,15 @@
         "class": "File"
     }
   }
-  tool: draft-4/stagefile.cwl
+  tool: v1.0/stagefile.cwl
   doc: Test writable staged files.
 
-- job: draft-4/file-literal.yml
+- job: v1.0/file-literal.yml
   output:
     output_file:
       class: File
       checksum: sha1$d0e04ff6c413c7d57f9a0ca0a33cd3ab52e2dd9c
       location: output.txt
       size: 18
-  tool: draft-4/cat3-tool.cwl
+  tool: v1.0/cat3-tool.cwl
   doc: Test file literal as input

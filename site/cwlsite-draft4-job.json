@@ -1,9 +1,9 @@
 [{
     "source": {
                 "class": "File",
-                "path": "../draft-4/README.md"
+                "path": "../v1.0/README.md"
             },
-            "target": "draft-4/index.html",
+            "target": "v1.0/index.html",
             "renderlist": [],
             "redirect": [],
             "brandlink": "../index.html",
@@ -13,10 +13,10 @@
         {
             "source": {
                 "class": "File",
-                "path": "../draft-4/CommandLineTool-standalone.yml",
+                "path": "../v1.0/CommandLineTool-standalone.yml",
                 "secondaryFiles": {"$import": "draft4-deps.json"}
             },
-            "target": "draft-4/CommandLineTool.html",
+            "target": "v1.0/CommandLineTool.html",
             "renderlist": [
                 "https://w3id.org/cwl/cwl#CommandLineToolDoc",
                 "https://w3id.org/cwl/cwl#CommandLineTool"
@@ -29,10 +29,10 @@
         {
             "source": {
                 "class": "File",
-                "path": "../draft-4/CommonWorkflowLanguage.yml",
+                "path": "../v1.0/CommonWorkflowLanguage.yml",
                 "secondaryFiles": {"$import": "draft4-deps.json"}
             },
-            "target": "draft-4/Workflow.html",
+            "target": "v1.0/Workflow.html",
             "renderlist": [
                 "https://w3id.org/cwl/cwl#WorkflowDoc",
                 "https://w3id.org/cwl/cwl#Workflow"
@@ -51,7 +51,7 @@
         },
         {
             "source": {$import: draft4-metaschema.json},
-            "target": "draft-4/SchemaSalad.html",
+            "target": "v1.0/SchemaSalad.html",
             "renderlist": [
                 "https://w3id.org/cwl/salad#Semantic_Annotations_for_Linked_Avro_Data",
                 "https://w3id.org/cwl/salad#SaladRecordSchema",
@@ -65,7 +65,7 @@
         },
         #{
         #    "source": {"$import": "userguide-draft4-input.json"},
-        #    "target": "draft-4/UserGuide.html",
+        #    "target": "v1.0/UserGuide.html",
         #    "renderlist": [],
         #    "redirect": [],
         #    "brandlink": "index.html",

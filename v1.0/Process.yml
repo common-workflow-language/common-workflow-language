@@ -6,7 +6,7 @@ $namespaces:
 
 $graph:
 
-- name: "Common Workflow Language, Draft 4"
+- name: "Common Workflow Language, v1.0"
   type: documentation
   doc: {$include: concepts.md}
 
@@ -21,7 +21,7 @@ $graph:
     - "#Process"
 
 - type: enum
-  name: CWLVersions
+  name: CWLVersion
   doc: "Version symbols for published CWL document versions."
   symbols:
     - cwl:draft-2
@@ -129,7 +129,7 @@ $graph:
       type: string?
       doc: |
         The name of the directory containing file, that is, the path leading up
-        to the final slash in the path such that `dirname + '/' + basename =
+        to the final slash in the path such that `dirname + '/' + basename ==
         path`.
 
         The implementation must set this field based on the value of `path`
@@ -141,8 +141,9 @@ $graph:
       doc: |
         The basename root such that `nameroot + nameext == basename`, and
         `nameext` is empty or begins with a period and contains at most one
-        period.  Leading periods on the basename are ignored; a basename of
-        `.cshrc` will have a nameroot of `.cshrc`.
+        period.  For the purposess of path splitting leading periods on the
+        basename are ignored; a basename of `.cshrc` will have a nameroot of
+        `.cshrc`.
 
         The implementation must set this field automatically based on the value
         of `basename` prior to evaluating parameter references or expressions.
@@ -241,7 +242,7 @@ $graph:
         unsupported protocol, access denied, or other issue) it must signal an
         error.
 
-        If the `location' field is not provided, the `listing` field must be
+        If the `location` field is not provided, the `listing` field must be
         provided.  The implementation must assign a unique identifier for
         the `location` field.
 
@@ -691,7 +692,7 @@ $graph:
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."
     - name: cwlVersion
-      type: CWLVersions?
+      type: CWLVersion?
       doc: |
         CWL document version. Always required at the document root. Not
         required for a Process embedded inside another Process.

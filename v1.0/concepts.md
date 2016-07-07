@@ -205,7 +205,7 @@ requirements, or a requirement is listed which is not recognized by the
 implementation, it is a fatal error and the implementation must not attempt
 to run the process, unless overridden at user option.
 
-A **hint** is similar to a requirement, however it is not an error if an
+A **hint** is similar to a requirement; however, it is not an error if an
 implementation cannot satisfy all hints.  The implementation may report a
 warning if a hint cannot be satisfied.
 
@@ -233,12 +233,13 @@ field permitting the pseudo-type `Expression`, as specified by this document.
 Conforming implementations must support parameter references.  Parameter
 references use the following subset of
 [Javascript/ECMAScript 5.1](http://www.ecma-international.org/ecma-262/5.1/)
-syntax but they are designed to not require a Javascript engine for evaluation.
+syntax, but they are designed to not require a Javascript engine for evaluation.
 
-In the following BNF grammar, character classes and grammar rules are denoted
+In the following BNF grammar, character classes, and grammar rules are denoted
 in '{}', '-' denotes exclusion from a character class, '(())' denotes grouping,
 '|' denotes alternates, trailing '*' denotes zero or more repeats, '+' denote
-one or more repeats, all other characters are literal values.
+one or more repeats, '/' escapes these special characters, and all other
+characters are literal values.
 
 <p>
 <table class="table">
@@ -253,12 +254,12 @@ one or more repeats, all other characters are literal values.
 
 Use the following algorithm to resolve a parameter reference:
 
-  1. Match the leading symbol as key
+  1. Match the leading symbol as the key
   2. Look up the key in the parameter context (described below) to get the current value.
      It is an error if the key is not found in the parameter context.
   3. If there are no subsequent segments, terminate and return current value
   4. Else, match the next segment
-  5. Extract the symbol, string, or index from the segment as key
+  5. Extract the symbol, string, or index from the segment as the key
   6. Look up the key in current value and assign as new current value.  If
      the key is a symbol or string, the current value must be an object.
      If the key is an index, the current value must be an array or string.
@@ -323,10 +324,11 @@ fragment wrapped in the `$(...)` syntax must be evaluated as a
 code fragment wrapped in the `${...}` syntax must be evaluated as a
 [EMACScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
 for an anonymous, zero-argument function.  Expressions must return a valid JSON
-data type: one of null, string, number, boolean, array, object.
-Implementations must permit any syntactically valid Javascript and account
-for nesting of parenthesis or braces and that strings that may contain
-parenthesis or braces when scanning for expressions.
+data type: one of null, string, number, boolean, array, object. Other return
+values must result in a `permanentFailure`. Implementations must permit any
+syntactically valid Javascript and account for nesting of parenthesis or braces
+and that strings that may contain parenthesis or braces when scanning for
+expressions.
 
 The runtime must include any code defined in the ["expressionLib" field of
 InlineJavascriptRequirement](#InlineJavascriptRequirement) prior to
@@ -357,24 +359,6 @@ with running untrusted code embedded in a CWL document.
 
 Exceptions thrown from an exception must result in a `permanentFailure` of the
 process.
-
-## Success and failure
-
-A completed process must result in one of `success`, `temporaryFailure` or
-`permanentFailure` states.  An implementation may choose to retry a process
-execution which resulted in `temporaryFailure`.  An implementation may
-choose to either continue running other steps of a workflow, or terminate
-immediately upon `permanentFailure`.
-
-* If any step of a workflow execution results in `permanentFailure`, then the
-workflow status is `permanentFailure`.
-
-* If one or more steps result in `temporaryFailure` and all other steps
-complete `success` or are not executed, then the workflow status is
-`temporaryFailure`.
-
-* If all workflow steps are executed and complete with `success`, then the workflow
-status is `success`.
 
 ## Executing CWL documents as scripts
 
