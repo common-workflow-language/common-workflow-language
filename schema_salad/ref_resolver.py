@@ -621,7 +621,7 @@ class Loader(object):
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
-    def fetch(self, url, inject_ids=True):  # type: (unicode) -> Any
+    def fetch(self, url, inject_ids=True):  # type: (unicode, bool) -> Any
         if url in self.idx:
             return self.idx[url]
         try:
