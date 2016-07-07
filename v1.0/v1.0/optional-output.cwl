@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: "v1.0.dev4"
+cwlVersion: "v1.0"
 doc: "Print the contents of a file to stdout using 'cat' running in a docker container."
 hints:
   DockerRequirement:

@@ -2,7 +2,7 @@
 # Simplest example command line program wrapper for the Unix tool "rev".
 #
 class: CommandLineTool
-cwlVersion: v1.0.dev4
+cwlVersion: v1.0
 doc: "Reverse each line using the `rev` command"
 
 # The "inputs" array defines the structure of the input object that describes
