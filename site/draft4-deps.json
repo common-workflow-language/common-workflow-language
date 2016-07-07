@@ -5,7 +5,7 @@
                 {
                     "basename": "concepts.md",
                     "class": "File",
-                    "location": "../draft-4/concepts.md"
+                    "location": "../v1.0/concepts.md"
                 },
                 {
                     "basename": "salad",
@@ -25,7 +25,7 @@
                                         {
                                             "basename": "metaschema_base.yml",
                                             "class": "File",
-                                            "location": "../draft-4/salad/schema_salad/metaschema/metaschema_base.yml"
+                                            "location": "../v1.0/salad/schema_salad/metaschema/metaschema_base.yml"
                                         }
                                     ]
                                 }
@@ -36,55 +36,55 @@
             ],
             "basename": "Process.yml",
             "class": "File",
-            "location": "../draft-4/Process.yml"
+            "location": "../v1.0/Process.yml"
         },
         {
             "secondaryFiles": [
                 {
                     "basename": "contrib.md",
                     "class": "File",
-                    "location": "../draft-4/contrib.md"
+                    "location": "../v1.0/contrib.md"
                 },
                 {
                     "basename": "concepts.md",
                     "class": "File",
-                    "location": "../draft-4/concepts.md"
+                    "location": "../v1.0/concepts.md"
                 },
                 {
                     "basename": "invocation.md",
                     "class": "File",
-                    "location": "../draft-4/invocation.md"
+                    "location": "../v1.0/invocation.md"
                 },
                 {
                     "basename": "intro.md",
                     "class": "File",
-                    "location": "../draft-4/intro.md"
+                    "location": "../v1.0/intro.md"
                 }
             ],
             "basename": "CommandLineTool.yml",
             "class": "File",
-            "location": "../draft-4/CommandLineTool.yml"
+            "location": "../v1.0/CommandLineTool.yml"
         },
         {
             "secondaryFiles": [
                 {
                     "basename": "contrib.md",
                     "class": "File",
-                    "location": "../draft-4/contrib.md"
+                    "location": "../v1.0/contrib.md"
                 },
                 {
                     "basename": "concepts.md",
                     "class": "File",
-                    "location": "../draft-4/concepts.md"
+                    "location": "../v1.0/concepts.md"
                 },
                 {
                     "basename": "intro.md",
                     "class": "File",
-                    "location": "../draft-4/intro.md"
+                    "location": "../v1.0/intro.md"
                 }
             ],
             "basename": "Workflow.yml",
             "class": "File",
-            "location": "../draft-4/Workflow.yml"
+            "location": "../v1.0/Workflow.yml"
         }
     ]
