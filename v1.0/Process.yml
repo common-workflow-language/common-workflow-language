@@ -77,7 +77,7 @@ $graph:
         remote resource (due to unsupported protocol, access denied, or other
         issue) it must signal an error.
 
-        If the `location' field is not provided, the `contents` field must be
+        If the `location` field is not provided, the `contents` field must be
         provided.  The implementation must assign a unique identifier for
         the `location` field.
 
@@ -165,7 +165,7 @@ $graph:
         "sha1$ + hexadecimal string" using the SHA-1 algorithm.
     - name: size
       type: long?
-      doc: Optional file size.
+      doc: Optional file size
     - name: "secondaryFiles"
       type:
         - "null"
@@ -217,7 +217,7 @@ $graph:
 
 - name: Directory
   type: record
-  docParent: "#CWLType"
+  docAfter: "#File"
   doc: |
     Represents a directory to present to a command line tool.
   fields:
