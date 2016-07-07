@@ -225,7 +225,7 @@ $graph:
       doc: |
         Evaluate an expression to generate the output value.  If `glob` was
         specified, the value of `self` must be an array containing file objects
-        that were matched.  If no files were matched, `self' must be a zero
+        that were matched.  If no files were matched, `self` must be a zero
         length array; if a single file was matched, the value of `self` is an
         array of a single element.  Additionally, if `loadContents` is `true`,
         the File objects must include up to the first 64 KiB of file contents
