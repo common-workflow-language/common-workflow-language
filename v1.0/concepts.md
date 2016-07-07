@@ -1,4 +1,4 @@
-## References to Other Specifications
+## References to other specifications
 
 **Javascript Object Notation (JSON)**: http://json.org
 

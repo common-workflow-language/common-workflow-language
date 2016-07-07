@@ -49,8 +49,8 @@ $graph:
           to execution.
         * Shortcuts for specifying the standard [output](#stdout) and/or
           [error](#stderr) streams as a (streamable) File output.
-        * SoftwareRequirement: a lightweight method of describing software
-          dependencies
+        * [SoftwareRequirement](#SoftwareRequirement) for describing software
+          dependencies of a tool.
 
       ## Purpose
 
