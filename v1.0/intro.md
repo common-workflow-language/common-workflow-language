@@ -1,4 +1,4 @@
-# Status of this socument
+# Status of this document
 
 This document is the product of the [Common Workflow Language working
 group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
