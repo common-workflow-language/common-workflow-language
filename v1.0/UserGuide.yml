@@ -313,7 +313,7 @@
       Create your input files and invoke `cwl-runner` with the tool wrapper and the input object on the
       command line:
       ```
-      $ rm hello.tar || true && touch goodbye.txt && tar -cvf hello.tar
+      $ rm hello.tar || true && touch goodbye.txt && tar -cvf hello.tar goodbye.txt
       $ cwl-runner tar-param.cwl tar-param-job.yml
       [job 139868145165200] $ tar xf /home/example/hello.tar goodbye.txt
       Final process status is success
