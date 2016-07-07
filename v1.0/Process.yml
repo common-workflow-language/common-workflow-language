@@ -44,7 +44,7 @@ $graph:
     - cwl:File
     - cwl:Directory
   doc:
-    - "Extends primitive types with the concept of a file as a first class type."
+    - "Extends primitive types with the concept of a file and directory as a builtin type."
     - "File: A File object"
     - "Directory: A Directory object"
 
@@ -77,7 +77,7 @@ $graph:
         remote resource (due to unsupported protocol, access denied, or other
         issue) it must signal an error.
 
-        If the `location' field is not provided, the `contents` field must be
+        If the `location` field is not provided, the `contents` field must be
         provided.  The implementation must assign a unique identifier for
         the `location` field.
 
@@ -165,7 +165,7 @@ $graph:
         "sha1$ + hexadecimal string" using the SHA-1 algorithm.
     - name: size
       type: long?
-      doc: Optional file size.
+      doc: Optional file size
     - name: "secondaryFiles"
       type:
         - "null"
@@ -186,7 +186,7 @@ $graph:
         _type: "@id"
         identity: true
       doc: |
-        The format of the file.  This must be a IRI of a concept node that
+        The format of the file: this must be an IRI of a concept node that
         represents the file format, preferrably defined within an ontology.
         If no ontology is available, file formats may be tested by exact match.
 
@@ -217,7 +217,7 @@ $graph:
 
 - name: Directory
   type: record
-  docParent: "#CWLType"
+  docAfter: "#File"
   doc: |
     Represents a directory to present to a command line tool.
   fields:
@@ -362,7 +362,7 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        For input parameters, this must be one or more IRIs of a concept nodes
+        For input parameters, this must be one or more IRIs of concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
@@ -391,8 +391,8 @@ $graph:
 - type: enum
   name: Expression
   doc: |
-    Not a real type.  Indicates that a field must allow runtime parameter
-    references.  If [InlineJavascriptRequirement](#InlineJavascriptRequirement)
+    'Expression' is not a real type.  It indicates that a field must allow
+    runtime parameter references.  If [InlineJavascriptRequirement](#InlineJavascriptRequirement)
     is declared and supported by the platform, the field must also allow
     Javascript expressions.
   symbols:
