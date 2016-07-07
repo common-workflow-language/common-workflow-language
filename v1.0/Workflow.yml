@@ -399,7 +399,7 @@ $graph:
       type: string?
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this process object."
-    - name: description
+    - name: doc
       type: string?
       jsonldPredicate: "rdfs:comment"
       doc: "A long, human-readable description of this process object."

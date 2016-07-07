@@ -322,7 +322,7 @@ $graph:
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this parameter object."
 
-    - name: description
+    - name: doc
       type:
         - "null"
         - string
@@ -685,7 +685,7 @@ $graph:
         - string
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this process object."
-    - name: description
+    - name: doc
       type:
         - "null"
         - string
