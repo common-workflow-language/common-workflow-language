@@ -2,7 +2,7 @@
 
 This document is the product of the [Common Workflow Language working
 group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
-latest version of this document is available in the "draft-4" directory at
+latest version of this document is available in the "v1.0" directory at
 
 https://github.com/common-workflow-language/common-workflow-language
 

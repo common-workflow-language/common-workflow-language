@@ -9,10 +9,10 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Command Line Tool Description, draft 4
+      # Common Workflow Language (CWL) Command Line Tool Description, v1.0
 
       This version:
-        * https://w3id.org/cwl/draft-4/
+        * https://w3id.org/cwl/v1.0/
 
       Current version:
         * https://w3id.org/cwl/
@@ -36,9 +36,9 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to draft 4
+      ## Introduction to v1.0
 
-      This specification represents the fourth milestone of the CWL group.
+      This specification represents the first full release from the CWL group.
       Since draft-3, this draft introduces the following changes and additions:
 
         * The [Directory](#Directory) type.
