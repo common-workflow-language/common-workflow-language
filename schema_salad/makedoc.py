@@ -214,7 +214,7 @@ class RenderType(object):
                 self.render_type(f, 1)
 
     def typefmt(self, tp, redirects, nbsp=False, jsonldPredicate=None):
-        # type: (Any, Dict[str, str], bool) -> Union[str, unicode]
+        # type: (Any, Dict[str, str], bool, Dict[str, str]) -> Union[str, unicode]
         global primitiveType
         if isinstance(tp, list):
             if nbsp and len(tp) <= 3:
