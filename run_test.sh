@@ -66,10 +66,12 @@ runtest() {
     (cd $DRAFT
      ${COVERAGE} -m cwltool.cwltest --tool "$1" \
 	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
-	     ${TEST_L} ${ONLY_TOOLS} --basedir ${DRAFT}
+	     ${TEST_L} ${ONLY_TOOLS} --basedir ${DRAFT} --junit-xml ../xml_results/${DRAFT}_test_results.xml
     )
     checkexit
 }
+
+mkdir -p xml_results
 
 if [[ $PLATFORM == "Linux" ]]; then
     runtest "$(readlink -f $runner)"
