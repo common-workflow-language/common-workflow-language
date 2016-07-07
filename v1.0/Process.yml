@@ -379,6 +379,13 @@ $graph:
         indicate whether it is valid to stream file contents using a named
         pipe.  Default: `false`.
 
+    - name: doc
+      type:
+        - string?
+        - string[]?
+      doc: "A documentation string for this type, or an array of strings which should be concatenated."
+      jsonldPredicate: "rdfs:comment"
+
 
 - type: enum
   name: Expression

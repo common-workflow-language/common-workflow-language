@@ -1,7 +1,7 @@
 # Example command line program wrapper for the Unix tool "sort"
 # demonstrating command line flags.
 class: CommandLineTool
-description: "Sort lines using the `sort` command"
+doc: "Sort lines using the `sort` command"
 cwlVersion: v1.0.dev4
 
 # This example is similar to the previous one, with an additional input
