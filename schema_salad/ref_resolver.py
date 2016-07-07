@@ -297,9 +297,7 @@ class Loader(object):
         if not isinstance(ref, (str, unicode)):
             raise ValueError(u"Must be string: `%s`" % str(ref))
 
-        print ref, base_url
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
-        print url
 
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
