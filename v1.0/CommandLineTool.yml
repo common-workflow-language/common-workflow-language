@@ -42,8 +42,7 @@ $graph:
       Since draft-3, this draft introduces the following changes and additions:
 
         * The [Directory](#Directory) type.
-        * "id: name" is now just "name"; "class: Classname" is now just
-          "Classname".
+        * "id: name" is now "name"; "class: Classname" is now "Classname".
         * [InitialWorkDirRequirement](#InitialWorkDirRequirement): list of
           files and subdirectories to be present in the output directory prior
           to execution.
@@ -60,12 +59,12 @@ $graph:
       languages and execute concurrently on multiple hosts.  However, POSIX
       does not dictate computer-readable grammar or semantics for program input
       and output, resulting in extremely heterogeneous command line grammar and
-      input/output semantics among program.  This a particular problem in
+      input/output semantics among program.  This is a particular problem in
       distributed computing (multi-node compute clusters) and virtualized
       environments (such as Docker containers) where it is often necessary to
       provision resources such as input files before executing the program.
 
-      Often this is gap is filled by hard coding program invocation and
+      Often this gap is filled by hard coding program invocation and
       implicitly assuming requirements will be met, or abstracting program
       invocation with wrapper scripts or descriptor documents.  Unfortunately,
       where these approaches are application or platform specific it creates a
@@ -203,8 +202,8 @@ $graph:
           items: string
       doc: |
         Find files relative to the output directory, using POSIX glob(3)
-        pathname matching.  If provided an array, find files that match any
-        pattern in the array.  If provided an expression, the expression must
+        pathname matching.  If an array is provided, find files that match any
+        pattern in the array.  If an expression is provided, the expression must
         return a string or an array of strings, which will then be evaluated as
         one or more glob patterns.  Must only match and return files which
         actually exist.
@@ -554,14 +553,14 @@ $graph:
       type: int[]?
       doc: |
         Exit codes that indicate the process failed due to a possibly
-        temporary condition, where excuting the process with the same
+        temporary condition, where executing the process with the same
         runtime environment and inputs may produce different results.
 
     - name: permanentFailCodes
       type: int[]?
       doc:
         Exit codes that indicate the process failed due to a permanent logic
-        error, where excuting the process with the same runtime environment and
+        error, where executing the process with the same runtime environment and
         same inputs is expected to always fail.
 
 
@@ -574,7 +573,7 @@ $graph:
     the image.
 
     If a CommandLineTool lists `DockerRequirement` under
-    `hints` or `requirements`, it may (or must) be run in the specified Docker
+    `hints` (or `requirements`), it may (or must) be run in the specified Docker
     container.
 
     The platform must first acquire or install the correct Docker image as
@@ -639,7 +638,7 @@ $graph:
   extends: ProcessRequirement
   doc: |
     A list of software packages that should be configured in the environment of
-    the defined process.
+    the defined proce ss.
   fields:
     - name: class
       type: string

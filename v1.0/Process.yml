@@ -186,7 +186,7 @@ $graph:
         _type: "@id"
         identity: true
       doc: |
-        The format of the file.  This must be a IRI of a concept node that
+        The format of the file: this must be an IRI of a concept node that
         represents the file format, preferrably defined within an ontology.
         If no ontology is available, file formats may be tested by exact match.
 
@@ -362,7 +362,7 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        For input parameters, this must be one or more IRIs of a concept nodes
+        For input parameters, this must be one or more IRIs of concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
@@ -391,8 +391,8 @@ $graph:
 - type: enum
   name: Expression
   doc: |
-    Not a real type.  Indicates that a field must allow runtime parameter
-    references.  If [InlineJavascriptRequirement](#InlineJavascriptRequirement)
+    'Expression' is not a real type.  It indicates that a field must allow
+    runtime parameter references.  If [InlineJavascriptRequirement](#InlineJavascriptRequirement)
     is declared and supported by the platform, the field must also allow
     Javascript expressions.
   symbols:

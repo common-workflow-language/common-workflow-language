@@ -66,8 +66,7 @@ the workflow platform immediately after the tool terminates.
 For compatibility, files may be written to the **system temporary directory**
 which must be located at `/tmp`.  Because the system temporary directory may be
 shared with other processes on the system, files placed in the system temporary
-directory are not guaranteed to be deleted automatically.  Correct tools must
-clean up temporary files written to the system temporary directory.  A tool
+directory are not guaranteed to be deleted automatically.  A tool
 must not use the system temporary directory as a backchannel communication with
 other tools.  It is valid for the system temporary directory to be the same as
 the designated temporary directory.
@@ -79,7 +78,6 @@ specified or at user option.
 
   * `HOME` must be set to the designated output directory.
   * `TMPDIR` must be set to the designated temporary directory.
-    when the tool invocation and output collection is complete.
   * `PATH` may be inherited from the parent process, except when run in a
     container that provides its own `PATH`.
   * Variables defined by [EnvVarRequirement](#EnvVarRequirement)

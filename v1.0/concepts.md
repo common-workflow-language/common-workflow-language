@@ -28,7 +28,7 @@ serve as a reference for the behavior of conforming implementations.
 The terminology used to describe CWL documents is defined in the
 Concepts section of the specification. The terms defined in the
 following list are used in building those definitions and in describing the
-actions of an CWL implementation:
+actions of a CWL implementation:
 
 **may**: Conforming CWL documents and CWL implementations are permitted but
 not required to behave as described.
@@ -68,16 +68,16 @@ A **process** is a basic unit of computation which accepts input data,
 performs some computation, and produces output data. Examples include
 CommandLineTools, Workflows, and ExpressionTools.
 
-An **input object** is an object describing the inputs to a invocation of
-process.
+An **input object** is an object describing the inputs to an invocation of
+a process.
 
-An **output object** is an object describing the output of an invocation of a
-process.
+An **output object** is an object describing the output resulting from an
+invocation of a process.
 
 An **input schema** describes the valid format (required fields, data types)
 for an input object.
 
-An **output schema** describes the valid format for a output object.
+An **output schema** describes the valid format for an output object.
 
 **Metadata** is information about workflows, tools, or input items.
 
@@ -87,7 +87,7 @@ CWL documents must consist of an object or array of objects represented using
 JSON or YAML syntax.  Upon loading, a CWL implementation must apply the
 preprocessing steps described in the
 [Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html).
-A implementation may formally validate the structure of a CWL document using
+An implementation may formally validate the structure of a CWL document using
 SALAD schemas located at
 https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-4
 
@@ -112,7 +112,7 @@ Another transformation defined in Schema salad is simplification of data type de
 Type `<T>` ending with `?` should be transformed to `[<T>, "null"]`.
 Type `<T>` ending with `[]` should be transformed to `{"type": "array", "items": <T>}`
 
-## Extensions and Metadata
+## Extensions and metadata
 
 Input metadata (for example, a lab sample identifier) may be represented within
 a tool or workflow using input parameters which are explicitly propagated to
@@ -138,13 +138,13 @@ associated datatype or schema.  During execution, values are assigned to
 parameters to make the input object or output object used for concrete
 process invocation.
 
-A **command line tool** is a process characterized by the execution of a
+A **CommandLineTool** is a process characterized by the execution of a
 standalone, non-interactive program which is invoked on some input,
 produces output, and then terminates.
 
 A **workflow** is a process characterized by multiple subprocess steps,
-where step outputs are connected to the inputs of other downstream steps to
-form a directed graph, and independent steps may run concurrently.
+where step outputs are connected to the inputs of downstream steps to
+form a directed acylic graph, and independent steps may run concurrently.
 
 A **runtime environment** is the actual hardware and software environment when
 executing a command line tool.  It includes, but is not limited to, the
@@ -168,14 +168,14 @@ not covered by this specification.  Some areas that are currently out of
 scope for CWL specification but may be handled by a specific workflow
 platform include:
 
-* Data security and permissions.
+* Data security and permissions
 * Scheduling tool invocations on remote cluster or cloud compute nodes.
 * Using virtual machines or operating system containers to manage the runtime
 (except as described in [DockerRequirement](CommandLineTool.html#DockerRequirement)).
 * Using remote or distributed file systems to manage input and output files.
 * Transforming file paths.
-* Determining if a process has previously been executed, skipping it and
-reusing previous results.
+* Determining if a process has previously been executed, and if so skipping it
+and reusing previous results.
 * Pausing, resuming or checkpointing processes or workflows.
 
 Conforming CWL processes must not assume anything about the runtime
@@ -190,7 +190,7 @@ command line line tools) is as follows.
 1. Load, process and validate a CWL document, yielding a process object.
 2. Load input object.
 3. Validate the input object against the `inputs` schema for the process.
-4. Validate that process requirements are met.
+4. Validate process requirements are met.
 5. Perform any further setup required by the specific process type.
 6. Execute the process.
 7. Capture results of process execution into the output object.
@@ -288,16 +288,16 @@ characters around a parameter reference, the effective value of the field
 becomes the value of the referenced parameter, preserving the return type.
 
 If the value of a field has non-whitespace leading or trailing characters
-around an parameter reference, it is subject to string interpolation.  The
-effective value of the field is a string containing the leading characters;
-followed by the string value of the parameter reference; followed by the
+around a parameter reference, it is subject to string interpolation.  The
+effective value of the field is a string containing the leading characters,
+followed by the string value of the parameter reference, followed by the
 trailing characters.  The string value of the parameter reference is its
 textual JSON representation with the following rules:
 
   * Leading and trailing quotes are stripped from strings
   * Objects entries are sorted by key
 
-Multiple parameter references may appear in a single field.  This case is
+Multiple parameter references may appear in a single field.  This case
 must be treated as a string interpolation.  After interpolating the first
 parameter reference, interpolation must be recursively applied to the
 trailing characters to yield the final string value.
@@ -305,8 +305,8 @@ trailing characters to yield the final string value.
 ## Expressions
 
 An expression is a fragment of [Javascript/ECMAScript
-5.1](http://www.ecma-international.org/ecma-262/5.1/) code which is
-evaluated by the workflow platform to affect the inputs, outputs, or
+5.1](http://www.ecma-international.org/ecma-262/5.1/) code evaluated by the
+workflow platform to affect the inputs, outputs, or
 behavior of a process.  In the generic execution sequence, expressions may
 be evaluated during step 5 (process setup), step 6 (execute process),
 and/or step 7 (capture output).  Expressions are distinct from regular
@@ -370,7 +370,7 @@ platform's CWL implementation.
 
 A CWL input object document may similarly begin with `#!/usr/bin/env
 cwl-runner` and be marked as executable.  In this case, the input object
-must include the field `cwl:tool` supplying a IRI to the default CWL
+must include the field `cwl:tool` supplying an IRI to the default CWL
 document that should be executed using the fields of the input object as
 input parameters.
 
