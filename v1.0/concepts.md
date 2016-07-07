@@ -276,7 +276,7 @@ be provided:
     a contextual value of 'self' is not documented for a field, it
     must be 'null'.
   * `runtime`: An object containing configuration details.  Specific to the
-    process type.  An implementation may provide may provide
+    process type.  An implementation may provide
     opaque strings for any or all fields of `runtime`.  These must be
     filled in by the platform after processing the Tool but before actual
     execution.  Parameter references and expressions may only use the
