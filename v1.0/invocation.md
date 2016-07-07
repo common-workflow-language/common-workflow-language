@@ -111,6 +111,10 @@ not perform computation on the contents.
   * `runtime.outdirSize`: reserved storage space available in the designated output directory
   * `runtime.tmpdirSize`: reserved storage space available in the designated temporary directory
 
+For `cores`, `ram`, `outdirSize` and `tmpdirSize`, if an implementation can't
+provide the actual number of reserved cores during the expression evaluation time,
+it should report back the minimal requested amount.
+
 See [ResourceRequirement](#ResourceRequirement) for details on how to
 describe the hardware resources required by a tool.
 

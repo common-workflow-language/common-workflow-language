@@ -281,7 +281,7 @@ be provided:
     filled in by the platform after processing the Tool but before actual
     execution.  Parameter references and expressions may only use the
     literal string value of the field and must not perform computation on
-    the contents.
+    the contents, except where noted otherwise.
 
 If the value of a field has no leading or trailing non-whitespace
 characters around a parameter reference, the effective value of the field
