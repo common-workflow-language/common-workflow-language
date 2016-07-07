@@ -16,7 +16,7 @@ Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
 
 ## CWL User Guide
 
-[User guide for the current stable specification (draft-3)](http://www.commonwl.org/draft-3/UserGuide.html),
+[User guide for the current stable specification (v1.0)](http://www.commonwl.org/v1.0/UserGuide.html),
 provides a gentle introduction to writing CWL command line tool and workflow descriptions.
 
 ## CWL Specification
