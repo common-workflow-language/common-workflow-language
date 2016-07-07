@@ -1,0 +1,20 @@
+{
+  "id": "http://example.com/base",
+  "form": {
+    "id": "http://example.com/base#one",
+    "things": [
+      {
+        "id": "http://example.com/base#one/two"
+      },
+      {
+        "id": "http://example.com/base#three"
+      },
+      {
+        "id": "http://example.com/four#five",
+      },
+      {
+        "id": "http://example.com/acid#six",
+      }
+    ]
+  }
+}

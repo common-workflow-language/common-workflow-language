@@ -1,0 +1,55 @@
+- |
+  ## Link resolution
+
+  The schema may designate one or more fields as link fields reference other
+  objects.  Processing must resolve links to either absolute URIs using the
+  following rules:
+
+  * If a reference URI is prefixed with `#` it is a relative
+  fragment identifier.  It is resolved relative to the base URI by setting
+  or replacing the fragment portion of the base URI.
+
+  * If a reference URI does not contain a scheme and is not prefixed with `#`
+  it is a path relative reference.  If the reference URI contains `#` in any
+  position other than the first character, the reference URI must be divided
+  into a path portion and a fragment portion split on the first instance of
+  `#`.  The path portion is resolved relative to the base URI by the following
+  rule: if the path portion of the base URI ends in a slash `/`, append the
+  path portion of the reference URI to the path portion of the base URI.  If
+  the path portion of the base URI does not end in a slash, replace the final
+  path segment with the path portion of the reference URI.  Replace the
+  fragment portion of the base URI with the fragment portion of the reference
+  URI.
+
+  * If a reference URI begins with a namespace prefix declared in `$namespaces`
+  followed by a colon `:`, the prefix and colon must be replaced by the
+  namespace declared in `$namespaces`.
+
+  * If a reference URI is an absolute URI consisting of a scheme and path,
+  no processing occurs.
+
+  Link resolution must not affect the base URI used to resolve identifiers
+  and other links.
+
+  ### Link resolution example
+
+  Given the following schema:
+
+  ```
+- $include: link_res_schema.yml
+- |
+  ```
+
+  Process the following example:
+
+  ```
+- $include: link_res_src.yml
+- |
+  ```
+
+  This becomes:
+
+  ```
+- $include: link_res_proc.yml
+- |
+  ```

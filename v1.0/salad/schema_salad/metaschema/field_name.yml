@@ -1,0 +1,46 @@
+- |
+  ## Field name resolution
+
+  The document schema declares the vocabulary of known field names.  During
+  preprocessing traversal, field name in the document which are not part of
+  the schema vocabulary must be resolved to absolute URIs.  Under "strict"
+  validation, it is an error for a document to include fields which are not
+  part of the vocabulary and not resolvable to absolute URIs.  Fields names
+  which are not part of the vocabulary are resolved using the following
+  rules:
+
+  * If an field name URI begins with a namespace prefix declared in the
+  document context (`@context`) followed by a colon `:`, the prefix and
+  colon must be replaced by the namespace declared in `@context`.
+
+  * If there is a vocabulary term which maps to the URI of a resolved
+  field, the field name must be replace with the vocabulary term.
+
+  * If a field name URI is an absolute URI consisting of a scheme and path
+  and is not part of the vocabulary, no processing occurs.
+
+  Field name resolution is not relative.  It must not be affected by the
+  base URI.
+
+  ### Field name resolution example
+
+  Given the following schema:
+
+  ```
+- $include: field_name_schema.yml
+- |
+  ```
+
+  Process the following example:
+
+  ```
+- $include: field_name_src.yml
+- |
+  ```
+
+  This becomes:
+
+  ```
+- $include: field_name_proc.yml
+- |
+  ```
