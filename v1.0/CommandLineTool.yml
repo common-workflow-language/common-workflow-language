@@ -669,7 +669,7 @@ $graph:
         "_id": "@type"
         "_type": "@vocab"
     - name: packages
-      type: SoftwarePackage?
+      type: SoftwarePackage[]
       doc: "The list of software to be configured."
       jsonldPredicate:
         mapSubject: name
