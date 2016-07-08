@@ -672,13 +672,13 @@ $graph:
       type: SoftwarePackage[]
       doc: "The list of software to be configured."
       jsonldPredicate:
-        mapSubject: name
+        mapSubject: package
         mapPredicate: specs
 
 - name: SoftwarePackage
   type: record
   fields:
-    - name: name
+    - name: package
       type: string
       doc: "The common name of the software to be configured."
       jsonldPredicate: "@id"
