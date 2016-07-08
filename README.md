@@ -29,7 +29,7 @@ Older drafts: [draft-1](https://github.com/common-workflow-language/common-workf
 
 ### Citation
 
-Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v1
+Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 
 ## Implementations
 
