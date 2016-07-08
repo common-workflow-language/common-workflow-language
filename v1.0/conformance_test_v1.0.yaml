@@ -791,13 +791,11 @@
   doc: Test file literal as input
 
 - job: examples/arguments-job.yml
-  output: {
-    "classfile": {
-        "checksum": "sha1$2f7ac33c1f3aac3f1fec7b936b6562422c85b38a",
-        "location": "Hello.class",
-        "class": "File",
-        "size": 416
-    }
-  }
+  output:
+    classfile:
+        checksum: sha1$e68df795c0686e9aa1a1195536bd900f5f417b18
+        location: Hello.class
+        class: File
+        size: 184
   tool: examples/linkfile.cwl
   doc: The expression in InitialWorkDir listing
