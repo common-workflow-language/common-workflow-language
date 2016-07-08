@@ -357,7 +357,7 @@ class RenderType(object):
                     "<td>%s</td>" % (
                         rfrg, self.typefmt(tp, self.redirects,
                                            jsonldPredicate=i.get("jsonldPredicate")),
-                        "Optional" if opt else "Required",
+                        opt,
                         mistune.markdown(desc))
                 if opt:
                     required.append(tr)
