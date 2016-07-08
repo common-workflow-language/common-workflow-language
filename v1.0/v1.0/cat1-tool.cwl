@@ -6,7 +6,8 @@ hints:
   DockerRequirement:
     dockerPull: debian:wheezy
   SoftwareRequirement:
-    name: cat
+    packages:
+     - name: cat
 inputs:
   file1:
     type: File
