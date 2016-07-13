@@ -9,7 +9,6 @@ outputs:
     type: File
     outputBinding:
       glob: output.txt
-baseCommand: []
 arguments: ["cd", "$(inputs.inf.dirname)",
   {shellQuote: false, valueFrom: "&&"},
   "find", ".",

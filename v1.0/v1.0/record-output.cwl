@@ -30,7 +30,6 @@ outputs:
         type: File
         outputBinding:
           glob: bar
-baseCommand: []
 arguments:
   - {valueFrom: "cat", position: 1}
   - {valueFrom: "> foo", position: 3, shellQuote: false}
