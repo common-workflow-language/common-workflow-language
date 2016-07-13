@@ -798,4 +798,14 @@
         class: File
         size: 184
   tool: examples/linkfile.cwl
-  doc: The expression in InitialWorkDir listing
+  doc: Test expression in InitialWorkDir listing
+
+- job: v1.0/wc-job.json
+  output:
+    b:
+        checksum: sha1$c4cfd130e7578714e3eef91c1d6d90e0e0b9db3e
+        location: whale.xtx
+        class: File
+        size: 21
+  tool: v1.0/nameroot.cwl
+  doc: Test nameroot/nameext expression in arguments, stdout
