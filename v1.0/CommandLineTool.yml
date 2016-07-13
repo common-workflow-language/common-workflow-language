@@ -73,6 +73,12 @@ $graph:
         * [SoftwareRequirement](#SoftwareRequirement) for describing software
           dependencies of a tool.
 
+      ## Errata
+
+      Post v1.0 release changes to the spec.
+
+        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+
       ## Purpose
 
       Standalone programs are a flexible and interoperable form of code reuse.
@@ -510,18 +516,24 @@ $graph:
       type: string
     - name: baseCommand
       doc: |
-        Specifies the program to execute.  If the value is an array, the first
-        element is the program to execute, and subsequent elements are placed
-        at the beginning of the command line in prior to any command line
-        bindings.  If the program includes a path separator character it must
+        Specifies the program to execute.  If an array, the first element of
+        the array is the command to execute, and subsequent elements are
+        mandatory command line arguments.  The elements in `baseCommand` must
+        appear before any command line bindings from `inputBinding` or
+        `arguments`.
+
+        If `baseCommand` is not provided or is an empty array, the first
+        element of the command line produced after processing `inputBinding` or
+        `arguments` must be used as the program to execute.
+
+        If the program includes a path separator character it must
         be an absolute path, otherwise it is an error.  If the program does not
         include a path separator, search the `$PATH` variable in the runtime
         environment of the workflow runner find the absolute path of the
         executable.
       type:
-        - string
-        - type: array
-          items: string
+        - string?
+        - string[]?
       jsonldPredicate:
         "_id": "cwl:baseCommand"
         "_container": "@list"
