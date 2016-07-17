@@ -771,9 +771,9 @@
 - job: v1.0/stagefile-job.yml
   output: {
     "outfile": {
-        "checksum": "sha1$2d6c5e4430c4b200227cc77d3b0025082505ee19",
-        "size": 1107,
-        "location": "whale.txt",
+        "checksum": "sha1$b769c7b2e316edd4b5eb2d24799b2c1f9d8c86e6",
+        "size": 1111,
+        "location": "bob.txt",
         "class": "File"
     }
   }
