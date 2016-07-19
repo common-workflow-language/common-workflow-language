@@ -38,7 +38,7 @@ $graph:
       This specification represents the first full release from the CWL group.
       Since draft-3, this draft introduces the following changes and additions:
 
-        * The 'inputs' and 'outputs' fields have been renamed 'in' and 'out'.
+        * The `inputs` and `outputs` fields have been renamed `in` and `out`.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: `in`
           contains a list of items, each with an id. Now one can specify
           a mapping of that identifier to the corresponding
@@ -62,6 +62,7 @@ $graph:
             type: int
             doc: Second input parameter
           ```
+        * The common field 'description` has been renamed to `doc`.
 
       ## Purpose
 
