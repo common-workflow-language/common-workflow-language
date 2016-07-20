@@ -2,8 +2,9 @@ class: CommandLineTool
 cwlVersion: v1.0
 requirements:
   - class: ShellCommandRequirement
-  - class: DockerRequirement
-    dockerPull: debian:wheezy
+hints:
+  DockerRequirement:
+    dockerPull: "debian:wheezy"
 
 inputs: []
 

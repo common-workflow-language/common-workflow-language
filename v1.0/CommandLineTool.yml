@@ -72,6 +72,7 @@ $graph:
           [error](#stderr) streams as a (streamable) File output.
         * [SoftwareRequirement](#SoftwareRequirement) for describing software
           dependencies of a tool.
+        * The common `description` field has been renamed to `doc`.
 
       ## Errata
 

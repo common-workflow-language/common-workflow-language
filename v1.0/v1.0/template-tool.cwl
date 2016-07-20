@@ -2,8 +2,6 @@
 cwlVersion: v1.0
 class: CommandLineTool
 requirements:
-  - class: DockerRequirement
-    dockerPull: "debian:8"
   - class: InlineJavascriptRequirement
     expressionLib:
       - { $include: underscore.js }
@@ -12,6 +10,9 @@ requirements:
     listing:
       - entryname: foo.txt
         entry: $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
+hints:
+  DockerRequirement:
+    dockerPull: "debian:8"
 inputs:
   - id: file1
     type: File
