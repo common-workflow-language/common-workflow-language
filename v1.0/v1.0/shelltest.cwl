@@ -12,7 +12,6 @@ outputs:
     outputBinding:
       glob: output.txt
 
-baseCommand: []
 arguments:
   - rev
   - {valueFrom: $(inputs.input)}

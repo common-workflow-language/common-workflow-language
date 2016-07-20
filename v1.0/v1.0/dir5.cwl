@@ -11,7 +11,6 @@ outputs:
     type: File
     outputBinding:
       glob: output.txt
-baseCommand: []
 arguments: ["find", ".",
   {shellQuote: false, valueFrom: "|"},
   "sort"]

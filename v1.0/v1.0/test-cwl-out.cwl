@@ -12,7 +12,6 @@ outputs:
   - id: foo
     type: File
 
-baseCommand: []
 arguments:
    - valueFrom: >
        echo foo > foo && echo '{"foo": {"path": "$(runtime.outdir)/foo", "class": "File"} }' > cwl.output.json
