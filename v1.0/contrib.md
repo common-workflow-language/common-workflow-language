@@ -5,7 +5,7 @@ Authors:
   project
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
-Contributers:
+Contributors:
 
 * Brad Chapman <bchapman@hsph.harvard.edu>, Harvard Chan School of Public Health
 * John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
