@@ -7,9 +7,9 @@ portability of data analysis workflows.  Our goal is to create specifications
 that enable data scientists to describe analysis tools and workflows that are
 powerful, easy to use, portable, and support reproducibility.
 
-CWL builds on technologies such as [JSON-LD](http://json-ld.org) and
-[Avro](https://avro.apache.org/) for data modeling and
-[Docker](http://docker.com) for portable runtime environments.
+CWL builds on technologies such as [JSON-LD](http://json-ld.org)
+for data modeling and [Docker](http://docker.com) for portable runtime\
+environments.
 
 CWL is designed to express workflows for data-intensive science, such as
 Bioinformatics, Medical Imaging, Chemistry, Physics, and Astronomy.
@@ -64,6 +64,15 @@ https://ci.commonwl.org
 
 [Github repository of example tools and workflows.](https://github.com/common-workflow-language/workflows)
 
+## Support
+
+The best place to ask a question about all things CWL is on
+[Biostars](https://www.biostars.org/t/cwl/).
+
+[![Biostars
+CWL](https://www.biostars.org/static/biostar2.logo.png)](https://www.biostars.org/t/cwl/)
+</a>
+
 ## Development and testing
 
 [The CWL project is on Github.](https://github.com/common-workflow-language/common-workflow-language)
@@ -91,7 +100,7 @@ and send a pull request!
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Your CWL Community Engineer, Michael R. Crusoe, publishes a blog about his work
-with weekly updates at http://mrc.commonwl.org.
+with updates at http://mrc.commonwl.org.
 
 ### Code of Conduct
 
