@@ -8,7 +8,7 @@ that enable data scientists to describe analysis tools and workflows that are
 powerful, easy to use, portable, and support reproducibility.
 
 CWL builds on technologies such as [JSON-LD](http://json-ld.org)
-dor data modeling and [Docker](http://docker.com) for portable runtime\
+for data modeling and [Docker](http://docker.com) for portable runtime\
 environments.
 
 CWL is designed to express workflows for data-intensive science, such as
