@@ -35,18 +35,6 @@ inputs:
    inputBinding:
     position: 2
 
- conformance-test:
-   type: boolean?
-   doc: ???
-   inputBinding:
-    prefix: "--conformance-test"
-
- basedir:
-   type: string?
-   doc: ???
-   inputBinding:
-    prefix: "--basedir"
-
  no-container:
    type: boolean?
    doc: |
@@ -71,8 +59,4 @@ inputs:
 
 baseCommand: cwl-runner
 
-stdout: output-object.json
-
-outputs:
-  output-object:
-    type: stdout	
+stdout: cwl.output.json  # The CWL output document
