@@ -151,6 +151,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall <joshua.randall@sanger.ac.uk>
+* Janko Simonović <janko.simonovic@sbgenomics.com>
 * Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
