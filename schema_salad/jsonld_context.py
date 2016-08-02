@@ -189,10 +189,10 @@ def fix_jsonld_ids(obj, ids):
             fix_jsonld_ids(entry, ids)
 
 def makerdf(workflow, wf, ctx, graph=None):
-    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType) -> Graph
+    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType, Graph) -> Graph
     prefixes = {}
     idfields = []
-    for k,v in ctx.iteritems():
+    for k, v in ctx.iteritems():
         if isinstance(v, dict):
             url = v["@id"]
         else:
@@ -220,10 +220,10 @@ def makerdf(workflow, wf, ctx, graph=None):
         g.parse(data=json.dumps(wf), format='json-ld', location=workflow)
 
     # Bug in json-ld loader causes @id fields to be added to the graph
-    for s,p,o in g.triples((None, URIRef("@id"), None)):
+    for s, p, o in g.triples((None, URIRef("@id"), None)):
         g.remove((s, p, o))
 
-    for k2,v2 in prefixes.iteritems():
+    for k2, v2 in prefixes.iteritems():
         g.namespace_manager.bind(k2, v2)
 
     return g
