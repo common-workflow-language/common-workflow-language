@@ -314,15 +314,6 @@ $graph:
       jsonldPredicate: "rdfs:label"
       doc: "A short, human-readable label of this object."
 
-
-- name: Parameter
-  type: record
-  extends: SchemaBase
-  abstract: true
-  doc: |
-    Define an input or output parameter to a process.
-
-  fields:
     - name: secondaryFiles
       type:
         - "null"
@@ -380,6 +371,15 @@ $graph:
         indicate whether it is valid to stream file contents using a named
         pipe.  Default: `false`.
 
+
+- name: Parameter
+  type: record
+  extends: SchemaBase
+  abstract: true
+  doc: |
+    Define an input or output parameter to a process.
+
+  fields:
     - name: doc
       type:
         - string?
