@@ -188,11 +188,11 @@ def fix_jsonld_ids(obj, ids):
         for entry in obj:
             fix_jsonld_ids(entry, ids)
 
-def makerdf(workflow, wf, ctx):
-    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType) -> Graph
+def makerdf(workflow, wf, ctx, graph=None):
+    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType, Graph) -> Graph
     prefixes = {}
     idfields = []
-    for k,v in ctx.iteritems():
+    for k, v in ctx.iteritems():
         if isinstance(v, dict):
             url = v["@id"]
         else:
@@ -201,26 +201,29 @@ def makerdf(workflow, wf, ctx):
             idfields.append(k)
         doc_url, frg = urlparse.urldefrag(url)
         if "/" in frg:
-            p, _ = frg.split("/")
+            p = frg.split("/")[0]
             prefixes[p] = u"%s#%s/" % (doc_url, p)
-
-    if isinstance(wf, list):
-        wf = {
-            "@context": ctx,
-            "@graph": wf
-        }
-    else:
-        wf["@context"] = ctx
 
     fix_jsonld_ids(wf, idfields)
 
-    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
+    if graph is None:
+        g = Graph()
+    else:
+        g = graph
+
+    if isinstance(wf, list):
+        for w in wf:
+            w["@context"] = ctx
+            g.parse(data=json.dumps(w), format='json-ld', location=workflow)
+    else:
+        wf["@context"] = ctx
+        g.parse(data=json.dumps(wf), format='json-ld', location=workflow)
 
     # Bug in json-ld loader causes @id fields to be added to the graph
-    for s,p,o in g.triples((None, URIRef("@id"), None)):
-        g.remove((s, p, o))
+    for sub, pred, obj in g.triples((None, URIRef("@id"), None)):
+        g.remove((sub, pred, obj))
 
-    for k2,v2 in prefixes.iteritems():
+    for k2, v2 in prefixes.iteritems():
         g.namespace_manager.bind(k2, v2)
 
     return g
