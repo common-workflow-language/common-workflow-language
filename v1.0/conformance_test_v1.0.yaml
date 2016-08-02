@@ -713,7 +713,7 @@
         "class": "File"
     }
   tool: v1.0/dir.cwl
-  doc: Test directory input
+  doc: Test directory input with parameter reference
 
 - job: v1.0/dir-job.yml
   output:
@@ -809,3 +809,14 @@
         size: 21
   tool: v1.0/nameroot.cwl
   doc: Test nameroot/nameext expression in arguments, stdout
+
+- job: v1.0/dir-job.yml
+  output:
+    "outlist": {
+        "size": 20,
+        "location": "output.txt",
+        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+        "class": "File"
+    }
+  tool: v1.0/dir6.cwl
+  doc: Test directory input with inputBinding
