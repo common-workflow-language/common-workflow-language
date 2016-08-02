@@ -220,8 +220,8 @@ def makerdf(workflow, wf, ctx, graph=None):
         g.parse(data=json.dumps(wf), format='json-ld', location=workflow)
 
     # Bug in json-ld loader causes @id fields to be added to the graph
-    for s, p, o in g.triples((None, URIRef("@id"), None)):
-        g.remove((s, p, o))
+    for sub, pred, obj in g.triples((None, URIRef("@id"), None)):
+        g.remove((sub, pred, obj))
 
     for k2, v2 in prefixes.iteritems():
         g.namespace_manager.bind(k2, v2)
