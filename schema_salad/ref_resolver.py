@@ -553,7 +553,7 @@ class Loader(object):
                     document[key], _ = loader.resolve_all(
                         val, base_url, file_base=file_base, checklinks=False)
             except validate.ValidationException as v:
-                _logger.warn("loader is %s", id(loader), exc_info=v)
+                _logger.warn("loader is %s", id(loader), exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
                     id(loader), file_base, key, validate.indent(str(v))))
 
@@ -577,7 +577,7 @@ class Loader(object):
                             val, base_url, file_base=file_base, checklinks=False)
                         i += 1
             except validate.ValidationException as v:
-                _logger.warn("failed", exc_info=v)
+                _logger.warn("failed", exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
                     id(loader), file_base, i, validate.indent(str(v))))
 

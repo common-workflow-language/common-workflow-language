@@ -2,6 +2,7 @@ from __future__ import print_function
 import argparse
 import logging
 import sys
+import traceback
 import pkg_resources  # part of setuptools
 from . import schema
 from . import jsonld_context
@@ -103,7 +104,7 @@ def main(argsl=None):  # type: (List[str]) -> int
             schema_raw_doc, schema_uri)
     except (validate.ValidationException) as e:
         _logger.error("Schema `%s` failed link checking:\n%s",
-                      args.schema, e, exc_info=(e if args.debug else False))
+                args.schema, e, exc_info=(True if args.debug else False))
         _logger.debug("Index is %s", metaschema_loader.idx.keys())
         _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
         return 1
@@ -148,7 +149,8 @@ def main(argsl=None):  # type: (List[str]) -> int
 
     if isinstance(avsc_names, Exception):
         _logger.error("Schema `%s` error:\n%s", args.schema,
-                      avsc_names, exc_info=(avsc_names if args.debug else False))
+                avsc_names, exc_info=((type(avsc_names), avsc_names,
+                    None) if args.debug else None))
         if args.print_avro:
             print(json.dumps(avsc_obj, indent=4))
         return 1
