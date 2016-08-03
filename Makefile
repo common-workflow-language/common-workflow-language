@@ -173,7 +173,7 @@ mypy: ${PYSOURCES}
 	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls schema_salad
 
 jenkins:
-	if ! test -d env ; then virtualenv env ; fi
+	rm -Rf env && virtualenv env
 	. env/bin/activate ; \
 	pip install -U setuptools pip wheel ; \
 	${MAKE} install-dep coverage.html coverage.xml pep257_report.txt \
