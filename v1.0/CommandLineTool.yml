@@ -363,6 +363,7 @@ $graph:
       specializeTo: CommandOutputArraySchema
     - specializeFrom: OutputBinding
       specializeTo: CommandOutputBinding
+  fields:
     - name: secondaryFiles
       type:
         - "null"
