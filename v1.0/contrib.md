@@ -10,6 +10,7 @@ Contributors:
 * Brad Chapman <bchapman@hsph.harvard.edu>, Harvard Chan School of Public Health
 * John Chilton <jmchilton@gmail.com>, Galaxy Project, Pennsylvania State University
 * Michael Heuer <heuermh@berkeley.edu,>,UC Berkeley AMPLab
+* Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>, Seven Bridges Genomics
 * Andrey Kartashov <Andrey.Kartashov@cchmc.org>, Cincinnati Children's Hospital
 * Dan Leehr <dan.leehr@duke.edu>, Duke University
 * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
