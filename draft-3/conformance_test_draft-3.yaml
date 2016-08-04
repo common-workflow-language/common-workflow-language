@@ -276,23 +276,33 @@
         "secondaryFiles": [
             {
                 "path": "input.txt.idx1",
-                "class": "File"
+                "class": "File",
+                "checksum": "sha1$553f3a09003a9f69623f03bec13c0b078d706023",
+                "size": 1500
             },
             {
                 "path": "input.idx2",
-                "class": "File"
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
             },
             {
                 "path": "input.txt.idx3",
-                "class": "File"
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
             },
             {
                 "path": "input.txt.idx4",
-                "class": "File"
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
             },
             {
                 "path": "input.txt.idx5",
-                "class": "File"
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
             }
         ],
         "size": 1111
