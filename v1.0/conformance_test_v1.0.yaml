@@ -834,3 +834,13 @@
     }
   tool: v1.0/dir6.cwl
   doc: Test directory input with inputBinding
+
+- job: v1.0/nested-array-job.yml
+  output:
+    echo:
+        checksum: sha1$3f786850e387550fdab836ed7e6dc881de23001b
+        location: echo.txt
+        class: File
+        size: 2
+  tool: v1.0/nested-array.cwl
+  doc: Test command line generation of array-of-arrays
