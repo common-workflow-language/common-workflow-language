@@ -9,10 +9,10 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Command Line Tool Description, v1.0
+      # Common Workflow Language (CWL) Command Line Tool Description, v1.1
 
       This version:
-        * https://w3id.org/cwl/v1.0/
+        * https://w3id.org/cwl/v1.1/
 
       Current version:
         * https://w3id.org/cwl/
@@ -36,9 +36,9 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to v1.0.1
+      ## Introduction to v1.1
 
-      Version 1.0.1 introduces the following changes and additions:
+      Version 1.1 introduces the following changes and additions:
 
        * Copy the `secondaryFiles`, `format` and `streamable` properites to
          `InputArraySchema`, and `OutputArraySchema` which flow to

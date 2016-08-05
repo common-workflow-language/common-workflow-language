@@ -9,10 +9,10 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Workflow Description, v1.0
+      # Common Workflow Language (CWL) Workflow Description, v1.0.1
 
       This version:
-        * https://w3id.org/cwl/v1.0/
+        * https://w3id.org/cwl/v1.0.1/
 
       Current version:
         * https://w3id.org/cwl/
