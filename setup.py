@@ -17,6 +17,9 @@ try:
 except ImportError:
     tagger = egg_info_cmd.egg_info
 
+needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+pytest_runner = ['pytest-runner'] if needs_pytest else []
+
 if os.path.exists("requirements.txt"):
     requirements = [
         r for r in open("requirements.txt").read().split("\n") if ";" not in r]
@@ -49,12 +52,14 @@ setup(name='schema-salad',
       url="https://github.com/common-workflow-language/common-workflow-language",
       download_url="https://github.com/common-workflow-language/common-workflow-language",
       license='Apache 2.0',
-      packages=["schema_salad"],
+      setup_requires=[] + pytest_runner,
+      packages=["schema_salad", "schema_salad.tests"],
       package_data={'schema_salad': ['metaschema/*']},
+      include_package_data=True,
       install_requires=install_requires,
       extras_require=extras_require,
       test_suite='tests',
-      tests_require=[],
+      tests_require=['pytest'],
       entry_points={
           'console_scripts': ["schema-salad-tool=schema_salad.main:main"]
       },

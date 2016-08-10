@@ -6,7 +6,7 @@ $namespaces:
 
 $graph:
 
-- $import: "../schema_salad/metaschema/metaschema_base.yml"
+- $import: "../metaschema/metaschema_base.yml"
 
 - name: InputBinding
   type: record
