@@ -3,6 +3,7 @@ import schema_salad.ref_resolver
 import schema_salad.main
 import schema_salad.schema
 from schema_salad.jsonld_context import makerdf
+from pkg_resources import Requirement, resource_filename, ResolutionError  # type: ignore
 import rdflib
 import ruamel.yaml as yaml
 import json
@@ -11,7 +12,19 @@ import os
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from ruamel.yaml import SafeLoader
+    from ruamel.yaml import SafeLoader  # type: ignore
+
+
+def get_data(filename):
+    filepath = None
+    try:
+        filepath = resource_filename(
+            Requirement.parse("schema-salad"), filename)
+    except ResolutionError:
+        pass
+    if not filepath or not os.path.isfile(filepath):
+        filepath = os.path.join(os.path.dirname(__file__), os.pardir, filename)
+    return filepath
 
 
 class TestSchemas(unittest.TestCase):
@@ -19,13 +32,13 @@ class TestSchemas(unittest.TestCase):
         l = schema_salad.ref_resolver.Loader({})
 
         ra, _ = l.resolve_all({
-            u"$schemas": [u"tests/EDAM.owl"],
+            u"$schemas": [get_data("tests/EDAM.owl")],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u"edam:has_format": u"edam:format_1915"
         }, "")
 
         self.assertEqual({
-            u"$schemas": [u"tests/EDAM.owl"],
+            u"$schemas": [get_data("tests/EDAM.owl")],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u'http://edamontology.org/has_format': u'http://edamontology.org/format_1915'
         }, ra)
@@ -50,12 +63,15 @@ class TestSchemas(unittest.TestCase):
     #     })
 
     def test_self_validate(self):
-        self.assertEqual(0, schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml"]))
-        self.assertEqual(0, schema_salad.main.main(argsl=["schema_salad/metaschema/metaschema.yml",
-                                     "schema_salad/metaschema/metaschema.yml"]))
+        self.assertEqual(0, schema_salad.main.main(
+            argsl=[get_data("metaschema/metaschema.yml")]))
+        self.assertEqual(0, schema_salad.main.main(
+            argsl=[get_data("metaschema/metaschema.yml"),
+                   get_data("metaschema/metaschema.yml")]))
 
     def test_avro_regression(self):
-        self.assertEqual(0, schema_salad.main.main(argsl=["tests/Process.yml"]))
+        self.assertEqual(0, schema_salad.main.main(
+            argsl=[get_data("tests/Process.yml")]))
 
     def test_jsonld_ctx(self):
         ldr, _, _, _ = schema_salad.schema.load_schema({
@@ -75,8 +91,6 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual(ra, {
             'http://example.com/foo#bar': 'asym'
         })
-
-    maxDiff = None
 
     def test_idmap(self):
         ldr = schema_salad.ref_resolver.Loader({})
@@ -107,7 +121,8 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual("http://example2.com/#stuff", ra["id"])
         for item in ra["inputs"]:
             if item["a"] == 2:
-                self.assertEquals('http://example2.com/#stuff/zing', item["id"])
+                self.assertEquals(
+                    'http://example2.com/#stuff/zing', item["id"])
             else:
                 self.assertEquals('http://example2.com/#stuff/zip', item["id"])
         self.assertEquals(['http://example2.com/#stuff/out'], ra['outputs'])
@@ -183,46 +198,44 @@ class TestSchemas(unittest.TestCase):
                 'id': 'http://example2.com/#inp2',
                 'type': 'string'
             }],
-             'outputs': [{
-                'id': 'http://example2.com/#out',
-                 'type': 'string',
-                 'source': 'http://example2.com/#step2/out'
-             }],
-            'steps': [{
+                'outputs': [{
+                    'id': 'http://example2.com/#out',
+                    'type': 'string',
+                    'source': 'http://example2.com/#step2/out'
+                }],
+                'steps': [{
                     'id': 'http://example2.com/#step1',
                     'scatter': 'http://example2.com/#step1/inp',
                     'in': [{
-                            'id': 'http://example2.com/#step1/inp',
-                            'source': 'http://example2.com/#inp'
+                        'id': 'http://example2.com/#step1/inp',
+                        'source': 'http://example2.com/#inp'
                     }, {
-                            'id': 'http://example2.com/#step1/inp2',
-                            'source': 'http://example2.com/#inp2'
+                        'id': 'http://example2.com/#step1/inp2',
+                        'source': 'http://example2.com/#inp2'
                     }, {
-                            'id': 'http://example2.com/#step1/inp3',
-                            'source': ['http://example2.com/#inp', 'http://example2.com/#inp2']
+                        'id': 'http://example2.com/#step1/inp3',
+                        'source': ['http://example2.com/#inp', 'http://example2.com/#inp2']
                     }],
                     "out": ["http://example2.com/#step1/out"],
-            }, {
+                }, {
                     'id': 'http://example2.com/#step2',
                     'scatter': 'http://example2.com/#step2/inp',
                     'in': [{
-                            'id': 'http://example2.com/#step2/inp',
-                            'source': 'http://example2.com/#step1/out'
+                        'id': 'http://example2.com/#step2/inp',
+                        'source': 'http://example2.com/#step1/out'
                     }],
                     "out": ["http://example2.com/#step2/out"],
                 }]
-        }, ra)
-
+            }, ra)
 
     def test_examples(self):
-        self.maxDiff = None
         for a in ["field_name", "ident_res", "link_res", "vocab_res"]:
             ldr, _, _, _ = schema_salad.schema.load_schema(
-                "schema_salad/metaschema/%s_schema.yml" % a)
-            with open("schema_salad/metaschema/%s_src.yml" % a) as src_fp:
+                get_data("metaschema/%s_schema.yml" % a))
+            with open(get_data("metaschema/%s_src.yml" % a)) as src_fp:
                 src = ldr.resolve_all(
                     yaml.load(src_fp, Loader=SafeLoader), "", checklinks=False)[0]
-            with open("schema_salad/metaschema/%s_proc.yml" % a) as src_proc:
+            with open(get_data("metaschema/%s_proc.yml" % a)) as src_proc:
                 proc = yaml.load(src_proc, Loader=SafeLoader)
             self.assertEqual(proc, src)
 
@@ -251,7 +264,8 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual({'type': {'items': 'File', 'type': 'array'}}, ra)
 
         ra, _ = ldr.resolve_all({"type": "File[]?"}, "")
-        self.assertEqual({'type': ['null', {'items': 'File', 'type': 'array'}]}, ra)
+        self.assertEqual(
+            {'type': ['null', {'items': 'File', 'type': 'array'}]}, ra)
 
     def test_scoped_id(self):
         ldr = schema_salad.ref_resolver.Loader({})
@@ -275,7 +289,7 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual({'id': 'http://example.com/#foo',
                           'bar': {
                               'id': 'http://example.com/#foo/baz'},
-                      }, ra)
+                          }, ra)
 
         g = makerdf(None, ra, ctx)
         print(g.serialize(format="n3"))
@@ -289,7 +303,7 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual({'location': 'http://example.com/foo',
                           'bar': {
                               'location': 'http://example.com/baz'},
-                      }, ra)
+                          }, ra)
 
         g = makerdf(None, ra, ctx)
         print(g.serialize(format="n3"))
@@ -303,7 +317,7 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual({'id': 'http://example.com/#foo',
                           'bar': {
                               'location': 'http://example.com/baz'},
-                      }, ra)
+                          }, ra)
 
         g = makerdf(None, ra, ctx)
         print(g.serialize(format="n3"))
@@ -317,37 +331,36 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual({'location': 'http://example.com/foo',
                           'bar': {
                               'id': 'http://example.com/#baz'},
-                      }, ra)
+                          }, ra)
 
         g = makerdf(None, ra, ctx)
         print(g.serialize(format="n3"))
 
-
     def test_mixin(self):
         ldr = schema_salad.ref_resolver.Loader({})
-        ra = ldr.resolve_ref({"$mixin": "mixin.yml", "one": "five"},
-                             base_url="file://"+os.getcwd()+"/tests/")
+        ra = ldr.resolve_ref({"$mixin": get_data("tests/mixin.yml"), "one": "five"},
+                             base_url="file://" + os.getcwd() + "/tests/")
         self.assertEqual({'id': 'four', 'one': 'five'}, ra[0])
 
         ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
-        base_url="file://"+os.getcwd()+"/tests/"
+        base_url = "file://" + os.getcwd() + "/tests/"
         ra = ldr.resolve_all([{
             "id": "a",
-            "m": {"$mixin": "mixin.yml"}
+            "m": {"$mixin": get_data("tests/mixin.yml")}
         }, {
             "id": "b",
-            "m": {"$mixin": "mixin.yml"}
+            "m": {"$mixin": get_data("tests/mixin.yml")}
         }], base_url=base_url)
         self.assertEqual([{
-            'id': base_url+'#a',
+            'id': base_url + '#a',
             'm': {
-                'id': base_url+u'#a/four',
+                'id': base_url + u'#a/four',
                 'one': 'two'
             },
         }, {
-            'id': base_url+'#b',
+            'id': base_url + '#b',
             'm': {
-                'id': base_url+u'#b/four',
+                'id': base_url + u'#b/four',
                 'one': 'two'}
         }], ra[0])
 

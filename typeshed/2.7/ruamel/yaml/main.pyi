@@ -4,9 +4,10 @@
 
 from typing import Any, AnyStr, BinaryIO, IO, List, Tuple, Union
 from ruamel.yaml.loader import *
+import StringIO
 
 VersionType = Union[List[int], str, Tuple[int, int]] 
-StreamType = Union[BinaryIO, IO[str]]
+StreamType = Union[BinaryIO, IO[str], StringIO.StringIO]
 
 def load(stream: StreamType,
          Loader: Any =...,
