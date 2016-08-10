@@ -168,8 +168,14 @@ class Loader(object):
         for sch in aslist(ns):
             for fmt in ['xml', 'turtle', 'rdfa']:
                 try:
-                    self.graph.parse(urlparse.urljoin(base_url, sch),
-                                     format=fmt)
+                    fetchurl = urlparse.urljoin(base_url, sch)
+                    if fetchurl not in self.cache:
+                        _logger.info("Getting external schema %s", fetchurl)
+                        cachekey = hashlib.md5(fetchurl).hexdigest()
+                        if os.path.join(os.environ["HOME"], ".settings
+                        self.cache[fetchurl] = rdflib.graph.Graph()
+                        self.cache[fetchurl].parse(fetchurl, format=fmt)
+                    self.graph += self.cache[fetchurl]
                     break
                 except xml.sax.SAXParseException:  # type: ignore
                     pass
