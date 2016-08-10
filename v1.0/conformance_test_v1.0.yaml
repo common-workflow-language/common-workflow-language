@@ -856,3 +856,14 @@
   output: {}
   tool: v1.0/envvar2.cwl
   doc: Test $HOME and $TMPDIR are set correctly in Docker
+
+- job: v1.0/empty.json
+  output:
+    "out": {
+        "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a",
+        "location": "whatever.txt",
+        "class": "File",
+        "size": 2
+    }
+  tool: "v1.0/js-expr-req-wf.cwl#wf"
+  doc: Test that expressionLib requirement of individual tool step overrides expressionLib of workflow.
