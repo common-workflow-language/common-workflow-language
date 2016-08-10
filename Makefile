@@ -26,7 +26,7 @@ MODULE=schema_salad
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
 PYSOURCES=$(wildcard ${MODULE}/**.py tests/*.py) setup.py
-DEVPKGS=pep8 diff_cover autopep8 pylint coverage pep257
+DEVPKGS=pep8 diff_cover autopep8 pylint coverage pep257 pytest
 
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
@@ -46,7 +46,7 @@ install-dependencies:
 
 ## install     : install the ${MODULE} module and schema-salad-tool
 install: FORCE
-	./setup.py build install
+	pip install .
 
 ## dist        : create a module package for distribution
 dist: dist/${MODULE}-$(VERSION).tar.gz
