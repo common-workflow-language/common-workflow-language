@@ -46,6 +46,8 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
             v = {}
             for k, val in field["jsonldPredicate"].items():
                 v[("@" + k[1:] if k.startswith("_") else k)] = val
+            if "@id" not in v:
+                v["@id"] = vee
         else:
             v = field["jsonldPredicate"]
     elif "jsonldPredicate" in datatype:
