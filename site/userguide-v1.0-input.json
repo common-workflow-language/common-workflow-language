@@ -46,6 +46,11 @@
                     "location": "../v1.0/examples/record-job2.yml"
                 }, 
                 {
+                    "basename": "record-job3.yml", 
+                    "class": "File", 
+                    "location": "../v1.0/examples/record-job3.yml"
+                }, 
+                {
                     "basename": "echo-job.yml", 
                     "class": "File", 
                     "location": "../v1.0/examples/echo-job.yml"
