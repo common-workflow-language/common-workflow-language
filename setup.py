@@ -33,7 +33,9 @@ install_requires = [
     'rdflib >= 4.1.0',
     'rdflib-jsonld >= 0.3.0',
     'mistune',
-    'typing']
+    'typing',
+    'CacheControl',
+    'lockfile']
 
 install_requires.append("avro")  # TODO: remove me once cwltool is
 # available in Debian Stable, Ubuntu 12.04 LTS
