@@ -15,7 +15,7 @@ from .aslist import aslist
 from .flatten import flatten
 
 import requests
-from cachecontrol import CacheControl
+from cachecontrol.wrapper import CacheControl
 from cachecontrol.caches import FileCache
 import ruamel.yaml as yaml
 
@@ -80,7 +80,7 @@ class Loader(object):
 
     def __init__(self, ctx, schemagraph=None, foreign_properties=None,
                  idx=None, cache=None, session=None):
-        # type: (Loader.ContextType, rdflib.Graph, Set[unicode], Dict[unicode, Union[List, Dict[unicode, Any], unicode]], Dict[unicode, Any]) -> None
+        # type: (Loader.ContextType, rdflib.Graph, Set[unicode], Dict[unicode, Union[List, Dict[unicode, Any], unicode]], Dict[unicode, Any], requests.sessions.Session) -> None
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
@@ -103,6 +103,7 @@ class Loader(object):
         else:
             self.cache = {}
 
+        self.session = None  # type: requests.sessions.Session
         if session is not None:
             self.session = session
         else:
