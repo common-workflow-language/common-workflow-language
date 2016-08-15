@@ -62,7 +62,7 @@ $graph:
             type: int
             doc: Second input parameter
           ```
-        * The common field 'description` has been renamed to `doc`.
+        * The common field `description` has been renamed to `doc`.
 
       ## Purpose
 
