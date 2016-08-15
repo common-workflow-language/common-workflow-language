@@ -32,13 +32,13 @@ class TestSchemas(unittest.TestCase):
         l = schema_salad.ref_resolver.Loader({})
 
         ra, _ = l.resolve_all({
-            u"$schemas": [get_data("tests/EDAM.owl")],
+            u"$schemas": ["file://" + get_data("tests/EDAM.owl")],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u"edam:has_format": u"edam:format_1915"
         }, "")
 
         self.assertEqual({
-            u"$schemas": [get_data("tests/EDAM.owl")],
+            u"$schemas": ["file://" + get_data("tests/EDAM.owl")],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u'http://edamontology.org/has_format': u'http://edamontology.org/format_1915'
         }, ra)

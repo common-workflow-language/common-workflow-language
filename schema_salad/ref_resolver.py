@@ -4,20 +4,26 @@ import json
 import hashlib
 import logging
 import collections
-import requests
 import urlparse
 import re
 import copy
+import pprint
+from StringIO import StringIO
+
+from . import validate
+from .aslist import aslist
+from .flatten import flatten
+
+import requests
+from cachecontrol.wrapper import CacheControl
+from cachecontrol.caches import FileCache
 import ruamel.yaml as yaml
+
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
     from ruamel.yaml import SafeLoader  # type: ignore
-from . import validate
-import pprint
-from StringIO import StringIO
-from .aslist import aslist
-from .flatten import flatten
+
 import rdflib
 from rdflib.namespace import RDF, RDFS, OWL
 from rdflib.plugins.parsers.notation3 import BadSyntax
@@ -64,7 +70,7 @@ def merge_properties(a, b):
 def SubLoader(loader):  # type: (Loader) -> Loader
     return Loader(loader.ctx, schemagraph=loader.graph,
                   foreign_properties=loader.foreign_properties, idx=loader.idx,
-                  cache=loader.cache)
+                  cache=loader.cache, session=loader.session)
 
 
 class Loader(object):
@@ -73,8 +79,8 @@ class Loader(object):
     DocumentType = TypeVar('DocumentType', List, Dict[unicode, Any])
 
     def __init__(self, ctx, schemagraph=None, foreign_properties=None,
-                 idx=None, cache=None):
-        # type: (Loader.ContextType, rdflib.Graph, Set[unicode], Dict[unicode, Union[List, Dict[unicode, Any], unicode]], Dict[unicode, Any]) -> None
+                 idx=None, cache=None, session=None):
+        # type: (Loader.ContextType, rdflib.Graph, Set[unicode], Dict[unicode, Union[List, Dict[unicode, Any], unicode]], Dict[unicode, Any], requests.sessions.Session) -> None
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
@@ -96,6 +102,13 @@ class Loader(object):
             self.cache = cache
         else:
             self.cache = {}
+
+        self.session = None  # type: requests.sessions.Session
+        if session is not None:
+            self.session = session
+        else:
+            self.session = CacheControl(requests.Session(),
+                                        cache=FileCache(os.path.join(os.environ["HOME"], ".cache", "salad")))
 
         self.url_fields = None  # type: Set[unicode]
         self.scoped_ref_fields = None  # type: Dict[unicode, int]
@@ -166,17 +179,22 @@ class Loader(object):
     def add_schemas(self, ns, base_url):
         # type: (Union[List[unicode], unicode], unicode) -> None
         for sch in aslist(ns):
-            for fmt in ['xml', 'turtle', 'rdfa']:
-                try:
-                    self.graph.parse(urlparse.urljoin(base_url, sch),
-                                     format=fmt)
-                    break
-                except xml.sax.SAXParseException:  # type: ignore
-                    pass
-                except TypeError:
-                    pass
-                except BadSyntax:
-                    pass
+            fetchurl = urlparse.urljoin(base_url, sch)
+            if fetchurl not in self.cache:
+                _logger.info("Getting external schema %s", fetchurl)
+                content = self.fetch_text(fetchurl)
+                self.cache[fetchurl] = rdflib.graph.Graph()
+                for fmt in ['xml', 'turtle', 'rdfa']:
+                    try:
+                        self.cache[fetchurl].parse(data=content, format=fmt)
+                        self.graph += self.cache[fetchurl]
+                        break
+                    except xml.sax.SAXParseException:  # type: ignore
+                        pass
+                    except TypeError:
+                        pass
+                    except BadSyntax:
+                        pass
 
         for s, _, _ in self.graph.triples((None, RDF.type, RDF.Property)):
             self._add_properties(s)
@@ -601,9 +619,9 @@ class Loader(object):
         split = urlparse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
-        if scheme in [u'http', u'https'] and requests:
+        if scheme in [u'http', u'https'] and self.session:
             try:
-                resp = requests.get(url)
+                resp = self.session.get(url)
                 resp.raise_for_status()
             except Exception as e:
                 raise RuntimeError(url, e)
