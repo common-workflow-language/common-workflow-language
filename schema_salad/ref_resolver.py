@@ -661,12 +661,21 @@ class Loader(object):
             self.idx[url] = result
         return result
 
-    def check_file(self, fn):  # type: (unicode) -> bool
-        if fn.startswith("file://"):
-            u = urlparse.urlsplit(fn)
-            return os.path.exists(u.path)
+    def check_file(self, url):  # type: (unicode) -> bool
+        split = urlparse.urlsplit(url)
+        scheme, path = split.scheme, split.path
+
+        if scheme in [u'http', u'https'] and self.session:
+            try:
+                resp = self.session.head(url)
+                resp.raise_for_status()
+            except Exception as e:
+                return False
+            return True
+        elif scheme == 'file':
+            return os.path.exists(path)
         else:
-            return False
+            raise ValueError('Unsupported scheme in url: %s' % url)
 
     FieldType = TypeVar('FieldType', unicode, List[unicode], Dict[unicode, Any])
 
