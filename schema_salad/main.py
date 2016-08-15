@@ -188,7 +188,7 @@ def main(argsl=None):  # type: (List[str]) -> int
         document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s",
-                      args.document, e, exc_info=(e if args.debug else False))
+                      args.document, e, exc_info=args.debug)
         return 1
 
     # Optionally print the document after ref resolution

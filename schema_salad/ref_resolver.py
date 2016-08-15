@@ -763,7 +763,7 @@ class Loader(object):
 
         for key, val in iterator:
             try:
-                document[key] = self.validate_links(val, docid)  # type: ignore
+                document[key] = self.validate_links(val, docid)
             except validate.ValidationException as v:
                 if key not in self.nolinkcheck:
                     docid2 = self.getid(val)

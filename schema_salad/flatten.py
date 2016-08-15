@@ -21,4 +21,4 @@ def flatten(l, ltypes=(list, tuple)):
             else:
                 l[i:i + 1] = l[i]
         i += 1
-    return ltype(l)  # type: ignore
+    return ltype(l)

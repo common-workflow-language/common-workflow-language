@@ -5,7 +5,7 @@ os:
 env:
   - TOX_ENV=py27-lint
   - TOX_ENV=py27-unit
-  - TOX_ENV=py34-mypy
+  - TOX_ENV=py35-mypy
 #  - TOX_ENV=py34-lint
 #  - TOX_ENV=py33-lint
 #  - TOX_ENV=py34-unit
