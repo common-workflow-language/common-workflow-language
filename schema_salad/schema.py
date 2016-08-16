@@ -351,8 +351,7 @@ def make_valid_avro(items, alltypes, found, union=False):
         if items in alltypes and avro_name(items) not in found:
             return cast(Dict, make_valid_avro(alltypes[items], alltypes, found,
                         union=union))
-        items = avro_name(items)  # type: ignore
-        # bug in mypy 0.3.1, fixed in 0.4-dev
+        items = avro_name(items)
     return items
 
 

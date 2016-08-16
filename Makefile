@@ -170,7 +170,9 @@ list-author-emails:
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
 mypy: ${PYSOURCES}
-	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls schema_salad
+	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls \
+		 --fast-parser --warn-redundant-casts --warn-unused-ignores \
+		 schema_salad
 
 jenkins:
 	rm -Rf env && virtualenv env
