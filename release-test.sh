@@ -49,7 +49,7 @@ cd ../testenv3/
 source bin/activate
 pip install -U setuptools==3.4.1
 pip install ${package}*tar.gz
-pip install nose
+pip install pytest
 tar xzf ${package}*tar.gz
 cd ${package}*
 make dist
