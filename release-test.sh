@@ -18,7 +18,7 @@ virtualenv testenv4
 
 # First we test the head
 source testenv1/bin/activate
-pip install -U setuptools=20.10.1
+pip install -U setuptools==20.10.1
 make install-dependencies
 make test
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
