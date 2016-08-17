@@ -1,4 +1,4 @@
-include gittaggers.py ez_setup.py Makefile
+include gittaggers.py Makefile
 include schema_salad/tests/*.py schema_salad/tests/*.yml schema_salad/tests/*.owl
 include schema_salad/metaschema/*
 global-exclude *.pyc
