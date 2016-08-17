@@ -20,7 +20,8 @@ virtualenv testenv4
 source testenv1/bin/activate
 pip uninstall -y setuptools \
 	&& rm testenv1/lib/python-wheels/setuptools* \
-        && pip install -U setuptools==20.10.1
+        && pip install -U setuptools==20.10.1 \
+	&& pip install --force-reinstall -U pip==1.5.6
 make install-dependencies
 make test
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
@@ -36,7 +37,8 @@ cd testenv2
 source bin/activate
 pip uninstall -y setuptools \
 	&& rm lib/python-wheels/setuptools* \
-        && pip install -U setuptools==20.10.1
+        && pip install -U setuptools==20.10.1 \
+	&& pip install --force-reinstall -U pip==1.5.6
 pip install -e git+${repo}@${HEAD}#egg=${package}
 cd src/${package}
 make install-dependencies
@@ -54,7 +56,8 @@ cd ../testenv3/
 source bin/activate
 pip uninstall -y setuptools \
 	&& rm lib/python-wheels/setuptools* \
-        && pip install -U setuptools==20.10.1
+        && pip install -U setuptools==20.10.1 \
+	&& pip install --force-reinstall -U pip==1.5.6
 pip install ${package}*tar.gz
 pip install pytest
 tar xzf ${package}*tar.gz
