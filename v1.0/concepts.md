@@ -95,7 +95,7 @@ https://github.com/common-workflow-language/common-workflow-language/tree/master
 
 If an object contains an `id` field, that is used to uniquely identify the
 object in that document.  The value of the `id` field must be unique over the
-entire document.  Identifiers may be resolved relative to other the document
+entire document.  Identifiers may be resolved relative to either the document
 base and/or other identifiers following the rules are described in the
 [Schema Salad specification](SchemaSalad.html#Identifier_resolution).
 
