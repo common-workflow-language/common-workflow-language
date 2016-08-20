@@ -867,3 +867,19 @@
     }
   tool: "v1.0/js-expr-req-wf.cwl#wf"
   doc: Test that expressionLib requirement of individual tool step overrides expressionLib of workflow.
+
+- job: v1.0/initialworkdirrequirement-docker-out-job.json
+  output:
+    OUTPUT:
+      "checksum": "sha1$aeb3d11bdf536511649129f4077d5cda6a324118"
+      "location": "ref.fasta"
+      "secondaryFiles": [{
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": "ref.fasta.fai",
+          "class": "File",
+          "size": 0
+      }]
+      "class": "File"
+      "size": 12010
+  tool: v1.0/initialworkdirrequirement-docker-out.cwl
+  doc: Test output of InitialWorkDir
