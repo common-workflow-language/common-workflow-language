@@ -6,3 +6,5 @@ mistune
 typing>=3.5.2 ; python_version>="2.7"
 avro ; python_version<"3"
 avro-python3 ; python_version>="3"
+CacheControl
+lockfile
