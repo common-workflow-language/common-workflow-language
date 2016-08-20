@@ -5,7 +5,7 @@ import os
 import copy
 import re
 import sys
-import StringIO
+from StringIO import StringIO
 import logging
 import urlparse
 from .aslist import aslist
@@ -153,7 +153,7 @@ class RenderType(object):
 
     def __init__(self, toc, j, renderlist, redirects):
         # type: (ToC, List[Dict], str, Dict) -> None
-        self.typedoc = StringIO.StringIO()
+        self.typedoc = StringIO()
         self.toc = toc
         self.subs = {}  # type: Dict[str, str]
         self.docParent = {}  # type: Dict[str, List]
