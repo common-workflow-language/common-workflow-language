@@ -64,7 +64,7 @@ runtest() {
 
     runs=$((runs+1))
     (cd $DRAFT
-     ${COVERAGE} -m cwltool.cwltest --tool "$1" \
+     cwltest --tool "$1" \
 	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
 	     ${TEST_L} ${ONLY_TOOLS} --basedir ${DRAFT}
     )
