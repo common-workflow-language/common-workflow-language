@@ -659,3 +659,14 @@
   }
   tool: "draft-3/conflict-wf.cwl#collision"
   doc: Test workflow two input files with same name.
+
+- job: draft-3/docker-array-secondaryfiles-job.json
+  output: {
+    "bai_list": {
+      "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "class": "File",
+      "location": "fai.list",
+      "size": 0
+      }
+  }
+  tool: draft-3/docker-array-secondaryfiles.cwl
