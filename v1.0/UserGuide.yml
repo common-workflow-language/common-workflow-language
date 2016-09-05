@@ -676,7 +676,7 @@
       `tmpdirMax`, `outdirMin`, and `outdirMax`.
 
     - |
-      ## Creating files at runtime
+      ## Generating input files on the fly
 
       Sometimes you need to create a file on the fly from input parameters,
       such as tools which expect to read their input configuration from a file
@@ -744,7 +744,13 @@
         }
       }
       ```
-
+# Todo:
+# secondaryFiles
+# Directory
+# ShellCommandRequirement
+# loadContents/outputEval
+# resource requirement
+# exit codes
     - |
       # Writing Workflows
 
@@ -867,3 +873,12 @@
       connecting the input parameter `src` to the output parameter of `untar`
       using `untar/example_out`.  The output of this step `classfile` is
       connected to the `outputs` section for the Workflow, described above.
+# Todo:
+# scatter
+# subworkflows
+# valueFrom
+# default
+# requirements on steps
+# multiple inputs sources / linkMerge
+# SchemaDefRequirement
+# ExpressionTool
