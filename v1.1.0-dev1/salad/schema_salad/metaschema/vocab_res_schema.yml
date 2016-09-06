@@ -1,0 +1,21 @@
+{
+  "$namespaces": {
+    "acid": "http://example.com/acid#"
+  },
+  "$graph": [{
+    "name": "Colors",
+    "type": "enum",
+    "symbols": ["acid:red"]
+  },
+  {
+    "name": "ExampleType",
+    "type": "record",
+    "fields": [{
+      "name": "voc",
+      "type": "string",
+      "jsonldPredicate": {
+        "_type": "@vocab"
+      }
+    }]
+  }]
+}

@@ -1,0 +1,53 @@
+- |
+  ## Identifier resolution
+
+  The schema may designate one or more fields as identifier fields to identify
+  specific objects.  Processing must resolve relative identifiers to absolute
+  identifiers using the following rules:
+
+    * If an identifier URI is prefixed with `#` it is a URI relative
+      fragment identifier.  It is resolved relative to the base URI by setting
+      or replacing the fragment portion of the base URI.
+
+    * If an identifier URI does not contain a scheme and is not prefixed `#` it
+      is a parent relative fragment identifier.  It is resolved relative to the
+      base URI by the following rule: if the base URI does not contain a
+      document fragment, set the fragment portion of the base URI.  If the base
+      URI does contain a document fragment, append a slash `/` followed by the
+      identifier field to the fragment portion of the base URI.
+
+    * If an identifier URI begins with a namespace prefix declared in
+      `$namespaces` followed by a colon `:`, the prefix and colon must be
+      replaced by the namespace declared in `$namespaces`.
+
+    * If an identifier URI is an absolute URI consisting of a scheme and path,
+      no processing occurs.
+
+  When preprocessing visits a node containing an identifier, that identifier
+  must be used as the base URI to process child nodes.
+
+  It is an error for more than one object in a document to have the same
+  absolute URI.
+
+  ### Identifier resolution example
+
+  Given the following schema:
+
+  ```
+- $include: ident_res_schema.yml
+- |
+  ```
+
+  Process the following example:
+
+  ```
+- $include: ident_res_src.yml
+- |
+  ```
+
+  This becomes:
+
+  ```
+- $include: ident_res_proc.yml
+- |
+  ```
