@@ -181,7 +181,7 @@ class Loader(object):
         for sch in aslist(ns):
             fetchurl = urlparse.urljoin(base_url, sch)
             if fetchurl not in self.cache:
-                _logger.info("Getting external schema %s", fetchurl)
+                _logger.debug("Getting external schema %s", fetchurl)
                 content = self.fetch_text(fetchurl)
                 self.cache[fetchurl] = rdflib.graph.Graph()
                 for fmt in ['xml', 'turtle', 'rdfa']:
