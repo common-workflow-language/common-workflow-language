@@ -1,0 +1,10 @@
+requests
+ruamel.yaml==0.12.4
+rdflib>=4.1.
+rdflib-jsonld>=0.3.0
+mistune
+typing>=3.5.2 ; python_version>="2.7"
+avro ; python_version<"3"
+avro-python3 ; python_version>="3"
+CacheControl
+lockfile

@@ -1,0 +1,7 @@
+@prefix gx: <http://galaxyproject.org/formats/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix edam: <http://edamontology.org/> .
+
+gx:fasta a owl:Class .
+gx:fasta owl:equivalentClass edam:format_1929 .

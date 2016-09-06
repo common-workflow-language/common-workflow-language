@@ -1,0 +1,35 @@
+- |
+  ## Vocabulary resolution
+
+    The schema may designate one or more vocabulary fields which use terms
+    defined in the vocabulary.  Processing must resolve vocabulary fields to
+    either vocabulary terms or absolute URIs by first applying the link
+    resolution rules defined above, then applying the following additional
+    rule:
+
+      * If a reference URI is a vocabulary field, and there is a vocabulary
+      term which maps to the resolved URI, the reference must be replace with
+      the vocabulary term.
+
+  ### Vocabulary resolution example
+
+  Given the following schema:
+
+  ```
+- $include: vocab_res_schema.yml
+- |
+  ```
+
+  Process the following example:
+
+  ```
+- $include: vocab_res_src.yml
+- |
+  ```
+
+  This becomes:
+
+  ```
+- $include: vocab_res_proc.yml
+- |
+  ```

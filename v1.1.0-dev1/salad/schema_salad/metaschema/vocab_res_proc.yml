@@ -1,0 +1,15 @@
+    {
+      "form": {
+        "things": [
+          {
+            "voc": "red",
+          },
+          {
+            "voc": "red",
+          },
+          {
+            "voc": "http://example.com/acid#blue",
+          }
+        ]
+      }
+    }
