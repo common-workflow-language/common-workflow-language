@@ -584,6 +584,7 @@ $graph:
         "_container": "@list"
     - name: stdin
       type: ["null", string, Expression]
+      jsonldPredicate: "https://w3id.org/cwl/cwl#stdin"
       doc: |
         A path to a file whose contents must be piped into the command's
         standard input stream.
