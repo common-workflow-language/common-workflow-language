@@ -17,6 +17,7 @@ JUNIT_XML=""
 RUNNER=cwl-runner
 PLATFORM=$(uname -s)
 COVERAGE="python"
+EXTRA=""
 
 while [[ -n "$1" ]]
 do
@@ -70,7 +71,7 @@ runtest() {
     (cd $DRAFT
      cwltest --tool "$1" \
 	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
-	     ${TEST_L} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT}
+	     ${TEST_L} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT} -- ${EXTRA}
     )
     checkexit
 }

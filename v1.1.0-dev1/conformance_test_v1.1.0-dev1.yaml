@@ -117,6 +117,17 @@
   tool: v1.1.0-dev1/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
 
+- job: v1.1.0-dev1/cat-job.json
+  output:
+    output_txt:
+      class: File
+      checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
+      location: output.txt
+      size: 13
+  tool: v1.1.0-dev1/cat4b-tool.cwl
+  doc: Test command execution in Docker with stdin and stdout redirection
+          with stdin shortcut
+
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/null-expression1-tool.cwl
   output:

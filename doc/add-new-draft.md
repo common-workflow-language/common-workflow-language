@@ -11,8 +11,8 @@ How to make a new draft version of the CWL spec
 
 4. In the reference implementation (cwltool): make a new branch, and update the
    subtree checkout of the spec:
-   
-     git subtree merge -P cwltool/schemas/ cwl_repo/v1.1.0-dev1
+  
+     git subtree merge --squash -P cwltool/schemas/ cwl_repo/v1.1.0-dev1
    
    Where `cwl_repo` is the remote repository for the CWL specifications.
 4. In the reference implementation, teach it about the new draft version:
