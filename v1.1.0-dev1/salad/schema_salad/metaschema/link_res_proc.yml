@@ -1,0 +1,21 @@
+{
+  "$base": "http://example.com/base",
+  "link": "http://example.com/base/zero",
+  "form": {
+    "link": "http://example.com/one",
+    "things": [
+      {
+        "link": "http://example.com/two"
+      },
+      {
+        "link": "http://example.com/base#three"
+      },
+      {
+        "link": "http://example.com/four#five",
+      },
+      {
+        "link": "http://example.com/acid#six",
+      }
+    ]
+  }
+}
