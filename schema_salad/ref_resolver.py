@@ -189,7 +189,7 @@ class Loader(object):
                         self.cache[fetchurl].parse(data=content, format=fmt)
                         self.graph += self.cache[fetchurl]
                         break
-                    except xml.sax.SAXParseException:  # type: ignore
+                    except xml.sax.SAXParseException:
                         pass
                     except TypeError:
                         pass
