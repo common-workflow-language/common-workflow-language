@@ -1,9 +1,0 @@
-requests
-ruamel.yaml
-rdflib >= 4.1.
-rdflib-jsonld >= 0.3.0
-mistune
-typing ; python_version>="2.7"
-avro ; python_version<"3"
-avro-python3 ; python_version>="3"
-
