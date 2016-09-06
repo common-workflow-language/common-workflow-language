@@ -170,6 +170,9 @@ list-author-emails:
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
 mypy: ${PYSOURCES}
+	rm -Rf typeshed/2.7/ruamel/yaml
+	ln -s $(shell python -c 'from __future__ import print_function; import ruamel.yaml; import os.path; print(os.path.dirname(ruamel.yaml.__file__))') \
+		typeshed/2.7/ruamel/
 	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls \
 		 --fast-parser --warn-redundant-casts --warn-unused-ignores \
 		 schema_salad
@@ -182,6 +185,8 @@ jenkins:
 		sloccount.sc pep8_report.txt pylint_report.txt
 	if ! test -d env3 ; then virtualenv -p python3 env3 ; fi
 	. env3/bin/activate ; \
-	pip install -U mypy-lang typed-ast; ${MAKE} mypy
+	pip install -U setuptools pip wheel ; \
+	${MAKE} install-dep ; \
+	pip install -U mypy-lang typed-ast ; ${MAKE} mypy
 
 FORCE:

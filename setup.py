@@ -29,11 +29,11 @@ else:
 
 install_requires = [
     'requests',
-    'ruamel.yaml == 0.11.11',
+    'ruamel.yaml == 0.12.4',
     'rdflib >= 4.1.0',
     'rdflib-jsonld >= 0.3.0',
     'mistune',
-    'typing',
+    'typing >= 3.5.2',
     'CacheControl',
     'lockfile']
 
@@ -46,7 +46,7 @@ install_requires.append("avro")  # TODO: remove me once cwltool is
 extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
-      version='1.16',
+      version='1.17',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',

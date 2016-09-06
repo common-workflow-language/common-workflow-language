@@ -650,7 +650,7 @@ class Loader(object):
                 textIO = StringIO(text)
             textIO.name = url  # type: ignore
             result = yaml.load(textIO, Loader=SafeLoader)
-        except yaml.parser.ParserError as e:  # type: ignore
+        except yaml.parser.ParserError as e:
             raise validate.ValidationException("Syntax error %s" % (e))
         if isinstance(result, dict) and inject_ids and self.identifiers:
             for identifier in self.identifiers:
