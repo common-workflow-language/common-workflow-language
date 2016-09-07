@@ -14,7 +14,7 @@
             "source": {
                 "class": "File",
                 "path": "../v1.0/CommandLineTool-standalone.yml",
-                "secondaryFiles": {"$import": "draft4-deps.json"}
+                "secondaryFiles": {"$import": "v1.0.0-deps.json"}
             },
             "target": "v1.0/CommandLineTool.html",
             "renderlist": [
@@ -30,7 +30,7 @@
             "source": {
                 "class": "File",
                 "path": "../v1.0/CommonWorkflowLanguage.yml",
-                "secondaryFiles": {"$import": "draft4-deps.json"}
+                "secondaryFiles": {"$import": "v1.0.0-deps.json"}
             },
             "target": "v1.0/Workflow.html",
             "renderlist": [
@@ -50,7 +50,7 @@
             "primtype": "#CWLType"
         },
         {
-            "source": {$import: draft4-metaschema.json},
+            "source": {$import: v1.0.0-metaschema.json},
             "target": "v1.0/SchemaSalad.html",
             "renderlist": [
                 "https://w3id.org/cwl/salad#Semantic_Annotations_for_Linked_Avro_Data",

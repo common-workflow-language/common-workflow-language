@@ -4,7 +4,7 @@
 
     "schemas": [
         {"$import": "cwlsite-draft3-schemas.json"},
-        {"$import": "cwlsite-draft4-schemas.json"}],
+        {"$import": "cwlsite-v1.0.0-schemas.json"}],
 
     "brand": "CWL",
     "brandimg": {
@@ -26,6 +26,6 @@
             "primtype": null
         },
         {"$import": "cwlsite-draft3-job.json"},
-        {"$import": "cwlsite-draft4-job.json"}
+        {"$import": "cwlsite-v1.0.0-job.json"}
     ]
 }
