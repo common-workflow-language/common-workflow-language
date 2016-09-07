@@ -87,17 +87,17 @@ $graph:
     - name: type
       type:
         - "null"
-        - "#CWLType"
-        - "#OutputRecordSchema"
-        - "#OutputEnumSchema"
-        - "#OutputArraySchema"
+        - CWLType
+        - OutputRecordSchema
+        - OutputEnumSchema
+        - OutputArraySchema
         - string
         - type: array
           items:
-            - "#CWLType"
-            - "#OutputRecordSchema"
-            - "#OutputEnumSchema"
-            - "#OutputArraySchema"
+            - CWLType
+            - OutputRecordSchema
+            - OutputEnumSchema
+            - OutputArraySchema
             - string
       jsonldPredicate:
         "_id": "sld:type"
@@ -111,13 +111,15 @@ $graph:
   name: ExpressionTool
   extends: Process
   specialize:
-    - specializeFrom: "#OutputParameter"
-      specializeTo: "#ExpressionToolOutputParameter"
+    - specializeFrom: InputParameter
+      specializeTo: RegularInputParameter
+    - specializeFrom: OutputParameter
+      specializeTo: ExpressionToolOutputParameter
   documentRoot: true
   doc: |
     Execute an expression as a Workflow step.
   fields:
-    - name: "class"
+    - name: class
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
@@ -158,7 +160,7 @@ $graph:
         - string?
         - string[]?
     - name: linkMerge
-      type: ["null", "#LinkMergeMethod"]
+      type: ["null", LinkMergeMethod]
       jsonldPredicate: "cwl:linkMerge"
       doc: |
         The method to use to merge multiple sources into a single array.
@@ -166,17 +168,17 @@ $graph:
     - name: type
       type:
         - "null"
-        - "#CWLType"
-        - "#OutputRecordSchema"
-        - "#OutputEnumSchema"
-        - "#OutputArraySchema"
+        - CWLType
+        - OutputRecordSchema
+        - OutputEnumSchema
+        - OutputArraySchema
         - string
         - type: array
           items:
-            - "#CWLType"
-            - "#OutputRecordSchema"
-            - "#OutputEnumSchema"
-            - "#OutputArraySchema"
+            - CWLType
+            - OutputRecordSchema
+            - OutputEnumSchema
+            - OutputArraySchema
             - string
       jsonldPredicate:
         "_id": "sld:type"
@@ -268,8 +270,8 @@ $graph:
     - name: valueFrom
       type:
         - "null"
-        - "string"
-        - "#Expression"
+        - string
+        - Expression
       jsonldPredicate: "cwl:valueFrom"
       doc: |
         To use valueFrom, [StepInputExpressionRequirement](#StepInputExpressionRequirement) must
@@ -462,8 +464,10 @@ $graph:
   extends: "#Process"
   documentRoot: true
   specialize:
-    - specializeFrom: "#OutputParameter"
-      specializeTo: "#WorkflowOutputParameter"
+    - specializeFrom: InputParameter
+      specializeTo: RegularInputParameter
+    - specializeFrom: OutputParameter
+      specializeTo: WorkflowOutputParameter
   doc: |
     A workflow describes a set of **steps** and the **dependencies** between
     those steps.  When a step produces output that will be consumed by a

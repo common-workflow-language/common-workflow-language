@@ -568,6 +568,10 @@ $graph:
         The default value for this parameter if not provided in the input
         object.
 
+- name: RegularInputParameter
+  type: record
+  extends: InputParameter
+  fields:
     - name: type
       type:
         - "null"
@@ -590,6 +594,7 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+
 
 - name: OutputParameter
   type: record
