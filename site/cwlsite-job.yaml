@@ -1,0 +1,20 @@
+#!/usr/bin/env cwl-runner
+brand: CWL
+brandimg: {class: File, path: CWL-Logo-Header.png}
+cwl:tool: cwlsite.cwl
+render:
+- brandimg: '<img src=''CWL-Logo-Header.png'' style=''height: 61px; margin-top: -20px;
+    margin-left: -20px''></img>'
+  brandlink: index.html
+  primtype: null
+  redirect: []
+  renderlist: []
+  source: {class: File, path: ../README.md}
+  target: index.html
+- {$import: cwlsite-draft3-job.json}
+- {$import: cwlsite-v1.0.0-job.json}
+- {$import: cwlsite-v1.1.0-dev1-job.yaml}
+schemas:
+- {$import: cwlsite-draft3-schemas.json}
+- {$import: cwlsite-v1.0.0-schemas.json}
+- {$import: cwlsite-v1.1.0-dev1-schemas.yaml}
