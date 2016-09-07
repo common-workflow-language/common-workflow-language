@@ -209,6 +209,11 @@ A **hint** is similar to a requirement; however, it is not an error if an
 implementation cannot satisfy all hints.  The implementation may report a
 warning if a hint cannot be satisfied.
 
+Requirements can be specified in the input object document as an array of
+requirements under the field name `cwl:requirements`. They are combined with
+any requirements present in the corresponding Process as if they were specified
+there.
+
 Requirements are inherited.  A requirement specified in a Workflow applies
 to all workflow steps; a requirement specified on a workflow step will
 apply to the process implementation of that step and any of its substeps.

@@ -33,12 +33,18 @@ $graph:
 
     - |
 
-      ## Introduction to v1.1.0-dev1
+      ## Introduction to the CWL Workflow Description v1.1.0-dev1
 
       This is the first development release of the 1.1.0 version of the CWL
       Workflow specification.
+      
+        * [Addition](#Requirements_and_hints) of `cwl:requirments` field to
+          input object documents
 
-      ## Introduction to v1.0
+      See also the [Introduction to the CWL Command Line Tool Description
+      v1.1.0-dev1](CommandLineTool.html#Introduction_to_the_CWL_Command_Line_Tool_Description_v1.1.0-dev1)
+
+      ## Introduction to the CWL Workflow Description v1.0
 
       This specification represents the first full release from the CWL group.
       Since draft-3, this draft introduces the following changes and additions:

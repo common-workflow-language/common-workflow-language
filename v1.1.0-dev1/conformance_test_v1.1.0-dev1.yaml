@@ -254,6 +254,39 @@
   tool: v1.1.0-dev1/env-tool1.cwl
   doc: Test EnvVarRequirement
 
+- job: v1.1.0-dev1/env-job3.yaml
+  output:
+    out:
+      class: File
+      checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
+      location: out
+      size: 15
+  tool: v1.1.0-dev1/env-tool3.cwl
+  doc: Test requirements in input document via EnvVarRequirement
+
+
+- job: v1.1.0-dev1/env-job3.yaml
+  output:
+    out:
+      class: File
+      checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
+      location: out
+      size: 15
+  tool: v1.1.0-dev1/env-tool4.cwl
+  doc: Test conflicting requirements in input document via EnvVarRequirement
+
+
+- job: v1.1.0-dev1/env-job4.yaml
+  output:
+    out:
+      class: File
+      checksum: sha1$1bc9425d0ff90c05c17b9f39a7b7854be9992564
+      location: out
+      size: 9
+  tool: v1.1.0-dev1/env-tool3.cwl
+  doc: Test conflicting requirements in input document via EnvVarRequirement
+
+
 - job: v1.1.0-dev1/scatter-job1.json
   output:
     out: ["foo one", "foo two", "foo three", "foo four"]

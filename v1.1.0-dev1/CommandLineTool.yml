@@ -36,13 +36,19 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to v1.1.0-dev1
+      ## Introduction to the CWL Command Line Tool Description v1.1.0-dev1
 
-      This is the in progress first development version of the first
+      This is the in-progress first development version of the first
       maintenance release of the CWL CommandLineTool specification.
-      Version 1.1 introduces the followings additions:
+      Version 1.1.0-dev1 introduces the followings additions:
 
-        * Addition of `stdin` type shortcut for `CommandInputParamater`s.
+        * Addition of `stdin` type shortcut for
+          [`CommandInputParamater`s](#CommandInputParameter).
+        * [Addition](#Requirements_and_hints) of `cwl:requirements` field to
+          input object documents
+
+      See also the [Introduction to the CWL Command Line Tool Description
+      v1.1.0-dev1](Workflow.html#Introduction_to_the_CWL_Workflow_Description_v1.1.0-dev1)
 
       ## Introduction to v1.0
 
