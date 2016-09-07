@@ -38,6 +38,9 @@ $graph:
       This is the first development release of the 1.1.0 version of the CWL
       Workflow specification.
 
+        * Copy the `secondaryFiles`, `format` and `streamable` properites to
+          `InputArraySchema`, and `OutputArraySchema`.
+
       ## Introduction to v1.0
 
       This specification represents the first full release from the CWL group.

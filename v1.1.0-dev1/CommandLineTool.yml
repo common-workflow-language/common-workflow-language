@@ -43,6 +43,9 @@ $graph:
       Version 1.1 introduces the followings additions:
 
         * Addition of `stdin` type shortcut for `CommandInputParamater`s.
+        * Copy the `secondaryFiles`, `format` and `streamable` properites to
+          `InputArraySchema`, and `OutputArraySchema` which flow to
+          `CommandInputArraySchema`, `CommandOutputArraySchema` automatically.
 
       ## Introduction to v1.0
 

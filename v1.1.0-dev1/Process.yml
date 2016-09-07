@@ -304,25 +304,9 @@ $graph:
       jsonldPredicate:
         _id: "cwl:listing"
 
-- name: SchemaBase
+- name: PotentialFileBase
   type: record
   abstract: true
-  fields:
-    - name: label
-      type:
-        - "null"
-        - string
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this object."
-
-
-- name: Parameter
-  type: record
-  extends: SchemaBase
-  abstract: true
-  doc: |
-    Define an input or output parameter to a process.
-
   fields:
     - name: secondaryFiles
       type:
@@ -334,21 +318,16 @@ $graph:
       jsonldPredicate: "cwl:secondaryFiles"
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
-
         Describes files that must be included alongside the primary file(s).
-
         If the value is an expression, the value of `self` in the expression
         must be the primary input or output File to which this binding applies.
-
         If the value is a string, it specifies that the following pattern
         should be applied to the primary file:
-
           1. If string begins with one or more caret `^` characters, for each
             caret, remove the last file extension from the path (the last
             period `.` and all following characters).  If there are no file
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
-
     - name: format
       type:
         - "null"
@@ -362,25 +341,41 @@ $graph:
         identity: true
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
-
         For input parameters, this must be one or more IRIs of concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
-
         For output parameters, this is the file format that will be assigned to
         the output parameter.
-
     - name: streamable
       type: boolean?
+      jsonldPredicate: "cwl:streamable"
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
-
         A value of `true` indicates that the file is read or written
         sequentially without seeking.  An implementation may use this flag to
         indicate whether it is valid to stream file contents using a named
         pipe.  Default: `false`.
 
+
+- name: SchemaBase
+  type: record
+  abstract: true
+  fields:
+    - name: label
+      type: string?
+      jsonldPredicate: "rdfs:label"
+      doc: "A short, human-readable label of this object."
+
+
+- name: Parameter
+  type: record
+  extends: SchemaBase
+  abstract: true
+  doc: |
+    Define an input or output parameter to a process.
+
+  fields:
     - name: doc
       type:
         - string?
@@ -474,7 +469,7 @@ $graph:
 
 - name: InputArraySchema
   type: record
-  extends: ["sld:ArraySchema", InputSchema]
+  extends: ["sld:ArraySchema", InputSchema, PotentialFileBase]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -528,7 +523,7 @@ $graph:
 
 - name: OutputArraySchema
   type: record
-  extends: ["sld:ArraySchema", OutputSchema]
+  extends: ["sld:ArraySchema", OutputSchema, PotentialFileBase]
   docParent: "#OutputParameter"
   specialize:
     - specializeFrom: "sld:RecordSchema"
