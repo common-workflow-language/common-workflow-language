@@ -173,6 +173,17 @@
   tool: v1.1.0-dev1/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
+- job: v1.1.0-dev1/wc-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
+      location: output
+      size: 15
+  tool: v1.1.0-dev1/wc-tool-shortcut.cwl
+  doc: Test command execution in with stdin and stdout redirection using stdin shortcut
+
+
 - job: v1.1.0-dev1/parseInt-job.json
   output: {output: 42}
   tool: v1.1.0-dev1/parseInt-tool.cwl
