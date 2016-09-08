@@ -21,11 +21,12 @@ inputs:
    inputBinding:
     prefix: "--quiet"
 
- toolfile:
+ processfile:
    type: File?
    doc: |
-    The tool or workflow description to run. Optional if the jobfile has a
-    `cwl:tool` field to indicate the tool or workflow description to run.
+    The CommandLineTool, ExpressionTool, or Workflow description to run.
+    Optional if the jobfile has a `cwl:tool` field to indicate which process
+    description to run.
    inputBinding:
     position: 1
 
