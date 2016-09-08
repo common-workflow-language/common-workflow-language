@@ -35,12 +35,14 @@ inputs:
    inputBinding:
     position: 2
 
-
-
 baseCommand: cwl-runner
+
+outputs:
+  log: stderr
+  output_object_document: stdout  # in the CWL Output Object Document format
+
 successCodes:
  - 0  # success
 
-stdout: cwl.output.json  # The CWL output document
 permanentFailCodes:
   - 33 # failure due to unimplemented feature
