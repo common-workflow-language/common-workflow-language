@@ -35,27 +35,7 @@ inputs:
    inputBinding:
     position: 2
 
- no-container:
-   type: boolean?
-   doc: |
-    Do not execute jobs in a Docker container, even when listed as a Requirement
-   inputBinding:
-    prefix: "--no-container"
 
- tmp-outdir-prefix:
-   type: string?
-   doc: |
-    Path prefix for temporary directories. Useful for OS X so that boot2docker
-    writes to /Users
-   inputBinding:
-    prefix: "--tmp-outdir-prefix"
-
- tmpdir-prefix:
-   type: string?
-   doc: |
-    Path prefix for temporary directories
-   inputBinding:
-    prefix: "--tmpdir-prefix"
 
 baseCommand: cwl-runner
 successCodes:
