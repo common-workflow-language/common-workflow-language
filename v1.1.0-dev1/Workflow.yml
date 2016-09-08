@@ -38,7 +38,7 @@ $graph:
       This is the first development release of the 1.1.0 version of the CWL
       Workflow specification.
       
-        * [Addition](#Requirements_and_hints) of `cwl:requirments` field to
+        * [Addition](#Requirements_and_hints) of `cwl:requirements` field to
           input object documents
 
       See also the [Introduction to the CWL Command Line Tool Description
