@@ -290,8 +290,8 @@
     - |
       ## Parameter references
 
-      In a previous example, we used extracted a file using the "tar" program.
-      However, that example was very limited becuase it assumed that the file
+      In a previous example, we extracted a file using the "tar" program.
+      However, that example was very limited because it assumed that the file
       we were interested in was called "hello.txt".  In this example, you will
       see how to reference the value of input parameters dynamically from other
       fields.
