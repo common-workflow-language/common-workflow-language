@@ -1,6 +1,6 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
-cwlVersion: v1.0
+cwlVersion: v1.1.0-dev1
 
 doc: |
  Generic interface to run a Common Workflow Language tool or workflow from the
@@ -58,5 +58,9 @@ inputs:
     prefix: "--tmpdir-prefix"
 
 baseCommand: cwl-runner
+successCodes:
+ - 0  # success
 
 stdout: cwl.output.json  # The CWL output document
+permanentFailCodes:
+  - 33 # failure due to unimplemented feature
