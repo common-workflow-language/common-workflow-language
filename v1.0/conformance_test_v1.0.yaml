@@ -883,3 +883,8 @@
       "size": 12010
   tool: v1.0/initialworkdirrequirement-docker-out.cwl
   doc: Test output of InitialWorkDir
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines10-wf.cwl
+  doc: Test embedded subworkflow
