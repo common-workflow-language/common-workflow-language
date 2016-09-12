@@ -79,6 +79,7 @@ $graph:
       Post v1.0 release changes to the spec.
 
         * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 11 September 2016: replace `basename` with `entryname` in the doc for field `entryname` in paragraph 5.8.1 `Dirent`
 
       ## Purpose
 
@@ -729,7 +730,7 @@ $graph:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
-        If `entry` is a File or Directory, this overrides `basename`.  Optional.
+        If `entry` is a File or Directory, this overrides `entryname`. Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
