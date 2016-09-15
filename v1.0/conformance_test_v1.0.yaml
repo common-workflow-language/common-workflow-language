@@ -287,6 +287,16 @@
   tool: v1.0/env-wf2.cwl
   doc: Test requirements override hints
 
+- job: v1.0/env-job.json
+  output:
+    out:
+      class: File
+      checksum: sha1$cdc1e84968261d6a7575b5305945471f8be199b6
+      location: out
+      size: 9
+  tool: v1.0/env-wf3.cwl
+  doc: Test requirements on workflow steps
+
 - job: v1.0/empty.json
   output: {count_output: 16}
   tool: v1.0/count-lines9-wf.cwl
