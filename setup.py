@@ -35,7 +35,7 @@ install_requires = [
     'mistune',
     'typing >= 3.5.2',
     'CacheControl',
-    'lockfile']
+    'lockfile >= 0.9']
 
 install_requires.append("avro")  # TODO: remove me once cwltool is
 # available in Debian Stable, Ubuntu 12.04 LTS
@@ -46,7 +46,7 @@ install_requires.append("avro")  # TODO: remove me once cwltool is
 extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
-      version='1.17',
+      version='1.18',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',

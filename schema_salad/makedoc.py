@@ -49,6 +49,12 @@ class MyRenderer(mistune.Renderer):
     def header(self, text, level, raw=None):
         return """<h%i id="%s">%s</h%i>""" % (level, to_id(text), text, level)
 
+    def table(self, header, body):
+        return (
+            '<table class="table table-striped">\n<thead>%s</thead>\n'
+            '<tbody>\n%s</tbody>\n</table>\n'
+        ) % (header, body)
+
 
 def to_id(text):  # type: (Union[str, unicode]) -> Union[str, unicode]
     textid = text
