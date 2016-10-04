@@ -63,7 +63,7 @@
     output_file:
       class: File
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
-      location:
+      location: Any
       size: 13
   doc: Test command execution in Docker with simplified syntax stdout redirection
 
