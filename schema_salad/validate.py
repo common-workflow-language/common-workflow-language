@@ -204,7 +204,7 @@ def validate_ex(expected_schema, datum, identifiers=None, strict=False,
                         raise ValidationException(u"Missing 'class' field")
                     else:
                         return False
-                if not validate_ex(f.type, d, identifiers, strict=strict, foreign_properties=foreign_properties, raise_ex=raise_ex):
+                if expected_schema.name != d:
                     return False
                 classmatch = d
                 break
