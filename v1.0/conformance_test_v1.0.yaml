@@ -661,7 +661,7 @@
   tool: v1.0/test-cwl-out.cwl
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
-    and just "path" is provided.
+    and just 'path' is provided.
 
 - job: v1.0/empty.json
   output: {
@@ -675,7 +675,7 @@
   tool: v1.0/test-cwl-out2.cwl
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
-    and just "location" is provided.
+    and just 'location' is provided.
 
 - job: v1.0/abc.json
   output:
