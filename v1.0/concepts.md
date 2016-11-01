@@ -89,7 +89,7 @@ preprocessing steps described in the
 [Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html).
 An implementation may formally validate the structure of a CWL document using
 SALAD schemas located at
-https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-4
+https://github.com/common-workflow-language/common-workflow-language/tree/master/v1.0
 
 ## Identifiers
 

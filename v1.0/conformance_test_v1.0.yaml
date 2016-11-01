@@ -789,10 +789,10 @@
 - job: v1.0/dir4-job.yml
   output: {
     "outlist": {
-        "checksum": "sha1$2ab6f189e84753c05a23413fbf6b6fbf4c53489f",
-        "size": 90,
-        "location": "output.txt",
-        "class": "File"
+      "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+      "size": 20,
+      "location": "output.txt",
+      "class": "File"
     }
   }
   tool: v1.0/dir4.cwl
