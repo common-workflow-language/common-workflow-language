@@ -38,7 +38,7 @@
             "type": ["null", "File"]
         },
         {
-            "id": "args",
+            "id": "#args",
             "type": {
                 "type": "array",
                 "items": "string"

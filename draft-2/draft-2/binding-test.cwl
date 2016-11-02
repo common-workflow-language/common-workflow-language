@@ -23,7 +23,7 @@ inputs:
       position: -1
 
 outputs:
-  - id: args
+  - id: "#args"
     type:
       type: array
       items: string

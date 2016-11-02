@@ -29,7 +29,7 @@
       }
     ],
     "outputs": [{
-      "id": "args",
+      "id": "#args",
       "type": {
           "type": "array",
           "items": "string"
