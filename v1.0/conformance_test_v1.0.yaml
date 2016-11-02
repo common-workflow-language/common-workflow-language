@@ -77,7 +77,7 @@
   tool: v1.0/cat3-tool-mediumcut.cwl
   doc: Test command execution in Docker with stdout redirection
 
-- job:
+- job: v1.0/empty.json
   tool: v1.0/egrep-stderr.cwl
   doc: Test command line with stderr redirection
   output:
@@ -87,7 +87,7 @@
       size: 84
       location: error.txt
 
-- job:
+- job: v1.0/empty.json
   tool: v1.0/egrep-stderr-shortcut.cwl
   doc: Test command line with stderr redirection, brief syntax
   output:
@@ -103,7 +103,7 @@
       size: 84
       checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
       location: std.err
-  job:
+  job: v1.0/empty.json
   tool: v1.0/egrep-stderr-mediumcut.cwl
   doc: Test command line with stderr redirection, named brief syntax
 
