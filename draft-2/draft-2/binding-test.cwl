@@ -22,7 +22,11 @@ inputs:
     inputBinding:
       position: -1
 
-outputs: []
+outputs:
+  - id: args
+    type:
+      type: array
+      items: string
 
 baseCommand: python
 arguments: ["bwa", "mem"]
