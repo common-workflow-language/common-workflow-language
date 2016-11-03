@@ -20,15 +20,15 @@
             }
         },
         {
-        id: "#args.py",
-        type: File,
-        default: {
-          class: File,
-          path: args.py
-        },
-        inputBinding: {
-          position: -1
-        }
+            "id": "#args.py",
+            "type": "File",
+            "default": {
+              "class": "File",
+              "path": "args.py"
+            },
+            "inputBinding": {
+              "position": -1
+            }
       }
     ],
     "outputs": [
@@ -38,6 +38,13 @@
                 "glob": "output.sam"
             },
             "type": ["null", "File"]
+        },
+        {
+            "id": "args",
+            "type": {
+                "type": "array",
+                "items": "string"
+            }
         }
     ],
     "requirements": [

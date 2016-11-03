@@ -29,7 +29,7 @@
         }
       }
     ],
-    "outputs": [],
+    "outputs": [{"id": "args", "type": "string[]"}],
     "baseCommand": "python",
     "arguments": ["cat"]
 }

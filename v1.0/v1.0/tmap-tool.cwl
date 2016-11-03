@@ -38,7 +38,8 @@
                 "glob": "output.sam"
             },
             "type": ["null", "File"]
-        }
+        },
+        {"id": "args", "type": "string[]"}
     ],
     "requirements": [
     {"class": "SchemaDefRequirement",
