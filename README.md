@@ -40,7 +40,7 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 
 ## Implementations
 
-|Software|Description|CWL support|Platform support|Maturity|
+|Software|Description|CWL support|Platform support|Platform Maturity|
 |--------|-----------|-----------|--------|--------|
 |[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, local execution only|Production|
 |[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](http://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](http://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|Production|
@@ -50,6 +50,7 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|Python|Production|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|Go|Production|
 |[Funnel](https://github.com/bmeg/funnel)|Use Google Genomics Pipeline API with CWL|alpha|GCP|alpha|
+|[xenon-cwl-runner](https://github.com/NLeSC/xenon-cwl-runner)|Run CWL workflows using Xenon|alpha|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|Production|
 
 
 ## Repositories of CWL Tools and Workflows
