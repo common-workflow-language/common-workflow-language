@@ -6,6 +6,7 @@
   renderlist: []
   source: {class: File, path: ../v1.1.0-dev1/README.md}
   target: v1.1.0-dev1/index.html
+  extra: {class: File, path: empty}
 - brandimg: '<img src=''../CWL-Logo-Header.png'' style=''height: 61px; margin-top:
     -20px; margin-left: -20px''></img>'
   brandlink: index.html
@@ -17,6 +18,9 @@
     path: ../v1.1.0-dev1/CommandLineTool-standalone.yml
     secondaryFiles: {$import: v1.1.0-dev1-deps.yaml}
   target: v1.1.0-dev1/CommandLineTool.html
+  extra:
+    class: File
+    path: ../v1.1.0-dev1/cwl-runner.cwl
 - brandimg: '<img src=''../CWL-Logo-Header.png'' style=''height: 61px; margin-top:
     -20px; margin-left: -20px''></img>'
   brandlink: index.html
@@ -33,6 +37,7 @@
     path: ../v1.1.0-dev1/CommonWorkflowLanguage.yml
     secondaryFiles: {$import: v1.1.0-dev1-deps.yaml}
   target: v1.1.0-dev1/Workflow.html
+  extra: {class: File, path: empty}
 - brandimg: '<img src=''../CWL-Logo-Header.png'' style=''height: 61px; margin-top:
     -20px; margin-left: -20px''></img>'
   brandlink: index.html
@@ -43,6 +48,7 @@
     'https://w3id.org/cwl/salad#Documentation']
   source: {$import: v1.1.0-dev1-metaschema.yaml}
   target: v1.1.0-dev1/SchemaSalad.html
+  extra: {class: File, path: empty}
 - brandimg: '<img src=''../CWL-Logo-Header.png'' style=''height: 61px; margin-top:
     -20px; margin-left: -20px''></img>'
   brandlink: index.html
@@ -51,3 +57,4 @@
   renderlist: []
   source: {$import: userguide-v1.1.0-dev1-input.yaml}
   target: v1.1.0-dev1/UserGuide.html
+  extra: {class: File, path: empty}

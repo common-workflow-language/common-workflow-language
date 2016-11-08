@@ -8,7 +8,8 @@
             "redirect": [],
             "brandlink": "../index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
+            "primtype": null,
+	    "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {
@@ -24,7 +25,8 @@
             "redirect": [],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": "#CWLType"
+            "primtype": "#CWLType",
+	    "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {
@@ -43,11 +45,12 @@
                 "https://w3id.org/cwl/cwl#CreateFileRequirement=CommandLineTool.html#CreateFileRequirement",
                 "https://w3id.org/cwl/cwl#EnvVarRequirement=CommandLineTool.html#EnvVarRequirement",
                 "https://w3id.org/cwl/cwl#ShellCommandRequirement=CommandLineTool.html#ShellCommandRequirement",
-                "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement",
+                "https://w3id.org/cwl/cwl#ResourceRequirement=CommandLineTool.html#ResourceRequirement"
             ],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": "#CWLType"
+            "primtype": "#CWLType",
+	    "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {$import: draft3-metaschema.json},
@@ -61,7 +64,8 @@
             "redirect": [],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
+            "primtype": null,
+	    "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {"$import": "userguide-input.json"},
@@ -70,6 +74,7 @@
             "redirect": [],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
+            "primtype": null,
+	    "extra": { "class": "File", "path": "empty" }
         }
     ]

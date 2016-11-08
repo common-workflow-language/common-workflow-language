@@ -10,11 +10,13 @@ inputs:
         type: record
         fields:
           source: File
-          renderlist: string[]
-          redirect: string[]
+          renderlist: string[]?
+          redirect: string[]?
           target: string
           brandlink: string
           brandimg: string
+          primtype: string?
+          extra: File
   schemas:
     type:
       type: array
@@ -26,7 +28,7 @@ inputs:
           rdfs_target: string
   brandimg: File
   empty:
-    type: string
+    type: string?
     default: ""
 
 outputs:
@@ -78,7 +80,8 @@ steps:
       brandlink: { valueFrom: $(inputs.render.brandlink) }
       brand: { valueFrom: $(inputs.render.brandimg) }
       primtype: { valueFrom: $(inputs.render.primtype) }
-    out: [out, targetdir]
+      extra: { valueFrom: $(inputs.render.extra) }
+    out: [out, targetdir, extra]
     run:  makedoc.cwl
 
   merge:
@@ -87,7 +90,7 @@ steps:
         source: docs/out
         valueFrom: $(self[0])
       secondary:
-        source: [docs/out, rdfs/out, context/out, brandimg]
+        source: [docs/out, rdfs/out, context/out, brandimg, docs/extra]
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
       dirs:

@@ -375,6 +375,13 @@ must include the field `cwl:tool` supplying an IRI to the default CWL
 document that should be executed using the fields of the input object as
 input parameters.
 
+The `cwl-runner` interface is required for conformance testing and is
+documented in [cwl-runner.cwl](cwl-runner.cwl) which is reproduced below:
+
+<pre>
+$include: cwl-runner.cwl
+</pre>
+
 ## Discovering CWL documents on a local filesystem
 
 To discover CWL documents look in the following locations:
