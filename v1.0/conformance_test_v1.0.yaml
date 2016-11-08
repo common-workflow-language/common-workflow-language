@@ -926,3 +926,37 @@
   }
   tool: v1.0/docker-array-secondaryfiles.cwl
   doc: Test secondaryFiles on array of files.
+
+- job: v1.0/dir7.yml
+  output: {
+    "dir": {
+        "location": "a_directory",
+        "class": "Directory",
+        "listing": [
+            {
+                "class": "File",
+                "location": "whale.txt",
+                "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+                "size": 1111
+            },
+            {
+                "class": "File",
+                "location": "hello.txt",
+                "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
+                "size": 13
+            }
+        ]
+    }
+  }
+  tool: v1.0/dir7.cwl
+  doc: Test directory literal output created by ExpressionTool
+
+- job: v1.0/empty.json
+  output:
+    lit:
+      location: "a_file"
+      class: "File"
+      checksum: "sha1$fea23663b9c8ed71968f86415b5ec091bb111448"
+      size: 19
+  tool: v1.0/file-literal-ex.cwl
+  doc: Test file literal output created by ExpressionTool
