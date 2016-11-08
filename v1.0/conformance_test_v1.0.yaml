@@ -960,3 +960,14 @@
       size: 19
   tool: v1.0/file-literal-ex.cwl
   doc: Test file literal output created by ExpressionTool
+
+- job: v1.0/empty.json
+  output:
+    "thing": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": "thing",
+        "class": "File",
+        "size": 0
+    }
+  tool: v1.0/docker-output-dir.cwl
+  doc: Test dockerOutputDirectory
