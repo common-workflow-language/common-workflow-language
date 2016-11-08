@@ -914,3 +914,15 @@
   output: {count_output: 16}
   tool: v1.0/count-lines10-wf.cwl
   doc: Test embedded subworkflow
+
+- job: v1.0/docker-array-secondaryfiles-job.json
+  output: {
+    "bai_list": {
+        "checksum": "sha1$081fc0e57d6efa5f75eeb237aab1d04031132be6",
+        "location": "fai.list",
+        "class": "File",
+        "size": 386
+    }
+  }
+  tool: v1.0/docker-array-secondaryfiles.cwl
+  doc: Test secondaryFiles on array of files.
