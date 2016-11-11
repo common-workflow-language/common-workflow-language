@@ -183,7 +183,7 @@
 
       The value of `position` is used to determine where parameter should
       appear on the command line.  Positions are relative to one another, not
-      abosolute.  As a result, positions do not have to be sequential, three
+      absolute.  As a result, positions do not have to be sequential, three
       parameters with positions `[1, 3, 5]` will result in the same command
       line as `[1, 2, 3]`.  More than one parameter can have the same position
       (ties are broken using the parameter name), and the position field itself
@@ -466,7 +466,7 @@
       tool is actually executed.  The `$(runtime.outdir)` parameter is the path
       to the designated output directory.  Other parameters include
       `$(runtime.tmpdir)`, `$(runtime.ram)`, `$(runtime.cores)`,
-      `$(runtime.ram)`, `$(runtime.outdirSize)`, and `$(runtime.tmpdirSize)`.  See
+      `$(runtime.outdirSize)`, and `$(runtime.tmpdirSize)`.  See
       the [Runtime Environment](CommandLineTool.html#Runtime_environment)
       section of the CWL specification for details.
 
@@ -796,7 +796,7 @@
       class: Workflow
       ```
 
-      The 'cwlVersion` field indicates the version of the CWL spec used by the
+      The `cwlVersion` field indicates the version of the CWL spec used by the
       document.  The `class` field indicates this document describes a workflow.
 
 
