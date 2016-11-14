@@ -78,7 +78,10 @@ $graph:
 
       Post v1.0 release changes to the spec.
 
-        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 13 July 2016: Mark `baseCommand` as optional and update descriptive
+          text.
+        * 14 November 2016: Clarify [SoftwareRequirement](#SoftwareRequirement)
+          `spec` fields.
 
       ## Purpose
 
@@ -693,26 +696,51 @@ $graph:
   fields:
     - name: package
       type: string
-      doc: "The common name of the software to be configured."
+      doc: |
+        The name of the software to be made available. If the name is
+        common, inconsistent, or otherwise ambiguous it should be combined with
+        one or more identifiers in the `specs` field.
     - name: version
       type: string[]?
-      doc: "The (optional) version of the software to configured."
+      doc: |
+        The (optional) versions of the software that are known to be
+        compatible.
     - name: specs
       type: string[]?
       doc: |
-        Must be one or more IRIs identifying resources for installing or
-        enabling the software.  Implementations may provide resolvers which map
-        well-known software spec IRIs to some configuration action.
+        One or more IRIs identifying resources for installing or
+        enabling the software named in the `package` field. Implementations may
+        provide resolvers which map these software identifer IRIs to some
+        configuration action; or they can use only the name from the `package`
+        field on a best effort basis.
 
-        For example, an IRI `https://packages.debian.org/jessie/bowtie` could
-        be resolved with `apt-get install bowtie`.  An IRI
+        For example, the IRI `https://packages.debian.org/bowtie` could
+        be resolved with `apt-get install bowtie`. The IRI
         `https://anaconda.org/bioconda/bowtie` could be resolved with `conda
         install -c bioconda bowtie`.
 
-        Tools may also provide IRIs to index entries such as
-        [RRID](http://www.identifiers.org/rrid/), such as
-        `http://identifiers.org/rrid/RRID:SCR_005476`
+        IRIs can also be system independent and used to map to a specific
+        software installation or selection mechanism.
+        Using [RRID](https://www.identifiers.org/rrid/) as an example:
+        `https://identifiers.org/rrid/RRID:SCR_005476` could be fulfilled using
+        the above mentioned Debian or bioconda package, a local installation
+        managed by [Environement Modules](http://modules.sourceforge.net/), or
+        any other mechanism the platform chooses.
 
+        A site specific IRI can be listed as well. For example, an academic
+        computing cluster using Environement Modules could list the IRI
+        `https://hpc.university.edu/modules/bowtie-tbb/1.22` to indicate that
+        `module load bowtie-tbb/1.1.2` should be executed to make available
+        `bowtie` version 1.1.2 with the TBB library prior to running the
+        accompanying Workflow or CommandLineTool. Note that the example IRI is
+        specific to a particular institution and computing environment as the
+        Environment Modules system does not have a common namespace.
+
+        This last example is the least portable and should only be used if
+        mechanisms based off of the `package` field or more generic IRIs are
+        unavailable or unsuitable. While harmless to other sites, site specific
+        software IRIs should be left out of shared CWL descriptions to avoid
+        clutter.
 
 - name: Dirent
   type: record
