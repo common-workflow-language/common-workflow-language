@@ -66,7 +66,7 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |--------|-----------|
 |[cwltest](https://github.com/common-workflow-language/cwltest)|CWL testing framework,  automated testing of tools and workflows written with CWL|
 |[cwl-upgrader](https://github.com/common-workflow-language/cwl-upgrader)|Upgrade CWL documents from draft-3 to v1.0|
-|[argparse2cwl](https://github.com/common-workflow-language/gxargparse#argparse2cwl)|Generate CWL CommandLineTool wrapper from Python programs that use argparse.  Also supports [click](http://click.pocoo.org/5/) argument parser.|
+|[argparse2tool](https://github.com/erasche/argparse2tool#cwl-specific-functionality)|Generate CWL CommandLineTool wrappers (and/or Galaxy tool descriptions) from Python programs that use argparse.  Also supports the [click](http://click.pocoo.org/5/) argument parser.|
 |[cwl2argparse](https://github.com/common-workflow-language/cwl2argparse)|Generate Python argparse code from CWL CommandLineTool description.|
 |[pypi2cwl](https://github.com/common-workflow-language/pypi2cwl)|Automatically run argparse2cwl on any package in PyPi|
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
