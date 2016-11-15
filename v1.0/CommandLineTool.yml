@@ -714,21 +714,25 @@ $graph:
         these software identifer IRIs to some configuration action; or they can
         use only the name from the `package` field on a best effort basis.
 
-        For example, the IRI `https://packages.debian.org/bowtie` could
+        For example, the IRI https://packages.debian.org/bowtie could
         be resolved with `apt-get install bowtie`. The IRI
-        `https://anaconda.org/bioconda/bowtie` could be resolved with `conda
+        https://anaconda.org/bioconda/bowtie could be resolved with `conda
         install -c bioconda bowtie`.
 
         IRIs can also be system independent and used to map to a specific
         software installation or selection mechanism.
         Using [RRID](https://www.identifiers.org/rrid/) as an example:
-        `https://identifiers.org/rrid/RRID:SCR_005476` could be fulfilled using
-        the above mentioned Debian or bioconda package, a local installation
-        managed by [Environement Modules](http://modules.sourceforge.net/), or
-        any other mechanism the platform chooses. If supported by a given
-        registry, implementations are encouraged to query these system
-        independent sofware identifier IRIs directly for links to packaging
-        systems.
+        https://identifiers.org/rrid/RRID:SCR_005476
+        could be fulfilled using the above mentioned Debian or bioconda
+        package, a local installation managed by [Environement Modules](http://modules.sourceforge.net/),
+        or any other mechanism the platform chooses. IRIs can also be from
+        identifer sources that are discipline specific yet still system
+        independent. As an example, the equivalent [ELIXIR Tools and Data
+        Service Registry](https://bio.tools) IRI to the previous RRID example is
+        https://bio.tools/tool/bowtie2/version/2.2.8.
+        If supported by a given registry, implementations are encouraged to
+        query these system independent sofware identifier IRIs directly for
+        links to packaging systems.
 
         A site specific IRI can be listed as well. For example, an academic
         computing cluster using Environement Modules could list the IRI
