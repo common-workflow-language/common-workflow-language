@@ -708,11 +708,11 @@ $graph:
     - name: specs
       type: string[]?
       doc: |
-        One or more IRIs identifying resources for installing or
-        enabling the software named in the `package` field. Implementations may
-        provide resolvers which map these software identifer IRIs to some
-        configuration action; or they can use only the name from the `package`
-        field on a best effort basis.
+        One or more [IRI](https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier)s
+        identifying resources for installing or enabling the software named in
+        the `package` field. Implementations may provide resolvers which map
+        these software identifer IRIs to some configuration action; or they can
+        use only the name from the `package` field on a best effort basis.
 
         For example, the IRI `https://packages.debian.org/bowtie` could
         be resolved with `apt-get install bowtie`. The IRI
@@ -725,16 +725,20 @@ $graph:
         `https://identifiers.org/rrid/RRID:SCR_005476` could be fulfilled using
         the above mentioned Debian or bioconda package, a local installation
         managed by [Environement Modules](http://modules.sourceforge.net/), or
-        any other mechanism the platform chooses.
+        any other mechanism the platform chooses. If supported by a given
+        registry, implementations are encouraged to query these system
+        independent sofware identifier IRIs directly for links to packaging
+        systems.
 
         A site specific IRI can be listed as well. For example, an academic
         computing cluster using Environement Modules could list the IRI
-        `https://hpc.university.edu/modules/bowtie-tbb/1.22` to indicate that
+        `https://hpc.example.edu/modules/bowtie-tbb/1.22` to indicate that
         `module load bowtie-tbb/1.1.2` should be executed to make available
-        `bowtie` version 1.1.2 with the TBB library prior to running the
-        accompanying Workflow or CommandLineTool. Note that the example IRI is
-        specific to a particular institution and computing environment as the
-        Environment Modules system does not have a common namespace.
+        `bowtie` version 1.1.2 compiled with the TBB library prior to running
+        the accompanying Workflow or CommandLineTool. Note that the example IRI
+        is specific to a particular institution and computing environment as
+        the Environment Modules system does not have a common namespace or
+        standardized naming convention.
 
         This last example is the least portable and should only be used if
         mechanisms based off of the `package` field or more generic IRIs are
