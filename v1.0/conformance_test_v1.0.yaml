@@ -971,3 +971,13 @@
     }
   tool: v1.0/docker-output-dir.cwl
   doc: Test dockerOutputDirectory
+
+- job: v1.0/empty.json
+  output:
+    out:
+      class: File
+      checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
+      location: out
+      size: 15
+  tool: v1.0/imported-hint.cwl
+  doc: Test hints with $import
