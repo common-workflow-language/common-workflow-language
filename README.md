@@ -117,8 +117,9 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
 * [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
-* [BioDatomics](http://www.biodatomics.com/)
 * [Wolfson Wohl Cancer Research Centre](http://www.gla.ac.uk/researchinstitutes/cancersciences/ics/facilities/wwcrc/)
+* [Netherlands eScience Center](https://www.esciencecenter.nl/)
+* [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing)
 
 ## Individual Contributors
 
