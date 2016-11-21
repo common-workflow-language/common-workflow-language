@@ -13,27 +13,30 @@ from StringIO import StringIO
 from . import validate
 from .aslist import aslist
 from .flatten import flatten
+from .sourceline import SourceLine, add_lc_filename, relname
 
 import requests
 from cachecontrol.wrapper import CacheControl
 from cachecontrol.caches import FileCache
 import ruamel.yaml as yaml
-
-try:
-    from ruamel.yaml import CSafeLoader as SafeLoader
-except ImportError:
-    from ruamel.yaml import SafeLoader  # type: ignore
+from ruamel.yaml.comments import CommentedSeq, CommentedMap
 
 import rdflib
+from rdflib import Graph
 from rdflib.namespace import RDF, RDFS, OWL
 from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import (Any, AnyStr, Callable, cast, Dict, List, Iterable, Tuple,
-         TypeVar, Union)
+                    TypeVar, Union)
 
 _logger = logging.getLogger("salad")
+ContextType = Dict[unicode, Union[Dict, unicode, Iterable[unicode]]]
+DocumentType = TypeVar('DocumentType', CommentedSeq, CommentedMap)
+DocumentOrStrType = TypeVar(
+    'DocumentOrStrType', CommentedSeq, CommentedMap, unicode)
 
-class NormDict(dict):
+
+class NormDict(CommentedMap):
 
     def __init__(self, normalize=unicode):  # type: (type) -> None
         super(NormDict, self).__init__()
@@ -75,29 +78,36 @@ def SubLoader(loader):  # type: (Loader) -> Loader
 
 class Loader(object):
 
-    ContextType = Dict[unicode, Union[Dict, unicode, Iterable[unicode]]]
-    DocumentType = TypeVar('DocumentType', List, Dict[unicode, Any])
-
-    def __init__(self, ctx, schemagraph=None, foreign_properties=None,
-                 idx=None, cache=None, session=None):
-        # type: (Loader.ContextType, rdflib.Graph, Set[unicode], Dict[unicode, Union[List, Dict[unicode, Any], unicode]], Dict[unicode, Any], requests.sessions.Session) -> None
+    def __init__(self,
+                 ctx,                       # type: ContextType
+                 schemagraph=None,          # type: Graph
+                 foreign_properties=None,   # type: Set[unicode]
+                 idx=None,                  # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode]]
+                 cache=None,                # type: Dict[unicode, Any]
+                 session=None               # type: requests.sessions.Session
+                 ):
+        # type: (...) -> None
         normalize = lambda url: urlparse.urlsplit(url).geturl()
+        self.idx = None     # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode]]
         if idx is not None:
             self.idx = idx
         else:
             self.idx = NormDict(normalize)
 
-        self.ctx = {}  # type: Loader.ContextType
+        self.ctx = {}       # type: ContextType
+        self.graph = None   # type: Graph
         if schemagraph is not None:
             self.graph = schemagraph
         else:
             self.graph = rdflib.graph.Graph()
 
+        self.foreign_properties = None  # type: Set[unicode]
         if foreign_properties is not None:
             self.foreign_properties = foreign_properties
         else:
             self.foreign_properties = set()
 
+        self.cache = None   # type: Dict[unicode, Any]
         if cache is not None:
             self.cache = cache
         else:
@@ -110,23 +120,29 @@ class Loader(object):
             self.session = CacheControl(requests.Session(),
                                         cache=FileCache(os.path.join(os.environ["HOME"], ".cache", "salad")))
 
-        self.url_fields = None  # type: Set[unicode]
-        self.scoped_ref_fields = None  # type: Dict[unicode, int]
-        self.vocab_fields = None  # type: Set[unicode]
-        self.identifiers = None  # type: Set[unicode]
-        self.identity_links = None  # type: Set[unicode]
-        self.standalone = None  # type: Set[unicode]
-        self.nolinkcheck = None  # type: Set[unicode]
-        self.vocab = {}  # type: Dict[unicode, unicode]
-        self.rvocab = {}  # type: Dict[unicode, unicode]
-        self.idmap = None  # type: Dict[unicode, Any]
-        self.mapPredicate = None  # type: Dict[unicode, unicode]
-        self.type_dsl_fields = None  # type: Set[unicode]
+        self.url_fields = None          # type: Set[unicode]
+        self.scoped_ref_fields = None   # type: Dict[unicode, int]
+        self.vocab_fields = None        # type: Set[unicode]
+        self.identifiers = None         # type: Set[unicode]
+        self.identity_links = None      # type: Set[unicode]
+        self.standalone = None          # type: Set[unicode]
+        self.nolinkcheck = None         # type: Set[unicode]
+        self.vocab = {}                 # type: Dict[unicode, unicode]
+        self.rvocab = {}                # type: Dict[unicode, unicode]
+        self.idmap = None               # type: Dict[unicode, Any]
+        self.mapPredicate = None        # type: Dict[unicode, unicode]
+        self.type_dsl_fields = None     # type: Set[unicode]
 
         self.add_context(ctx)
 
-    def expand_url(self, url, base_url, scoped_id=False, vocab_term=False, scoped_ref=None):
-        # type: (unicode, unicode, bool, bool, int) -> unicode
+    def expand_url(self,
+                   url,                 # type: unicode
+                   base_url,            # type: unicode
+                   scoped_id=False,     # type: bool
+                   vocab_term=False,    # type: bool
+                   scoped_ref=None      # type: int
+                   ):
+        # type: (...) -> unicode
         if url in (u"@id", u"@type"):
             return url
 
@@ -210,7 +226,7 @@ class Loader(object):
             self.idx[unicode(s)] = None
 
     def add_context(self, newcontext, baseuri=""):
-        # type: (Loader.ContextType, unicode) -> None
+        # type: (ContextType, unicode) -> None
         if self.vocab:
             raise validate.ValidationException(
                 "Refreshing context that already has stuff in it")
@@ -272,33 +288,42 @@ class Loader(object):
         _logger.debug("vocab_fields is %s", self.vocab_fields)
         _logger.debug("vocab is %s", self.vocab)
 
-    def resolve_ref(self, ref, base_url=None, checklinks=True):
-        # type: (Union[Dict[unicode, Any], unicode], unicode, bool) -> Tuple[Union[List, Dict[unicode, Any], unicode], Dict[unicode, Any]]
+    def resolve_ref(self,
+                    ref,             # type: Union[CommentedMap, CommentedSeq, unicode]
+                    base_url=None,   # type: unicode
+                    checklinks=True  # type: bool
+                    ):
+        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode], Dict[unicode, Any]]
         base_url = base_url or u'file://%s/' % os.path.abspath('.')
 
-        obj = None  # type: Dict[unicode, Any]
+        obj = None              # type: CommentedMap
+        resolved_obj = None     # type: Union[CommentedMap, CommentedSeq, unicode]
         inc = False
-        mixin = None
+        mixin = None            # type: Dict[unicode, Any]
 
+        sl = SourceLine(obj, None, ValueError)
         # If `ref` is a dict, look for special directives.
-        if isinstance(ref, dict):
+        if isinstance(ref, CommentedMap):
             obj = ref
-            if u"$import" in obj:
+            if "$import" in obj:
+                sl = SourceLine(obj, "$import", RuntimeError)
                 if len(obj) == 1:
                     ref = obj[u"$import"]
                     obj = None
                 else:
-                    raise ValueError(
-                        u"'$import' must be the only field in %s" % (str(obj)))
-            elif u"$include" in obj:
+                    raise sl.makeError(
+                        u"'$import' must be the only field in %s" % (unicode(obj)))
+            elif "$include" in obj:
+                sl = SourceLine(obj, "$include", RuntimeError)
                 if len(obj) == 1:
                     ref = obj[u"$include"]
                     inc = True
                     obj = None
                 else:
-                    raise ValueError(
-                        u"'$include' must be the only field in %s" % (str(obj)))
-            elif u"$mixin" in obj:
+                    raise sl.makeError(
+                        u"'$include' must be the only field in %s" % (unicode(obj)))
+            elif "$mixin" in obj:
+                sl = SourceLine(obj, "$mixin", RuntimeError)
                 ref = obj[u"$mixin"]
                 mixin = obj
                 obj = None
@@ -309,11 +334,11 @@ class Loader(object):
                         ref = obj[identifier]
                         break
                 if not ref:
-                    raise ValueError(
-                        u"Object `%s` does not have identifier field in %s" % (obj, self.identifiers))
+                    raise sl.makeError(
+                        u"Object `%s` does not have identifier field in %s" % (relname(obj), self.identifiers))
 
         if not isinstance(ref, (str, unicode)):
-            raise ValueError(u"Must be string: `%s`" % str(ref))
+            raise ValueError(u"Expected CommentedMap or string, got %s: `%s`" % (type(ref), unicode(ref)))
 
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
 
@@ -321,25 +346,26 @@ class Loader(object):
         if url in self.idx and (not mixin):
             return self.idx[url], {}
 
-        # "$include" directive means load raw text
-        if inc:
-            return self.fetch_text(url), {}
+        with sl:
+            # "$include" directive means load raw text
+            if inc:
+                return self.fetch_text(url), {}
 
-        doc = None
-        if obj:
-            for identifier in self.identifiers:
-                obj[identifier] = url
-            doc_url = url
-        else:
-            # Load structured document
-            doc_url, frg = urlparse.urldefrag(url)
-            if doc_url in self.idx and (not mixin):
-                # If the base document is in the index, it was already loaded,
-                # so if we didn't find the reference earlier then it must not
-                # exist.
-                raise validate.ValidationException(
-                    u"Reference `#%s` not found in file `%s`." % (frg, doc_url))
-            doc = self.fetch(doc_url, inject_ids=(not mixin))
+            doc = None
+            if obj:
+                for identifier in self.identifiers:
+                    obj[identifier] = url
+                doc_url = url
+            else:
+                # Load structured document
+                doc_url, frg = urlparse.urldefrag(url)
+                if doc_url in self.idx and (not mixin):
+                    # If the base document is in the index, it was already loaded,
+                    # so if we didn't find the reference earlier then it must not
+                    # exist.
+                    raise validate.ValidationException(
+                        u"Reference `#%s` not found in file `%s`." % (frg, doc_url))
+                doc = self.fetch(doc_url, inject_ids=(not mixin))
 
         # Recursively expand urls and resolve directives
         if mixin:
@@ -359,10 +385,11 @@ class Loader(object):
             if url in self.idx:
                 resolved_obj = self.idx[url]
             else:
-                raise RuntimeError("Reference `%s` is not in the index. "
-                    "Index contains:\n  %s" % (url, "\n  ".join(self.idx)))
+                raise RuntimeError(
+                    "Reference `%s` is not in the index. Index contains:\n  %s"
+                    % (url, "\n  ".join(self.idx)))
 
-        if isinstance(resolved_obj, (dict)):
+        if isinstance(resolved_obj, CommentedMap):
             if u"$graph" in resolved_obj:
                 metadata = _copy_dict_without_key(resolved_obj, u"$graph")
                 return resolved_obj[u"$graph"], metadata
@@ -371,9 +398,11 @@ class Loader(object):
         else:
             return resolved_obj, metadata
 
-
-    def _resolve_idmap(self, document, loader):
-        # type: (Dict[unicode, Union[Dict[unicode, Dict[unicode, unicode]], List[Dict[unicode, Any]]]], Loader) -> None
+    def _resolve_idmap(self,
+                       document,    # type: CommentedMap
+                       loader       # type: Loader
+                       ):
+        # type: (...) -> None
         # Convert fields with mapSubject into lists
         # use mapPredicate if the mapped value isn't a dict.
         for idmapField in loader.idmap:
@@ -382,27 +411,46 @@ class Loader(object):
                 if (isinstance(idmapFieldValue, dict)
                         and "$import" not in idmapFieldValue
                         and "$include" not in idmapFieldValue):
-                    ls = []
+                    ls = CommentedSeq()
                     for k in sorted(idmapFieldValue.keys()):
                         val = idmapFieldValue[k]
-                        v = None  # type: Dict[unicode, Any]
-                        if not isinstance(val, dict):
+                        v = None  # type: CommentedMap
+                        if not isinstance(val, CommentedMap):
                             if idmapField in loader.mapPredicate:
-                                v = {loader.mapPredicate[idmapField]: val}
+                                v = CommentedMap(
+                                    ((loader.mapPredicate[idmapField], val),))
+                                v.lc.add_kv_line_col(
+                                    loader.mapPredicate[idmapField],
+                                    document[idmapField].lc.data[k])
+                                v.lc.filename = document.lc.filename
                             else:
                                 raise validate.ValidationException(
                                     "mapSubject '%s' value '%s' is not a dict"
                                     "and does not have a mapPredicate", k, v)
                         else:
                             v = val
+
                         v[loader.idmap[idmapField]] = k
+                        v.lc.add_kv_line_col(loader.idmap[idmapField],
+                                             document[idmapField].lc.data[k])
+                        v.lc.filename = document.lc.filename
+
+                        ls.lc.add_kv_line_col(
+                            len(ls), document[idmapField].lc.data[k])
+
+                        ls.lc.filename = document.lc.filename
                         ls.append(v)
+
                     document[idmapField] = ls
 
     typeDSLregex = re.compile(ur"^([^[?]+)(\[\])?(\?)?$")
 
-    def _type_dsl(self, t):
-        # type: (Union[unicode, Dict, List]) -> Union[unicode, Dict[unicode, unicode], List[Union[unicode, Dict[unicode, unicode]]]]
+    def _type_dsl(self,
+                  t,        # type: Union[unicode, Dict, List]
+                  lc,
+                  filename):
+        # type: (...) -> Union[unicode, Dict[unicode, unicode], List[Union[unicode, Dict[unicode, unicode]]]]
+
         if not isinstance(t, (str, unicode)):
             return t
 
@@ -412,34 +460,59 @@ class Loader(object):
         first = m.group(1)
         second = third = None
         if m.group(2):
-            second = {u"type": u"array",
-                 u"items": first}
+            second = CommentedMap((("type", "array"),
+                                   ("items", first)))
+            second.lc.add_kv_line_col("type", lc)
+            second.lc.add_kv_line_col("items", lc)
+            second.lc.filename = filename
         if m.group(3):
-            third = [u"null", second or first]
+            third = CommentedSeq([u"null", second or first])
+            third.lc.add_kv_line_col(0, lc)
+            third.lc.add_kv_line_col(1, lc)
+            third.lc.filename = filename
         return third or second or first
 
-    def _resolve_type_dsl(self, document, loader):
-        # type: (Dict[unicode, Union[unicode, Dict[unicode, unicode], List]], Loader) -> None
+    def _resolve_type_dsl(self,
+                          document,  # type: CommentedMap
+                          loader     # type: Loader
+                          ):
+        # type: (...) -> None
         for d in loader.type_dsl_fields:
             if d in document:
-                datum = document[d]
+                datum2 = datum = document[d]
                 if isinstance(datum, (str, unicode)):
-                    document[d] = self._type_dsl(datum)
-                elif isinstance(datum, list):
-                    document[d] = [self._type_dsl(t) for t in datum]
-                datum2 = document[d]
-                if isinstance(datum2, list):
-                    document[d] = flatten(datum2)
+                    datum2 = self._type_dsl(datum, document.lc.data[
+                                            d], document.lc.filename)
+                elif isinstance(datum, CommentedSeq):
+                    datum2 = CommentedSeq()
+                    for n, t in enumerate(datum):
+                        datum2.lc.add_kv_line_col(
+                            len(datum2), datum.lc.data[n])
+                        datum2.append(self._type_dsl(
+                            t, datum.lc.data[n], document.lc.filename))
+                if isinstance(datum2, CommentedSeq):
+                    datum3 = CommentedSeq()
                     seen = []  # type: List[unicode]
-                    uniq = []
-                    for item in document[d]:
-                        if item not in seen:
-                            uniq.append(item)
-                            seen.append(item)
-                    document[d] = uniq
+                    for i, item in enumerate(datum2):
+                        if isinstance(item, CommentedSeq):
+                            for j, v in enumerate(item):
+                                if v not in seen:
+                                    datum3.lc.add_kv_line_col(
+                                        len(datum3), item.lc.data[j])
+                                    datum3.append(v)
+                                    seen.append(v)
+                        else:
+                            if item not in seen:
+                                datum3.lc.add_kv_line_col(
+                                    len(datum3), datum2.lc.data[i])
+                                datum3.append(item)
+                                seen.append(item)
+                    document[d] = datum3
+                else:
+                    document[d] = datum2
 
     def _resolve_identifier(self, document, loader, base_url):
-        # type: (Dict[unicode, unicode], Loader, unicode) -> unicode
+        # type: (CommentedMap, Loader, unicode) -> unicode
         # Expand identifier field (usually 'id') to resolve scope
         for identifer in loader.identifiers:
             if identifer in document:
@@ -480,8 +553,12 @@ class Loader(object):
                 document[d2] = document[d]
                 del document[d]
 
-    def _resolve_uris(self, document, loader, base_url):
-        # type: (Dict[unicode, Union[unicode, List[unicode]]], Loader, unicode) -> None
+    def _resolve_uris(self,
+                      document,  # type: Dict[unicode, Union[unicode, List[unicode]]]
+                      loader,    # type: Loader
+                      base_url   # type: unicode
+                      ):
+        # type: (...) -> None
         # Resolve remaining URLs based on document base
         for d in loader.url_fields:
             if d in document:
@@ -492,35 +569,43 @@ class Loader(object):
                         vocab_term=(d in loader.vocab_fields),
                         scoped_ref=self.scoped_ref_fields.get(d))
                 elif isinstance(datum, list):
-                    document[d] = [
-                        loader.expand_url(
-                            url, base_url, scoped_id=False,
-                            vocab_term=(d in loader.vocab_fields),
-                            scoped_ref=self.scoped_ref_fields.get(d))
-                        if isinstance(url, (str, unicode))
-                        else url for url in datum]
+                    for i, url in enumerate(datum):
+                        if isinstance(url, (str, unicode)):
+                            datum[i] = loader.expand_url(
+                                url, base_url, scoped_id=False,
+                                vocab_term=(d in loader.vocab_fields),
+                                scoped_ref=self.scoped_ref_fields.get(d))
 
 
-    def resolve_all(self, document, base_url, file_base=None, checklinks=True):
-        # type: (DocumentType, unicode, unicode, bool) -> Tuple[Union[List, Dict[unicode, Any], unicode], Dict[unicode, Any]]
+    def resolve_all(self,
+                    document,           # type: Union[CommentedMap, CommentedSeq]
+                    base_url,           # type: unicode
+                    file_base=None,     # type: unicode
+                    checklinks=True     # type: bool
+                    ):
+        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode], Dict[unicode, Any]]
         loader = self
-        metadata = {}  # type: Dict[unicode, Any]
+        metadata = CommentedMap()  # type: CommentedMap
         if file_base is None:
             file_base = base_url
 
-        if isinstance(document, dict):
+        if isinstance(document, CommentedMap):
             # Handle $import and $include
             if (u'$import' in document or u'$include' in document):
-                return self.resolve_ref(document, base_url=file_base, checklinks=checklinks)
+                return self.resolve_ref(
+                    document, base_url=file_base, checklinks=checklinks)
             elif u'$mixin' in document:
-                return self.resolve_ref(document, base_url=base_url, checklinks=checklinks)
-        elif isinstance(document, list):
+                return self.resolve_ref(
+                    document, base_url=base_url, checklinks=checklinks)
+        elif isinstance(document, CommentedSeq):
             pass
+        elif isinstance(document, (list, dict)):
+            raise Exception("Expected CommentedMap or CommentedSeq, got %s" % type(document))
         else:
             return (document, metadata)
 
         newctx = None  # type: Loader
-        if isinstance(document, dict):
+        if isinstance(document, CommentedMap):
             # Handle $base, $profile, $namespaces, $schemas and $graph
             if u"$base" in document:
                 base_url = document[u"$base"]
@@ -549,8 +634,9 @@ class Loader(object):
             if u"$graph" in document:
                 metadata = _copy_dict_without_key(document, u"$graph")
                 document = document[u"$graph"]
-                resolved_metadata = loader.resolve_all(metadata, base_url,
-                        file_base=file_base, checklinks=False)[0]
+                resolved_metadata = loader.resolve_all(
+                    metadata, base_url, file_base=file_base,
+                    checklinks=False)[0]
                 if isinstance(resolved_metadata, dict):
                     metadata = resolved_metadata
                 else:
@@ -558,7 +644,7 @@ class Loader(object):
                         "Validation error, metadata must be dict: %s"
                         % (resolved_metadata))
 
-        if isinstance(document, dict):
+        if isinstance(document, CommentedMap):
             self._normalize_fields(document, loader)
             self._resolve_idmap(document, loader)
             self._resolve_type_dsl(document, loader)
@@ -573,19 +659,26 @@ class Loader(object):
             except validate.ValidationException as v:
                 _logger.warn("loader is %s", id(loader), exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
-                    id(loader), file_base, key, validate.indent(str(v))))
+                    id(loader), file_base, key, validate.indent(unicode(v))))
 
-        elif isinstance(document, list):
+        elif isinstance(document, CommentedSeq):
             i = 0
             try:
                 while i < len(document):
                     val = document[i]
-                    if isinstance(val, dict) and (u"$import" in val or u"$mixin" in val):
-                        l, _ = loader.resolve_ref(val, base_url=file_base, checklinks=False)
-                        if isinstance(l, list):  # never true?
+                    if isinstance(val, CommentedMap) and (u"$import" in val or u"$mixin" in val):
+                        l, _ = loader.resolve_ref(
+                            val, base_url=file_base, checklinks=False)
+                        if isinstance(l, CommentedSeq):
+                            lc = document.lc.data[i]
                             del document[i]
-                            for item in aslist(l):
-                                document.insert(i, item)
+                            llen = len(l)
+                            for j in range(len(document) + llen, i + llen, -1):
+                                document.lc.data[
+                                    j - 1] = document.lc.data[j - llen]
+                            for item in l:
+                                document.insert(i, item)  # type: ignore
+                                document.lc.data[i] = lc
                                 i += 1
                         else:
                             document[i] = l
@@ -597,7 +690,7 @@ class Loader(object):
             except validate.ValidationException as v:
                 _logger.warn("failed", exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
-                    id(loader), file_base, i, validate.indent(str(v))))
+                    id(loader), file_base, i, validate.indent(unicode(v))))
 
             for identifer in loader.identity_links:
                 if identifer in metadata:
@@ -607,7 +700,7 @@ class Loader(object):
                         loader.idx[metadata[identifer]] = document
 
         if checklinks:
-            document = self.validate_links(document, u"")
+            self.validate_links(document, u"")
 
         return document, metadata
 
@@ -635,7 +728,10 @@ class Loader(object):
                 else:
                     return read
             except (OSError, IOError) as e:
-                raise RuntimeError('Error reading %s %s' % (url, e))
+                if e.filename == path:
+                    raise RuntimeError(unicode(e))
+                else:
+                    raise RuntimeError('Error reading %s: %s' % (url, e))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
@@ -648,11 +744,12 @@ class Loader(object):
                 textIO = StringIO(text.decode('utf-8'))
             else:
                 textIO = StringIO(text)
-            textIO.name = url  # type: ignore
-            result = yaml.load(textIO, Loader=SafeLoader)
+            textIO.name = url    # type: ignore
+            result = yaml.round_trip_load(textIO)  # type: ignore
+            add_lc_filename(result, url)
         except yaml.parser.ParserError as e:
             raise validate.ValidationException("Syntax error %s" % (e))
-        if isinstance(result, dict) and inject_ids and self.identifiers:
+        if isinstance(result, CommentedMap) and inject_ids and self.identifiers:
             for identifier in self.identifiers:
                 if identifier not in result:
                     result[identifier] = url
@@ -677,7 +774,7 @@ class Loader(object):
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
-    FieldType = TypeVar('FieldType', unicode, List[unicode], Dict[unicode, Any])
+    FieldType = TypeVar('FieldType', unicode, CommentedSeq, CommentedMap)
 
     def validate_scoped(self, field, link, docid):
         # type: (unicode, unicode, unicode) -> unicode
@@ -701,7 +798,7 @@ class Loader(object):
                 break
             sp.pop()
         raise validate.ValidationException(
-            "Field `%s` contains undefined reference to `%s`, tried %s" % (field, link, tried))
+            "Field `%s` references unknown identifier `%s`, tried %s" % (field, link, ", ".join(tried)))
 
     def validate_link(self, field, link, docid):
         # type: (unicode, FieldType, unicode) -> FieldType
@@ -721,7 +818,7 @@ class Loader(object):
                 elif not self.check_file(link):
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
-        elif isinstance(link, list):
+        elif isinstance(link, CommentedSeq):
             errors = []
             for n, i in enumerate(link):
                 try:
@@ -730,12 +827,12 @@ class Loader(object):
                     errors.append(v)
             if errors:
                 raise validate.ValidationException(
-                    "\n".join([str(e) for e in errors]))
-        elif isinstance(link, dict):
+                    "\n".join([unicode(e) for e in errors]))
+        elif isinstance(link, CommentedMap):
             self.validate_links(link, docid)
         else:
-            raise validate.ValidationException("Link must be a str, unicode, "
-                                               "list, or a dict.")
+            raise validate.ValidationException(
+                "`%s` field is %s, expected string, list, or a dict." % (field, type(link).__name__))
         return link
 
     def getid(self, d):  # type: (Any) -> unicode
@@ -747,59 +844,62 @@ class Loader(object):
         return None
 
     def validate_links(self, document, base_url):
-        # type: (DocumentType, unicode) -> DocumentType
+        # type: (Union[CommentedMap, CommentedSeq, unicode], unicode) -> None
         docid = self.getid(document)
         if not docid:
             docid = base_url
 
-        errors = []
-        iterator = None  # type: Any
+        errors = []         # type: List[Exception]
+        iterator = None     # type: Any
         if isinstance(document, list):
             iterator = enumerate(document)
         elif isinstance(document, dict):
             try:
                 for d in self.url_fields:
+                    sl = SourceLine(document, d, validate.ValidationException)
                     if d in document and d not in self.identity_links:
                         document[d] = self.validate_link(d, document[d], docid)
             except validate.ValidationException as v:
-                errors.append(v)
+                errors.append(sl.makeError(unicode(v)))
             if hasattr(document, "iteritems"):
                 iterator = document.iteritems()
             else:
                 iterator = document.items()
         else:
-            return document
+            return
 
         for key, val in iterator:
+            sl = SourceLine(document, key, validate.ValidationException)
             try:
-                document[key] = self.validate_links(val, docid)
+                self.validate_links(val, docid)
             except validate.ValidationException as v:
                 if key not in self.nolinkcheck:
                     docid2 = self.getid(val)
                     if docid2:
-                        errors.append(validate.ValidationException(
-                            "While checking object `%s`\n%s" % (docid2, validate.indent(str(v)))))
+                        errors.append(sl.makeError("checking object `%s`\n%s" % (
+                            relname(docid2), validate.indent(unicode(v)))))
                     else:
                         if isinstance(key, basestring):
-                            errors.append(validate.ValidationException(
-                                "While checking field `%s`\n%s" % (key, validate.indent(str(v)))))
+                            errors.append(sl.makeError("checking field `%s`\n%s" % (
+                                key, validate.indent(unicode(v)))))
                         else:
-                            errors.append(validate.ValidationException(
-                                "While checking position %s\n%s" % (key, validate.indent(str(v)))))
+                            errors.append(sl.makeError("checking item\n%s" % (
+                                validate.indent(unicode(v)))))
 
         if errors:
             if len(errors) > 1:
                 raise validate.ValidationException(
-                    "\n".join([str(e) for e in errors]))
+                    u"\n".join([unicode(e) for e in errors]))
             else:
                 raise errors[0]
-        return document
+        return
 
+
+D = TypeVar('D', CommentedMap, ContextType)
 
 def _copy_dict_without_key(from_dict, filtered_key):
-    # type: (Dict, Any) -> Dict
-    new_dict = {}
-    for key, value in from_dict.items():
-        if key != filtered_key:
-            new_dict[key] = value
+    # type: (D, Any) -> D
+    new_dict = copy.copy(from_dict)
+    if filtered_key in new_dict:
+        del new_dict[filtered_key]  # type: ignore
     return new_dict

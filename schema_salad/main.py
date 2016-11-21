@@ -3,19 +3,23 @@ import argparse
 import logging
 import sys
 import traceback
-import pkg_resources  # part of setuptools
-from . import schema
-from . import jsonld_context
-from . import makedoc
 import json
-from rdflib import Graph, plugin
-from rdflib.serializer import Serializer
 import os
 import urlparse
 
-from .ref_resolver import Loader
-from . import validate
+import pkg_resources  # part of setuptools
+
 from typing import Any, Dict, List, Union
+
+from rdflib import Graph, plugin
+from rdflib.serializer import Serializer
+
+from . import schema
+from . import jsonld_context
+from . import makedoc
+from . import validate
+from .sourceline import strip_dup_lineno
+from .ref_resolver import Loader
 
 _logger = logging.getLogger("salad")
 
@@ -23,8 +27,12 @@ from rdflib.plugin import register, Parser
 register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
 
-def printrdf(workflow, wf, ctx, sr):
-    # type: (str, Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Dict[unicode, Any], str) -> None
+def printrdf(workflow,  # type: str
+             wf,        # type: Union[List[Dict[unicode, Any]], Dict[unicode, Any]]
+             ctx,       # type: Dict[unicode, Any]
+             sr         # type: str
+             ):
+    # type: (...) -> None
     g = jsonld_context.makerdf(workflow, wf, ctx)
     print(g.serialize(format=sr))
 
@@ -104,9 +112,13 @@ def main(argsl=None):  # type: (List[str]) -> int
             schema_raw_doc, schema_uri)
     except (validate.ValidationException) as e:
         _logger.error("Schema `%s` failed link checking:\n%s",
-                args.schema, e, exc_info=(True if args.debug else False))
+                      args.schema, e, exc_info=(True if args.debug else False))
         _logger.debug("Index is %s", metaschema_loader.idx.keys())
         _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
+        return 1
+    except (RuntimeError) as e:
+        _logger.error("Schema `%s` read error:\n%s",
+                      args.schema, e, exc_info=(True if args.debug else False))
         return 1
 
     # Optionally print the schema after ref resolution
@@ -121,7 +133,8 @@ def main(argsl=None):  # type: (List[str]) -> int
     # Validate the schema document against the metaschema
     try:
         schema.validate_doc(metaschema_names, schema_doc,
-                            metaschema_loader, args.strict)
+                            metaschema_loader, args.strict,
+                            source=schema_metadata["name"])
     except validate.ValidationException as e:
         _logger.error("While validating schema `%s`:\n%s" %
                       (args.schema, str(e)))
@@ -149,8 +162,8 @@ def main(argsl=None):  # type: (List[str]) -> int
 
     if isinstance(avsc_names, Exception):
         _logger.error("Schema `%s` error:\n%s", args.schema,
-                avsc_names, exc_info=((type(avsc_names), avsc_names,
-                    None) if args.debug else None))
+                      avsc_names, exc_info=((type(avsc_names), avsc_names,
+                                             None) if args.debug else None))
         if args.print_avro:
             print(json.dumps(avsc_obj, indent=4))
         return 1
@@ -188,7 +201,7 @@ def main(argsl=None):  # type: (List[str]) -> int
         document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s",
-                      args.document, e, exc_info=args.debug)
+                      args.document, strip_dup_lineno(unicode(e)), exc_info=args.debug)
         return 1
 
     # Optionally print the document after ref resolution

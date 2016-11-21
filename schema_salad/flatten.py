@@ -2,6 +2,8 @@ import sys
 from typing import Any, Tuple
 
 # http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html
+
+
 def flatten(l, ltypes=(list, tuple)):
     # type: (Any, Any) -> Any
     if l is None:

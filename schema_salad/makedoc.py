@@ -110,6 +110,7 @@ class ToC(object):
         c += """</nav>"""
         return c
 
+
 basicTypes = ("https://w3id.org/cwl/salad#null",
               "http://www.w3.org/2001/XMLSchema#boolean",
               "http://www.w3.org/2001/XMLSchema#int",
@@ -219,8 +220,13 @@ class RenderType(object):
                  ("docAfter" not in f))):
                 self.render_type(f, 1)
 
-    def typefmt(self, tp, redirects, nbsp=False, jsonldPredicate=None):
-        # type: (Any, Dict[str, str], bool, Dict[str, str]) -> Union[str, unicode]
+    def typefmt(self,
+                tp,                     # type: Any
+                redirects,              # type: Dict[str, str]
+                nbsp=False,             # type: bool
+                jsonldPredicate=None    # type: Dict[str, str]
+                ):
+        # type: (...) -> Union[str, unicode]
         global primitiveType
         if isinstance(tp, list):
             if nbsp and len(tp) <= 3:
@@ -229,16 +235,20 @@ class RenderType(object):
                 return " | ".join([self.typefmt(n, redirects) for n in tp])
         if isinstance(tp, dict):
             if tp["type"] == "https://w3id.org/cwl/salad#array":
-                ar = "array&lt;%s&gt;" % (self.typefmt(tp["items"], redirects, nbsp=True))
+                ar = "array&lt;%s&gt;" % (self.typefmt(
+                    tp["items"], redirects, nbsp=True))
                 if jsonldPredicate and "mapSubject" in jsonldPredicate:
                     if "mapPredicate" in jsonldPredicate:
                         ar += " | map&lt;%s.%s,&nbsp;%s.%s&gt" % (self.typefmt(tp["items"], redirects),
-                                                           jsonldPredicate["mapSubject"],
-                                                           self.typefmt(tp["items"], redirects),
-                                                           jsonldPredicate["mapPredicate"])
+                                                                  jsonldPredicate[
+                                                                      "mapSubject"],
+                                                                  self.typefmt(
+                                                                      tp["items"], redirects),
+                                                                  jsonldPredicate["mapPredicate"])
                     ar += " | map&lt;%s.%s,&nbsp;%s&gt" % (self.typefmt(tp["items"], redirects),
-                                                          jsonldPredicate["mapSubject"],
-                                                          self.typefmt(tp["items"], redirects))
+                                                           jsonldPredicate[
+                                                               "mapSubject"],
+                                                           self.typefmt(tp["items"], redirects))
                 return ar
             if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
                 frg = schema.avro_name(tp["name"])
@@ -480,6 +490,7 @@ def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink):
     </div>
     </body>
     </html>""")
+
 
 if __name__ == "__main__":
 

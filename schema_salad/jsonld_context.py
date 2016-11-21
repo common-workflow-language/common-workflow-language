@@ -20,13 +20,19 @@ import urlparse
 import logging
 from .aslist import aslist
 from typing import Any, cast, Dict, Iterable, Tuple, Union
-from .ref_resolver import Loader
+from .ref_resolver import Loader, ContextType
 
 _logger = logging.getLogger("salad")
 
 
-def pred(datatype, field, name, context, defaultBase, namespaces):
-    # type: (Dict[str, Union[Dict, str]], Dict, str, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace]) -> Union[Dict, str]
+def pred(datatype,      # type: Dict[str, Union[Dict, str]]
+         field,         # type: Dict
+         name,          # type: str
+         context,       # type: ContextType
+         defaultBase,   # type: str
+         namespaces     # type: Dict[str, rdflib.namespace.Namespace]
+         ):
+    # type: (...) -> Union[Dict, str]
     split = urlparse.urlsplit(name)
 
     vee = None  # type: Union[str, unicode]
@@ -84,8 +90,14 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
     return ret
 
 
-def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
-    # type: (Dict[str, Any], Graph, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace], str) -> None
+def process_type(t,             # type: Dict[str, Any]
+                 g,             # type: Graph
+                 context,       # type: ContextType
+                 defaultBase,   # type: str
+                 namespaces,    # type: Dict[str, rdflib.namespace.Namespace]
+                 defaultPrefix  # type: str
+                 ):
+    # type: (...) -> None
     if t["type"] == "record":
         recordname = t["name"]
 
@@ -154,8 +166,8 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
 
 def salad_to_jsonld_context(j, schema_ctx):
-    # type: (Iterable, Dict[str, Any]) -> Tuple[Loader.ContextType, Graph]
-    context = {}  # type: Loader.ContextType
+    # type: (Iterable, Dict[str, Any]) -> Tuple[ContextType, Graph]
+    context = {}  # type: ContextType
     namespaces = {}
     g = Graph()
     defaultPrefix = ""
@@ -178,8 +190,11 @@ def salad_to_jsonld_context(j, schema_ctx):
 
     return (context, g)
 
-def fix_jsonld_ids(obj, ids):
-    # type: (Union[Dict[unicode, Any], List[Dict[unicode, Any]]], List[unicode]) -> None
+
+def fix_jsonld_ids(obj,     # type: Union[Dict[unicode, Any], List[Dict[unicode, Any]]]
+                   ids      # type: List[unicode]
+                   ):
+    # type: (...) -> None
     if isinstance(obj, dict):
         for i in ids:
             if i in obj:
@@ -190,8 +205,13 @@ def fix_jsonld_ids(obj, ids):
         for entry in obj:
             fix_jsonld_ids(entry, ids)
 
-def makerdf(workflow, wf, ctx, graph=None):
-    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType, Graph) -> Graph
+
+def makerdf(workflow,       # type: Union[str, unicode]
+            wf,             # type: Union[List[Dict[unicode, Any]], Dict[unicode, Any]]
+            ctx,            # type: ContextType
+            graph=None      # type: Graph
+            ):
+    # type: (...) -> Graph
     prefixes = {}
     idfields = []
     for k, v in ctx.iteritems():
