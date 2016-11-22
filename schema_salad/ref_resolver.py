@@ -600,7 +600,7 @@ class Loader(object):
         elif isinstance(document, CommentedSeq):
             pass
         elif isinstance(document, (list, dict)):
-            raise Exception("Expected CommentedMap or CommentedSeq, got %s" % type(document))
+            raise Exception("Expected CommentedMap or CommentedSeq, got %s: `%s`" % (type(document), document))
         else:
             return (document, metadata)
 
@@ -902,4 +902,7 @@ def _copy_dict_without_key(from_dict, filtered_key):
     new_dict = copy.copy(from_dict)
     if filtered_key in new_dict:
         del new_dict[filtered_key]  # type: ignore
+    if isinstance(from_dict, CommentedMap):
+        new_dict.lc.data = copy.copy(from_dict.lc.data)
+        new_dict.lc.filename = from_dict.lc.filename
     return new_dict

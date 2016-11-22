@@ -84,18 +84,41 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         lc = [0, 0, 0, 0]
     if fn is None:
         fn = "test"
+
+    if isinstance(d, CommentedMap):
+        for k,v in d.iteritems():
+            if k in d.lc.data:
+                d[k] = cmap(v, lc=d.lc.data[k], fn=d.lc.filename)
+            else:
+                d[k] = cmap(v, lc, fn=d.lc.filename)
+        return d
+    if isinstance(d, CommentedSeq):
+        for k,v in enumerate(d):
+            if k in d.lc.data:
+                d[k] = cmap(v, lc=d.lc.data[k], fn=d.lc.filename)
+            else:
+                d[k] = cmap(v, lc, fn=d.lc.filename)
+        return d
     if isinstance(d, dict):
         cm = CommentedMap()
         for k,v in d.iteritems():
+            if isinstance(v, CommentedBase):
+                uselc = [v.lc.line, v.lc.col, v.lc.line, v.lc.col]
+            else:
+                uselc = lc
             cm[k] = cmap(v)
-            cm.lc.add_kv_line_col(k, lc)
+            cm.lc.add_kv_line_col(k, uselc)
             cm.lc.filename = fn
         return cm
     if isinstance(d, list):
         cs = CommentedSeq()
         for k,v in enumerate(d):
+            if isinstance(v, CommentedBase):
+                uselc = [v.lc.line, v.lc.col, v.lc.line, v.lc.col]
+            else:
+                uselc = lc
             cs.append(cmap(v))
-            cs.lc.add_kv_line_col(k, lc)
+            cs.lc.add_kv_line_col(k, uselc)
             cs.lc.filename = fn
         return cs
     else:
@@ -119,7 +142,7 @@ class SourceLine(object):
         if not isinstance(self.item, ruamel.yaml.comments.CommentedBase):
             return self.raise_type(msg)
         errs = []
-        if self.key is None:
+        if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:
             lead = "%s:%i:%i:" % (self.item.lc.filename,
                                   self.item.lc.line+1,
                                   self.item.lc.col+1)
