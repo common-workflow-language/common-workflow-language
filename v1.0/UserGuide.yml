@@ -662,10 +662,17 @@
     - |
       ```
       
-      As this tool does not require any `inputs` we can run it with an empty job file:
+      As this tool does not require any `inputs` we can run it with an (almost) empty job file:
+      
+      *empty.yml*
+      ```
+    - $include: examples/empty.yml
+    - |
+      ```
+      
+      We can then run `expression.cwl`:
 
       ```
-      $ touch empty.yml
       $ cwl-runner expression.cwl empty.yml
       [job 140000594593168] /home/example$ echo -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
       -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
