@@ -8,7 +8,7 @@ hints:
   - class: ResourceRequirement
     coresMin: 4
   - class: DockerRequirement
-    dockerPull: python:2-alpine
+    dockerPull: python:2-slim
 
 inputs:
   - id: reference
