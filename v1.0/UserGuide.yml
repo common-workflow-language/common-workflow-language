@@ -522,7 +522,7 @@
     - |
       ```
 
-      *array-outpust-job.yml*
+      *array-outputs-job.yml*
       ```
     - $include: examples/array-outputs-job.yml
     - |
@@ -796,7 +796,7 @@
       class: Workflow
       ```
 
-      The 'cwlVersion` field indicates the version of the CWL spec used by the
+      The `cwlVersion` field indicates the version of the CWL spec used by the
       document.  The `class` field indicates this document describes a workflow.
 
 
