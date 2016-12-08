@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # Toy program to generate inverted index of word to line.
 # Takes input text file on stdin and prints output index on stdout.
