@@ -72,7 +72,7 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |[pypi2cwl](https://github.com/common-workflow-language/pypi2cwl)|Automatically run argparse2cwl on any package in PyPi|
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|CWL generator for ACD (EMBOSS) files |
-|[CWLviewer](https://github.com/MarkRobbo/CWLViewer)|A web application to view and share Common Workflow Language workflows|
+|[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
 
 ## Support, Community and Contributing
 
