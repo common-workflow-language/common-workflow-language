@@ -661,15 +661,15 @@
     - $include: examples/expression.cwl
     - |
       ```
-      
+
       As this tool does not require any `inputs` we can run it with an (almost) empty job file:
-      
+
       *empty.yml*
       ```
     - $include: examples/empty.yml
     - |
       ```
-      
+
       We can then run `expression.cwl`:
 
       ```
@@ -830,7 +830,7 @@
 
       The `outputs` section describes the outputs of the workflow.  This is a
       list of output parameters where each parameter consists of an identifier
-      and a data type.  The `source` connects the output parameter `classfile`
+      and a data type.  The `outputSource` connects the output parameter `classfile`
       of the `compile` step to the workflow output parameter `classout`.
 
       ```
