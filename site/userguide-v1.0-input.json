@@ -144,6 +144,11 @@
                     "basename": "tar-job.yml", 
                     "class": "File", 
                     "location": "../v1.0/examples/tar-job.yml"
+                },
+                {
+                    "basename": "empty.yml",
+                    "class": "File",
+                    "location": "../v1.0/examples/empty.yml"
                 }
             ]
         }
