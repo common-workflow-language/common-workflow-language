@@ -867,3 +867,18 @@
       connecting the input parameter `src` to the output parameter of `untar`
       using `untar/example_out`.  The output of this step `classfile` is
       connected to the `outputs` section for the Workflow, described above.
+
+    - |
+      # Suggested Metadata
+
+      ## File Formats
+
+      Here we describe how to describe the input and output file formats.  
+
+      ## Sample Parameter Files
+      
+      Here we describe how to create sample parameter files and describe why they are useful. 
+
+      ## Authorship
+
+      Here we describe how to describe the authors of a tool and how to cite it. 
