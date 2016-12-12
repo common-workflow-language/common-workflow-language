@@ -924,7 +924,7 @@
       or even in multiple steps within the same workflow.
 
       Here we use `default:` to hard-code
-      `"Hello.java" as the `ex` input,
+      `"Hello.java"` as the `ex` input,
       however our workflow also requires a tar file at `inp`,
       which we will prepare in the `create-tar` step.
       At this point it is probably a good idea to refactor
@@ -991,4 +991,9 @@
       our inner workflow was designed to take that as an input. A better
       refactoring of the inner workflow would be to take a list of
       Java files to compile, which would simplify its usage as a tool
-      step in other workflows. 
+      step in other workflows.  
+
+      Nested workflows can be a powerful feature to generate higher-level
+      functional and reusable workflow units - but just like for creating a
+      CWL Tool description, care must be taken to improve its usability 
+      in multiple workflows.
