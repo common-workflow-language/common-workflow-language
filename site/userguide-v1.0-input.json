@@ -144,6 +144,16 @@
                     "basename": "tar-job.yml", 
                     "class": "File", 
                     "location": "../v1.0/examples/tar-job.yml"
+                },
+                {
+                    "basename": "empty.yml", 
+                    "class": "File", 
+                    "location": "../v1.0/examples/empty.yml"
+                },
+                {
+                    "basename": "nestedworkflows.cwl", 
+                    "class": "File", 
+                    "location": "../v1.0/examples/nestedworkflows.cwl"
                 }
             ]
         }
