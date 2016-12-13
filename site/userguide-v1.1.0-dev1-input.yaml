@@ -32,4 +32,7 @@ secondaryFiles:
   - {basename: linkfile.cwl, class: File, location: ../v1.1.0-dev1/examples/linkfile.cwl}
   - {basename: record.cwl, class: File, location: ../v1.1.0-dev1/examples/record.cwl}
   - {basename: tar-job.yml, class: File, location: ../v1.1.0-dev1/examples/tar-job.yml}
+  - {basename: metadata_example.cwl, class: File, location: ../v1.1.0-dev1/examples/metadata_example.cwl}
+  - {basename: metadata_example2.cwl, class: File, location: ../v1.1.0-dev1/examples/metadata_example2.cwl}
+  - {basename: sample.json, class: File, location: ../v1.1.0-dev1/examples/sample.json}
   location: _:4f9d886b-443f-49bd-8e0e-f3517a8a5c34

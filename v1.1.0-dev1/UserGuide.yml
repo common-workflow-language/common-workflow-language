@@ -869,16 +869,65 @@
       connected to the `outputs` section for the Workflow, described above.
 
     - |
-      # Suggested Metadata
+      # Best Practices
 
       ## File Formats
 
-      Here we describe how to describe the input and output file formats.  
+      Tools and workflows can take *File* types as input and produce them as output. 
+      We also recommend indicating the format for *File* types. This helps document 
+      for others how to use your tool while allowing you to do some simple 
+      type-checking when creating parameter files. 
 
+      *metadata_example.cwl*
+      ```
+    - $include: examples/metadata_example.cwl
+    - |
+      ```
+      
       ## Sample Parameter Files
       
-      Here we describe how to create sample parameter files and describe why they are useful. 
+      Below is an example of a parameter file for the example above. We encourage 
+      checking in working examples of parameter files for your tool. This allows 
+      others to quickly work with your tool, starting from a "known good" 
+      parameterization. 
 
-      ## Authorship
+      *sample.json*
+      ```
+    - $include: examples/sample.json
+    - |
+      ```
 
-      Here we describe how to describe the authors of a tool and how to cite it. 
+      Now invoke `cwl-runner` with the tool wrapper and the input object on the
+      command line:
+
+      ```
+      $ cwltool metadata_example.cwl sample.json 
+      /usr/local/bin/cwltool 1.0.20161114152756
+      Resolved 'metadata_example.cwl' to 'file:///media/large_volume/testing/cwl_tutorial2/metadata_example.cwl'
+      [job metadata_example.cwl] /tmp/tmpNWyAd6$ /bin/sh \
+          -c \
+          'wc' '-l' '/tmp/tmpBf6m9u/stge293ac74-3d42-45c9-b506-dd35ea3e6eea/rna.SRR948778.bam' > /tmp/tmpNWyAd6/output.txt
+      Final process status is success
+      {
+        "report": {
+          "format": "http://edamontology.org/format_1964", 
+          "checksum": "sha1$49dc5004959ba9f1d07b8c00da9c46dd802cbe79", 
+          "basename": "output.txt", 
+          "location": "file:///media/large_volume/testing/cwl_tutorial2/output.txt", 
+          "path": "/media/large_volume/testing/cwl_tutorial2/output.txt", 
+          "class": "File", 
+          "size": 80
+        }
+      }
+      ```
+
+      ## Metdata and Authorship
+ 
+      It is also recommended to annotate your tool and workflows with metadata
+      informing others how to cite and describe your tool. 
+      
+      *metadata_example.cwl*
+      ```
+    - $include: examples/metadata_example2.cwl
+    - |
+      ```
