@@ -86,27 +86,31 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         fn = "test"
 
     if isinstance(d, CommentedMap):
+        fn = d.lc.filename if hasattr(d.lc, "filename") else fn
         for k,v in d.iteritems():
             if k in d.lc.data:
-                d[k] = cmap(v, lc=d.lc.data[k], fn=d.lc.filename)
+                d[k] = cmap(v, lc=d.lc.data[k], fn=fn)
             else:
-                d[k] = cmap(v, lc, fn=d.lc.filename)
+                d[k] = cmap(v, lc, fn=fn)
         return d
     if isinstance(d, CommentedSeq):
+        fn = d.lc.filename if hasattr(d.lc, "filename") else fn
         for k,v in enumerate(d):
             if k in d.lc.data:
-                d[k] = cmap(v, lc=d.lc.data[k], fn=d.lc.filename)
+                d[k] = cmap(v, lc=d.lc.data[k], fn=fn)
             else:
-                d[k] = cmap(v, lc, fn=d.lc.filename)
+                d[k] = cmap(v, lc, fn=fn)
         return d
     if isinstance(d, dict):
         cm = CommentedMap()
         for k,v in d.iteritems():
             if isinstance(v, CommentedBase):
                 uselc = [v.lc.line, v.lc.col, v.lc.line, v.lc.col]
+                vfn = v.lc.filename if hasattr(v.lc, "filename") else fn
             else:
                 uselc = lc
-            cm[k] = cmap(v)
+                vfn = fn
+            cm[k] = cmap(v, lc=uselc, fn=vfn)
             cm.lc.add_kv_line_col(k, uselc)
             cm.lc.filename = fn
         return cm
@@ -115,9 +119,11 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         for k,v in enumerate(d):
             if isinstance(v, CommentedBase):
                 uselc = [v.lc.line, v.lc.col, v.lc.line, v.lc.col]
+                vfn = v.lc.filename if hasattr(v.lc, "filename") else fn
             else:
                 uselc = lc
-            cs.append(cmap(v))
+                vfn = fn
+            cs.append(cmap(v, lc=uselc, fn=vfn))
             cs.lc.add_kv_line_col(k, uselc)
             cs.lc.filename = fn
         return cs
