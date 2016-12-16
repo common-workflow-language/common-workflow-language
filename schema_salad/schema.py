@@ -188,7 +188,7 @@ def load_schema(schema_ref,  # type: Union[CommentedMap, CommentedSeq, unicode]
 
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
     if cache is not None:
-        metaschema_loader.cache = cache
+        metaschema_loader.cache.update(cache)
     schema_doc, schema_metadata = metaschema_loader.resolve_ref(schema_ref, "")
 
     if not isinstance(schema_doc, list):

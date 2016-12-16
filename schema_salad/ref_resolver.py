@@ -73,20 +73,89 @@ def merge_properties(a, b):
 def SubLoader(loader):  # type: (Loader) -> Loader
     return Loader(loader.ctx, schemagraph=loader.graph,
                   foreign_properties=loader.foreign_properties, idx=loader.idx,
-                  cache=loader.cache, session=loader.session)
+                  cache=loader.cache, fetcher_constructor=loader.fetcher_constructor)
 
+class Fetcher(object):
+    def fetch_text(self, url):    # type: (unicode) -> unicode
+        raise NotImplementedError()
+
+    def check_exists(self, url):  # type: (unicode) -> bool
+        raise NotImplementedError()
+
+    def urljoin(self, base_url, url):  # type: (unicode, unicode) -> unicode
+        raise NotImplementedError()
+
+
+class DefaultFetcher(Fetcher):
+    def __init__(self, cache, session):  # type: (dict, requests.sessions.Session) -> None
+        self.cache = cache
+        self.session = session
+
+    def fetch_text(self, url):
+        # type: (unicode) -> unicode
+        if url in self.cache:
+            return self.cache[url]
+
+        split = urlparse.urlsplit(url)
+        scheme, path = split.scheme, split.path
+
+        if scheme in [u'http', u'https'] and self.session:
+            try:
+                resp = self.session.get(url)
+                resp.raise_for_status()
+            except Exception as e:
+                raise RuntimeError(url, e)
+            return resp.text
+        elif scheme == 'file':
+            try:
+                with open(path) as fp:
+                    read = fp.read()
+                if hasattr(read, "decode"):
+                    return read.decode("utf-8")
+                else:
+                    return read
+            except (OSError, IOError) as e:
+                if e.filename == path:
+                    raise RuntimeError(unicode(e))
+                else:
+                    raise RuntimeError('Error reading %s: %s' % (url, e))
+        else:
+            raise ValueError('Unsupported scheme in url: %s' % url)
+
+    def check_exists(self, url):  # type: (unicode) -> bool
+        if url in self.cache:
+            return True
+
+        split = urlparse.urlsplit(url)
+        scheme, path = split.scheme, split.path
+
+        if scheme in [u'http', u'https'] and self.session:
+            try:
+                resp = self.session.head(url)
+                resp.raise_for_status()
+            except Exception as e:
+                return False
+            return True
+        elif scheme == 'file':
+            return os.path.exists(path)
+        else:
+            raise ValueError('Unsupported scheme in url: %s' % url)
+
+    def urljoin(self, base_url, url):
+        return urlparse.urljoin(base_url, url)
 
 class Loader(object):
-
     def __init__(self,
                  ctx,                       # type: ContextType
-                 schemagraph=None,          # type: Graph
+                 schemagraph=None,          # type: rdflib.graph.Graph
                  foreign_properties=None,   # type: Set[unicode]
                  idx=None,                  # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode]]
                  cache=None,                # type: Dict[unicode, Any]
-                 session=None               # type: requests.sessions.Session
+                 session=None,              # type: requests.sessions.Session
+                 fetcher_constructor=None   # type: Callable[[Dict[unicode, unicode], requests.sessions.Session], Fetcher]
                  ):
         # type: (...) -> None
+
         normalize = lambda url: urlparse.urlsplit(url).geturl()
         self.idx = None     # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode]]
         if idx is not None:
@@ -113,12 +182,20 @@ class Loader(object):
         else:
             self.cache = {}
 
-        self.session = None  # type: requests.sessions.Session
-        if session is not None:
-            self.session = session
-        else:
+        if session is None:
             self.session = CacheControl(requests.Session(),
-                                        cache=FileCache(os.path.join(os.environ["HOME"], ".cache", "salad")))
+                                   cache=FileCache(os.path.join(os.environ["HOME"], ".cache", "salad")))
+        else:
+            self.session = session
+
+        if fetcher_constructor:
+            self.fetcher_constructor = fetcher_constructor
+        else:
+            self.fetcher_constructor = DefaultFetcher
+        self.fetcher = self.fetcher_constructor(self.cache, self.session)
+
+        self.fetch_text = self.fetcher.fetch_text
+        self.check_exists = self.fetcher.check_exists
 
         self.url_fields = None          # type: Set[unicode]
         self.scoped_ref_fields = None   # type: Dict[unicode, int]
@@ -171,7 +248,7 @@ class Loader(object):
         elif scoped_ref is not None and not split.fragment:
             pass
         else:
-            url = urlparse.urljoin(base_url, url)
+            url = self.fetcher.urljoin(base_url, url)
 
         if vocab_term and url in self.rvocab:
             return self.rvocab[url]
@@ -195,7 +272,7 @@ class Loader(object):
     def add_schemas(self, ns, base_url):
         # type: (Union[List[unicode], unicode], unicode) -> None
         for sch in aslist(ns):
-            fetchurl = urlparse.urljoin(base_url, sch)
+            fetchurl = self.fetcher.urljoin(base_url, sch)
             if fetchurl not in self.cache:
                 _logger.debug("Getting external schema %s", fetchurl)
                 content = self.fetch_text(fetchurl)
@@ -346,6 +423,7 @@ class Loader(object):
         if url in self.idx and (not mixin):
             return self.idx[url], {}
 
+        sl.raise_type = RuntimeError
         with sl:
             # "$include" directive means load raw text
             if inc:
@@ -704,37 +782,6 @@ class Loader(object):
 
         return document, metadata
 
-    def fetch_text(self, url):
-        # type: (unicode) -> unicode
-        if url in self.cache:
-            return self.cache[url]
-
-        split = urlparse.urlsplit(url)
-        scheme, path = split.scheme, split.path
-
-        if scheme in [u'http', u'https'] and self.session:
-            try:
-                resp = self.session.get(url)
-                resp.raise_for_status()
-            except Exception as e:
-                raise RuntimeError(url, e)
-            return resp.text
-        elif scheme == 'file':
-            try:
-                with open(path) as fp:
-                    read = fp.read()
-                if hasattr(read, "decode"):
-                    return read.decode("utf-8")
-                else:
-                    return read
-            except (OSError, IOError) as e:
-                if e.filename == path:
-                    raise RuntimeError(unicode(e))
-                else:
-                    raise RuntimeError('Error reading %s: %s' % (url, e))
-        else:
-            raise ValueError('Unsupported scheme in url: %s' % url)
-
     def fetch(self, url, inject_ids=True):  # type: (unicode, bool) -> Any
         if url in self.idx:
             return self.idx[url]
@@ -758,21 +805,6 @@ class Loader(object):
             self.idx[url] = result
         return result
 
-    def check_file(self, url):  # type: (unicode) -> bool
-        split = urlparse.urlsplit(url)
-        scheme, path = split.scheme, split.path
-
-        if scheme in [u'http', u'https'] and self.session:
-            try:
-                resp = self.session.head(url)
-                resp.raise_for_status()
-            except Exception as e:
-                return False
-            return True
-        elif scheme == 'file':
-            return os.path.exists(path)
-        else:
-            raise ValueError('Unsupported scheme in url: %s' % url)
 
     FieldType = TypeVar('FieldType', unicode, CommentedSeq, CommentedMap)
 
@@ -809,13 +841,13 @@ class Loader(object):
                 if link not in self.vocab and link not in self.idx and link not in self.rvocab:
                     if field in self.scoped_ref_fields:
                         return self.validate_scoped(field, link, docid)
-                    elif not self.check_file(link):
+                    elif not self.check_exists(link):
                         raise validate.ValidationException(
                             "Field `%s` contains undefined reference to `%s`" % (field, link))
             elif link not in self.idx and link not in self.rvocab:
                 if field in self.scoped_ref_fields:
                     return self.validate_scoped(field, link, docid)
-                elif not self.check_file(link):
+                elif not self.check_exists(link):
                     raise validate.ValidationException(
                         "Field `%s` contains undefined reference to `%s`" % (field, link))
         elif isinstance(link, CommentedSeq):
