@@ -10,11 +10,7 @@ import re
 import copy
 import pprint
 from StringIO import StringIO
-try:
-    # python >3.3
-    import pathlib  # type: ignore
-except:
-    import pathlib2 as pathlib  # type: ignore
+import  pathlib2
 
 from . import validate
 from .aslist import aslist
@@ -385,8 +381,8 @@ class Loader(object):
 
         if not base_url:
             if isinstance(ref, unicode):
-                ref = pathlib.Path(os.path.join(os.getcwd(), ref)).as_uri()
-            base_url = pathlib.Path(os.getcwd()).as_uri() + '/'
+                ref = pathlib2.Path(os.path.join(os.getcwd(), ref)).as_uri()
+            base_url = pathlib2.Path(os.getcwd()).as_uri() + '/'
 
         sl = SourceLine(obj, None, ValueError)
         # If `ref` is a dict, look for special directives.
