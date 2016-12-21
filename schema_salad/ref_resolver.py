@@ -380,7 +380,8 @@ class Loader(object):
         mixin = None            # type: Dict[unicode, Any]
 
         if not base_url:
-            ref = pathlib.Path(os.path.join(os.getcwd(), ref)).as_uri()
+            if isinstance(ref, unicode):
+                ref = pathlib.Path(os.path.join(os.getcwd(), ref)).as_uri()
             base_url = pathlib.Path(os.getcwd()).as_uri() + '/'
 
         sl = SourceLine(obj, None, ValueError)
