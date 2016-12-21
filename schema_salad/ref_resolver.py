@@ -12,9 +12,9 @@ import pprint
 from StringIO import StringIO
 try:
     # python >3.3
-    import pathlib
+    import pathlib  # type: ignore
 except:
-    import pathlib2 as pathlib
+    import pathlib2 as pathlib  # type: ignore
 
 from . import validate
 from .aslist import aslist
