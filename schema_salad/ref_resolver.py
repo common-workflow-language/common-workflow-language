@@ -10,7 +10,12 @@ import re
 import copy
 import pprint
 from StringIO import StringIO
-import pathlib2 as pathlib
+try:
+    # python 3
+    import pathlib
+except:
+    # python 2
+    import pathlib2 as pathlib
 
 from . import validate
 from .aslist import aslist
@@ -110,7 +115,7 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
-                with open(urllib.url2pathname(urlparse.urlparse(url).path)) as fp:
+                with open(urllib.url2pathname(str(urlparse.urlparse(url).path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
                     return read.decode("utf-8")
@@ -139,7 +144,7 @@ class DefaultFetcher(Fetcher):
                 return False
             return True
         elif scheme == 'file':
-            return os.path.exists(urllib.url2pathname(urlparse.urlparse(url).path))
+            return os.path.exists(urllib.url2pathname(str(urlparse.urlparse(url).path)))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
