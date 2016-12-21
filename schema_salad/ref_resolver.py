@@ -249,8 +249,6 @@ class Loader(object):
                 (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
         elif scoped_ref is not None and not split.fragment:
             pass
-        elif base_url is None:
-            url = pathlib.Path(os.path.join(os.getcwd(), url)).as_uri()
         else:
             url = self.fetcher.urljoin(base_url, url)
 
@@ -381,6 +379,10 @@ class Loader(object):
         inc = False
         mixin = None            # type: Dict[unicode, Any]
 
+        if not base_url:
+            ref = pathlib.Path(os.path.join(os.getcwd(), ref)).as_uri()
+            base_url = pathlib.Path(os.getcwd()).as_uri() + '/'
+
         sl = SourceLine(obj, None, ValueError)
         # If `ref` is a dict, look for special directives.
         if isinstance(ref, CommentedMap):
@@ -421,7 +423,6 @@ class Loader(object):
             raise ValueError(u"Expected CommentedMap or string, got %s: `%s`" % (type(ref), unicode(ref)))
 
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
-        base_url = base_url or pathlib.Path(os.getcwd()).as_uri() + '/'
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
             return self.idx[url], {}
