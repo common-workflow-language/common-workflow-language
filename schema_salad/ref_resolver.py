@@ -4,11 +4,13 @@ import json
 import hashlib
 import logging
 import collections
+import urllib
 import urlparse
 import re
 import copy
 import pprint
 from StringIO import StringIO
+import  pathlib2
 
 from . import validate
 from .aslist import aslist
@@ -108,7 +110,7 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
-                with open(path) as fp:
+                with open(urllib.url2pathname(str(urlparse.urlparse(url).path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
                     return read.decode("utf-8")
@@ -137,7 +139,7 @@ class DefaultFetcher(Fetcher):
                 return False
             return True
         elif scheme == 'file':
-            return os.path.exists(path)
+            return os.path.exists(urllib.url2pathname(str(urlparse.urlparse(url).path)))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
@@ -371,12 +373,16 @@ class Loader(object):
                     checklinks=True  # type: bool
                     ):
         # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode], Dict[unicode, Any]]
-        base_url = base_url or u'file://%s/' % os.path.abspath('.')
 
         obj = None              # type: CommentedMap
         resolved_obj = None     # type: Union[CommentedMap, CommentedSeq, unicode]
         inc = False
         mixin = None            # type: Dict[unicode, Any]
+
+        if not base_url:
+            if isinstance(ref, unicode):
+                ref = pathlib2.Path(os.path.join(os.getcwd(), ref)).as_uri()
+            base_url = pathlib2.Path(os.getcwd()).as_uri() + '/'
 
         sl = SourceLine(obj, None, ValueError)
         # If `ref` is a dict, look for special directives.
@@ -418,7 +424,6 @@ class Loader(object):
             raise ValueError(u"Expected CommentedMap or string, got %s: `%s`" % (type(ref), unicode(ref)))
 
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
-
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
             return self.idx[url], {}
