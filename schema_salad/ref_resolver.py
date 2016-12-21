@@ -4,11 +4,13 @@ import json
 import hashlib
 import logging
 import collections
+import urllib
 import urlparse
 import re
 import copy
 import pprint
 from StringIO import StringIO
+import pathlib2 as pathlib
 
 from . import validate
 from .aslist import aslist
@@ -108,7 +110,7 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
-                with open(path) as fp:
+                with open(urllib.url2pathname(urlparse.urlparse(url).path)) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
                     return read.decode("utf-8")
@@ -137,7 +139,7 @@ class DefaultFetcher(Fetcher):
                 return False
             return True
         elif scheme == 'file':
-            return os.path.exists(path)
+            return os.path.exists(urllib.url2pathname(urlparse.urlparse(url).path))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
@@ -247,6 +249,8 @@ class Loader(object):
                 (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
         elif scoped_ref is not None and not split.fragment:
             pass
+        elif base_url is None:
+            url = pathlib.Path(os.path.join(os.getcwd(), url)).as_uri()
         else:
             url = self.fetcher.urljoin(base_url, url)
 
@@ -371,7 +375,6 @@ class Loader(object):
                     checklinks=True  # type: bool
                     ):
         # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode], Dict[unicode, Any]]
-        base_url = base_url or u'file://%s/' % os.path.abspath('.')
 
         obj = None              # type: CommentedMap
         resolved_obj = None     # type: Union[CommentedMap, CommentedSeq, unicode]
@@ -418,7 +421,7 @@ class Loader(object):
             raise ValueError(u"Expected CommentedMap or string, got %s: `%s`" % (type(ref), unicode(ref)))
 
         url = self.expand_url(ref, base_url, scoped_id=(obj is not None))
-
+        base_url = base_url or pathlib.Path(os.getcwd()).as_uri() + '/'
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
             return self.idx[url], {}
