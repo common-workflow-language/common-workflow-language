@@ -11,10 +11,9 @@ import copy
 import pprint
 from StringIO import StringIO
 try:
-    # python 3
+    # python >3.3
     import pathlib
 except:
-    # python 2
     import pathlib2 as pathlib
 
 from . import validate
