@@ -4,14 +4,14 @@ Common Workflow Language
 [![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The Common Workflow Language (CWL) is a specification for describing analysis
-workflows and tools that are portable and scalable across a variety of software
-and hardware environments, from workstations to cluster, cloud, and high
-performance computing (HPC) environments.  CWL is designed to meet the needs of
-data-intensive science, such as Bioinformatics, Medical Imaging, Astronomy,
-Physics, and Chemistry.
+workflows and tools in a way that makes them portable and scalable across a
+variety of software and hardware environments, from workstations to cluster,
+cloud, and high performance computing (HPC) environments.  CWL is designed to
+meet the needs of data-intensive science, such as Bioinformatics, Medical
+Imaging, Astronomy, Physics, and Chemistry.
 
 CWL is developed by an informal, multi-vendor working group consisting of
-organizations and individuals interested enabling scientists to share data
+organizations and individuals aiming to enable scientists to share data
 analysis workflows.  [The CWL project is on Github.](https://github.com/common-workflow-language/common-workflow-language)
 
 CWL builds on technologies such as [JSON-LD](http://json-ld.org)
