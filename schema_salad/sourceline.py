@@ -103,7 +103,8 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         return d
     if isinstance(d, dict):
         cm = CommentedMap()
-        for k,v in d.iteritems():
+        for k in sorted(d.keys()):
+            v = d[k]
             if isinstance(v, CommentedBase):
                 uselc = [v.lc.line, v.lc.col, v.lc.line, v.lc.col]
                 vfn = v.lc.filename if hasattr(v.lc, "filename") else fn
