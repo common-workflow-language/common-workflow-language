@@ -243,7 +243,7 @@ class TestSchemas(unittest.TestCase):
             self.assertEqual(proc, src)
 
     def test_yaml_float_test(self):
-        self.assertEqual(ruamel.yaml.load("float-test: 2e-10")["float-test"],
+        self.assertEqual(ruamel.yaml.safe_load("float-test: 2e-10")["float-test"],
                 2e-10)
 
     def test_typedsl_ref(self):
@@ -341,13 +341,13 @@ class TestSchemas(unittest.TestCase):
         print(g.serialize(format="n3"))
 
     def test_mixin(self):
+        base_url = "file://" + os.getcwd() + "/tests/"
         ldr = schema_salad.ref_resolver.Loader({})
         ra = ldr.resolve_ref(cmap({"$mixin": get_data("tests/mixin.yml"), "one": "five"}),
-                             base_url="file://" + os.getcwd() + "/tests/")
+                             base_url=base_url)
         self.assertEqual({'id': 'four', 'one': 'five'}, ra[0])
-
         ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
-        base_url = "file://" + os.getcwd() + "/tests/"
+
         ra = ldr.resolve_all(cmap([{
             "id": "a",
             "m": {"$mixin": get_data("tests/mixin.yml")}
@@ -367,6 +367,11 @@ class TestSchemas(unittest.TestCase):
                 'id': base_url + u'#b/four',
                 'one': 'two'}
         }], ra[0])
+
+    def test_fragment(self):
+        ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
+        b, _ = ldr.resolve_ref("schema_salad/tests/frag.yml#foo2")
+        self.assertEquals({"id": b["id"], "bar":"b2"}, b)
 
 
 if __name__ == '__main__':

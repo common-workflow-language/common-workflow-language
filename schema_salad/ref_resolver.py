@@ -380,9 +380,11 @@ class Loader(object):
         mixin = None            # type: Dict[unicode, Any]
 
         if not base_url:
-            if isinstance(ref, unicode):
-                ref = pathlib2.Path(os.path.join(os.getcwd(), ref)).as_uri()
             base_url = pathlib2.Path(os.getcwd()).as_uri() + '/'
+
+        if isinstance(ref, (str, unicode)) and os.sep == "\\":
+            # Convert Windows paths
+            ref = ref.replace("\\", "/")
 
         sl = SourceLine(obj, None, ValueError)
         # If `ref` is a dict, look for special directives.
