@@ -1,7 +1,8 @@
 typing==3.5.2.2 ; python_version>="2.7"
 avro-python3 ; python_version>="3"
 avro==1.8.1 ; python_version<"3"
-ruamel.yaml==0.12.4
+pathlib2==2.1.0
+ruamel.yaml==0.13.7
 rdflib==4.2.1
 rdflib-jsonld==0.4.0
 html5lib==0.9999999

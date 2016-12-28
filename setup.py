@@ -30,14 +30,14 @@ else:
 install_requires = [
     'setuptools',
     'requests >= 1.0',
-    'ruamel.yaml >= 0.12.4, < 0.12.5',
+    'ruamel.yaml >= 0.12.4',
     'rdflib >= 4.2.0, < 4.3.0',
     'rdflib-jsonld >= 0.3.0, < 0.5.0',
-    'html5lib >= 0.90, <= 0.9999999',
     'mistune >= 0.7.3, < 0.8',
     'typing >= 3.5.2, < 3.6',
     'CacheControl >= 0.11.7, < 0.12',
-    'lockfile >= 0.9']
+    'lockfile >= 0.9',
+    'pathlib2 >= 2.1.0']
 
 install_requires.append("avro")  # TODO: remove me once cwltool is
 # available in Debian Stable, Ubuntu 12.04 LTS
