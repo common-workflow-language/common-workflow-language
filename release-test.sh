@@ -58,10 +58,11 @@ rm lib/python-wheels/setuptools* \
         && pip install setuptools==20.10.1
 pip install ${package}*tar.gz
 pip install pytest
-tar xzf ${package}*tar.gz
-cd ${package}*
+mkdir out
+tar --extract --directory=out -z -f ${package}*.tar.gz
+cd out/${package}*
 make dist
 make test
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
 mkdir ../not-${module}
-pushd ../not-${module} ; ../bin/${run_tests}; popd
+pushd ../not-${module} ; ../../bin/${run_tests}; popd
