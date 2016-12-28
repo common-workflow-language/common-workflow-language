@@ -1,9 +1,9 @@
+from .util import get_data
 import unittest
 import schema_salad.ref_resolver
 import schema_salad.main
 import schema_salad.schema
 from schema_salad.jsonld_context import makerdf
-from pkg_resources import Requirement, resource_filename, ResolutionError  # type: ignore
 import rdflib
 import ruamel.yaml
 import json
@@ -16,17 +16,6 @@ except ImportError:
     from ruamel.yaml import SafeLoader  # type: ignore
 
 from ruamel.yaml.comments import CommentedSeq, CommentedMap
-
-def get_data(filename):
-    filepath = None
-    try:
-        filepath = resource_filename(
-            Requirement.parse("schema-salad"), filename)
-    except ResolutionError:
-        pass
-    if not filepath or not os.path.isfile(filepath):
-        filepath = os.path.join(os.path.dirname(__file__), os.pardir, filename)
-    return filepath
 
 
 class TestSchemas(unittest.TestCase):
@@ -370,7 +359,7 @@ class TestSchemas(unittest.TestCase):
 
     def test_fragment(self):
         ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
-        b, _ = ldr.resolve_ref("schema_salad/tests/frag.yml#foo2")
+        b, _ = ldr.resolve_ref(get_data("tests/frag.yml#foo2"))
         self.assertEquals({"id": b["id"], "bar":"b2"}, b)
 
 
