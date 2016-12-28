@@ -1,4 +1,5 @@
 include gittaggers.py Makefile
-include schema_salad/tests/*.py schema_salad/tests/*.yml schema_salad/tests/*.owl
+include schema_salad/tests/*.py schema_salad/tests/*.yml
+include schema_salad/tests/test_schema/*.yml schema_salad/tests/*.owl
 include schema_salad/metaschema/*
 global-exclude *.pyc
