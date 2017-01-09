@@ -878,6 +878,13 @@
       for others how to use your tool while allowing you to do some simple 
       type-checking when creating parameter files. 
 
+      For file formats, we recommend referencing existing ontologies (like EDAM in 
+      our example), reference a local ontology for your institution, or do not add 
+      a file format initially for quick development before sharing your tool with others. 
+
+      Note that as a value add `cwltool` can do some basic reasoning based on file formats and 
+      warn you if there seem to be some obvious mismatches. 
+
       *metadata_example.cwl*
       ```
     - $include: examples/metadata_example.cwl
@@ -921,13 +928,23 @@
       }
       ```
 
-      ## Metdata and Authorship
+      ## Metadata and Authorship
  
-      It is also recommended to annotate your tool and workflows with metadata
-      informing others how to cite and describe your tool. 
+      For all developers, we recommend the following minimal metadata for your tool and workflows.
+      This example includes metadata allowing others to cite your tool. 
       
       *metadata_example.cwl*
       ```
     - $include: examples/metadata_example2.cwl
+    - |
+      ```
+
+      ## Extended Example
+      
+      For those that are highly motivated, it is also possible to annotate your tool with a much larger amount of metadata. This example includes EDAM ontology tags as keywords (allowing the grouping of related tools), hints at hardware requirements in order to use the tool, and a few more metadata fields. 
+
+      *metadata_example.cwl*
+      ```
+    - $include: examples/metadata_example3.cwl
     - |
       ```

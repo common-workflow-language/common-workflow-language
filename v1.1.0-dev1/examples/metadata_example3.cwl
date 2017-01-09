@@ -10,6 +10,10 @@ doc: |
 requirements:
   - class: ShellCommandRequirement
 
+hints:
+  - class: ResourceRequirement
+    coresMin: 4
+
 inputs:
   bam_input:
     type: File
@@ -54,9 +58,10 @@ s:contributor:
     s:email: dyuen@oicr.on.ca
     s:name: Denis Yuen
 
-
 s:citation: https://figshare.com/articles/Common_Workflow_Language_draft_3/3115156/2
 s:codeRepository: https://github.com/common-workflow-language/common-workflow-language
 s:dateCreated: "2016-12-13"
 s:license: https://www.apache.org/licenses/LICENSE-2.0
 
+s:keywords: http://edamontology.org/topic_0091 , http://edamontology.org/topic_0622
+s:programmingLanguage: C
