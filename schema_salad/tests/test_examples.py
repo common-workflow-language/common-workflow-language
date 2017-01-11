@@ -362,6 +362,14 @@ class TestSchemas(unittest.TestCase):
         b, _ = ldr.resolve_ref(get_data("tests/frag.yml#foo2"))
         self.assertEquals({"id": b["id"], "bar":"b2"}, b)
 
+    def test_file_uri(self):
+        # Note: this test probably won't pass on Windows.  Someone with a
+        # windows box should add an alternate test.
+        self.assertEquals("file:///foo/bar%20baz/quux", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux"))
+        self.assertEquals("/foo/bar baz/quux", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux"))
+        self.assertEquals("file:///foo/bar%20baz/quux#zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong"))
+        self.assertEquals("/foo/bar baz/quux#zing zong", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux#zing%20zong"))
+
 
 if __name__ == '__main__':
     unittest.main()
