@@ -8,9 +8,8 @@ import urllib
 import urlparse
 import re
 import copy
-import pprint
+import urllib
 from StringIO import StringIO
-import  pathlib2
 
 from . import validate
 from .aslist import aslist
@@ -37,6 +36,21 @@ DocumentType = TypeVar('DocumentType', CommentedSeq, CommentedMap)
 DocumentOrStrType = TypeVar(
     'DocumentOrStrType', CommentedSeq, CommentedMap, unicode)
 
+def file_uri(path):  # type: (unicode) -> unicode
+    if path.startswith("file://"):
+        return path
+    urlpath = urllib.pathname2url(str(path))
+    if urlpath.startswith("//"):
+        return "file:%s" % urlpath
+    else:
+        return "file://%s" % urlpath
+
+def uri_file_path(url):  # type: (unicode) -> unicode
+    split = urlparse.urlsplit(url)
+    if split.scheme == "file":
+        urllib.url2pathname(str(split.path))
+    else:
+        raise ValueError("Not a file URI")
 
 class NormDict(CommentedMap):
 
@@ -110,7 +124,7 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
-                with open(urllib.url2pathname(str(urlparse.urlparse(url).path))) as fp:
+                with open(urllib.url2pathname(str(path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
                     return read.decode("utf-8")
@@ -139,7 +153,7 @@ class DefaultFetcher(Fetcher):
                 return False
             return True
         elif scheme == 'file':
-            return os.path.exists(urllib.url2pathname(str(urlparse.urlparse(url).path)))
+            return os.path.exists(urllib.url2pathname(str(path)))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
@@ -380,10 +394,10 @@ class Loader(object):
         mixin = None            # type: Dict[unicode, Any]
 
         if not base_url:
-            base_url = pathlib2.Path(os.getcwd()).as_uri() + '/'
+            base_url = file_uri(os.getcwd()) + "/"
 
         if isinstance(ref, (str, unicode)) and os.sep == "\\":
-            # Convert Windows paths
+            # Convert Windows path separator in ref
             ref = ref.replace("\\", "/")
 
         sl = SourceLine(obj, None, ValueError)
