@@ -356,7 +356,7 @@
       containers are also purposefully isolated from the host system, so in
       order to run a tool inside a Docker container there is additional work to
       ensure that input files are available inside the container and output
-      files can be recovered from the contianer.  CWL can perform this work
+      files can be recovered from the container.  CWL can perform this work
       automatically, allowing you to use Docker to simplify your software
       management while avoiding the complexity of invoking and managing Docker
       containers.
