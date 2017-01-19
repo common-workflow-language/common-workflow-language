@@ -326,7 +326,7 @@ class Loader(object):
             raise validate.ValidationException(
                 "Refreshing context that already has stuff in it")
 
-        self.url_fields = set()
+        self.url_fields = set(("$schemas",))
         self.scoped_ref_fields = {}
         self.vocab_fields = set()
         self.identifiers = set()
