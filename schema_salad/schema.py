@@ -332,7 +332,6 @@ def replace_type(items, spec, loader, found):
     # type: (Any, Dict[unicode, Any], Loader, Set[unicode]) -> Any
     """ Go through and replace types in the 'spec' mapping"""
 
-    items = copy.deepcopy(items)
     if isinstance(items, dict):
         # recursively check these fields for types to replace
         if "type" in items and items["type"] in ("record", "enum"):
@@ -342,6 +341,7 @@ def replace_type(items, spec, loader, found):
                 else:
                     found.add(items["name"])
 
+        items = copy.copy(items)
         for n in ("type", "items", "fields"):
             if n in items:
                 items[n] = replace_type(items[n], spec, loader, found)
@@ -388,8 +388,8 @@ def make_valid_avro(items,          # type: Avro
                     union=False     # type: bool
                     ):
     # type: (...) -> Union[Avro, Dict]
-    items = copy.deepcopy(items)
     if isinstance(items, dict):
+        items = copy.copy(items)
         if items.get("name"):
             items["name"] = avro_name(items["name"])
 
@@ -424,19 +424,31 @@ def make_valid_avro(items,          # type: Avro
         items = avro_name(items)
     return items
 
+def deepcopy_strip(item):  # type: (Any) -> Any
+    """Make a deep copy of list and dict objects.
+
+    Intentionally do not copy attributes.  This is to discard CommentedMap and
+    CommentedSeq metadata which is very expensive with regular copy.deepcopy.
+
+    """
+
+    if isinstance(item, dict):
+        return {k: deepcopy_strip(v) for k,v in item.iteritems()}
+    elif isinstance(item, list):
+        return [deepcopy_strip(k) for k in item]
+    else:
+        return item
 
 def extend_and_specialize(items, loader):
     # type: (List[Dict[unicode, Any]], Loader) -> List[Dict[unicode, Any]]
     """Apply 'extend' and 'specialize' to fully materialize derived record
     types."""
 
-    types = {}  # type: Dict[unicode, Any]
-    for t in items:
-        types[t["name"]] = t
+    items = deepcopy_strip(items)
+    types = {t["name"]: t for t in items}  # type: Dict[unicode, Any]
     n = []
 
     for t in items:
-        t = copy.deepcopy(t)
         if "extends" in t:
             spec = {}  # type: Dict[unicode, unicode]
             if "specialize" in t:
@@ -450,7 +462,7 @@ def extend_and_specialize(items, loader):
                     raise Exception("Extends %s in %s refers to invalid base type" % (
                         t["extends"], t["name"]))
 
-                basetype = copy.deepcopy(types[ex])
+                basetype = copy.copy(types[ex])
 
                 if t["type"] == "record":
                     if spec:
@@ -466,6 +478,7 @@ def extend_and_specialize(items, loader):
                     exsym.extend(basetype.get("symbols", []))
 
             if t["type"] == "record":
+                t = copy.copy(t)
                 exfields.extend(t.get("fields", []))
                 t["fields"] = exfields
 
@@ -477,6 +490,7 @@ def extend_and_specialize(items, loader):
                     else:
                         fieldnames.add(field["name"])
             elif t["type"] == "enum":
+                t = copy.copy(t)
                 exsym.extend(t.get("symbols", []))
                 t["symbol"] = exsym
 
@@ -506,7 +520,6 @@ def extend_and_specialize(items, loader):
             t["fields"] = replace_type(t["fields"], extended_by, loader, set())
 
     return n
-
 
 def make_avro_schema(i,         # type: List[Dict[unicode, Any]]
                      loader     # type: Loader
