@@ -12,7 +12,9 @@ Imaging, Astronomy, Physics, and Chemistry.
 
 CWL is developed by an informal, multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
-analysis workflows.  [The CWL project is on Github.](https://github.com/common-workflow-language/common-workflow-language)
+analysis workflows.  [The CWL project is on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/)
+
+[![Open Stand badge](http://standards.ieee.org/images/openstand/128x128-blue2.png)](https://open-stand.org/about-us/principles/).
 
 CWL builds on technologies such as [JSON-LD](http://json-ld.org)
 for data modeling and [Docker](http://docker.com) for portable runtime
