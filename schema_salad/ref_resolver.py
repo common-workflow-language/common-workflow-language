@@ -56,7 +56,7 @@ def uri_file_path(url):  # type: (str) -> str
 
 class NormDict(CommentedMap):
 
-    def __init__(self, normalize=unicode):  # type: (type) -> None
+    def __init__(self, normalize=unicode):  # type: (Callable) -> None
         super(NormDict, self).__init__()
         self.normalize = normalize
 
