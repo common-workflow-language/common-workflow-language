@@ -239,7 +239,7 @@
 
       ```
       outputs:
-        - id: example_out
+        example_out:
           type: File
           outputBinding:
             glob: hello.txt
