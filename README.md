@@ -122,7 +122,8 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Broad Institute](https://www.broadinstitute.org)
 * [Wolfson Wohl Cancer Research Centre](http://www.gla.ac.uk/researchinstitutes/cancersciences/ics/facilities/wwcrc/)
 * [Netherlands eScience Center](https://www.esciencecenter.nl/)
-* [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing)
+* [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing) / [Agave Platform](https://agaveapi.co/)
+* [CyVerse](http://www.cyverse.org/)
 
 ## Individual Contributors
 
