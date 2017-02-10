@@ -1,0 +1,45 @@
+v1.0	5b7ad26d0e9bd6dcb27bb7a1191786b3bbc06500 2016-07-17
+
+v1.0.?	04d9dac46b3185310504049b7ab856aea96c53bd 2016-08-02
+Additional conformance test: command line inputBinding of Directory input
+parameter
+
+v1.0.?	91bb7b4fea8e3bd82a35dcf9076764fe26a72d5d 2016-08-03
+Additional conformance test: command line generation of array-of-arrays
+
+v1.0.?	e6043996508d9417066f6d1db3ae8d6329e62535 2016-08-05
+Additional conformance test: $HOME and $TMPDIR are set correctly according to
+spec
+
+v1.0.?	4a02bc702d4b35dabd07acd95bc6c4baf2922321 2016-08-10
+Additional conformance test: expressionLib requirement of individual tool step
+overrides expressionLib of workflow
+
+v1.0.?	58a935422f1d89103e9a1dcfb129651feabcfece 2016-08-19
+Typo fix in concepts.md
+
+v1.0.?	cf28454378c8862e4ffede18ddd46b65335f6722 2016-08-20
+Additional conformance test: initial work dir, docker, and secondary files
+
+v1.0.?	779c2d425f273680f818ed56c84015da63cf9b75 2016-09-08
+Additional conformance test: embedded subworkflow
+
+v1.0.?	8cad6f15cc65ed9675090e556483232efe1a544c 2016-09-15
+Additional conformance test: requirements/hints on workflow steps
+
+v1.0.?	ed40737ae80473ee107ba3d21aa3941461fb4350 2016-10-07
+Additional conformance test: cwl.output.json behavior
+
+v1.0.?	1356c4504fb77c2de93f640d38990688fff9b938 2016-10-13
+Additional conformance test: secondaryFiles with arrays
+
+v1.0.?	2a5b95ef9df02b017f298c3afb94203f23d0b397 2016-10-25
+fixing mentions to draft3/4
+
+v1.0.?	fc4cb0fb19a082c123b88b9424378086559823e8 2016-10-30
+Conformance test clarification: args output and empty.json for null jobs
+
+v1.0.?	b14404b0f8b212e6aceafa599159d8231da3d0fe 2016-11-13
+Removed errant jsonldPredicate from SoftwarePackage.package
+
+
