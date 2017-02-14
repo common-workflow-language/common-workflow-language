@@ -7,12 +7,11 @@ requirements:
       - entry: $(inputs.input_dir)
         entryname: work_dir
         writable: true
-baseCommand: "touch"
-arguments: [$(inputs.input_dir.path + "/e")]
+baseCommand: [touch, work_dir/e]
 inputs:
   input_dir: Directory
 outputs:
   output_dir:
     type: Directory
     outputBinding:
-      glob: $(inputs.input_dir)
+      glob: work_dir
