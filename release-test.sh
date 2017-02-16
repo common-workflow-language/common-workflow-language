@@ -7,7 +7,7 @@ package=schema-salad
 module=schema_salad
 repo=https://github.com/common-workflow-language/schema_salad.git
 run_tests="py.test --pyarg ${module}"
-pipver=6.0 # minimum required version of pip
+pipver=7.0.2 # minimum required version of pip
 
 rm -Rf testenv? || /bin/true
 
@@ -21,7 +21,7 @@ virtualenv testenv4
 source testenv1/bin/activate
 rm testenv1/lib/python-wheels/setuptools* \
 	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
+        && pip install setuptools==20.10.1 wheel
 make install-dependencies
 make test
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
@@ -37,7 +37,7 @@ cd testenv2
 source bin/activate
 rm lib/python-wheels/setuptools* \
 	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
+        && pip install setuptools==20.10.1 wheel
 pip install -e git+${repo}@${HEAD}#egg=${package}
 cd src/${package}
 make install-dependencies
@@ -55,7 +55,7 @@ cd ../testenv3/
 source bin/activate
 rm lib/python-wheels/setuptools* \
 	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
+        && pip install setuptools==20.10.1 wheel
 pip install ${package}*tar.gz
 pip install pytest
 mkdir out
