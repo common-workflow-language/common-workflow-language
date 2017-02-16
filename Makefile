@@ -187,6 +187,6 @@ jenkins:
 	. env3/bin/activate ; \
 	pip install -U setuptools pip wheel ; \
 	${MAKE} install-dep ; \
-	pip install -U mypy-lang typed-ast ; ${MAKE} mypy
+	pip install -U mypy ; ${MAKE} mypy
 
 FORCE:
