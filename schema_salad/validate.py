@@ -180,8 +180,8 @@ def validate_ex(expected_schema,            # type: Schema
             return True
         else:
             if raise_ex:
-                raise ValidationException(u"the value is not a list, expected list of %s" % (
-                    friendly(expected_schema.items)))
+                raise ValidationException(u"the value %s is not a list, expected list of %s" % (
+                    vpformat(datum), friendly(expected_schema.items)))
             else:
                 return False
     elif isinstance(expected_schema, avro.schema.UnionSchema):

@@ -150,13 +150,13 @@ class SourceLine(object):
             return self.raise_type(msg)
         errs = []
         if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:
-            lead = "%s:%i:%i:" % (self.item.lc.filename,
-                                  self.item.lc.line+1,
-                                  self.item.lc.col+1)
+            lead = "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
+                                  (self.item.lc.line or 0)+1,
+                                  (self.item.lc.col or 0)+1)
         else:
-            lead = "%s:%i:%i:" % (self.item.lc.filename,
-                                  self.item.lc.data[self.key][0]+1,
-                                  self.item.lc.data[self.key][1]+1)
+            lead = "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
+                                  (self.item.lc.data[self.key][0] or 0)+1,
+                                  (self.item.lc.data[self.key][1] or 0)+1)
         for m in msg.splitlines():
             if lineno_re.match(m):
                 errs.append(m)
