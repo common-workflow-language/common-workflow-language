@@ -10,15 +10,19 @@ requirements:
 baseCommand:
  -  bash
  - '-c'
- - 'if [ ! -w work_dir ]; then echo not writable; fi;
-   if [ -L work_dir ]; then echo dir is a symlink; fi;
-   if [ ! -w work_dir/a ]; then echo not writable; fi;
-   if [ -L work_dir/a ]; then echo dir is a symlink; fi;
-   if [ ! -w work_dir/c ]; then echo not writable; fi;
-   if [ -L work_dir/c ]; then echo dir is a symlink; fi;
-   if [ ! -w work_dir/c/d ]; then echo not writable; fi;
-   if [ -L work_dir/c/d ]; then echo dir is a symlink; fi;
-   touch work_dir/e'
+ - 'touch work_dir/testresult;
+    touch work_dir/e;
+    if [ ! -w work_dir ]; then echo work_dir not writable >> work_dir/testresult; fi;
+    if [ -L work_dir ]; then echo work_dir is a symlink >> work_dir/testresult; fi;
+    if [ ! -w work_dir/a ]; then echo work_dir/a not writable >> work_dir/testresult; fi;
+    if [ -L work_dir/a ]; then echo work_dir/a is a symlink >> work_dir/testresult; fi;
+    if [ ! -w work_dir/c ]; then echo work_dir/c not writable >> work_dir/testresult; fi;
+    if [ -L work_dir/c ]; then echo work_dir/c is a symlink >> work_dir/testresult; fi;
+    if [ ! -w work_dir/c/d ]; then echo work_dir/c/d not writable >> work_dir/testresult; fi;
+    if [ -L work_dir/c/d ]; then echo work_dir/c/d is a symlink >> work_dir/testresult; fi;
+    if [ ! -w work_dir/e ]; then echo work_dir/e not writable >> work_dir/testresult; fi;
+    if [ -L work_dir/e ]; then echo work_dir/e is a symlink >> work_dir/testresult; fi;'
+
 inputs:
   input_dir: Directory
 outputs:
