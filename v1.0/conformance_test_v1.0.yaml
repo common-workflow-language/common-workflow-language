@@ -983,7 +983,7 @@
   doc: Test hints with $import
 
 - job: v1.0/recursive-input-directory.json
-  output:
+  output: {
    output_dir: {
         "basename": "work_dir",
         "class": "Directory",
@@ -1023,17 +1023,17 @@
                 "location": "work_dir/e",
                 "size": 0
             },
-            {
-                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                "basename": "testresult",
-                "location": "work_dir/testresult",
-                "class": "File",
-                "size": 0
-            }
         ],
         "location": "work_dir",
+    },
+    "test_result": {
+        "basename": "output.txt",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": "output.txt",
+        "size": 0
     }
-
+}
 
 
 
