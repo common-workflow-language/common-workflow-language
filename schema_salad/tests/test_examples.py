@@ -367,7 +367,8 @@ class TestSchemas(unittest.TestCase):
         # windows box should add an alternate test.
         self.assertEquals("file:///foo/bar%20baz/quux", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux"))
         self.assertEquals("/foo/bar baz/quux", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux"))
-        self.assertEquals("file:///foo/bar%20baz/quux#zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong"))
+        self.assertEquals("file:///foo/bar%20baz/quux%23zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong"))
+        self.assertEquals("file:///foo/bar%20baz/quux#zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong", split_frag=True))
         self.assertEquals("/foo/bar baz/quux#zing zong", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux#zing%20zong"))
 
 

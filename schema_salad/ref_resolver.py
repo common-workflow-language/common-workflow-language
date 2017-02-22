@@ -36,12 +36,16 @@ DocumentType = TypeVar('DocumentType', CommentedSeq, CommentedMap)
 DocumentOrStrType = TypeVar(
     'DocumentOrStrType', CommentedSeq, CommentedMap, unicode)
 
-def file_uri(path):  # type: (str) -> str
+def file_uri(path, split_frag=False):  # type: (str, bool) -> str
     if path.startswith("file://"):
         return path
-    pathsp = path.split("#", 2)
-    frag = "#" + urllib.quote(str(pathsp[1])) if len(pathsp) == 2 else ""
-    urlpath = urllib.pathname2url(str(pathsp[0]))
+    if split_frag:
+        pathsp = path.split("#", 2)
+        frag = "#" + urllib.quote(str(pathsp[1])) if len(pathsp) == 2 else ""
+        urlpath = urllib.pathname2url(str(pathsp[0]))
+    else:
+        urlpath = urllib.pathname2url(path)
+        frag = ""
     if urlpath.startswith("//"):
         return "file:%s%s" % (urlpath, frag)
     else:
