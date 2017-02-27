@@ -204,7 +204,7 @@ class Loader(object):
         else:
             self.cache = {}
 
-        if session is None:
+        if (session is None) and ("HOME" in os.environ):
             self.session = CacheControl(requests.Session(),
                                    cache=FileCache(os.path.join(os.environ["HOME"], ".cache", "salad")))
         else:
