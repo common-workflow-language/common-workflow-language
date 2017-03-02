@@ -4,9 +4,12 @@ from avro.schema import Schema
 import sys
 import urlparse
 import re
+import logging
+
 from typing import Any, Union
 from .sourceline import SourceLine, lineno_re, bullets, indent
 
+_logger = logging.getLogger("salad")
 
 class ValidationException(Exception):
     pass
@@ -54,12 +57,14 @@ def vpformat(datum):  # type: (Any) -> str
     return a
 
 
-def validate_ex(expected_schema,            # type: Schema
-                datum,                      # type: Any
-                identifiers=None,           # type: Set[unicode]
-                strict=False,               # type: bool
-                foreign_properties=None,    # type: Set[unicode]
-                raise_ex=True               # type: bool
+def validate_ex(expected_schema,                  # type: Schema
+                datum,                            # type: Any
+                identifiers=None,                 # type: Set[unicode]
+                strict=False,                     # type: bool
+                foreign_properties=None,          # type: Set[unicode]
+                raise_ex=True,                    # type: bool
+                strict_foreign_properties=False,  # type: bool
+                logger=_logger                    # type: logging.Logger
                 ):
     # type: (...) -> bool
     """Determine if a python datum is an instance of a schema."""
@@ -167,9 +172,11 @@ def validate_ex(expected_schema,            # type: Schema
             for i, d in enumerate(datum):
                 try:
                     sl = SourceLine(datum, i, ValidationException)
-                    if not validate_ex(expected_schema.items, d, identifiers, strict=strict,
+                    if not validate_ex(expected_schema.items, d, identifiers,
+                                       strict=strict,
                                        foreign_properties=foreign_properties,
-                                       raise_ex=raise_ex):
+                                       raise_ex=raise_ex,
+                                       strict_foreign_properties=strict_foreign_properties):
                         return False
                 except ValidationException as v:
                     if raise_ex:
@@ -186,7 +193,8 @@ def validate_ex(expected_schema,            # type: Schema
                 return False
     elif isinstance(expected_schema, avro.schema.UnionSchema):
         for s in expected_schema.schemas:
-            if validate_ex(s, datum, identifiers, strict=strict, raise_ex=False):
+            if validate_ex(s, datum, identifiers, strict=strict, raise_ex=False,
+                           strict_foreign_properties=strict_foreign_properties):
                 return True
 
         if not raise_ex:
@@ -207,7 +215,9 @@ def validate_ex(expected_schema,            # type: Schema
             checked.append(s)
             try:
                 validate_ex(s, datum, identifiers, strict=strict,
-                            foreign_properties=foreign_properties, raise_ex=True)
+                            foreign_properties=foreign_properties,
+                            raise_ex=True,
+                            strict_foreign_properties=strict_foreign_properties)
             except ClassValidationException as e:
                 raise
             except ValidationException as e:
@@ -256,8 +266,10 @@ def validate_ex(expected_schema,            # type: Schema
 
             try:
                 sl = SourceLine(datum, f.name, unicode)
-                if not validate_ex(f.type, fieldval, identifiers, strict=strict, foreign_properties=foreign_properties,
-                                   raise_ex=raise_ex):
+                if not validate_ex(f.type, fieldval, identifiers, strict=strict,
+                                   foreign_properties=foreign_properties,
+                                   raise_ex=raise_ex,
+                                   strict_foreign_properties=strict_foreign_properties):
                     return False
             except ValidationException as v:
                 if f.name not in datum:
@@ -266,24 +278,34 @@ def validate_ex(expected_schema,            # type: Schema
                     errors.append(sl.makeError(u"the `%s` field is not valid because\n%s" % (
                         f.name, indent(str(v)))))
 
-        if strict:
-            for d in datum:
-                found = False
-                for f in expected_schema.fields:
-                    if d == f.name:
-                        found = True
-                if not found:
-                    sl = SourceLine(datum, d, unicode)
-                    if d not in identifiers and d not in foreign_properties and d[0] not in ("@", "$"):
-                        if not raise_ex:
-                            return False
-                        split = urlparse.urlsplit(d)
-                        if split.scheme:
-                            errors.append(sl.makeError(
-                                u"unrecognized extension field `%s` and strict is True.  Did you include a $schemas section?" % (d)))
+        for d in datum:
+            found = False
+            for f in expected_schema.fields:
+                if d == f.name:
+                    found = True
+            if not found:
+                sl = SourceLine(datum, d, unicode)
+                if d not in identifiers and d not in foreign_properties and d[0] not in ("@", "$"):
+                    if (d not in identifiers and strict) and (
+                            d not in foreign_properties and strict_foreign_properties) and not raise_ex:
+                        return False
+                    split = urlparse.urlsplit(d)
+                    if split.scheme:
+                        err = sl.makeError(u"unrecognized extension field `%s`%s."
+                                           "  Did you include "
+                                           "a $schemas section?" % (
+                                               d, " and strict_foreign_properties is True" if strict_foreign_properties else ""))
+                        if strict_foreign_properties:
+                            errors.append(err)
                         else:
-                            errors.append(sl.makeError(u"invalid field `%s`, expected one of: %s" % (
-                                d, ", ".join("'%s'" % fn.name for fn in expected_schema.fields))))
+                            logger.warn(err)
+                    else:
+                        err = sl.makeError(u"invalid field `%s`, expected one of: %s" % (
+                            d, ", ".join("'%s'" % fn.name for fn in expected_schema.fields)))
+                        if strict:
+                            errors.append(err)
+                        else:
+                            logger.warn(err)
 
         if errors:
             if raise_ex:
