@@ -236,10 +236,10 @@ def makerdf(workflow,       # type: Union[str, unicode]
     if isinstance(wf, list):
         for w in wf:
             w["@context"] = ctx
-            g.parse(data=json.dumps(w), format='json-ld', location=workflow)
+            g.parse(data=json.dumps(w), format='json-ld', publicID=str(workflow))
     else:
         wf["@context"] = ctx
-        g.parse(data=json.dumps(wf), format='json-ld', location=workflow)
+        g.parse(data=json.dumps(wf), format='json-ld', publicID=str(workflow))
 
     # Bug in json-ld loader causes @id fields to be added to the graph
     for sub, pred, obj in g.triples((None, URIRef("@id"), None)):

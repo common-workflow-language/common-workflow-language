@@ -311,7 +311,7 @@ class Loader(object):
                 self.cache[fetchurl] = rdflib.graph.Graph()
                 for fmt in ['xml', 'turtle', 'rdfa']:
                     try:
-                        self.cache[fetchurl].parse(data=content, format=fmt)
+                        self.cache[fetchurl].parse(data=content, format=fmt, publicID=str(fetchurl))
                         self.graph += self.cache[fetchurl]
                         break
                     except xml.sax.SAXParseException:
