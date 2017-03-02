@@ -1,0 +1,9 @@
+#!/usr/bin/env cwl-runner
+class: CommandLineTool
+cwlVersion: v1.1.0-dev1
+doc: "Test of capturing stderr output in a docker container."
+inputs: []
+outputs:
+  output_file:
+    type: stderr
+baseCommand: [sh, -c, "echo foo 1>&2"]
