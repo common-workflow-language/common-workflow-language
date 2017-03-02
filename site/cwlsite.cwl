@@ -26,7 +26,7 @@ inputs:
           rdfs_target: string
   brandimg: File
   empty:
-    type: string
+    type: string?
     default: ""
 
 outputs:
