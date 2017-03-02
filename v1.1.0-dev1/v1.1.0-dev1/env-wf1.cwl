@@ -11,8 +11,7 @@ outputs:
       outputSource: step1/out
 
 requirements:
-  - class: SubworkflowFeatureRequirement
-  - class: EnvVarRequirement
+  EnvVarRequirement:
     envDef:
       TEST_ENV: override
 

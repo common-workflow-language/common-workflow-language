@@ -77,7 +77,7 @@
   tool: v1.1.0-dev1/cat3-tool-mediumcut.cwl
   doc: Test command execution in Docker with stdout redirection
 
-- job:
+- job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/egrep-stderr.cwl
   doc: Test command line with stderr redirection
   output:
@@ -87,7 +87,7 @@
       size: 84
       location: error.txt
 
-- job:
+- job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/egrep-stderr-shortcut.cwl
   doc: Test command line with stderr redirection, brief syntax
   output:
@@ -103,7 +103,7 @@
       size: 84
       checksum: sha1$cec7b8746a78c42060c96505887449bca0142976
       location: std.err
-  job:
+  job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/egrep-stderr-mediumcut.cwl
   doc: Test command line with stderr redirection, named brief syntax
 
@@ -172,17 +172,6 @@
       size: 15
   tool: v1.1.0-dev1/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
-
-- job: v1.1.0-dev1/wc-job.json
-  output:
-    output:
-      class: File
-      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
-      location: output
-      size: 15
-  tool: v1.1.0-dev1/wc-tool-shortcut.cwl
-  doc: Test command execution in with stdin and stdout redirection using stdin shortcut
-
 
 - job: v1.1.0-dev1/parseInt-job.json
   output: {output: 42}
@@ -308,6 +297,16 @@
       size: 9
   tool: v1.1.0-dev1/env-wf2.cwl
   doc: Test requirements override hints
+
+- job: v1.1.0-dev1/env-job.json
+  output:
+    out:
+      class: File
+      checksum: sha1$cdc1e84968261d6a7575b5305945471f8be199b6
+      location: out
+      size: 9
+  tool: v1.1.0-dev1/env-wf3.cwl
+  doc: Test requirements on workflow steps
 
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 16}
@@ -671,7 +670,23 @@
     }
   }
   tool: v1.1.0-dev1/test-cwl-out.cwl
-  doc: Test support for reading cwl.output.json when running in Docker container
+  doc: |
+    Test support for reading cwl.output.json when running in a Docker container
+    and just 'path' is provided.
+
+- job: v1.1.0-dev1/empty.json
+  output: {
+    "foo": {
+        "location": "foo",
+        "class": "File",
+        "checksum": "sha1$f1d2d2f924e986ac86fdf7b36c94bcdf32beec15",
+        "size": 4
+    }
+  }
+  tool: v1.1.0-dev1/test-cwl-out2.cwl
+  doc: |
+    Test support for reading cwl.output.json when running in a Docker container
+    and just 'location' is provided.
 
 - job: v1.1.0-dev1/abc.json
   output:
@@ -785,10 +800,10 @@
 - job: v1.1.0-dev1/dir4-job.yml
   output: {
     "outlist": {
-        "checksum": "sha1$2ab6f189e84753c05a23413fbf6b6fbf4c53489f",
-        "size": 90,
-        "location": "output.txt",
-        "class": "File"
+      "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+      "size": 20,
+      "location": "output.txt",
+      "class": "File"
     }
   }
   tool: v1.1.0-dev1/dir4.cwl
@@ -905,3 +920,75 @@
       "size": 12010
   tool: v1.1.0-dev1/initialworkdirrequirement-docker-out.cwl
   doc: Test output of InitialWorkDir
+
+- job: v1.1.0-dev1/wc-job.json
+  output: {count_output: 16}
+  tool: v1.1.0-dev1/count-lines10-wf.cwl
+  doc: Test embedded subworkflow
+
+- job: v1.1.0-dev1/docker-array-secondaryfiles-job.json
+  output: {
+    "bai_list": {
+        "checksum": "sha1$081fc0e57d6efa5f75eeb237aab1d04031132be6",
+        "location": "fai.list",
+        "class": "File",
+        "size": 386
+    }
+  }
+  tool: v1.1.0-dev1/docker-array-secondaryfiles.cwl
+  doc: Test secondaryFiles on array of files.
+
+- job: v1.1.0-dev1/dir7.yml
+  output: {
+    "dir": {
+        "location": "a_directory",
+        "class": "Directory",
+        "listing": [
+            {
+                "class": "File",
+                "location": "whale.txt",
+                "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+                "size": 1111
+            },
+            {
+                "class": "File",
+                "location": "hello.txt",
+                "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
+                "size": 13
+            }
+        ]
+    }
+  }
+  tool: v1.1.0-dev1/dir7.cwl
+  doc: Test directory literal output created by ExpressionTool
+
+- job: v1.1.0-dev1/empty.json
+  output:
+    lit:
+      location: "a_file"
+      class: "File"
+      checksum: "sha1$fea23663b9c8ed71968f86415b5ec091bb111448"
+      size: 19
+  tool: v1.1.0-dev1/file-literal-ex.cwl
+  doc: Test file literal output created by ExpressionTool
+
+- job: v1.1.0-dev1/empty.json
+  output:
+    "thing": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": "thing",
+        "class": "File",
+        "size": 0
+    }
+  tool: v1.1.0-dev1/docker-output-dir.cwl
+  doc: Test dockerOutputDirectory
+
+- job: v1.1.0-dev1/empty.json
+  output:
+    out:
+      class: File
+      checksum: sha1$b3ec4ed1749c207e52b3a6d08c59f31d83bff519
+      location: out
+      size: 15
+  tool: v1.1.0-dev1/imported-hint.cwl
+  doc: Test hints with $import

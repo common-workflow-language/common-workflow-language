@@ -23,7 +23,8 @@ inputs:
     inputBinding:
       position: -1
 
-outputs: []
+outputs:
+  args: string[]
 
 baseCommand: python
 arguments: ["bwa", "mem"]
