@@ -1,11 +1,13 @@
 #!/usr/bin/env cwl-runner
+$namespaces:
+  ex: http://example.com/
 cwlVersion: v1.1.0-dev1
 class: CommandLineTool
 doc: "Print the contents of a file to stdout using 'cat' running in a docker container."
 hints:
   DockerRequirement:
     dockerPull: "debian:wheezy"
-  BlibberBlubberFakeRequirement:
+  ex:BlibberBlubberFakeRequirement:
     fakeField: fraggleFroogle
 inputs:
   file1:
