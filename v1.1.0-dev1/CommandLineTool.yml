@@ -747,7 +747,6 @@ $graph:
     - name: package
       type: string
       doc: "The common name of the software to be configured."
-      jsonldPredicate: "@id"
     - name: version
       type: string[]?
       doc: "The (optional) version of the software to configured."

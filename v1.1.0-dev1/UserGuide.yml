@@ -183,7 +183,7 @@
 
       The value of `position` is used to determine where parameter should
       appear on the command line.  Positions are relative to one another, not
-      abosolute.  As a result, positions do not have to be sequential, three
+      absolute.  As a result, positions do not have to be sequential, three
       parameters with positions `[1, 3, 5]` will result in the same command
       line as `[1, 2, 3]`.  More than one parameter can have the same position
       (ties are broken using the parameter name), and the position field itself
@@ -290,8 +290,8 @@
     - |
       ## Parameter references
 
-      In a previous example, we used extracted a file using the "tar" program.
-      However, that example was very limited becuase it assumed that the file
+      In a previous example, we extracted a file using the "tar" program.
+      However, that example was very limited because it assumed that the file
       we were interested in was called "hello.txt".  In this example, you will
       see how to reference the value of input parameters dynamically from other
       fields.
@@ -356,7 +356,7 @@
       containers are also purposefully isolated from the host system, so in
       order to run a tool inside a Docker container there is additional work to
       ensure that input files are available inside the container and output
-      files can be recovered from the contianer.  CWL can perform this work
+      files can be recovered from the container.  CWL can perform this work
       automatically, allowing you to use Docker to simplify your software
       management while avoiding the complexity of invoking and managing Docker
       containers.
@@ -466,7 +466,7 @@
       tool is actually executed.  The `$(runtime.outdir)` parameter is the path
       to the designated output directory.  Other parameters include
       `$(runtime.tmpdir)`, `$(runtime.ram)`, `$(runtime.cores)`,
-      `$(runtime.ram)`, `$(runtime.outdirSize)`, and `$(runtime.tmpdirSize)`.  See
+      `$(runtime.outdirSize)`, and `$(runtime.tmpdirSize)`.  See
       the [Runtime Environment](CommandLineTool.html#Runtime_environment)
       section of the CWL specification for details.
 
@@ -522,7 +522,7 @@
     - |
       ```
 
-      *array-outpust-job.yml*
+      *array-outputs-job.yml*
       ```
     - $include: examples/array-outputs-job.yml
     - |
@@ -662,6 +662,16 @@
     - |
       ```
 
+      As this tool does not require any `inputs` we can run it with an (almost) empty job file:
+
+      *empty.yml*
+      ```
+      {}
+      |
+      ```
+
+      We can then run `expression.cwl`:
+
       ```
       $ cwl-runner expression.cwl empty.yml
       [job 140000594593168] /home/example$ echo -A 2 -B baz -C 10 9 8 7 6 5 4 3 2 1
@@ -796,7 +806,7 @@
       class: Workflow
       ```
 
-      The 'cwlVersion` field indicates the version of the CWL spec used by the
+      The `cwlVersion` field indicates the version of the CWL spec used by the
       document.  The `class` field indicates this document describes a workflow.
 
 
@@ -820,7 +830,7 @@
 
       The `outputs` section describes the outputs of the workflow.  This is a
       list of output parameters where each parameter consists of an identifier
-      and a data type.  The `source` connects the output parameter `classfile`
+      and a data type.  The `outputSource` connects the output parameter `classfile`
       of the `compile` step to the workflow output parameter `classout`.
 
       ```
