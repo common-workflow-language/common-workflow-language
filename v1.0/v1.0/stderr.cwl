@@ -9,8 +9,6 @@ outputs:
   output_file:
     type: File
     outputBinding: {glob: error.txt}
-baseCommand: [sh]
 arguments:
- - '-c'
  - { valueFrom: "echo foo 1>&2", shellQuote: False }
 stderr: error.txt

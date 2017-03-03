@@ -2,10 +2,13 @@
 class: CommandLineTool
 cwlVersion: v1.1.0-dev1
 doc: "Test of capturing stderr output in a docker container."
+requirements:
+  ShellCommandRequirement: {}
 inputs: []
 outputs:
   output_file:
     type: File
     outputBinding: {glob: error.txt}
-baseCommand: [sh, -c, "echo foo 1>&2"]
+arguments:
+ - { valueFrom: "echo foo 1>&2", shellQuote: False }
 stderr: error.txt

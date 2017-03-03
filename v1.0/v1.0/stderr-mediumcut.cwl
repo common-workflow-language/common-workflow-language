@@ -8,8 +8,6 @@ inputs: []
 outputs:
   output_file:
     type: stderr
-baseCommand: [sh]
 arguments:
- - '-c'
  - { valueFrom: "echo foo 1>&2", shellQuote: False }
 stderr: std.err
