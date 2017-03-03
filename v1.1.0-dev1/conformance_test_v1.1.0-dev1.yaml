@@ -992,3 +992,21 @@
       size: 15
   tool: v1.1.0-dev1/imported-hint.cwl
   doc: Test hints with $import
+
+- job: v1.1.0-dev1/empty.json
+  output: {
+    "stderr_file": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": Any,
+        "class": "File",
+        "size": 0
+    },
+    "stdout_file": {
+        "checksum": "sha1$1555252d52d4ec3262538a4426a83a99cfff4402",
+        "location": Any,
+        "class": "File",
+        "size": 9
+    }
+  }
+  tool: v1.1.0-dev1/shellchar.cwl
+  doc: "Test that shell directives are not interpreted."
