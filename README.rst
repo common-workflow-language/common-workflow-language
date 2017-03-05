@@ -27,6 +27,13 @@ Usage
    $ python
    >>> import schema_salad
 
+To install from source::
+
+  git clone https://github.com/common-workflow-language/schema_salad 
+  cd schema_salad 
+  python setup.py install
+ 
+
 Documentation
 -------------
 
