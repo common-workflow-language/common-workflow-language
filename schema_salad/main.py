@@ -146,7 +146,11 @@ def main(argsl=None):  # type: (List[str]) -> int
         metactx = schema_raw_doc.get("$namespaces", {})
         if "$base" in schema_raw_doc:
             metactx["@base"] = schema_raw_doc["$base"]
-    (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(schema_doc, metactx)
+    if schema_doc is not None:
+        (schema_ctx, rdfs) = jsonld_context.salad_to_jsonld_context(
+            schema_doc, metactx)
+    else:
+        raise Exception("schema_doc is None??")
 
     # Create the loader that will be used to load the target document.
     document_loader = Loader(schema_ctx)

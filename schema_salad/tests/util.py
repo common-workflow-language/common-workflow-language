@@ -1,7 +1,8 @@
 from pkg_resources import Requirement, resource_filename, ResolutionError  # type: ignore
+from typing import Optional, Text
 import os
 
-def get_data(filename):
+def get_data(filename):  # type: (Text) -> Optional[Text]
     filepath = None
     try:
         filepath = resource_filename(

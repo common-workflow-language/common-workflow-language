@@ -12,7 +12,7 @@ from .aslist import aslist
 from .add_dictlist import add_dictlist
 import re
 import argparse
-from typing import Any, IO, Union
+from typing import cast, Any, Dict, IO, List, Optional, Set, Text, Union
 
 _logger = logging.getLogger("salad")
 
@@ -35,7 +35,7 @@ def has_types(items):  # type: (Any) -> List[basestring]
     return []
 
 
-def linkto(item):
+def linkto(item):  # type: (Text) -> Text
     _, frg = urlparse.urldefrag(item)
     return "[%s](#%s)" % (frg, to_id(frg))
 
@@ -46,10 +46,10 @@ class MyRenderer(mistune.Renderer):
         super(mistune.Renderer, self).__init__()
         self.options = {}
 
-    def header(self, text, level, raw=None):
+    def header(self, text, level, raw=None):  # type: (Text, int, Any) -> Text
         return """<h%i id="%s">%s</h%i>""" % (level, to_id(text), text, level)
 
-    def table(self, header, body):
+    def table(self, header, body):  # type: (Text, Text) -> Text
         return (
             '<table class="table table-striped">\n<thead>%s</thead>\n'
             '<tbody>\n%s</tbody>\n</table>\n'
@@ -136,7 +136,7 @@ def number_headings(toc, maindoc):  # type: (ToC, str) -> str
 
         if not skip:
             m = re.match(r'^(#+) (.*)', line)
-            if m:
+            if m is not None:
                 num = toc.add_entry(len(m.group(1)), m.group(2))
                 line = "%s %s %s" % (m.group(1), num, m.group(2))
             line = re.sub(r'^(https?://\S+)', r'[\1](\1)', line)
@@ -167,7 +167,7 @@ class RenderType(object):
         self.docAfter = {}  # type: Dict[str, List]
         self.rendered = set()  # type: Set[str]
         self.redirects = redirects
-        self.title = None  # type: str
+        self.title = None  # type: Optional[str]
 
         for t in j:
             if "extends" in t:
@@ -224,7 +224,7 @@ class RenderType(object):
                 tp,                     # type: Any
                 redirects,              # type: Dict[str, str]
                 nbsp=False,             # type: bool
-                jsonldPredicate=None    # type: Dict[str, str]
+                jsonldPredicate=None    # type: Optional[Dict[str, str]]
                 ):
         # type: (...) -> Union[str, unicode]
         global primitiveType
@@ -237,7 +237,7 @@ class RenderType(object):
             if tp["type"] == "https://w3id.org/cwl/salad#array":
                 ar = "array&lt;%s&gt;" % (self.typefmt(
                     tp["items"], redirects, nbsp=True))
-                if jsonldPredicate and "mapSubject" in jsonldPredicate:
+                if jsonldPredicate is not None and "mapSubject" in jsonldPredicate:
                     if "mapPredicate" in jsonldPredicate:
                         ar += " | map&lt;%s.%s,&nbsp;%s.%s&gt" % (self.typefmt(tp["items"], redirects),
                                                                   jsonldPredicate[
@@ -251,7 +251,7 @@ class RenderType(object):
                                                            self.typefmt(tp["items"], redirects))
                 return ar
             if tp["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum"):
-                frg = schema.avro_name(tp["name"])
+                frg = cast(Text, schema.avro_name(tp["name"]))
                 if tp["name"] in redirects:
                     return """<a href="%s">%s</a>""" % (redirects[tp["name"]], frg)
                 elif tp["name"] in self.typemap:
@@ -267,9 +267,10 @@ class RenderType(object):
                 return """<a href="%s">%s</a>""" % (primitiveType, schema.avro_name(str(tp)))
             else:
                 _, frg = urlparse.urldefrag(tp)
-                if frg:
+                if frg is not '':
                     tp = frg
                 return """<a href="#%s">%s</a>""" % (to_id(tp), tp)
+        raise Exception("We should not be here!")
 
     def render_type(self, f, depth):  # type: (Dict[str, Any], int) -> None
         if f["name"] in self.rendered or f["name"] in self.redirects:
@@ -328,9 +329,11 @@ class RenderType(object):
             doc = ""
 
         if self.title is None and f["doc"]:
-            self.title = f["doc"][0:f["doc"].index("\n")]
-            if self.title.startswith('# '):
-                self.title = self.title[2:]
+            title = f["doc"][0:f["doc"].index("\n")]
+            if title.startswith('# '):
+                self.title = title[2:]
+            else:
+                self.title = title
 
         if f["type"] == "documentation":
             f["doc"] = number_headings(self.toc, f["doc"])
