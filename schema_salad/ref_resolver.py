@@ -966,7 +966,8 @@ class Loader(object):
                         else:
                             errors.append(sl.makeError("checking item\n%s" % (
                                 validate.indent(unicode(v)))))
-
+                else:
+                    _logger.warn( validate.indent(unicode(v)))
         if bool(errors):
             if len(errors) > 1:
                 raise validate.ValidationException(
