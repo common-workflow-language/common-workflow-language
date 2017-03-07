@@ -20,7 +20,7 @@ import logging
 from .aslist import aslist
 from . import jsonld_context
 from .sourceline import SourceLine, strip_dup_lineno, add_lc_filename, bullets, relname
-from typing import Any, AnyStr, cast, Dict, List, Tuple, TypeVar, Union
+from typing import cast, Any, AnyStr, Dict, List, Set, Tuple, TypeVar, Union
 from ruamel.yaml.comments import CommentedSeq, CommentedMap
 
 _logger = logging.getLogger("salad")
@@ -243,14 +243,14 @@ def load_and_validate(document_loader,  # type: Loader
     except validate.ValidationException as v:
         validationErrors += unicode(v)
 
-    if validationErrors:
+    if validationErrors != u"":
         raise validate.ValidationException(validationErrors)
 
     return data, metadata
 
 
 def validate_doc(schema_names,  # type: Names
-                 doc,           # type: Union[Dict[unicode, Any], List[Dict[unicode, Any]], unicode]
+                 doc,           # type: Union[Dict[unicode, Any], List[Dict[unicode, Any]], unicode, None]
                  loader,        # type: Loader
                  strict,        # type: bool
                  source=None
@@ -323,7 +323,7 @@ def validate_doc(schema_names,  # type: Names
                     break
             anyerrors.append(u"%s\n%s" %
                              (objerr, validate.indent(bullets(errors, "- "))))
-    if anyerrors:
+    if len(anyerrors) > 0:
         raise validate.ValidationException(
             strip_dup_lineno(bullets(anyerrors, "* ")))
 
@@ -371,7 +371,7 @@ def replace_type(items, spec, loader, found):
 
 def avro_name(url):  # type: (AnyStr) -> AnyStr
     doc_url, frg = urlparse.urldefrag(url)
-    if frg:
+    if frg != '':
         if '/' in frg:
             return frg[frg.rindex('/') + 1:]
         else:
@@ -387,7 +387,7 @@ def make_valid_avro(items,          # type: Avro
                     found,          # type: Set[unicode]
                     union=False     # type: bool
                     ):
-    # type: (...) -> Union[Avro, Dict]
+    # type: (...) -> Union[Avro, Dict, unicode]
     if isinstance(items, dict):
         items = copy.copy(items)
         if items.get("name"):
@@ -402,7 +402,7 @@ def make_valid_avro(items,          # type: Avro
                     "Named schemas must have a non-empty name: %s" % items)
 
             if items["name"] in found:
-                return items["name"]
+                return cast(unicode, items["name"])
             else:
                 found.add(items["name"])
         for n in ("type", "items", "values", "fields"):
@@ -465,7 +465,7 @@ def extend_and_specialize(items, loader):
                 basetype = copy.copy(types[ex])
 
                 if t["type"] == "record":
-                    if spec:
+                    if len(spec) > 0:
                         basetype["fields"] = replace_type(
                             basetype.get("fields", []), spec, loader, set())
 

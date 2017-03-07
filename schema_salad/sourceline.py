@@ -46,7 +46,7 @@ def indent(v, nolead=False, shift=u"  ", bullet=u"  "):  # type: (Text, bool, Te
     else:
         def lineno(i, l):  # type: (int, Text) -> Text
             r = lineno_re.match(l)
-            if r:
+            if bool(r):
                 return r.group(1) + (bullet if i == 0 else shift) + r.group(2)
             else:
                 return (bullet if i == 0 else shift) + l
@@ -137,10 +137,14 @@ class SourceLine(object):
         self.key = key
         self.raise_type = raise_type
 
-    def __enter__(self):
+    def __enter__(self):  # type: () -> SourceLine
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self,
+                 exc_type,   # type: Any
+                 exc_value,  # type: Any
+                 traceback   # type: Any
+                 ):  # -> Any
         if not exc_value:
             return
         raise self.makeError(unicode(exc_value))
@@ -158,7 +162,7 @@ class SourceLine(object):
                                   (self.item.lc.data[self.key][0] or 0)+1,
                                   (self.item.lc.data[self.key][1] or 0)+1)
         for m in msg.splitlines():
-            if lineno_re.match(m):
+            if bool(lineno_re.match(m)):
                 errs.append(m)
             else:
                 errs.append("%s %s" % (lead, m))

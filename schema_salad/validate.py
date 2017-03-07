@@ -6,7 +6,7 @@ import urlparse
 import re
 import logging
 
-from typing import Any, Union
+from typing import Any, List, Set, Union
 from .sourceline import SourceLine, lineno_re, bullets, indent
 
 _logger = logging.getLogger("salad")
@@ -222,7 +222,7 @@ def validate_ex(expected_schema,                  # type: Schema
                 raise
             except ValidationException as e:
                 errors.append(unicode(e))
-        if errors:
+        if bool(errors):
             raise ValidationException(bullets(["tried %s but\n%s" % (friendly(
                 checked[i]), indent(errors[i])) for i in range(0, len(errors))], "- "))
         else:
@@ -307,7 +307,7 @@ def validate_ex(expected_schema,                  # type: Schema
                         else:
                             logger.warn(err)
 
-        if errors:
+        if bool(errors):
             if raise_ex:
                 if classmatch:
                     raise ClassValidationException(bullets(errors, "* "))
