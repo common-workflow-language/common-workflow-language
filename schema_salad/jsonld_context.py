@@ -19,25 +19,26 @@ from rdflib.namespace import RDF, RDFS
 import urlparse
 import logging
 from .aslist import aslist
-from typing import Any, cast, Dict, Iterable, Tuple, Union
+from typing import (cast, Any, Dict, Iterable, List, Optional, Text, Tuple,
+    Union)
 from .ref_resolver import Loader, ContextType
 
 _logger = logging.getLogger("salad")
 
 
 def pred(datatype,      # type: Dict[str, Union[Dict, str]]
-         field,         # type: Dict
+         field,         # type: Optional[Dict]
          name,          # type: str
          context,       # type: ContextType
          defaultBase,   # type: str
          namespaces     # type: Dict[str, rdflib.namespace.Namespace]
          ):
-    # type: (...) -> Union[Dict, str]
+    # type: (...) -> Union[Dict, Text]
     split = urlparse.urlsplit(name)
 
-    vee = None  # type: Union[str, unicode]
+    vee = None  # type: Optional[Union[str, unicode]]
 
-    if split.scheme:
+    if split.scheme != '':
         vee = name
         (ns, ln) = rdflib.namespace.split_uri(unicode(vee))
         name = ln
@@ -45,9 +46,9 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
             vee = unicode(namespaces[ns[0:-1]][ln])
         _logger.debug("name, v %s %s", name, vee)
 
-    v = None  # type: Any
+    v = None  # type: Optional[Dict]
 
-    if field and "jsonldPredicate" in field:
+    if field is not None and "jsonldPredicate" in field:
         if isinstance(field["jsonldPredicate"], dict):
             v = {}
             for k, val in field["jsonldPredicate"].items():
@@ -132,14 +133,15 @@ def process_type(t,             # type: Dict[str, Any]
 
             _logger.debug("Processing field %s", i)
 
-            v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
+            v = pred(t, i, fieldname, context, defaultPrefix,
+                    namespaces)  # type: Union[Dict[Any, Any], unicode, None]
 
             if isinstance(v, basestring):
                 v = v if v[0] != "@" else None
-            else:
+            elif v is not None:
                 v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
 
-            if v:
+            if bool(v):
                 (ns, ln) = rdflib.namespace.split_uri(unicode(v))
                 if ns[0:-1] in namespaces:
                     propnode = namespaces[ns[0:-1]][ln]
