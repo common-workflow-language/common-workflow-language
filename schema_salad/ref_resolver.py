@@ -67,16 +67,16 @@ class NormDict(CommentedMap):
         self.normalize = normalize
 
     def __getitem__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__getitem__(self.normalize(key))
+        return super(NormDict, self).__getitem__(self.normalize(key))  # type:  ignore
 
     def __setitem__(self, key, value):  # type: (Any, Any) -> Any
         return super(NormDict, self).__setitem__(self.normalize(key), value)
 
     def __delitem__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__delitem__(self.normalize(key))
+        return super(NormDict, self).__delitem__(self.normalize(key))  # type: ignore
 
     def __contains__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__contains__(self.normalize(key))
+        return super(NormDict, self).__contains__(self.normalize(key))  # type: ignore
 
 
 def merge_properties(a, b):  # type: (List[Any], List[Any]) -> Dict[Any, Any]
@@ -465,8 +465,7 @@ class Loader(object):
         url = self.expand_url(lref, base_url, scoped_id=(obj is not None))
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
-            return cast(Union[CommentedMap, CommentedSeq, unicode],
-                self.idx[url]), {}
+            return self.idx[url], {}
 
         sl.raise_type = RuntimeError
         with sl:
