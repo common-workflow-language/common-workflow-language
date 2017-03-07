@@ -5,8 +5,6 @@ cwlVersion: v1.1.0-dev1
 class: CommandLineTool
 
 hints:
-  - class: ResourceRequirement
-    coresMin: 4
   - class: DockerRequirement
     dockerPull: python
 
