@@ -399,7 +399,8 @@ def make_valid_avro(items,          # type: Avro
     if isinstance(items, dict):
         items = copy.copy(items)
         if items.get("name"):
-            items["name"] = avro_name(items["name"])
+            if items.get("inVocab", True):
+                items["name"] = avro_name(items["name"])
 
         if "type" in items and items["type"] in ("https://w3id.org/cwl/salad#record", "https://w3id.org/cwl/salad#enum", "record", "enum"):
             if (hasattr(items, "get") and items.get("abstract")) or ("abstract"

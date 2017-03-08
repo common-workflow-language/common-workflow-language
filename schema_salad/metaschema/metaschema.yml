@@ -162,6 +162,12 @@ $graph:
       type: string
       jsonldPredicate: "@id"
       doc: "The identifier for this type"
+    - name: inVocab
+      type: boolean?
+      doc: |
+        By default or if "true", include the short name of this type in the
+        vocabulary (the keys of the JSON-LD context).  If false, do not include
+        the short name in the vocabulary.
 
 
 - name: DocType

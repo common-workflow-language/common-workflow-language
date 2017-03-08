@@ -69,11 +69,6 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
                         "Dictionaries")
         else:
             raise Exception("jsonldPredicate must be a List of Dictionaries.")
-    # if not v:
-    #     if field and "jsonldPrefix" in field:
-    #         defaultBase = field["jsonldPrefix"]
-    #     elif "jsonldPrefix" in datatype:
-    #         defaultBase = datatype["jsonldPrefix"]
 
     ret = v or vee
 
@@ -108,14 +103,14 @@ def process_type(t,             # type: Dict[str, Any]
         g.add((classnode, RDF.type, RDFS.Class))
 
         split = urlparse.urlsplit(recordname)
-        if "jsonldPrefix" in t:
-            predicate = "%s:%s" % (t["jsonldPrefix"], recordname)
-        elif split.scheme:
-            (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
-            predicate = recordname
-            recordname = ln
-        else:
-            predicate = "%s:%s" % (defaultPrefix, recordname)
+        predicate = recordname
+        if t.get("inVocab", True):
+            if split.scheme:
+                (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
+                predicate = recordname
+                recordname = ln
+            else:
+                predicate = "%s:%s" % (defaultPrefix, recordname)
 
         if context.get(recordname, predicate) != predicate:
             raise Exception("Predicate collision on '%s', '%s' != '%s'" % (
