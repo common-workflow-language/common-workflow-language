@@ -259,7 +259,9 @@ $graph:
       doc: |
         The default value for this parameter if there is no `source`
         field.
-      jsonldPredicate: "cwl:default"
+      jsonldPredicate:
+        _id: "cwl:default"
+        noLinkCheck: true
     - name: valueFrom
       type:
         - "null"
