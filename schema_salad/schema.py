@@ -45,7 +45,15 @@ salad_files = ('metaschema.yml',
                'link_res_proc.yml',
                'vocab_res_schema.yml',
                'vocab_res_src.yml',
-               'vocab_res_proc.yml')
+               'vocab_res_proc.yml',
+               'map_res.yml',
+               'map_res_schema.yml',
+               'map_res_src.yml',
+               'map_res_proc.yml',
+               'typedsl_res.yml',
+               'typedsl_res_schema.yml',
+               'typedsl_res_src.yml',
+               'typedsl_res_proc.yml')
 
 
 def get_metaschema():

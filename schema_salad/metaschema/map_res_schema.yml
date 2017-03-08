@@ -1,0 +1,30 @@
+{
+  "$graph": [{
+    "name": "MappedType",
+    "type": "record",
+    "documentRoot": true,
+    "fields": [{
+      "name": "mapped",
+      "type": {
+        "type": "array",
+        "items": "ExampleRecord"
+      },
+      "jsonldPredicate": {
+        "mapSubject": "key",
+        "mapPredicate": "value"
+      }
+    }],
+  },
+  {
+    "name": "ExampleRecord",
+    "type": "record",
+    "fields": [{
+      "name": "key",
+      "type": "string"
+      }, {
+      "name": "value",
+      "type": "string"
+      }
+    ]
+  }]
+}

@@ -64,7 +64,7 @@ setup(name='schema-salad',
       test_suite='tests',
       tests_require=['pytest'],
       entry_points={
-          'console_scripts': ["schema-salad-tool=schema_salad.main:main"]
+          'console_scripts': ["schema-salad-tool=schema_salad.main:main", "schema-salad-doc=schema_salad.makedoc:main"]
       },
       zip_safe=True,
       cmdclass={'egg_info': tagger},
