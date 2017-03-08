@@ -1,7 +1,7 @@
 Common Workflow Language
 ========================
 
-[![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [Support](#support-community-and-contributing)
 
 The Common Workflow Language (CWL) is a specification for describing analysis
 workflows and tools in a way that makes them portable and scalable across a
@@ -12,7 +12,9 @@ Imaging, Astronomy, Physics, and Chemistry.
 
 CWL is developed by an informal, multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
-analysis workflows.  [The CWL project is on Github.](https://github.com/common-workflow-language/common-workflow-language)
+analysis workflows.  [The CWL project is on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/)
+
+[![Open Stand badge](http://standards.ieee.org/images/openstand/128x128-blue2.png)](https://open-stand.org/about-us/principles/).
 
 CWL builds on technologies such as [JSON-LD](http://json-ld.org)
 for data modeling and [Docker](http://docker.com) for portable runtime
@@ -44,8 +46,9 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |--------|-----------|-----------|--------|
 |[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, local execution only|
 |[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](http://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](http://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|
-|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, GCP, Azure, OpenStack, Grid Engine, Mesos|
-|[Rabix Bunny](https://github.com/rabix/bunny)|Reproducible Analyses for Bioinformatics|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=rabix-conformance)](https://ci.commonwl.org/job/rabix-conformance/)|Java|
+|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm, OpenStack, Grid Engine, Mesos|
+|[Rabix Bunny](https://github.com/rabix/bunny)|An open-source, Java-based implementation of Common Workflow Language with support for multiple drafts/versions. See [Rabix.io](http://rabix.io) for details.|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=rabix-conformance)](https://ci.commonwl.org/job/rabix-conformance/)|Linux, OS X, [GA4GH TES](https://github.com/ga4gh/task-execution-server) (experimental)|
+|[Consonance](https://github.com/Consonance/consonance)|orchestration tool for running SeqWare workflows and CWL tools|[pending](https://ci.commonwl.org/job/rabix-conformance/)|AWS, OpenStack, Azure|
 |[Apache Taverna](http://taverna.incubator.apache.org/)|Domain-independent Workflow Management System|[alpha](https://issues.apache.org/jira/browse/TAVERNA-900)|Java|
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|Python|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|Go|
@@ -73,6 +76,16 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|CWL generator for ACD (EMBOSS) files |
 |[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
+|[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
+|[cwl2zshcomp](https://github.com/kloetzl/cwl2zshcomp)|generates ZSH auto completions from CWL command line tool descriptions|
+
+## Projects the CWL community is participating in
+
+|Name|Details|
+|-------|-----------|
+|[GA4GH Task Execution API](https://github.com/ga4gh/task-execution-schemas/)|a minimal common API for submitting a single job to a remote execution endpoint. Many contributions from CWL project participants.|
+|[GA4GH Workflow Execution API](https://github.com/ga4gh/workflow-execution-schemas)|a minimal common API for submitting workflow requests to workflow execution systems in a standardized way. Many contributions from CWL project participants.|
+|[Bio-compute objects](https://hive.biochemistry.gwu.edu/htscsrs?pageid=biocompute)|"a step towards evaluation and validation of bio-medical scientific computations", CWL and researchobject.org participants are cooperating with this effort|
 
 ## Support, Community and Contributing
 
@@ -115,12 +128,13 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Institut Pasteur](http://www.pasteur.fr)
 * [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
 * [University of California Santa Cruz](https://cbse.soe.ucsc.edu/research/bioinfo)
-* [Harvard Chan School of Public Health](http://www.hsph.harvard.edu/)
+* [Harvard T.H. Chan School of Public Health](http://www.hsph.harvard.edu/)
 * [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
-* [Wolfson Wohl Cancer Research Centre](http://www.gla.ac.uk/researchinstitutes/cancersciences/ics/facilities/wwcrc/)
+* [University of Melbourne Center for Cancer Research](https://umccr.github.io/)
 * [Netherlands eScience Center](https://www.esciencecenter.nl/)
-* [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing)
+* [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing) / [Agave Platform](https://agaveapi.co/)
+* [CyVerse](http://www.cyverse.org/)
 
 ## Individual Contributors
 

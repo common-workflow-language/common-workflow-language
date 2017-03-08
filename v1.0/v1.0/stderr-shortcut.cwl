@@ -2,17 +2,11 @@
 class: CommandLineTool
 cwlVersion: v1.0
 doc: "Test of capturing stderr output in a docker container."
-hints:
-  DockerRequirement:
-    dockerPull: debian:wheezy
-
+requirements:
+  ShellCommandRequirement: {}
 inputs: []
-
 outputs:
   output_file:
     type: stderr
-
-baseCommand: egrep
-successCodes: [2]
-
-stderr: std.err
+arguments:
+ - { valueFrom: "echo foo 1>&2", shellQuote: False }

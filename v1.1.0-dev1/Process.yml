@@ -595,7 +595,6 @@ $graph:
       doc: |
         Specify valid types of data that may be assigned to this parameter.
 
-
 - name: OutputParameter
   type: record
   extends: Parameter

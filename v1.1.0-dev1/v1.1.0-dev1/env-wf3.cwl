@@ -10,14 +10,13 @@ outputs:
       type: File
       outputSource: step1/out
 
-requirements:
-  EnvVarRequirement:
-    envDef:
-      TEST_ENV: override
-
 steps:
   step1:
-    run: env-tool1.cwl
+    run: env-tool2.cwl
+    requirements:
+      EnvVarRequirement:
+        envDef:
+          TEST_ENV: override
     in:
       in: in
     out: [out]

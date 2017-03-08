@@ -1,7 +1,6 @@
 cwlVersion: v1.1.0-dev1
 class: CommandLineTool
 label: Example trivial wrapper for Java 7 compiler
-baseCommand: javac
 hints:
   DockerRequirement:
     dockerPull: java:7
