@@ -2,7 +2,7 @@ cwlVersion: v1.1.0-dev1
 $graph:
 - id: index
   class: CommandLineTool
-  baseCommand: python
+  baseCommand: python2
   arguments:
     - valueFrom: input.txt
       position: 1
@@ -36,7 +36,7 @@ $graph:
 
 - id: search
   class: CommandLineTool
-  baseCommand: python
+  baseCommand: python2
   requirements:
     - class: InlineJavascriptRequirement
   inputs:
