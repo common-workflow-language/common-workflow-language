@@ -567,8 +567,9 @@ $graph:
         _id: cwl:default
         noLinkCheck: true
       doc: |
-        The default value for this parameter if not provided in the input
-        object.
+        The default value to use for this parameter if the parameter is missing
+        from the input object, or if the value of the parameter in the input
+        object is `null`.
 
     - name: type
       type:
@@ -648,6 +649,13 @@ $graph:
         values.  Input parameters include a schema for each parameter which is
         used to validate the input object.  It may also be used to build a user
         interface for constructing the input object.
+
+        When accepting an input object, all input parameters must have a value.
+        If an input parameter is missing from the input object, it must be
+        assigned a value of `null` (or the value of `default` for that
+        parameter, if provided) for the purposes of validation and evaluation
+        of expressions.
+
     - name: outputs
       type:
         type: array
