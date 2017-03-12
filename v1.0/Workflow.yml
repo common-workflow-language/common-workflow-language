@@ -219,10 +219,11 @@ $graph:
     ## Input object
 
     A WorkflowStepInput object must contain an `id` field in the form
-    `#fieldname` or `#stepname.fieldname`.  When the `id` field contains a
-    period `.` the field name consists of the characters following the final
-    period.  This defines a field of the workflow step input object with the
-    value of the `source` parameter(s).
+    `#fieldname` or `#prefix/fieldname`.  When the `id` field contains a slash
+    `/` the field name consists of the characters following the final slash
+    (the prefix portion may contain one or more slashes to indicate scope).
+    This defines a field of the workflow step input object with the value of
+    the `source` parameter(s).
 
     ## Merging
 
