@@ -9,7 +9,7 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Command Line Tool Description, v1.0
+      # Common Workflow Language (CWL) Command Line Tool Description, v1.0.1
 
       This version:
         * https://w3id.org/cwl/v1.0/
@@ -80,6 +80,7 @@ $graph:
       Post v1.0 release changes to the spec.
 
         * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 12 March 2017: (v1.0.1) Mark `default` as not required for link checking.
 
       ## Purpose
 
