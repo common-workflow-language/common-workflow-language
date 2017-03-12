@@ -80,7 +80,12 @@ $graph:
       Post v1.0 release changes to the spec.
 
         * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
-        * 12 March 2017: (v1.0.1) Mark `default` as not required for link checking.
+        * 12 March 2017: (v1.0.1)
+          * Mark `default` as not required for link checking.
+          * Add note that recursive subworkflows is not allowed.
+          * Add note that files in InitialWorkDir must have path in output directory.
+          * Add note that writable: true applies recursively.
+          * Fix mistake in discussion of extracting field names from workflow step ids.
 
       ## Purpose
 
