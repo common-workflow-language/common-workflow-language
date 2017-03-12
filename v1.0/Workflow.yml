@@ -372,6 +372,9 @@ $graph:
     [SubworkflowFeatureRequirement](#SubworkflowFeatureRequirement) must be
     specified in the workflow or workflow step requirements.
 
+    It is a fatal error if a workflow directly or indirectly invokes itself as
+    a subworkflow (recursive workflows are not allowed).
+
   fields:
     - name: id
       type: string
