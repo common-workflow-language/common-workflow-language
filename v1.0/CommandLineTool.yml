@@ -759,6 +759,9 @@ $graph:
         the original file or directory.  Default false (files and directories
         read-only by default).
 
+        A directory marked as `writable: true` implies that all files and
+        subdirectories are recursively writable as well.
+
 
 - name: InitialWorkDirRequirement
   type: record
