@@ -261,7 +261,8 @@ $graph:
       type: ["null", Any]
       doc: |
         The default value for this parameter to use if either there is no
-        `source` field, or the value produced by the `source` is `null`.
+        `source` field, or the value produced by the `source` is `null`.  The
+        default must be applied prior to scattering or evaluating `valueFrom`.
       jsonldPredicate:
         _id: "cwl:default"
         noLinkCheck: true
@@ -287,10 +288,10 @@ $graph:
 
         The value of `inputs` in the parameter reference or expression must be
         the input object to the workflow step after assigning the `source`
-        values and then scattering.  The order of evaluating `valueFrom` among
-        step input parameters is undefined and the result of evaluating
-        `valueFrom` on a parameter must not be visible to evaluation of
-        `valueFrom` on other parameters.
+        values, applying `default`, and then scattering.  The order of
+        evaluating `valueFrom` among step input parameters is undefined and the
+        result of evaluating `valueFrom` on a parameter must not be visible to
+        evaluation of `valueFrom` on other parameters.
 
 
 - type: record
