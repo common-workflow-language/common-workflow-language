@@ -313,6 +313,16 @@
   tool: v1.1.0-dev1/count-lines9-wf.cwl
   doc: Test default value on input parameter
 
+- job: v1.1.0-dev1/empty.json
+  output: {count_output: 16}
+  tool: v1.1.0-dev1/count-lines11-wf.cwl
+  doc: Test use default value on step input parameter with null source
+
+- job: v1.1.0-dev1/cat-job.json
+  output: {count_output: 1}
+  tool: v1.1.0-dev1/count-lines11-wf.cwl
+  doc: Test default value on step input parameter overridden by provided source
+
 - job: v1.1.0-dev1/revsort-job.json
   output:
     output:

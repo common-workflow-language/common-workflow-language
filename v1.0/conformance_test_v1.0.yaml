@@ -126,7 +126,7 @@
 - job: v1.0/null-expression1-job.json
   tool: v1.0/null-expression1-tool.cwl
   output:
-    output: 2
+    output: 1
   doc: Test explicitly passing null to Any type inputs with default values.
 
 - job: v1.0/null-expression2-job.json
@@ -300,7 +300,17 @@
 - job: v1.0/empty.json
   output: {count_output: 16}
   tool: v1.0/count-lines9-wf.cwl
-  doc: Test default value on input parameter
+  doc: Test default value on step input parameter
+
+- job: v1.0/empty.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines11-wf.cwl
+  doc: Test use default value on step input parameter with null source
+
+- job: v1.0/cat-job.json
+  output: {count_output: 1}
+  tool: v1.0/count-lines11-wf.cwl
+  doc: Test default value on step input parameter overridden by provided source
 
 - job: v1.0/revsort-job.json
   output:
