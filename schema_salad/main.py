@@ -62,8 +62,6 @@ def main(argsl=None):  # type: (List[str]) -> int
         "--print-index", action="store_true", help="Print node index")
     exgroup.add_argument("--print-metadata",
                          action="store_true", help="Print document metadata")
-    exgroup.add_argument("--version", action="store_true",
-                         help="Print version")
 
     exgroup = parser.add_mutually_exclusive_group()
     exgroup.add_argument("--strict", action="store_true", help="Strict validation (unrecognized or out of place fields are error)",
@@ -79,10 +77,17 @@ def main(argsl=None):  # type: (List[str]) -> int
     exgroup.add_argument("--debug", action="store_true",
                          help="Print even more logging")
 
-    parser.add_argument("schema", type=str)
+    parser.add_argument("schema", type=str, nargs="?", default=None)
     parser.add_argument("document", type=str, nargs="?", default=None)
+    parser.add_argument("--version", "-v", action="store_true",
+                        help="Print version", default=None)
+
 
     args = parser.parse_args(argsl)
+
+    if args.version is None and args.schema is None:
+        print('%s: error: too few arguments' % sys.argv[0])
+        return 1
 
     if args.quiet:
         _logger.setLevel(logging.WARN)
@@ -92,10 +97,10 @@ def main(argsl=None):  # type: (List[str]) -> int
     pkg = pkg_resources.require("schema_salad")
     if pkg:
         if args.version:
-            print("%s %s" % (sys.argv[0], pkg[0].version))
+            print("%s Current version: %s" % (sys.argv[0], pkg[0].version))
             return 0
         else:
-            _logger.info("%s %s", sys.argv[0], pkg[0].version)
+            _logger.info("%s Current version: %s", sys.argv[0], pkg[0].version)
 
     # Get the metaschema to validate the schema
     metaschema_names, metaschema_doc, metaschema_loader = schema.get_metaschema()
