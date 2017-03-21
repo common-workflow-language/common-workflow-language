@@ -87,7 +87,7 @@ def main(argsl=None):  # type: (List[str]) -> int
 
     if args.version is None and args.schema is None:
         print('%s: error: too few arguments' % sys.argv[0])
-        exit(0)
+        return 1
 
     if args.quiet:
         _logger.setLevel(logging.WARN)
