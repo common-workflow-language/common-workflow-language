@@ -822,7 +822,8 @@ class Loader(object):
                         loader.idx[metadata[identifer]] = document
 
         if checklinks:
-            self.validate_links(document, u"")
+            all_doc_ids={}  # type: Dict[Text, Text]
+            self.validate_links(document, u"", all_doc_ids)
 
         return document, metadata
 
@@ -877,8 +878,8 @@ class Loader(object):
         raise validate.ValidationException(
             "Field `%s` references unknown identifier `%s`, tried %s" % (field, link, ", ".join(tried)))
 
-    def validate_link(self, field, link, docid):
-        # type: (unicode, FieldType, unicode) -> FieldType
+    def validate_link(self, field, link, docid, all_doc_ids):
+        # type: (unicode, FieldType, unicode, Dict[Text, Text]) -> FieldType
         if field in self.nolinkcheck:
             return link
         if isinstance(link, (str, unicode)):
@@ -901,14 +902,14 @@ class Loader(object):
             errors = []
             for n, i in enumerate(link):
                 try:
-                    link[n] = self.validate_link(field, i, docid)
+                    link[n] = self.validate_link(field, i, docid, all_doc_ids)
                 except validate.ValidationException as v:
                     errors.append(v)
             if bool(errors):
                 raise validate.ValidationException(
                     "\n".join([unicode(e) for e in errors]))
         elif isinstance(link, CommentedMap):
-            self.validate_links(link, docid)
+            self.validate_links(link, docid, all_doc_ids)
         else:
             raise validate.ValidationException(
                 "`%s` field is %s, expected string, list, or a dict."
@@ -924,8 +925,8 @@ class Loader(object):
                         return idd
         return None
 
-    def validate_links(self, document, base_url):
-        # type: (Union[CommentedMap, CommentedSeq, unicode, None], unicode) -> None
+    def validate_links(self, document, base_url, all_doc_ids):
+        # type: (Union[CommentedMap, CommentedSeq, unicode, None], unicode, Dict[Text, Text]) -> None
         docid = self.getid(document)
         if not docid:
             docid = base_url
@@ -939,7 +940,15 @@ class Loader(object):
                 for d in self.url_fields:
                     sl = SourceLine(document, d, validate.ValidationException)
                     if d in document and d not in self.identity_links:
-                        document[d] = self.validate_link(d, document[d], docid)
+                        document[d] = self.validate_link(d, document[d], docid, all_doc_ids)
+                for identifier in self.identifiers:  # validate that each id is defined uniquely
+                    if identifier in document:
+                        sl = SourceLine(document, identifier, validate.ValidationException)
+                        if document[identifier] in all_doc_ids and sl.makeLead() != all_doc_ids[document[identifier]]:
+                            raise validate.ValidationException(
+                                "%s object %s `%s` previously defined" % (all_doc_ids[document[identifier]], identifier, relname(document[identifier]), ))
+                        else:
+                            all_doc_ids[document[identifier]] = sl.makeLead()
             except validate.ValidationException as v:
                 errors.append(sl.makeError(unicode(v)))
             if hasattr(document, "iteritems"):
@@ -952,7 +961,7 @@ class Loader(object):
         for key, val in iterator:
             sl = SourceLine(document, key, validate.ValidationException)
             try:
-                self.validate_links(val, docid)
+                self.validate_links(val, docid, all_doc_ids)
             except validate.ValidationException as v:
                 if key not in self.nolinkcheck:
                     docid2 = self.getid(val)

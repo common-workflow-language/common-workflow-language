@@ -149,18 +149,21 @@ class SourceLine(object):
             return
         raise self.makeError(unicode(exc_value))
 
+    def makeLead(self):  # type: () -> Text
+        if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:
+            return "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
+                                  (self.item.lc.line or 0)+1,
+                                  (self.item.lc.col or 0)+1)
+        else:
+            return "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
+                                  (self.item.lc.data[self.key][0] or 0)+1,
+                                  (self.item.lc.data[self.key][1] or 0)+1)
+
     def makeError(self, msg):  # type: (Text) -> Any
         if not isinstance(self.item, ruamel.yaml.comments.CommentedBase):
             return self.raise_type(msg)
         errs = []
-        if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:
-            lead = "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
-                                  (self.item.lc.line or 0)+1,
-                                  (self.item.lc.col or 0)+1)
-        else:
-            lead = "%s:%i:%i:" % (self.item.lc.filename if hasattr(self.item.lc, "filename") else "",
-                                  (self.item.lc.data[self.key][0] or 0)+1,
-                                  (self.item.lc.data[self.key][1] or 0)+1)
+        lead = self.makeLead()
         for m in msg.splitlines():
             if bool(lineno_re.match(m)):
                 errs.append(m)

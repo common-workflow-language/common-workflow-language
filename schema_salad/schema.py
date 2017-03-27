@@ -242,7 +242,7 @@ def load_and_validate(document_loader,  # type: Loader
 
     validationErrors = u""
     try:
-        document_loader.validate_links(data, u"")
+        document_loader.validate_links(data, u"", {})
     except validate.ValidationException as v:
         validationErrors = unicode(v) + "\n"
 

@@ -139,7 +139,7 @@ def main(argsl=None):  # type: (List[str]) -> int
     try:
         schema.validate_doc(metaschema_names, schema_doc,
                             metaschema_loader, args.strict,
-                            source=schema_metadata["name"])
+                            source=schema_metadata.get("name"))
     except validate.ValidationException as e:
         _logger.error("While validating schema `%s`:\n%s" %
                       (args.schema, str(e)))

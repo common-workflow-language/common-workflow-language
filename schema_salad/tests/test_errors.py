@@ -21,7 +21,10 @@ class TestErrors(unittest.TestCase):
                   "test_schema/test8.cwl",
                   "test_schema/test9.cwl",
                   "test_schema/test10.cwl",
-                  "test_schema/test11.cwl"):
+                  "test_schema/test11.cwl",
+                  "test_schema/test12.cwl",
+                  "test_schema/test13.cwl",
+                  "test_schema/test14.cwl"):
             with self.assertRaises(ValidationException):
                 try:
                     load_and_validate(document_loader, avsc_names,
