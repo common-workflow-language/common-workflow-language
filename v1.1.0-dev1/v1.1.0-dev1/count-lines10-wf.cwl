@@ -13,6 +13,7 @@ steps:
     out: [count_output]
     run:
       class: Workflow
+      id: subwf
       inputs:
         file1: File
       outputs:
