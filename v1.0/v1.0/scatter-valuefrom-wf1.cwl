@@ -35,6 +35,7 @@ steps:
     scatter: echo_in
     run:
       class: CommandLineTool
+      id: subtool
       inputs:
         first:
           type: string
