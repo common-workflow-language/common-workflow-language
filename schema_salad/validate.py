@@ -176,7 +176,8 @@ def validate_ex(expected_schema,                  # type: Schema
                                        strict=strict,
                                        foreign_properties=foreign_properties,
                                        raise_ex=raise_ex,
-                                       strict_foreign_properties=strict_foreign_properties):
+                                       strict_foreign_properties=strict_foreign_properties,
+                                       logger=logger):
                         return False
                 except ValidationException as v:
                     if raise_ex:
@@ -194,7 +195,8 @@ def validate_ex(expected_schema,                  # type: Schema
     elif isinstance(expected_schema, avro.schema.UnionSchema):
         for s in expected_schema.schemas:
             if validate_ex(s, datum, identifiers, strict=strict, raise_ex=False,
-                           strict_foreign_properties=strict_foreign_properties):
+                           strict_foreign_properties=strict_foreign_properties,
+                           logger=logger):
                 return True
 
         if not raise_ex:
@@ -217,7 +219,8 @@ def validate_ex(expected_schema,                  # type: Schema
                 validate_ex(s, datum, identifiers, strict=strict,
                             foreign_properties=foreign_properties,
                             raise_ex=True,
-                            strict_foreign_properties=strict_foreign_properties)
+                            strict_foreign_properties=strict_foreign_properties,
+                            logger=logger)
             except ClassValidationException as e:
                 raise
             except ValidationException as e:
@@ -269,7 +272,8 @@ def validate_ex(expected_schema,                  # type: Schema
                 if not validate_ex(f.type, fieldval, identifiers, strict=strict,
                                    foreign_properties=foreign_properties,
                                    raise_ex=raise_ex,
-                                   strict_foreign_properties=strict_foreign_properties):
+                                   strict_foreign_properties=strict_foreign_properties,
+                                   logger=logger):
                     return False
             except ValidationException as v:
                 if f.name not in datum:
