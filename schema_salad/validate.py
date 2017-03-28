@@ -21,7 +21,7 @@ class ClassValidationException(ValidationException):
 
 def validate(expected_schema,           # type: Schema
              datum,                     # type: Any
-             identifiers=set(),         # type: Set[unicode]
+             identifiers=[],            # type: List[unicode]
              strict=False,              # type: bool
              foreign_properties=set()   # type: Set[unicode]
              ):
@@ -59,7 +59,7 @@ def vpformat(datum):  # type: (Any) -> str
 
 def validate_ex(expected_schema,                  # type: Schema
                 datum,                            # type: Any
-                identifiers=None,                 # type: Set[unicode]
+                identifiers=None,                 # type: List[unicode]
                 strict=False,                     # type: bool
                 foreign_properties=None,          # type: Set[unicode]
                 raise_ex=True,                    # type: bool
@@ -70,7 +70,7 @@ def validate_ex(expected_schema,                  # type: Schema
     """Determine if a python datum is an instance of a schema."""
 
     if not identifiers:
-        identifiers = set()
+        identifiers = []
 
     if not foreign_properties:
         foreign_properties = set()

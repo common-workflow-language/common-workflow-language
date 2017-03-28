@@ -4,4 +4,5 @@ include schema_salad/tests/test_schema/*.md
 include schema_salad/tests/test_schema/*.yml
 include schema_salad/tests/test_schema/*.cwl
 include schema_salad/metaschema/*
+global-exclude *~
 global-exclude *.pyc

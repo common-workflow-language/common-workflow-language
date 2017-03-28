@@ -233,7 +233,7 @@ class Loader(object):
         self.url_fields = set()         # type: Set[unicode]
         self.scoped_ref_fields = {}     # type: Dict[unicode, int]
         self.vocab_fields = set()       # type: Set[unicode]
-        self.identifiers = set()        # type: Set[unicode]
+        self.identifiers = []           # type: List[unicode]
         self.identity_links = set()     # type: Set[unicode]
         self.standalone = None          # type: Optional[Set[unicode]]
         self.nolinkcheck = set()        # type: Set[unicode]
@@ -345,7 +345,7 @@ class Loader(object):
         self.url_fields = set(("$schemas",))
         self.scoped_ref_fields = {}
         self.vocab_fields = set()
-        self.identifiers = set()
+        self.identifiers = []
         self.identity_links = set()
         self.standalone = set()
         self.nolinkcheck = set()
@@ -361,7 +361,7 @@ class Loader(object):
 
         for key, value in self.ctx.items():
             if value == u"@id":
-                self.identifiers.add(key)
+                self.identifiers.append(key)
                 self.identity_links.add(key)
             elif isinstance(value, dict) and value.get(u"@type") == u"@id":
                 self.url_fields.add(key)
@@ -392,6 +392,8 @@ class Loader(object):
 
         for k, v in self.vocab.items():
             self.rvocab[self.expand_url(v, u"", scoped_id=False)] = k
+
+        self.identifiers.sort()
 
         _logger.debug("identifiers is %s", self.identifiers)
         _logger.debug("identity_links is %s", self.identity_links)
@@ -949,6 +951,7 @@ class Loader(object):
                                 "%s object %s `%s` previously defined" % (all_doc_ids[document[identifier]], identifier, relname(document[identifier]), ))
                         else:
                             all_doc_ids[document[identifier]] = sl.makeLead()
+                            break
             except validate.ValidationException as v:
                 errors.append(sl.makeError(unicode(v)))
             if hasattr(document, "iteritems"):
