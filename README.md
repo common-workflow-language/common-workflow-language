@@ -135,6 +135,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Netherlands eScience Center](https://www.esciencecenter.nl/)
 * [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing) / [Agave Platform](https://agaveapi.co/)
 * [CyVerse](http://www.cyverse.org/)
+* [Institute for Systems Biology](https://www.systemsbiology.org/)
 
 ## Individual Contributors
 
@@ -153,6 +154,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Dan Leehr <dan.leehr@duke.edu>
 * Hervé Ménager <herve.menager@gmail.com>
 * Maxim Mikheev <mikhmv@biodatomics.com>
+* Michael Miller <mmiller@systemsbiology.org>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall <joshua.randall@sanger.ac.uk>
 * Janko Simonović <janko.simonovic@sbgenomics.com>
