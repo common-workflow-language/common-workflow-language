@@ -39,7 +39,6 @@ steps:
     out: [parseInt_output]
     run:
       class: ExpressionTool
-      id: subtool
       inputs:
         parseInt_file1:
           type: File
