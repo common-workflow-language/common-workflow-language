@@ -19,7 +19,6 @@ steps:
     scatter: echo_in
     run:
       class: CommandLineTool
-      id: subtool
       inputs:
         echo_in:
           type: string

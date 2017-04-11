@@ -155,10 +155,10 @@
 - job: v1.0/wc-job.json
   output:
     output:
+      checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
       class: File
-      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
       location: output
-      size: 15
+      size: 3
   tool: v1.0/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
