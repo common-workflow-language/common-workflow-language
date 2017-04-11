@@ -1,0 +1,3 @@
+file1:
+  class: File
+  path: hello.txt

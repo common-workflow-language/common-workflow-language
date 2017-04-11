@@ -981,3 +981,9 @@
       size: 15
   tool: v1.0/imported-hint.cwl
   doc: Test hints with $import
+
+- output: {}
+  job: v1.0/default_path_job.yml
+  tool: v1.0/default_path.cwl
+  doc: Test warning instead of error when default path is not found
+
