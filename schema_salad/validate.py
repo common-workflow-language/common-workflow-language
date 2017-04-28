@@ -250,7 +250,11 @@ def validate_ex(expected_schema,                  # type: Schema
                     else:
                         return False
                 if expected_schema.name != d:
-                    return False
+                    if raise_ex:
+                        raise ValidationException(
+                            u"Expected class '%s' but this is '%s'" % (expected_schema.name, d))
+                    else:
+                        return False
                 classmatch = d
                 break
 
