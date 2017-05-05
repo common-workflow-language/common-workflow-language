@@ -267,34 +267,34 @@
   tool: "v1.1.0-dev1/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
-- job: v1.0/scatter-empty-job1.json
+- job: v1.1.0-dev1/scatter-empty-job1.json
   output:
     out: []
-  tool: v1.0/scatter-wf1.cwl
+  tool: v1.1.0-dev1/scatter-wf1.cwl
   doc: Test workflow scatter with single empty list parameter
 
-- job: v1.0/scatter-empty-job2.json
+- job: v1.1.0-dev1/scatter-empty-job2.json
   output:
     out: [[], []]
-  tool: v1.0/scatter-wf2.cwl
+  tool: v1.1.0-dev1/scatter-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with second list empty
 
-- job: v1.0/scatter-empty-job3.json
+- job: v1.1.0-dev1/scatter-empty-job3.json
   output:
     out: []
-  tool: "v1.0/scatter-wf3.cwl#main"
+  tool: "v1.1.0-dev1/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with first list empty
 
-- job: v1.0/scatter-empty-job2.json
+- job: v1.1.0-dev1/scatter-empty-job2.json
   output:
     out: []
-  tool: "v1.0/scatter-wf3.cwl#main"
+  tool: "v1.1.0-dev1/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters, one of which is empty and flat_crossproduct join method
 
-- job: v1.0/scatter-empty-job4.json
+- job: v1.1.0-dev1/scatter-empty-job4.json
   output:
     out: []
-  tool: "v1.0/scatter-wf4.cwl#main"
+  tool: "v1.1.0-dev1/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two empty scatter parameters and dotproduct join method
 
 - tool: v1.1.0-dev1/echo-tool.cwl
