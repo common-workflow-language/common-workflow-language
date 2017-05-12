@@ -76,8 +76,9 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|CWL generator for ACD (EMBOSS) files |
 |[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
-|[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
 |[cwl2zshcomp](https://github.com/kloetzl/cwl2zshcomp)|generates ZSH auto completions from CWL command line tool descriptions|
+|[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
+|[python-cwlgen](https://github.com/common-workflow-language/python-cwlgen)|Generation of CWL programmatically from Python.|
 
 ## Projects the CWL community is participating in
 
