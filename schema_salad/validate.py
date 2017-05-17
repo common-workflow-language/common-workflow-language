@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import pprint
 import avro.schema
 from avro.schema import Schema
@@ -8,6 +9,8 @@ import logging
 
 from typing import Any, List, Set, Union
 from .sourceline import SourceLine, lineno_re, bullets, indent
+import six
+from six.moves import range
 
 _logger = logging.getLogger("salad")
 
@@ -94,7 +97,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type == 'string':
-        if isinstance(datum, basestring):
+        if isinstance(datum, six.string_types):
             return True
         elif isinstance(datum, bytes):
             datum = datum.decode(u"utf-8")
@@ -114,7 +117,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type == 'int':
-        if ((isinstance(datum, int) or isinstance(datum, long))
+        if ((isinstance(datum, int) or isinstance(datum, int))
                 and INT_MIN_VALUE <= datum <= INT_MAX_VALUE):
             return True
         else:
@@ -123,7 +126,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type == 'long':
-        if ((isinstance(datum, int) or isinstance(datum, long))
+        if ((isinstance(datum, int) or isinstance(datum, int))
                 and LONG_MIN_VALUE <= datum <= LONG_MAX_VALUE):
             return True
         else:
@@ -133,7 +136,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type in ['float', 'double']:
-        if (isinstance(datum, int) or isinstance(datum, long)
+        if (isinstance(datum, int) or isinstance(datum, int)
                 or isinstance(datum, float)):
             return True
         else:
@@ -151,7 +154,7 @@ def validate_ex(expected_schema,                  # type: Schema
                     raise ValidationException(u"'Any' type must be non-null")
                 else:
                     return False
-        if not isinstance(datum, basestring):
+        if not isinstance(datum, six.string_types):
             if raise_ex:
                 raise ValidationException(
                     u"value is a %s but expected a string" % (type(datum).__name__))
@@ -182,7 +185,7 @@ def validate_ex(expected_schema,                  # type: Schema
                 except ValidationException as v:
                     if raise_ex:
                         raise sl.makeError(
-                            unicode("item is invalid because\n%s" % (indent(str(v)))))
+                            six.text_type("item is invalid because\n%s" % (indent(str(v)))))
                     else:
                         return False
             return True
@@ -209,7 +212,7 @@ def validate_ex(expected_schema,                  # type: Schema
                 continue
             elif isinstance(datum, dict) and not isinstance(s, avro.schema.RecordSchema):
                 continue
-            elif isinstance(datum, (bool, int, long, float, basestring)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):
+            elif isinstance(datum, (bool, int, int, float, six.string_types)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):
                 continue
             elif datum is not None and s.type == "null":
                 continue
@@ -224,7 +227,7 @@ def validate_ex(expected_schema,                  # type: Schema
             except ClassValidationException as e:
                 raise
             except ValidationException as e:
-                errors.append(unicode(e))
+                errors.append(six.text_type(e))
         if bool(errors):
             raise ValidationException(bullets(["tried %s but\n%s" % (friendly(
                 checked[i]), indent(errors[i])) for i in range(0, len(errors))], "- "))
@@ -272,7 +275,7 @@ def validate_ex(expected_schema,                  # type: Schema
                     fieldval = None
 
             try:
-                sl = SourceLine(datum, f.name, unicode)
+                sl = SourceLine(datum, f.name, six.text_type)
                 if not validate_ex(f.type, fieldval, identifiers, strict=strict,
                                    foreign_properties=foreign_properties,
                                    raise_ex=raise_ex,
@@ -292,7 +295,7 @@ def validate_ex(expected_schema,                  # type: Schema
                 if d == f.name:
                     found = True
             if not found:
-                sl = SourceLine(datum, d, unicode)
+                sl = SourceLine(datum, d, six.text_type)
                 if d not in identifiers and d not in foreign_properties and d[0] not in ("@", "$"):
                     if (d not in identifiers and strict) and (
                             d not in foreign_properties and strict_foreign_properties) and not raise_ex:

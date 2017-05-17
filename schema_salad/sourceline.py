@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import ruamel.yaml
 from ruamel.yaml.comments import CommentedBase, CommentedMap, CommentedSeq
 import re
@@ -5,6 +6,7 @@ import os
 
 from typing import (Any, AnyStr, Callable, cast, Dict, List, Iterable, Tuple,
                     TypeVar, Union, Text)
+import six
 
 lineno_re = re.compile(u"^(.*?:[0-9]+:[0-9]+: )(( *)(.*))")
 
@@ -15,7 +17,7 @@ def _add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, A
         for d in r:
             _add_lc_filename(d, source)
     elif isinstance(r, dict):
-        for d in r.itervalues():
+        for d in six.itervalues(r):
             _add_lc_filename(d, source)
 
 def relname(source):  # type: (AnyStr) -> AnyStr
@@ -87,7 +89,7 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
 
     if isinstance(d, CommentedMap):
         fn = d.lc.filename if hasattr(d.lc, "filename") else fn
-        for k,v in d.iteritems():
+        for k,v in six.iteritems(d):
             if k in d.lc.data:
                 d[k] = cmap(v, lc=d.lc.data[k], fn=fn)
             else:
@@ -132,7 +134,7 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         return d
 
 class SourceLine(object):
-    def __init__(self, item, key=None, raise_type=unicode):  # type: (Any, Any, Callable) -> None
+    def __init__(self, item, key=None, raise_type=six.text_type):  # type: (Any, Any, Callable) -> None
         self.item = item
         self.key = key
         self.raise_type = raise_type
@@ -147,7 +149,7 @@ class SourceLine(object):
                  ):  # -> Any
         if not exc_value:
             return
-        raise self.makeError(unicode(exc_value))
+        raise self.makeError(six.text_type(exc_value))
 
     def makeLead(self):  # type: () -> Text
         if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:

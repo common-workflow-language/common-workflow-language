@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import argparse
 import logging
 import sys
@@ -20,6 +21,7 @@ from . import makedoc
 from . import validate
 from .sourceline import strip_dup_lineno
 from .ref_resolver import Loader
+import six
 
 _logger = logging.getLogger("salad")
 
@@ -118,8 +120,8 @@ def main(argsl=None):  # type: (List[str]) -> int
     except (validate.ValidationException) as e:
         _logger.error("Schema `%s` failed link checking:\n%s",
                       args.schema, e, exc_info=(True if args.debug else False))
-        _logger.debug("Index is %s", metaschema_loader.idx.keys())
-        _logger.debug("Vocabulary is %s", metaschema_loader.vocab.keys())
+        _logger.debug("Index is %s", list(metaschema_loader.idx.keys()))
+        _logger.debug("Vocabulary is %s", list(metaschema_loader.vocab.keys()))
         return 1
     except (RuntimeError) as e:
         _logger.error("Schema `%s` read error:\n%s",
@@ -132,7 +134,7 @@ def main(argsl=None):  # type: (List[str]) -> int
         return 0
 
     if not args.document and args.print_index:
-        print(json.dumps(metaschema_loader.idx.keys(), indent=4))
+        print(json.dumps(list(metaschema_loader.idx.keys()), indent=4))
         return 0
 
     # Validate the schema document against the metaschema
@@ -210,7 +212,7 @@ def main(argsl=None):  # type: (List[str]) -> int
         document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:
         _logger.error("Document `%s` failed validation:\n%s",
-                      args.document, strip_dup_lineno(unicode(e)), exc_info=args.debug)
+                      args.document, strip_dup_lineno(six.text_type(e)), exc_info=args.debug)
         return 1
 
     # Optionally print the document after ref resolution
@@ -219,7 +221,7 @@ def main(argsl=None):  # type: (List[str]) -> int
         return 0
 
     if args.print_index:
-        print(json.dumps(document_loader.idx.keys(), indent=4))
+        print(json.dumps(list(document_loader.idx.keys()), indent=4))
         return 0
 
     # Validate the schema document against the metaschema

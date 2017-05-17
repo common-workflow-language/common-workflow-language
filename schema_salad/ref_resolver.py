@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 import os
 import json
@@ -28,12 +29,14 @@ from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import (cast, Any, AnyStr, Callable, Dict, List, Iterable,
         Optional, Set, Text, Tuple, TypeVar, Union)
+import six
+from six.moves import range
 
 _logger = logging.getLogger("salad")
-ContextType = Dict[unicode, Union[Dict, unicode, Iterable[unicode]]]
+ContextType = Dict[six.text_type, Union[Dict, six.text_type, Iterable[six.text_type]]]
 DocumentType = TypeVar('DocumentType', CommentedSeq, CommentedMap)
 DocumentOrStrType = TypeVar(
-    'DocumentOrStrType', CommentedSeq, CommentedMap, unicode)
+    'DocumentOrStrType', CommentedSeq, CommentedMap, six.text_type)
 
 def file_uri(path, split_frag=False):  # type: (str, bool) -> str
     if path.startswith("file://"):
@@ -61,7 +64,7 @@ def uri_file_path(url):  # type: (str) -> str
 
 class NormDict(CommentedMap):
 
-    def __init__(self, normalize=unicode):  # type: (Callable) -> None
+    def __init__(self, normalize=six.text_type):  # type: (Callable) -> None
         super(NormDict, self).__init__()
         self.normalize = normalize
 
@@ -143,7 +146,7 @@ class DefaultFetcher(Fetcher):
                     return read
             except (OSError, IOError) as e:
                 if e.filename == path:
-                    raise RuntimeError(unicode(e))
+                    raise RuntimeError(six.text_type(e))
                 else:
                     raise RuntimeError('Error reading %s: %s' % (url, e))
         else:
@@ -297,14 +300,14 @@ class Loader(object):
 
     def _add_properties(self, s):  # type: (unicode) -> None
         for _, _, rng in self.graph.triples((s, RDFS.range, None)):
-            literal = ((unicode(rng).startswith(
+            literal = ((six.text_type(rng).startswith(
                 u"http://www.w3.org/2001/XMLSchema#") and
-                not unicode(rng) == u"http://www.w3.org/2001/XMLSchema#anyURI")
-                or unicode(rng) ==
+                not six.text_type(rng) == u"http://www.w3.org/2001/XMLSchema#anyURI")
+                or six.text_type(rng) ==
                 u"http://www.w3.org/2000/01/rdf-schema#Literal")
             if not literal:
-                self.url_fields.add(unicode(s))
-        self.foreign_properties.add(unicode(s))
+                self.url_fields.add(six.text_type(s))
+        self.foreign_properties.add(six.text_type(s))
 
     def add_namespaces(self, ns):  # type: (Dict[unicode, unicode]) -> None
         self.vocab.update(ns)
@@ -342,7 +345,7 @@ class Loader(object):
             self._add_properties(s)
 
         for s, _, _ in self.graph.triples((None, None, None)):
-            self.idx[unicode(s)] = None
+            self.idx[six.text_type(s)] = None
 
     def add_context(self, newcontext, baseuri=""):
         # type: (ContextType, unicode) -> None
@@ -395,7 +398,7 @@ class Loader(object):
 
             if isinstance(value, dict) and u"@id" in value:
                 self.vocab[key] = value[u"@id"]
-            elif isinstance(value, basestring):
+            elif isinstance(value, six.string_types):
                 self.vocab[key] = value
 
         for k, v in self.vocab.items():
@@ -425,7 +428,7 @@ class Loader(object):
         if not base_url:
             base_url = file_uri(os.getcwd()) + "/"
 
-        if isinstance(lref, (str, unicode)) and os.sep == "\\":
+        if isinstance(lref, (str, six.text_type)) and os.sep == "\\":
             # Convert Windows path separator in ref
             lref = lref.replace("\\", "/")
 
@@ -441,7 +444,7 @@ class Loader(object):
                 else:
                     raise sl.makeError(
                         u"'$import' must be the only field in %s"
-                        % (unicode(obj)))
+                        % (six.text_type(obj)))
             elif "$include" in obj:
                 sl = SourceLine(obj, "$include", RuntimeError)
                 if len(obj) == 1:
@@ -451,7 +454,7 @@ class Loader(object):
                 else:
                     raise sl.makeError(
                         u"'$include' must be the only field in %s"
-                        % (unicode(obj)))
+                        % (six.text_type(obj)))
             elif "$mixin" in obj:
                 sl = SourceLine(obj, "$mixin", RuntimeError)
                 lref = obj[u"$mixin"]
@@ -468,9 +471,9 @@ class Loader(object):
                         u"Object `%s` does not have identifier field in %s"
                         % (relname(obj), self.identifiers))
 
-        if not isinstance(lref, (str, unicode)):
+        if not isinstance(lref, (str, six.text_type)):
             raise ValueError(u"Expected CommentedMap or string, got %s: `%s`"
-                    % (type(lref), unicode(lref)))
+                    % (type(lref), six.text_type(lref)))
 
         url = self.expand_url(lref, base_url, scoped_id=(obj is not None))
         # Has this reference been loaded already?
@@ -583,7 +586,7 @@ class Loader(object):
                   filename):
         # type: (...) -> Union[unicode, Dict[unicode, unicode], List[Union[unicode, Dict[unicode, unicode]]]]
 
-        if not isinstance(t, (str, unicode)):
+        if not isinstance(t, (str, six.text_type)):
             return t
 
         m = Loader.typeDSLregex.match(t)
@@ -612,7 +615,7 @@ class Loader(object):
         for d in loader.type_dsl_fields:
             if d in document:
                 datum2 = datum = document[d]
-                if isinstance(datum, (str, unicode)):
+                if isinstance(datum, (str, six.text_type)):
                     datum2 = self._type_dsl(datum, document.lc.data[
                                             d], document.lc.filename)
                 elif isinstance(datum, CommentedSeq):
@@ -648,12 +651,12 @@ class Loader(object):
         # Expand identifier field (usually 'id') to resolve scope
         for identifer in loader.identifiers:
             if identifer in document:
-                if isinstance(document[identifer], basestring):
+                if isinstance(document[identifer], six.string_types):
                     document[identifer] = loader.expand_url(
                         document[identifer], base_url, scoped_id=True)
                     if (document[identifer] not in loader.idx
                             or isinstance(
-                                loader.idx[document[identifer]], basestring)):
+                                loader.idx[document[identifer]], six.string_types)):
                         loader.idx[document[identifer]] = document
                     base_url = document[identifer]
                 else:
@@ -669,7 +672,7 @@ class Loader(object):
         for identifer in loader.identity_links:
             if identifer in document and isinstance(document[identifer], list):
                 for n, v in enumerate(document[identifer]):
-                    if isinstance(document[identifer][n], basestring):
+                    if isinstance(document[identifer][n], six.string_types):
                         document[identifer][n] = loader.expand_url(
                             document[identifer][n], base_url, scoped_id=True)
                         if document[identifer][n] not in loader.idx:
@@ -695,14 +698,14 @@ class Loader(object):
         for d in loader.url_fields:
             if d in document:
                 datum = document[d]
-                if isinstance(datum, (str, unicode)):
+                if isinstance(datum, (str, six.text_type)):
                     document[d] = loader.expand_url(
                         datum, base_url, scoped_id=False,
                         vocab_term=(d in loader.vocab_fields),
                         scoped_ref=self.scoped_ref_fields.get(d))
                 elif isinstance(datum, list):
                     for i, url in enumerate(datum):
-                        if isinstance(url, (str, unicode)):
+                        if isinstance(url, (str, six.text_type)):
                             datum[i] = loader.expand_url(
                                 url, base_url, scoped_id=False,
                                 vocab_term=(d in loader.vocab_fields),
@@ -791,7 +794,7 @@ class Loader(object):
             except validate.ValidationException as v:
                 _logger.warn("loader is %s", id(loader), exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in field %s:\n%s" % (
-                    id(loader), file_base, key, validate.indent(unicode(v))))
+                    id(loader), file_base, key, validate.indent(six.text_type(v))))
 
         elif isinstance(document, CommentedSeq):
             i = 0
@@ -822,11 +825,11 @@ class Loader(object):
             except validate.ValidationException as v:
                 _logger.warn("failed", exc_info=True)
                 raise validate.ValidationException("(%s) (%s) Validation error in position %i:\n%s" % (
-                    id(loader), file_base, i, validate.indent(unicode(v))))
+                    id(loader), file_base, i, validate.indent(six.text_type(v))))
 
             for identifer in loader.identity_links:
                 if identifer in metadata:
-                    if isinstance(metadata[identifer], (str, unicode)):
+                    if isinstance(metadata[identifer], (str, six.text_type)):
                         metadata[identifer] = loader.expand_url(
                             metadata[identifer], base_url, scoped_id=True)
                         loader.idx[metadata[identifer]] = document
@@ -862,7 +865,7 @@ class Loader(object):
         return result
 
 
-    FieldType = TypeVar('FieldType', unicode, CommentedSeq, CommentedMap)
+    FieldType = TypeVar('FieldType', six.text_type, CommentedSeq, CommentedMap)
 
     def validate_scoped(self, field, link, docid):
         # type: (unicode, unicode, unicode) -> unicode
@@ -892,7 +895,7 @@ class Loader(object):
         # type: (unicode, FieldType, unicode, Dict[Text, Text]) -> FieldType
         if field in self.nolinkcheck:
             return link
-        if isinstance(link, (str, unicode)):
+        if isinstance(link, (str, six.text_type)):
             if field in self.vocab_fields:
                 if (link not in self.vocab and link not in self.idx
                         and link not in self.rvocab):
@@ -917,7 +920,7 @@ class Loader(object):
                     errors.append(v)
             if bool(errors):
                 raise validate.ValidationException(
-                    "\n".join([unicode(e) for e in errors]))
+                    "\n".join([six.text_type(e) for e in errors]))
         elif isinstance(link, CommentedMap):
             self.validate_links(link, docid, all_doc_ids)
         else:
@@ -931,7 +934,7 @@ class Loader(object):
             for i in self.identifiers:
                 if i in d:
                     idd = d[i]
-                    if isinstance(idd, (str, unicode)):
+                    if isinstance(idd, (str, six.text_type)):
                         return idd
         return None
 
@@ -961,11 +964,11 @@ class Loader(object):
                             all_doc_ids[document[identifier]] = sl.makeLead()
                             break
             except validate.ValidationException as v:
-                errors.append(sl.makeError(unicode(v)))
+                errors.append(sl.makeError(six.text_type(v)))
             if hasattr(document, "iteritems"):
-                iterator = document.iteritems()
+                iterator = six.iteritems(document)
             else:
-                iterator = document.items()
+                iterator = list(document.items())
         else:
             return
 
@@ -978,20 +981,20 @@ class Loader(object):
                     docid2 = self.getid(val)
                     if docid2 is not None:
                         errors.append(sl.makeError("checking object `%s`\n%s"
-                            % (relname(docid2), validate.indent(unicode(v)))))
+                            % (relname(docid2), validate.indent(six.text_type(v)))))
                     else:
-                        if isinstance(key, basestring):
+                        if isinstance(key, six.string_types):
                             errors.append(sl.makeError("checking field `%s`\n%s" % (
-                                key, validate.indent(unicode(v)))))
+                                key, validate.indent(six.text_type(v)))))
                         else:
                             errors.append(sl.makeError("checking item\n%s" % (
-                                validate.indent(unicode(v)))))
+                                validate.indent(six.text_type(v)))))
                 else:
-                    _logger.warn( validate.indent(unicode(v)))
+                    _logger.warn( validate.indent(six.text_type(v)))
         if bool(errors):
             if len(errors) > 1:
                 raise validate.ValidationException(
-                    u"\n".join([unicode(e) for e in errors]))
+                    u"\n".join([six.text_type(e) for e in errors]))
             else:
                 raise errors[0]
         return

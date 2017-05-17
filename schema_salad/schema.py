@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import avro
 import copy
 from schema_salad.utils import add_dictlist, aslist, flatten
@@ -10,6 +11,7 @@ from . import validate
 import json
 import urlparse
 import os
+import six
 AvroSchemaFromJSONData = avro.schema.make_avsc_object
 # AvroSchemaFromJSONData=avro.schema.SchemaFromJSONData
 from avro.schema import Names, SchemaParseException
@@ -242,12 +244,12 @@ def load_and_validate(document_loader,  # type: Loader
     try:
         document_loader.validate_links(data, u"", {})
     except validate.ValidationException as v:
-        validationErrors = unicode(v) + "\n"
+        validationErrors = six.text_type(v) + "\n"
 
     try:
         validate_doc(avsc_names, data, document_loader, strict, source=source)
     except validate.ValidationException as v:
-        validationErrors += unicode(v)
+        validationErrors += six.text_type(v)
 
     if validationErrors != u"":
         raise validate.ValidationException(validationErrors)
@@ -290,7 +292,7 @@ def validate_doc(schema_names,  # type: Names
 
     anyerrors = []
     for pos, item in enumerate(validate_doc):
-        sl = SourceLine(validate_doc, pos, unicode)
+        sl = SourceLine(validate_doc, pos, six.text_type)
         success = False
         for r in roots:
             success = validate.validate_ex(
@@ -358,7 +360,7 @@ def replace_type(items, spec, loader, found):
     elif isinstance(items, list):
         # recursively transform list
         return [replace_type(i, spec, loader, found) for i in items]
-    elif isinstance(items, (str, unicode)):
+    elif isinstance(items, (str, six.text_type)):
         # found a string which is a symbol corresponding to a type.
         replace_with = None
         if items in loader.vocab:
@@ -385,7 +387,7 @@ def avro_name(url):  # type: (AnyStr) -> AnyStr
     return url
 
 
-Avro = TypeVar('Avro', Dict[unicode, Any], List[Any], unicode)
+Avro = TypeVar('Avro', Dict[six.text_type, Any], List[Any], six.text_type)
 
 
 def make_valid_avro(items,          # type: Avro
@@ -409,7 +411,7 @@ def make_valid_avro(items,          # type: Avro
                     "Named schemas must have a non-empty name: %s" % items)
 
             if items["name"] in found:
-                return cast(unicode, items["name"])
+                return cast(six.text_type, items["name"])
             else:
                 found.add(items["name"])
         for n in ("type", "items", "values", "fields"):
@@ -424,7 +426,7 @@ def make_valid_avro(items,          # type: Avro
         for i in items:
             ret.append(make_valid_avro(i, alltypes, found, union=union))
         return ret
-    if union and isinstance(items, (str, unicode)):
+    if union and isinstance(items, (str, six.text_type)):
         if items in alltypes and avro_name(items) not in found:
             return cast(Dict, make_valid_avro(alltypes[items], alltypes, found,
                                               union=union))
@@ -440,7 +442,7 @@ def deepcopy_strip(item):  # type: (Any) -> Any
     """
 
     if isinstance(item, dict):
-        return {k: deepcopy_strip(v) for k,v in item.iteritems()}
+        return {k: deepcopy_strip(v) for k,v in six.iteritems(item)}
     elif isinstance(item, list):
         return [deepcopy_strip(k) for k in item]
     else:

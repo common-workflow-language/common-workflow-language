@@ -1,7 +1,9 @@
+from __future__ import absolute_import
 import collections
 import shutil
 import json
 import ruamel.yaml as yaml
+import six
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
@@ -40,10 +42,10 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
 
     if split.scheme != '':
         vee = name
-        (ns, ln) = rdflib.namespace.split_uri(unicode(vee))
+        (ns, ln) = rdflib.namespace.split_uri(six.text_type(vee))
         name = ln
         if ns[0:-1] in namespaces:
-            vee = unicode(namespaces[ns[0:-1]][ln])
+            vee = six.text_type(namespaces[ns[0:-1]][ln])
         _logger.debug("name, v %s %s", name, vee)
 
     v = None  # type: Optional[Dict]
@@ -106,7 +108,7 @@ def process_type(t,             # type: Dict[str, Any]
         predicate = recordname
         if t.get("inVocab", True):
             if split.scheme:
-                (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
+                (ns, ln) = rdflib.namespace.split_uri(six.text_type(recordname))
                 predicate = recordname
                 recordname = ln
             else:
@@ -131,13 +133,13 @@ def process_type(t,             # type: Dict[str, Any]
             v = pred(t, i, fieldname, context, defaultPrefix,
                     namespaces)  # type: Union[Dict[Any, Any], unicode, None]
 
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_types):
                 v = v if v[0] != "@" else None
             elif v is not None:
                 v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
 
             if bool(v):
-                (ns, ln) = rdflib.namespace.split_uri(unicode(v))
+                (ns, ln) = rdflib.namespace.split_uri(six.text_type(v))
                 if ns[0:-1] in namespaces:
                     propnode = namespaces[ns[0:-1]][ln]
                 else:
@@ -211,7 +213,7 @@ def makerdf(workflow,       # type: Union[str, unicode]
     # type: (...) -> Graph
     prefixes = {}
     idfields = []
-    for k, v in ctx.iteritems():
+    for k, v in six.iteritems(ctx):
         if isinstance(v, dict):
             url = v["@id"]
         else:
@@ -242,7 +244,7 @@ def makerdf(workflow,       # type: Union[str, unicode]
     for sub, pred, obj in g.triples((None, URIRef("@id"), None)):
         g.remove((sub, pred, obj))
 
-    for k2, v2 in prefixes.iteritems():
+    for k2, v2 in six.iteritems(prefixes):
         g.namespace_manager.bind(k2, v2)
 
     return g
