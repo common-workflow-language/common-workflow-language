@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import unittest
 import schema_salad.ref_resolver
 import schema_salad.main
@@ -52,6 +54,6 @@ class TestFetcher(unittest.TestCase):
         loader = schema_salad.ref_resolver.Loader({})
         foo = "file://%s/foo.txt" % os.getcwd()
         loader.cache.update({foo: "hello: foo"})
-        print(loader.cache)
+        print((loader.cache))
         self.assertEqual({"hello": "foo"}, loader.resolve_ref("foo.txt")[0])
         self.assertTrue(loader.check_exists(foo))

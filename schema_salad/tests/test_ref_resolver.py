@@ -1,5 +1,6 @@
 """Test the ref_resolver module."""
 
+from __future__ import absolute_import
 import shutil
 import tempfile
 

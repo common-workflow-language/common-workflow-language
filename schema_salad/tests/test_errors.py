@@ -1,9 +1,12 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from .util import get_data
 import unittest
 from typing import cast
 from schema_salad.schema import load_schema, load_and_validate
 from schema_salad.validate import ValidationException
 from avro.schema import Names
+import six
 
 class TestErrors(unittest.TestCase):
     def test_errors(self):
@@ -28,7 +31,7 @@ class TestErrors(unittest.TestCase):
             with self.assertRaises(ValidationException):
                 try:
                     load_and_validate(document_loader, avsc_names,
-                            unicode(get_data("tests/"+t)), True)
+                            six.text_type(get_data("tests/"+t)), True)
                 except ValidationException as e:
-                    print("\n", e)
+                    print(("\n", e))
                     raise
