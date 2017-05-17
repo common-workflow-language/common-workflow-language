@@ -7,6 +7,7 @@ import six
 from six.moves import urllib
 
 import ruamel.yaml as yaml
+import six
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:

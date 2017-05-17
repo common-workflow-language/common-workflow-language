@@ -12,6 +12,8 @@ from six.moves import range
 
 from typing import Any, List, Set, Union, Text
 from .sourceline import SourceLine, lineno_re, bullets, indent
+import six
+from six.moves import range
 
 _logger = logging.getLogger("salad")
 
