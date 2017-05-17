@@ -103,13 +103,13 @@ def SubLoader(loader):  # type: (Loader) -> Loader
                   skip_schemas=loader.skip_schemas)
 
 class Fetcher(object):
-    def fetch_text(self, url):    # type: (unicode) -> unicode
+    def fetch_text(self, url):    # type: (Text) -> Text
         raise NotImplementedError()
 
-    def check_exists(self, url):  # type: (unicode) -> bool
+    def check_exists(self, url):  # type: (Text) -> bool
         raise NotImplementedError()
 
-    def urljoin(self, base_url, url):  # type: (unicode, unicode) -> unicode
+    def urljoin(self, base_url, url):  # type: (Text, Text) -> Text
         raise NotImplementedError()
 
 
@@ -122,7 +122,7 @@ class DefaultFetcher(Fetcher):
         self.session = session
 
     def fetch_text(self, url):
-        # type: (unicode) -> unicode
+        # type: (Text) -> Text
         if url in self.cache:
             return self.cache[url]
 
@@ -152,7 +152,7 @@ class DefaultFetcher(Fetcher):
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
-    def check_exists(self, url):  # type: (unicode) -> bool
+    def check_exists(self, url):  # type: (Text) -> bool
         if url in self.cache:
             return True
 
@@ -178,9 +178,9 @@ class Loader(object):
     def __init__(self,
                  ctx,                       # type: ContextType
                  schemagraph=None,          # type: rdflib.graph.Graph
-                 foreign_properties=None,   # type: Set[unicode]
-                 idx=None,                  # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode, None]]
-                 cache=None,                # type: Dict[unicode, Any]
+                 foreign_properties=None,   # type: Set[Text]
+                 idx=None,                  # type: Dict[Text, Union[CommentedMap, CommentedSeq, Text, None]]
+                 cache=None,                # type: Dict[Text, Any]
                  session=None,              # type: requests.sessions.Session
                  fetcher_constructor=None,  # type: Callable[[Dict[unicode, unicode], requests.sessions.Session], Fetcher]
                  skip_schemas=None          # type: bool
@@ -239,29 +239,29 @@ class Loader(object):
         self.fetch_text = self.fetcher.fetch_text
         self.check_exists = self.fetcher.check_exists
 
-        self.url_fields = set()         # type: Set[unicode]
-        self.scoped_ref_fields = {}     # type: Dict[unicode, int]
-        self.vocab_fields = set()       # type: Set[unicode]
-        self.identifiers = []           # type: List[unicode]
-        self.identity_links = set()     # type: Set[unicode]
-        self.standalone = None          # type: Optional[Set[unicode]]
-        self.nolinkcheck = set()        # type: Set[unicode]
-        self.vocab = {}                 # type: Dict[unicode, unicode]
-        self.rvocab = {}                # type: Dict[unicode, unicode]
-        self.idmap = {}                 # type: Dict[unicode, Any]
-        self.mapPredicate = {}          # type: Dict[unicode, unicode]
-        self.type_dsl_fields = set()    # type: Set[unicode]
+        self.url_fields = set()         # type: Set[Text]
+        self.scoped_ref_fields = {}     # type: Dict[Text, int]
+        self.vocab_fields = set()       # type: Set[Text]
+        self.identifiers = []           # type: List[Text]
+        self.identity_links = set()     # type: Set[Text]
+        self.standalone = None          # type: Optional[Set[Text]]
+        self.nolinkcheck = set()        # type: Set[Text]
+        self.vocab = {}                 # type: Dict[Text, Text]
+        self.rvocab = {}                # type: Dict[Text, Text]
+        self.idmap = {}                 # type: Dict[Text, Any]
+        self.mapPredicate = {}          # type: Dict[Text, Text]
+        self.type_dsl_fields = set()    # type: Set[Text]
 
         self.add_context(ctx)
 
     def expand_url(self,
-                   url,                 # type: unicode
-                   base_url,            # type: unicode
+                   url,                 # type: Text
+                   base_url,            # type: Text
                    scoped_id=False,     # type: bool
                    vocab_term=False,    # type: bool
                    scoped_ref=None      # type: int
                    ):
-        # type: (...) -> unicode
+        # type: (...) -> Text
         if url in (u"@id", u"@type"):
             return url
 
@@ -298,7 +298,7 @@ class Loader(object):
         else:
             return url
 
-    def _add_properties(self, s):  # type: (unicode) -> None
+    def _add_properties(self, s):  # type: (Text) -> None
         for _, _, rng in self.graph.triples((s, RDFS.range, None)):
             literal = ((six.text_type(rng).startswith(
                 u"http://www.w3.org/2001/XMLSchema#") and
@@ -309,11 +309,11 @@ class Loader(object):
                 self.url_fields.add(six.text_type(s))
         self.foreign_properties.add(six.text_type(s))
 
-    def add_namespaces(self, ns):  # type: (Dict[unicode, unicode]) -> None
+    def add_namespaces(self, ns):  # type: (Dict[Text, Text]) -> None
         self.vocab.update(ns)
 
     def add_schemas(self, ns, base_url):
-        # type: (Union[List[unicode], unicode], unicode) -> None
+        # type: (Union[List[Text], Text], Text) -> None
         if self.skip_schemas:
             return
         for sch in aslist(ns):
@@ -348,7 +348,7 @@ class Loader(object):
             self.idx[six.text_type(s)] = None
 
     def add_context(self, newcontext, baseuri=""):
-        # type: (ContextType, unicode) -> None
+        # type: (ContextType, Text) -> None
         if bool(self.vocab):
             raise validate.ValidationException(
                 "Refreshing context that already has stuff in it")
@@ -413,17 +413,17 @@ class Loader(object):
         _logger.debug("vocab is %s", self.vocab)
 
     def resolve_ref(self,
-                    ref,             # type: Union[CommentedMap, CommentedSeq, unicode]
-                    base_url=None,   # type: unicode
+                    ref,             # type: Union[CommentedMap, CommentedSeq, Text]
+                    base_url=None,   # type: Text
                     checklinks=True  # type: bool
                     ):
-        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode, None], Dict[unicode, Any]]
+        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, Text, None], Dict[Text, Any]]
 
-        lref = ref           # type: Union[CommentedMap, CommentedSeq, unicode, None]
+        lref = ref           # type: Union[CommentedMap, CommentedSeq, Text, None]
         obj = None           # type: Optional[CommentedMap]
-        resolved_obj = None  # type: Optional[Union[CommentedMap, CommentedSeq, unicode]]
+        resolved_obj = None  # type: Optional[Union[CommentedMap, CommentedSeq, Text]]
         inc = False
-        mixin = None         # type: Optional[Dict[unicode, Any]]
+        mixin = None         # type: Optional[Dict[Text, Any]]
 
         if not base_url:
             base_url = file_uri(os.getcwd()) + "/"
@@ -581,10 +581,10 @@ class Loader(object):
     typeDSLregex = re.compile(ur"^([^[?]+)(\[\])?(\?)?$")
 
     def _type_dsl(self,
-                  t,        # type: Union[unicode, Dict, List]
+                  t,        # type: Union[Text, Dict, List]
                   lc,
                   filename):
-        # type: (...) -> Union[unicode, Dict[unicode, unicode], List[Union[unicode, Dict[unicode, unicode]]]]
+        # type: (...) -> Union[Text, Dict[Text, Text], List[Union[Text, Dict[Text, Text]]]]
 
         if not isinstance(t, (str, six.text_type)):
             return t
@@ -627,7 +627,7 @@ class Loader(object):
                             t, datum.lc.data[n], document.lc.filename))
                 if isinstance(datum2, CommentedSeq):
                     datum3 = CommentedSeq()
-                    seen = []  # type: List[unicode]
+                    seen = []  # type: List[Text]
                     for i, item in enumerate(datum2):
                         if isinstance(item, CommentedSeq):
                             for j, v in enumerate(item):
@@ -647,7 +647,7 @@ class Loader(object):
                     document[d] = datum2
 
     def _resolve_identifier(self, document, loader, base_url):
-        # type: (CommentedMap, Loader, unicode) -> unicode
+        # type: (CommentedMap, Loader, Text) -> Text
         # Expand identifier field (usually 'id') to resolve scope
         for identifer in loader.identifiers:
             if identifer in document:
@@ -666,7 +666,7 @@ class Loader(object):
         return base_url
 
     def _resolve_identity(self, document, loader, base_url):
-        # type: (Dict[unicode, List[unicode]], Loader, unicode) -> None
+        # type: (Dict[Text, List[Text]], Loader, Text) -> None
         # Resolve scope for identity fields (fields where the value is the
         # identity of a standalone node, such as enum symbols)
         for identifer in loader.identity_links:
@@ -680,7 +680,7 @@ class Loader(object):
                                 n]] = document[identifer][n]
 
     def _normalize_fields(self, document, loader):
-        # type: (Dict[unicode, unicode], Loader) -> None
+        # type: (Dict[Text, Text], Loader) -> None
         # Normalize fields which are prefixed or full URIn to vocabulary terms
         for d in document:
             d2 = loader.expand_url(d, u"", scoped_id=False, vocab_term=True)
@@ -689,9 +689,9 @@ class Loader(object):
                 del document[d]
 
     def _resolve_uris(self,
-                      document,  # type: Dict[unicode, Union[unicode, List[unicode]]]
+                      document,  # type: Dict[Text, Union[Text, List[Text]]]
                       loader,    # type: Loader
-                      base_url   # type: unicode
+                      base_url   # type: Text
                       ):
         # type: (...) -> None
         # Resolve remaining URLs based on document base
@@ -714,11 +714,11 @@ class Loader(object):
 
     def resolve_all(self,
                     document,           # type: Union[CommentedMap, CommentedSeq]
-                    base_url,           # type: unicode
-                    file_base=None,     # type: unicode
+                    base_url,           # type: Text
+                    file_base=None,     # type: Text
                     checklinks=True     # type: bool
                     ):
-        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode, None], Dict[unicode, Any]]
+        # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, Text, None], Dict[Text, Any]]
         loader = self
         metadata = CommentedMap()  # type: CommentedMap
         if file_base is None:
@@ -840,7 +840,7 @@ class Loader(object):
 
         return document, metadata
 
-    def fetch(self, url, inject_ids=True):  # type: (unicode, bool) -> Any
+    def fetch(self, url, inject_ids=True):  # type: (Text, bool) -> Any
         if url in self.idx:
             return self.idx[url]
         try:
@@ -868,7 +868,7 @@ class Loader(object):
     FieldType = TypeVar('FieldType', six.text_type, CommentedSeq, CommentedMap)
 
     def validate_scoped(self, field, link, docid):
-        # type: (unicode, unicode, unicode) -> unicode
+        # type: (Text, Text, Text) -> Text
         split = urlparse.urlsplit(docid)
         sp = split.fragment.split(u"/")
         n = self.scoped_ref_fields[field]
@@ -892,7 +892,7 @@ class Loader(object):
             "Field `%s` references unknown identifier `%s`, tried %s" % (field, link, ", ".join(tried)))
 
     def validate_link(self, field, link, docid, all_doc_ids):
-        # type: (unicode, FieldType, unicode, Dict[Text, Text]) -> FieldType
+        # type: (Text, FieldType, Text, Dict[Text, Text]) -> FieldType
         if field in self.nolinkcheck:
             return link
         if isinstance(link, (str, six.text_type)):
@@ -939,7 +939,7 @@ class Loader(object):
         return None
 
     def validate_links(self, document, base_url, all_doc_ids):
-        # type: (Union[CommentedMap, CommentedSeq, unicode, None], unicode, Dict[Text, Text]) -> None
+        # type: (Union[CommentedMap, CommentedSeq, Text, None], Text, Dict[Text, Text]) -> None
         docid = self.getid(document)
         if not docid:
             docid = base_url

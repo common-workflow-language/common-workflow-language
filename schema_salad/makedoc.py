@@ -58,7 +58,7 @@ class MyRenderer(mistune.Renderer):
         ) % (header, body)
 
 
-def to_id(text):  # type: (Union[str, unicode]) -> Union[str, unicode]
+def to_id(text):  # type: (Union[str, Text]) -> Union[str, Text]
     textid = text
     if text[0] in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
         try:
@@ -229,7 +229,7 @@ class RenderType(object):
                 nbsp=False,             # type: bool
                 jsonldPredicate=None    # type: Optional[Dict[str, str]]
                 ):
-        # type: (...) -> Union[str, unicode]
+        # type: (...) -> Union[str, Text]
         if isinstance(tp, list):
             if nbsp and len(tp) <= 3:
                 return "&nbsp;|&nbsp;".join([self.typefmt(n, redirects, jsonldPredicate=jsonldPredicate) for n in tp])
@@ -419,12 +419,12 @@ class RenderType(object):
 
 
 def avrold_doc(j, outdoc, renderlist, redirects, brand, brandlink, primtype):
-    # type: (List[Dict[unicode, Any]], IO[Any], str, Dict, str, str, str) -> None
+    # type: (List[Dict[Text, Any]], IO[Any], str, Dict, str, str, str) -> None
     toc = ToC()
     toc.start_numbering = False
 
     rt = RenderType(toc, j, renderlist, redirects, primtype)
-    content = rt.typedoc.getvalue()  # type: unicode
+    content = rt.typedoc.getvalue()  # type: Text
 
     outdoc.write("""
     <!DOCTYPE html>
@@ -512,7 +512,7 @@ def main():  # type: () -> None
 
     args = parser.parse_args()
 
-    s = []  # type: List[Dict[unicode, Any]]
+    s = []  # type: List[Dict[Text, Any]]
     a = args.schema
     with open(a) as f:
         if a.endswith("md"):

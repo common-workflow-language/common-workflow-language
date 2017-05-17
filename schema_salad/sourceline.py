@@ -81,7 +81,7 @@ def strip_dup_lineno(text, maxline=None):  # type: (Text, int) -> Text
             msg.append(" " * len(g.group(1)) + g2)
     return "\n".join(msg)
 
-def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, List], List[int], unicode) -> Union[int, float, str, unicode, CommentedMap, CommentedSeq]
+def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, Text, Dict, List], List[int], Text) -> Union[int, float, str, Text, CommentedMap, CommentedSeq]
     if lc is None:
         lc = [0, 0, 0, 0]
     if fn is None:

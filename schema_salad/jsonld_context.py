@@ -38,7 +38,7 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
     # type: (...) -> Union[Dict, Text]
     split = urlparse.urlsplit(name)
 
-    vee = None  # type: Optional[Union[str, unicode]]
+    vee = None  # type: Optional[Union[str, Text]]
 
     if split.scheme != '':
         vee = name
@@ -131,7 +131,7 @@ def process_type(t,             # type: Dict[str, Any]
             _logger.debug("Processing field %s", i)
 
             v = pred(t, i, fieldname, context, defaultPrefix,
-                    namespaces)  # type: Union[Dict[Any, Any], unicode, None]
+                    namespaces)  # type: Union[Dict[Any, Any], Text, None]
 
             if isinstance(v, six.string_types):
                 v = v if v[0] != "@" else None
@@ -190,8 +190,8 @@ def salad_to_jsonld_context(j, schema_ctx):
     return (context, g)
 
 
-def fix_jsonld_ids(obj,     # type: Union[Dict[unicode, Any], List[Dict[unicode, Any]]]
-                   ids      # type: List[unicode]
+def fix_jsonld_ids(obj,     # type: Union[Dict[Text, Any], List[Dict[Text, Any]]]
+                   ids      # type: List[Text]
                    ):
     # type: (...) -> None
     if isinstance(obj, dict):
@@ -205,8 +205,8 @@ def fix_jsonld_ids(obj,     # type: Union[Dict[unicode, Any], List[Dict[unicode,
             fix_jsonld_ids(entry, ids)
 
 
-def makerdf(workflow,       # type: Union[str, unicode]
-            wf,             # type: Union[List[Dict[unicode, Any]], Dict[unicode, Any]]
+def makerdf(workflow,       # type: Union[str, Text]
+            wf,             # type: Union[List[Dict[Text, Any]], Dict[Text, Any]]
             ctx,            # type: ContextType
             graph=None      # type: Graph
             ):

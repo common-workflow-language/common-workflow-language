@@ -7,7 +7,7 @@ import urlparse
 import re
 import logging
 
-from typing import Any, List, Set, Union
+from typing import Any, List, Set, Union, Text
 from .sourceline import SourceLine, lineno_re, bullets, indent
 import six
 from six.moves import range
@@ -24,9 +24,9 @@ class ClassValidationException(ValidationException):
 
 def validate(expected_schema,           # type: Schema
              datum,                     # type: Any
-             identifiers=[],            # type: List[unicode]
+             identifiers=[],            # type: List[Text]
              strict=False,              # type: bool
-             foreign_properties=set()   # type: Set[unicode]
+             foreign_properties=set()   # type: Set[Text]
              ):
     # type: (...) -> bool
     return validate_ex(
@@ -62,9 +62,9 @@ def vpformat(datum):  # type: (Any) -> str
 
 def validate_ex(expected_schema,                  # type: Schema
                 datum,                            # type: Any
-                identifiers=None,                 # type: List[unicode]
+                identifiers=None,                 # type: List[Text]
                 strict=False,                     # type: bool
-                foreign_properties=None,          # type: Set[unicode]
+                foreign_properties=None,          # type: Set[Text]
                 raise_ex=True,                    # type: bool
                 strict_foreign_properties=False,  # type: bool
                 logger=_logger                    # type: logging.Logger
@@ -205,14 +205,14 @@ def validate_ex(expected_schema,                  # type: Schema
         if not raise_ex:
             return False
 
-        errors = []  # type: List[unicode]
+        errors = []  # type: List[Text]
         checked = []
         for s in expected_schema.schemas:
             if isinstance(datum, list) and not isinstance(s, avro.schema.ArraySchema):
                 continue
             elif isinstance(datum, dict) and not isinstance(s, avro.schema.RecordSchema):
                 continue
-            elif isinstance(datum, (bool, int, int, float, six.string_types)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):
+            elif isinstance(datum, (bool, int, int, float, int)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):
                 continue
             elif datum is not None and s.type == "null":
                 continue

@@ -10,7 +10,7 @@ import urlparse
 
 import pkg_resources  # part of setuptools
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Text
 
 from rdflib import Graph, plugin
 from rdflib.serializer import Serializer
@@ -30,8 +30,8 @@ register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
 
 
 def printrdf(workflow,  # type: str
-             wf,        # type: Union[List[Dict[unicode, Any]], Dict[unicode, Any]]
-             ctx,       # type: Dict[unicode, Any]
+             wf,        # type: Union[List[Dict[Text, Any]], Dict[Text, Any]]
+             ctx,       # type: Dict[Text, Any]
              sr         # type: str
              ):
     # type: (...) -> None
