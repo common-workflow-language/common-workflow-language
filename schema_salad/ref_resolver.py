@@ -5,11 +5,15 @@ import json
 import hashlib
 import logging
 import collections
+
+import six
+from six.moves import range
 import urllib
-import urlparse
+# import urlparse
+from six.moves.urllib import parse
+
 import re
 import copy
-import urllib
 from StringIO import StringIO
 
 from . import validate
@@ -29,8 +33,7 @@ from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import (cast, Any, AnyStr, Callable, Dict, List, Iterable,
         Optional, Set, Text, Tuple, TypeVar, Union)
-import six
-from six.moves import range
+
 
 _logger = logging.getLogger("salad")
 ContextType = Dict[six.text_type, Union[Dict, six.text_type, Iterable[six.text_type]]]
@@ -54,7 +57,7 @@ def file_uri(path, split_frag=False):  # type: (str, bool) -> str
         return "file://%s%s" % (urlpath, frag)
 
 def uri_file_path(url):  # type: (str) -> str
-    split = urlparse.urlsplit(url)
+    split = parse.urlsplit(url)
     if split.scheme == "file":
         return urllib.url2pathname(
             str(split.path)) + ("#" + urllib.unquote(str(split.fragment))
@@ -126,7 +129,7 @@ class DefaultFetcher(Fetcher):
         if url in self.cache:
             return self.cache[url]
 
-        split = urlparse.urlsplit(url)
+        split = parse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
         if scheme in [u'http', u'https'] and self.session is not None:
@@ -156,7 +159,7 @@ class DefaultFetcher(Fetcher):
         if url in self.cache:
             return True
 
-        split = urlparse.urlsplit(url)
+        split = parse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
         if scheme in [u'http', u'https'] and self.session is not None:
@@ -172,7 +175,7 @@ class DefaultFetcher(Fetcher):
             raise ValueError('Unsupported scheme in url: %s' % url)
 
     def urljoin(self, base_url, url):  # type: (Text, Text) -> Text
-        return urlparse.urljoin(base_url, url)
+        return parse.urljoin(base_url, url)
 
 class Loader(object):
     def __init__(self,
@@ -187,7 +190,7 @@ class Loader(object):
                  ):
         # type: (...) -> None
 
-        normalize = lambda url: urlparse.urlsplit(url).geturl()
+        normalize = lambda url: parse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
         else:
@@ -273,20 +276,20 @@ class Loader(object):
             if prefix in self.vocab:
                 url = self.vocab[prefix] + url[len(prefix) + 1:]
 
-        split = urlparse.urlsplit(url)
+        split = parse.urlsplit(url)
 
         if (bool(split.scheme) or url.startswith(u"$(")
             or url.startswith(u"${")):
             pass
         elif scoped_id and not bool(split.fragment):
-            splitbase = urlparse.urlsplit(base_url)
+            splitbase = parse.urlsplit(base_url)
             frg = u""
             if bool(splitbase.fragment):
                 frg = splitbase.fragment + u"/" + split.path
             else:
                 frg = split.path
             pt = splitbase.path if splitbase.path != '' else "/"
-            url = urlparse.urlunsplit(
+            url = parse.urlunsplit(
                 (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
         elif scoped_ref is not None and not split.fragment:
             pass
@@ -493,7 +496,7 @@ class Loader(object):
                 doc_url = url
             else:
                 # Load structured document
-                doc_url, frg = urlparse.urldefrag(url)
+                doc_url, frg = parse.urldefrag(url)
                 if doc_url in self.idx and (not mixin):
                     # If the base document is in the index, it was already loaded,
                     # so if we didn't find the reference earlier then it must not
@@ -869,7 +872,7 @@ class Loader(object):
 
     def validate_scoped(self, field, link, docid):
         # type: (Text, Text, Text) -> Text
-        split = urlparse.urlsplit(docid)
+        split = parse.urlsplit(docid)
         sp = split.fragment.split(u"/")
         n = self.scoped_ref_fields[field]
         while n > 0 and len(sp) > 0:
@@ -878,7 +881,7 @@ class Loader(object):
         tried = []
         while True:
             sp.append(link)
-            url = urlparse.urlunsplit((
+            url = parse.urlunsplit((
                 split.scheme, split.netloc, split.path, split.query,
                 u"/".join(sp)))
             tried.append(url)

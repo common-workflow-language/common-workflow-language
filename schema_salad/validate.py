@@ -3,7 +3,8 @@ import pprint
 import avro.schema
 from avro.schema import Schema
 import sys
-import urlparse
+# import urlparse
+from six.moves.urllib import parse
 import re
 import logging
 
@@ -300,7 +301,7 @@ def validate_ex(expected_schema,                  # type: Schema
                     if (d not in identifiers and strict) and (
                             d not in foreign_properties and strict_foreign_properties) and not raise_ex:
                         return False
-                    split = urlparse.urlsplit(d)
+                    split = parse.urlsplit(d)
                     if split.scheme:
                         err = sl.makeError(u"unrecognized extension field `%s`%s."
                                            "  Did you include "

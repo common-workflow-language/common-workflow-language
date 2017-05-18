@@ -9,9 +9,10 @@ import ruamel.yaml as yaml
 import avro.schema
 from . import validate
 import json
-import urlparse
-import os
+# import urlparse
+from six.moves.urllib import parse
 import six
+import os
 AvroSchemaFromJSONData = avro.schema.make_avsc_object
 # AvroSchemaFromJSONData=avro.schema.SchemaFromJSONData
 from avro.schema import Names, SchemaParseException
@@ -378,7 +379,7 @@ def replace_type(items, spec, loader, found):
 
 
 def avro_name(url):  # type: (AnyStr) -> AnyStr
-    doc_url, frg = urlparse.urldefrag(url)
+    doc_url, frg = parse.urldefrag(url)
     if frg != '':
         if '/' in frg:
             return frg[frg.rindex('/') + 1:]
