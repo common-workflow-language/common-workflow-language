@@ -13,8 +13,13 @@ import json
 from six.moves.urllib import parse
 import six
 import os
-AvroSchemaFromJSONData = avro.schema.make_avsc_object
-# AvroSchemaFromJSONData=avro.schema.SchemaFromJSONData
+
+if six.PY3: 
+    AvroSchemaFromJSONData = avro.schema.SchemaFromJSONData
+else:      
+    AvroSchemaFromJSONData = avro.schema.make_avsc_object
+      
+
 from avro.schema import Names, SchemaParseException
 from . import ref_resolver
 from .ref_resolver import Loader, DocumentType
