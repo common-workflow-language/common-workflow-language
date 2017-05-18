@@ -9,12 +9,13 @@ import collections
 import six
 from six.moves import range
 import urllib
-# import urlparse
+
 from six.moves.urllib import parse
+from six import StringIO
 
 import re
 import copy
-from StringIO import StringIO
+
 
 from . import validate
 from schema_salad.utils import aslist, flatten

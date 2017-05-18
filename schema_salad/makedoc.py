@@ -7,7 +7,7 @@ import os
 import copy
 import re
 import sys
-from StringIO import StringIO
+
 import logging
 
 from . import schema
@@ -16,6 +16,7 @@ from schema_salad.utils import add_dictlist, aslist
 import six
 from six.moves import range
 from six.moves.urllib import parse
+from six import StringIO
 
 from typing import cast, Any, Dict, IO, List, Optional, Set, Text, Union
 
