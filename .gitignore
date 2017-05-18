@@ -2,3 +2,11 @@
 .eggs
 *.egg-info/
 *pyc
+
+build/
+dist/
+ruamel
+typeshed/2.7/ruamel/yaml
+# virtualenv 
+venv/
+.cache/
