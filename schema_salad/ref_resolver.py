@@ -581,7 +581,7 @@ class Loader(object):
 
                     document[idmapField] = ls
 
-    typeDSLregex = re.compile(ur"^([^[?]+)(\[\])?(\?)?$")
+    typeDSLregex = re.compile(u"^([^[?]+)(\[\])?(\?)?$")
 
     def _type_dsl(self,
                   t,        # type: Union[Text, Dict, List]
