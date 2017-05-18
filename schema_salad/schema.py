@@ -9,16 +9,15 @@ import ruamel.yaml as yaml
 import avro.schema
 from . import validate
 import json
-# import urlparse
+
 from six.moves.urllib import parse
 import six
 import os
 
-if six.PY3: 
+if six.PY3:
     AvroSchemaFromJSONData = avro.schema.SchemaFromJSONData
-else:      
+else:
     AvroSchemaFromJSONData = avro.schema.make_avsc_object
-      
 
 from avro.schema import Names, SchemaParseException
 from . import ref_resolver

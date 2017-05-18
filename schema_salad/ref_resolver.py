@@ -685,7 +685,7 @@ class Loader(object):
     def _normalize_fields(self, document, loader):
         # type: (Dict[Text, Text], Loader) -> None
         # Normalize fields which are prefixed or full URIn to vocabulary terms
-        for d in document:
+        for d in list(document.keys()):
             d2 = loader.expand_url(d, u"", scoped_id=False, vocab_term=True)
             if d != d2:
                 document[d2] = document[d]

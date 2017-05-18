@@ -41,9 +41,10 @@ install_requires = [
 # install_requires.append("avro")  # TODO: remove me once cwltool is
 # available in Debian Stable, Ubuntu 12.04 LTS
 
-extras_require={                # TODO: uncomment me, same conditions as above
-       ':python_version<"3"': ['avro'],
-       ':python_version>="3"': ['avro-python3']}
+
+extras_require={                  # TODO: uncomment me, same conditions as above
+    ':python_version<"3"': ['avro'],
+    ':python_version>="3"': ['avro-python3']}
 # extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
