@@ -32,8 +32,6 @@ from rdflib.plugins.parsers.notation3 import BadSyntax
 import xml.sax
 from typing import (cast, Any, AnyStr, Callable, Dict, List, Iterable,
         Optional, Set, Text, Tuple, TypeVar, Union)
-import six
-from six.moves import range
 
 
 _logger = logging.getLogger("salad")

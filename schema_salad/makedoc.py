@@ -16,10 +16,7 @@ import six
 from six.moves import range
 from six.moves import urllib
 from six import StringIO
-
 from typing import cast, Any, Dict, IO, List, Optional, Set, Text, Union
-import six
-from six.moves import range
 
 _logger = logging.getLogger("salad")
 
