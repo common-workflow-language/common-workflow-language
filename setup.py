@@ -38,13 +38,13 @@ install_requires = [
     'CacheControl >= 0.11.7, < 0.12',
     'lockfile >= 0.9']
 
-install_requires.append("avro")  # TODO: remove me once cwltool is
+# install_requires.append("avro")  # TODO: remove me once cwltool is
 # available in Debian Stable, Ubuntu 12.04 LTS
 
-# extras_require={                # TODO: uncomment me, same conditions as above
-#        ':python_version<"3"': ['avro'],
-#        ':python_version>="3"': ['avro-python3']}
-extras_require = {}               # TODO: to be removed when the above is added
+extras_require={                # TODO: uncomment me, same conditions as above
+       ':python_version<"3"': ['avro'],
+       ':python_version>="3"': ['avro-python3']}
+# extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
       version='2.5',
