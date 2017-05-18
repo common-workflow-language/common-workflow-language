@@ -8,9 +8,8 @@ import collections
 
 import six
 from six.moves import range
-import urllib
-
 from six.moves.urllib import parse
+from six.moves import urllib
 from six import StringIO
 
 import re
@@ -47,10 +46,10 @@ def file_uri(path, split_frag=False):  # type: (str, bool) -> str
         return path
     if split_frag:
         pathsp = path.split("#", 2)
-        frag = "#" + urllib.quote(str(pathsp[1])) if len(pathsp) == 2 else ""
-        urlpath = urllib.pathname2url(str(pathsp[0]))
+        frag = "#" + urllib.parse.quote(str(pathsp[1])) if len(pathsp) == 2 else ""
+        urlpath = urllib.request.pathname2url(str(pathsp[0]))
     else:
-        urlpath = urllib.pathname2url(path)
+        urlpath = urllib.request.pathname2url(path)
         frag = ""
     if urlpath.startswith("//"):
         return "file:%s%s" % (urlpath, frag)
@@ -60,8 +59,8 @@ def file_uri(path, split_frag=False):  # type: (str, bool) -> str
 def uri_file_path(url):  # type: (str) -> str
     split = parse.urlsplit(url)
     if split.scheme == "file":
-        return urllib.url2pathname(
-            str(split.path)) + ("#" + urllib.unquote(str(split.fragment))
+        return urllib.request.url2pathname(
+            str(split.path)) + ("#" + urllib.parse.unquote(str(split.fragment))
                 if bool(split.fragment) else "")
     else:
         raise ValueError("Not a file URI")
@@ -142,7 +141,7 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
-                with open(urllib.url2pathname(str(path))) as fp:
+                with open(urllib.request.url2pathname(str(path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
                     return read.decode("utf-8")
@@ -171,7 +170,7 @@ class DefaultFetcher(Fetcher):
                 return False
             return True
         elif scheme == 'file':
-            return os.path.exists(urllib.url2pathname(str(path)))
+            return os.path.exists(urllib.request.url2pathname(str(path)))
         else:
             raise ValueError('Unsupported scheme in url: %s' % url)
 
