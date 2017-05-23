@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by diasvg.py -->
+<svg width="303.799cm" height="70.986cm" viewBox="-11.812 -15.322 303.799 70.986"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Layer: Background -->
+<g id="Background">
+<!-- UML - Class -->
+<rect x="30.528" y="24.281" width="16.285" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="38.671" y="25.081"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="38.671" y="26.031"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+WorkflowStep</text>
+<rect x="30.528" y="26.481" width="16.285" height="8.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="30.678" y="27.181"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string</text>
+<text x="30.678" y="27.981"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++in: WorkflowStepInput[]</text>
+<text x="30.678" y="28.781"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++out: {string|WorkflowStepOutput}</text>
+<text x="30.678" y="29.581"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++requirements: ProcessRequirement[][0..1]</text>
+<text x="30.678" y="30.381"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++hints: Any[][0..1]</text>
+<text x="30.678" y="31.181"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++label: string[0..1]</text>
+<text x="30.678" y="31.981"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++doc: string[0..1]</text>
+<text x="30.678" y="32.781"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++run: {string|Process}</text>
+<text x="30.678" y="33.581"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++scatter: {string[0..1]|string[][0..1]}</text>
+<text x="30.678" y="34.381"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++scatterMethod: ScatterMethod[0..1]</text>
+<!-- UML - Class -->
+<rect x="0.172" y="24.579" width="15.130" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="7.737" y="25.379"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="7.737" y="26.329"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Sink</text>
+<rect x="0.172" y="26.779" width="15.130" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="0.322" y="27.479"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++source: {string[0..1]|string[][0..1]}</text>
+<text x="0.322" y="28.279"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++linkMerge: LinkMergeMethod[0..1]</text>
+<!-- UML - Class -->
+<rect x="0.642" y="35.081" width="14.745" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="8.014" y="35.881"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="8.014" y="36.831"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+WorkflowStepInput</text>
+<rect x="0.642" y="37.281" width="14.745" height="2.600" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="0.792" y="37.981"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string</text>
+<text x="0.792" y="38.781"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++default: Any[0..1]</text>
+<text x="0.792" y="39.581"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++valueFrom: {string|Expression}[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="7.737,29.541 7.737,32.230 8.014,32.230 8.014,35.031 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="8.137,29.541 7.737,28.741 7.337,29.541 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="30.478,29.481 22.318,29.481 22.318,37.481 15.660,37.481 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="16.348,37.081 15.548,37.481 16.348,37.881 "/>
+<text x="22.418" y="33.331"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+in</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="23.288,33.331 23.288,32.931 23.688,33.131 "/>
+<text x="30.278" y="29.331"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="16.436" y="37.331"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+*</text>
+<!-- UML - Class -->
+<rect x="-11.762" y="25.797" width="8.647" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="-7.438" y="26.597"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;&lt;&lt;enum&gt;&gt;&gt;</text>
+<text x="-7.438" y="27.547"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+LinkMergeMethod</text>
+<rect x="-11.762" y="27.997" width="8.647" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="-11.612" y="28.697"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++merge_nested</text>
+<text x="-11.612" y="29.497"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++merge_flattened</text>
+<!-- UML - Class -->
+<rect x="33.880" y="41.945" width="9.945" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="38.852" y="42.745"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="38.852" y="43.695"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+WorkflowStepOutput</text>
+<rect x="33.880" y="44.145" width="9.945" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="34.030" y="44.845"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string</text>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="46.863,29.481 50.744,29.481 50.744,43.545 44.095,43.545 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="44.784,43.145 43.984,43.545 44.784,43.945 "/>
+<text x="50.844" y="36.363"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+out</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="52.099,36.363 52.099,35.963 52.499,36.163 "/>
+<text x="47.063" y="29.331"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="44.872" y="43.395"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<!-- UML - Class -->
+<rect x="19.616" y="40.955" width="8.200" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="23.716" y="41.755"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;enum&gt;&gt;</text>
+<text x="23.716" y="42.705"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+ScatterMethod</text>
+<rect x="19.616" y="43.155" width="8.200" height="2.600" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="19.766" y="43.855"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++dotproduct</text>
+<text x="19.766" y="44.655"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++nested_crossproduct</text>
+<text x="19.766" y="45.455"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++flat_crossproduct</text>
+<!-- UML - Class -->
+<rect x="30.403" y="-0.334" width="16.285" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="38.545" y="0.466"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="38.545" y="1.416"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Process</text>
+<rect x="30.403" y="1.866" width="16.285" height="6.600" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="30.553" y="2.566"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string[0..1]</text>
+<text x="30.553" y="3.366"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++inputs: InputParameter[]</text>
+<text x="30.553" y="4.166"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++outputs: OutputParameter[]</text>
+<text x="30.553" y="4.966"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++requirements: ProcessRequirement[][0..1]</text>
+<text x="30.553" y="5.766"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++hints: Any[][0..1]</text>
+<text x="30.553" y="6.566"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++label: string[0..1]</text>
+<text x="30.553" y="7.366"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++doc: string[0..1]</text>
+<text x="30.553" y="8.166"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++cwlVersion: CWLVersion[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="38.545,9.428 38.545,11.367 38.562,11.367 38.562,13.418 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="38.945,9.428 38.545,8.628 38.145,9.428 "/>
+<!-- UML - Class -->
+<rect x="34.269" y="13.468" width="8.585" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="38.562" y="14.268"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="38.562" y="15.218"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Workflow</text>
+<rect x="34.269" y="15.668" width="8.585" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="34.419" y="16.368"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++class: string</text>
+<text x="34.419" y="17.168"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++steps: WorkflowStep*</text>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="38.562,17.519 38.562,20.500 38.671,20.500 38.671,24.007 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="38.271,23.319 38.671,24.119 39.071,23.319 "/>
+<text x="38.616" y="20.350"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+steps</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="39.679,20.350 39.679,19.950 40.079,20.150 "/>
+<text x="38.762" y="18.119"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="39.221" y="24.031"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+*</text>
+<!-- UML - Class -->
+<rect x="1.388" y="2.558" width="9.840" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="6.308" y="3.358"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="6.308" y="4.308"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+ProcessRequirement</text>
+<rect x="1.388" y="4.758" width="9.840" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<rect x="1.388" y="5.158" width="9.840" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="30.353,4.066 21.190,4.066 21.190,4.058 11.502,4.058 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="12.190,3.658 11.390,4.058 12.190,4.458 "/>
+<text x="21.290" y="3.912"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+requirements</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="26.010,3.912 26.010,3.512 26.410,3.712 "/>
+<text x="30.153" y="3.916"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="12.278" y="3.908"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+*</text>
+<!-- UML - Class -->
+<rect x="56.177" y="32.347" width="60.560" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="86.457" y="33.148"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="86.457" y="34.098"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputParameter</text>
+<rect x="56.177" y="34.547" width="60.560" height="3.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="56.327" y="35.248"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string</text>
+<text x="56.327" y="36.048"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++inputBinding: InputBinding[0..1]</text>
+<text x="56.327" y="36.848"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++default: Any[0..1]</text>
+<text x="56.327" y="37.648"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++type: {CWLType|InputRecordSchema|InputEnumSchema|InputArraySchema|string|CWLType[]|InputRecordSchema[]|InputEnumSchema[]|InputArraySchema[]|string[]}[0..1]</text>
+<!-- UML - Class -->
+<rect x="74.457" y="-3.453" width="25.140" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="87.027" y="-2.653"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="87.027" y="-1.703"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Parameter</text>
+<rect x="74.457" y="-1.253" width="25.140" height="3.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="74.607" y="-0.553"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++secondaryFiles: {string|Expression|string[]|Expression[]}[0..1]</text>
+<text x="74.607" y="0.247"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++format: {string|string[]|Expression}[0..1]</text>
+<text x="74.607" y="1.047"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++streamable: boolean[0..1]</text>
+<text x="74.607" y="1.847"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++doc: {string[0..1]|string[][0..1]}</text>
+<!-- UML - Class -->
+<rect x="280.657" y="33.939" width="11.280" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="286.297" y="34.739"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="286.297" y="35.689"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputBinding</text>
+<rect x="280.657" y="36.139" width="11.280" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="280.807" y="36.839"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++loadContents: boolean[0..1]</text>
+<!-- UML - Class -->
+<rect x="223.132" y="43.593" width="5.890" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="226.077" y="44.393"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;enum&gt;&gt;</text>
+<text x="226.077" y="45.343"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+CWLType</text>
+<rect x="223.132" y="45.793" width="5.890" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="223.282" y="46.493"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++cwl:File</text>
+<text x="223.282" y="47.293"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++cwl:Directory</text>
+<!-- UML - Class -->
+<rect x="221.830" y="7.363" width="8.317" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="225.989" y="8.163"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;enum&gt;&gt;</text>
+<text x="225.989" y="9.113"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+sld:PrimitiveType</text>
+<rect x="221.830" y="9.563" width="8.317" height="5.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="221.980" y="10.263"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++sld:null</text>
+<text x="221.980" y="11.063"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:boolean</text>
+<text x="221.980" y="11.863"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:int</text>
+<text x="221.980" y="12.663"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:long</text>
+<text x="221.980" y="13.463"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:float</text>
+<text x="221.980" y="14.263"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:double</text>
+<text x="221.980" y="15.063"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++xsd:string</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="225.989,16.319 225.989,34.213 226.077,34.213 226.077,43.545 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="226.389,16.319 225.989,15.519 225.589,16.319 "/>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="87.027,3.109 87.027,17.647 86.457,17.647 86.457,32.297 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="87.427,3.109 87.027,2.309 86.627,3.109 "/>
+<!-- UML - Class -->
+<rect x="126.412" y="34.077" width="6.428" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="129.626" y="34.877"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="129.626" y="35.827"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputSchema</text>
+<rect x="126.412" y="36.277" width="6.428" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<!-- UML - Class -->
+<rect x="126.126" y="9.098" width="8.200" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="130.226" y="9.898"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="130.226" y="10.848"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+SchemaBase</text>
+<rect x="126.126" y="11.298" width="8.200" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="126.276" y="11.998"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++label: string[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="130.226,13.260 130.226,23.588 129.626,23.588 129.626,34.027 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="130.626,13.260 130.226,12.460 129.826,13.260 "/>
+<!-- UML - Class -->
+<rect x="142.020" y="33.847" width="9.578" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="146.809" y="34.647"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="146.809" y="35.597"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputRecordSchema</text>
+<rect x="142.020" y="36.047" width="9.578" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<!-- UML - Class -->
+<rect x="141.363" y="8.554" width="11.280" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="147.003" y="9.354"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="147.003" y="10.304"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+sld:RecordSchema</text>
+<rect x="141.363" y="10.754" width="11.280" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="141.513" y="11.454"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++type: Record_symbol</text>
+<text x="141.513" y="12.254"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++fields: RecordField[][0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="133.802,35.377 137.830,35.377 137.830,35.147 141.970,35.147 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="133.802,34.977 133.002,35.377 133.802,35.777 "/>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="147.003,13.516 147.003,23.600 146.809,23.600 146.809,33.797 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="147.403,13.516 147.003,12.716 146.603,13.516 "/>
+<!-- UML - Class -->
+<rect x="256.662" y="33.587" width="13.205" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="263.264" y="34.387"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="263.264" y="35.337"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputRecordField</text>
+<rect x="256.662" y="35.787" width="13.205" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="256.812" y="36.487"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++inputBinding: InputBinding[0..1]</text>
+<text x="256.812" y="37.287"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++label: string[0..1]</text>
+<!-- UML - Class -->
+<rect x="237.303" y="8.829" width="48.240" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="261.423" y="9.629"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="261.423" y="10.579"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+sld:RecordField</text>
+<rect x="237.303" y="11.029" width="48.240" height="2.600" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="237.453" y="11.729"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++name: string</text>
+<text x="237.453" y="12.529"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++doc: string[0..1]</text>
+<text x="237.453" y="13.329"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++type: {PrimitiveType|RecordSchema|EnumSchema|ArraySchema|string|{PrimitiveType|RecordSchema|EnumSchema|ArraySchema|string}}</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="261.423,14.591 261.423,24.008 263.264,24.008 263.264,33.536 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="261.823,14.591 261.423,13.791 261.023,14.591 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="269.917,35.587 274.887,35.587 274.887,35.539 280.383,35.539 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="279.695,35.939 280.495,35.539 279.695,35.139 "/>
+<text x="274.987" y="35.413"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+inputBinding</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="279.707,35.413 279.707,35.013 280.107,35.213 "/>
+<text x="270.117" y="35.437"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="279.607" y="35.389"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+0..1</text>
+<!-- UML - Class -->
+<rect x="158.308" y="8.536" width="8.197" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="162.407" y="9.336"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="162.407" y="10.286"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+sld:EnumSchema</text>
+<rect x="158.308" y="10.736" width="8.197" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="158.458" y="11.436"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++type: Enum_symbol</text>
+<text x="158.458" y="12.236"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++symbols: string[]</text>
+<!-- UML - Class -->
+<rect x="169.448" y="8.587" width="48.625" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="193.761" y="9.387"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="193.761" y="10.337"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+ArraySchema</text>
+<rect x="169.448" y="10.787" width="48.625" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="169.598" y="11.487"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++type: Array_symbol</text>
+<text x="169.598" y="12.287"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++items: {PrimitiveType|RecordSchema|EnumSchema|ArraySchema|string|{PrimitiveType|RecordSchema|EnumSchema|ArraySchema|string}}</text>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="237.253,11.229 235.255,11.229 235.255,11.363 230.197,11.363 "/>
+<text x="235.355" y="11.146"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="236.995,11.146 236.995,10.746 237.395,10.946 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="261.423,8.829 261.423,-4.976 162.407,-4.976 162.407,8.486 "/>
+<text x="211.915" y="-5.126"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="212.785,-5.126 212.785,-5.526 213.185,-5.326 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="261.423,8.829 261.423,1.379 193.760,1.379 193.760,8.587 "/>
+<text x="227.591" y="1.229"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="228.461,1.229 228.461,0.829 228.861,1.029 "/>
+<!-- UML - Class -->
+<rect x="154.878" y="33.641" width="13.205" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="161.480" y="34.441"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="161.480" y="35.391"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputEnumSchema</text>
+<rect x="154.878" y="35.841" width="13.205" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="155.028" y="36.541"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++inputBinding: InputBinding[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="162.407,13.498 162.407,23.488 161.480,23.488 161.480,33.590 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="162.807,13.498 162.407,12.698 162.007,13.498 "/>
+<!-- UML - Class -->
+<rect x="185.353" y="33.911" width="13.205" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="191.956" y="34.711"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="191.956" y="35.661"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+InputArraySchema</text>
+<rect x="185.353" y="36.111" width="13.205" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="185.503" y="36.811"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++inputBinding: InputBinding[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="193.760,13.548 193.760,23.649 191.956,23.649 191.956,33.863 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="194.160,13.548 193.760,12.748 193.360,13.548 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="263.265,33.587 263.265,26.797 161.480,26.797 161.480,33.641 "/>
+<text x="212.373" y="26.647"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="213.242,26.647 213.242,26.247 213.642,26.447 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="263.265,33.536 263.265,29.650 191.956,29.650 191.956,33.911 "/>
+<text x="227.610" y="29.500"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="228.480,29.500 228.480,29.100 228.880,29.300 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="263.265,33.536 263.265,31.725 226.077,31.725 226.077,43.593 "/>
+<text x="244.671" y="31.575"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="245.541,31.575 245.541,31.175 245.941,31.375 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="261.423,8.829 261.423,-8.477 147.003,-8.477 147.003,8.554 "/>
+<text x="204.213" y="-8.627"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+type</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="205.083,-8.627 205.083,-9.027 205.483,-8.827 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="147.003,8.504 147.003,-14.572 261.423,-14.572 261.423,8.605 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="261.023,7.917 261.423,8.717 261.823,7.917 "/>
+<text x="204.213" y="-14.722"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+fields</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="205.468,-14.722 205.468,-15.122 205.868,-14.922 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="193.760,8.587 182.474,8.587 182.474,5.788 162.407,5.788 162.407,8.536 "/>
+<text x="172.440" y="5.638"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="173.503,5.638 173.503,5.238 173.903,5.438 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="193.760,8.587 185.197,8.587 185.197,1.509 147.003,1.509 147.003,8.554 "/>
+<text x="166.100" y="1.359"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="167.162,1.359 167.162,0.959 167.562,1.159 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="193.760,8.587 193.760,6.313 225.989,6.313 225.989,7.363 "/>
+<text x="209.875" y="6.163"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="210.937,6.163 210.937,5.763 211.337,5.963 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="218.073,12.587 218.073,16.293 206.418,16.293 206.418,12.643 "/>
+<text x="212.245" y="16.143"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="185.303,35.511 184.253,35.511 184.253,32.591 161.480,32.591 161.480,33.641 "/>
+<text x="172.867" y="32.441"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="173.929,32.441 173.929,32.041 174.329,32.241 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="191.956,33.861 191.956,30.039 146.809,30.039 146.809,33.847 "/>
+<text x="169.382" y="29.889"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="170.445,29.889 170.445,29.489 170.845,29.689 "/>
+<!-- UML - Association -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="191.956,37.161 191.956,40.377 226.077,40.377 226.077,43.593 "/>
+<text x="209.016" y="40.227"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+items</text>
+<polygon fill="#000000" stroke="none" stroke-width="0.100"  points="210.079,40.227 210.079,39.827 210.479,40.027 "/>
+<!-- UML - Class -->
+<rect x="77.407" y="51.545" width="13.975" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="84.395" y="52.345"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="84.395" y="53.295"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputParameter</text>
+<rect x="77.407" y="53.745" width="13.975" height="1.800" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="77.558" y="54.445"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++id: string</text>
+<text x="77.558" y="55.245"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++outputBinding: OutputBinding[0..1]</text>
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="87.027,3.108 87.027,13.067 54.563,13.067 54.563,53.545 77.357,53.545 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="87.427,3.108 87.027,2.308 86.627,3.108 "/>
+<!-- UML - Class -->
+<rect x="125.347" y="52.708" width="7.193" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="128.943" y="53.508"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="128.943" y="54.458"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputSchema</text>
+<rect x="125.347" y="54.908" width="7.193" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<!-- UML - Generalization -->
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="130.226,13.258 130.226,18.614 120.757,18.614 120.757,43.413 128.943,43.413 128.943,52.708 "/>
+<polygon fill="#FFFFFF" stroke="#000000" stroke-width="0.100"  points="130.626,13.258 130.226,12.458 129.826,13.258 "/>
+<!-- UML - Class -->
+<rect x="141.457" y="52.514" width="10.343" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="146.628" y="53.314"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="146.628" y="54.264"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputRecordSchema</text>
+<rect x="141.457" y="54.714" width="10.343" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<!-- UML - Class -->
+<rect x="154.657" y="52.413" width="13.975" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="161.645" y="53.214"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="161.645" y="54.164"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputEnumSchema</text>
+<rect x="154.657" y="54.614" width="13.975" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="154.807" y="55.314"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++outputBinding: OutputBinding[0..1]</text>
+<!-- UML - Class -->
+<rect x="184.556" y="52.413" width="13.975" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="191.544" y="53.214"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="191.544" y="54.164"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputArraySchema</text>
+<rect x="184.556" y="54.614" width="13.975" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="184.706" y="55.314"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++outputBinding: OutputBinding[0..1]</text>
+<!-- UML - Class -->
+<rect x="256.463" y="51.930" width="13.975" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="263.451" y="52.730"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="263.451" y="53.680"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputRecordField</text>
+<rect x="256.463" y="54.130" width="13.975" height="1.000" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="256.613" y="54.830"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++outputBinding: OutputBinding[0..1]</text>
+<!-- UML - Class -->
+<rect x="282.489" y="52.154" width="7.103" height="2.200" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+<text x="286.040" y="52.954"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+&lt;&lt;record&gt;&gt;</text>
+<text x="286.040" y="53.904"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+OutputBinding</text>
+<rect x="282.489" y="54.354" width="7.103" height="0.400" fill="#FFFFFF" stroke="#000000" stroke-width="0.100" />
+</g>
+</svg>
