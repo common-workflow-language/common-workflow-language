@@ -54,6 +54,7 @@ Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|Go|
 |[Funnel](https://github.com/bmeg/funnel)|Use Google Genomics Pipeline API with CWL|alpha|GCP|
 |[Xenon](http://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
+|[Airflow](https://github.com/Barski-lab/incubator-airflow)|Airflow updated with CWL-runner feature (supported by BioWardrobe Team, CCHMC)|[In progress](https://github.com/Barski-lab/incubator-airflow#cwl-support)|Linux, OS X|
 
 
 
