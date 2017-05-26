@@ -150,16 +150,19 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Michael R. Crusoe <michael.crusoe@gmail.com>
 * Roman Valls Guimerà <brainstorm@nopcode.org>
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
+* Kenzo-Hugo Hillion <kehillio@pasteur.fr>
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
 * Andrey Kartashov <Andrey.Kartashov@cchmc.org>
 * John Kern <kern3020@gmail.com>
+* Farah Zaib Khan <farahk@student.unimelb.edu.au>
 * Dan Leehr <dan.leehr@duke.edu>
 * Hervé Ménager <herve.menager@gmail.com>
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Michael Miller <mmiller@systemsbiology.org>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall <joshua.randall@sanger.ac.uk>
+* Mark Robinson <mark.robinson-4@student.manchester.ac.uk>
 * Janko Simonović <janko.simonovic@sbgenomics.com>
-* Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>
+* Stian Soiland-Reyes <soiland-reyes@manchester.ac.uk>
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
