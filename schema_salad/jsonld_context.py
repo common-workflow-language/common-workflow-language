@@ -7,9 +7,6 @@ import six
 from six.moves import urllib
 
 import ruamel.yaml as yaml
-import six
-# import urlparse
-from six.moves.urllib import parse
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
 except ImportError:
@@ -41,7 +38,7 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
          namespaces     # type: Dict[str, rdflib.namespace.Namespace]
          ):
     # type: (...) -> Union[Dict, Text]
-    split = parse.urlsplit(name)
+    split = urllib.parse.urlsplit(name)
 
     vee = None  # type: Optional[Union[str, Text]]
 
@@ -109,7 +106,7 @@ def process_type(t,             # type: Dict[str, Any]
         classnode = URIRef(recordname)
         g.add((classnode, RDF.type, RDFS.Class))
 
-        split = parse.urlsplit(recordname)
+        split = urllib.parse.urlsplit(recordname)
         predicate = recordname
         if t.get("inVocab", True):
             if split.scheme:
@@ -225,7 +222,7 @@ def makerdf(workflow,       # type: Union[str, Text]
             url = v
         if url == "@id":
             idfields.append(k)
-        doc_url, frg = parse.urldefrag(url)
+        doc_url, frg = urllib.parse.urldefrag(url)
         if "/" in frg:
             p = frg.split("/")[0]
             prefixes[p] = u"%s#%s/" % (doc_url, p)
