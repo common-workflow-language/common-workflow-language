@@ -118,7 +118,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type == 'int':
-        if ((isinstance(datum, int) or isinstance(datum, int))
+        if (isinstance(datum, six.integer_types)
                 and INT_MIN_VALUE <= datum <= INT_MAX_VALUE):
             return True
         else:
@@ -127,7 +127,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type == 'long':
-        if ((isinstance(datum, int) or isinstance(datum, int))
+        if ((isinstance(datum, six.integer_types))
                 and LONG_MIN_VALUE <= datum <= LONG_MAX_VALUE):
             return True
         else:
@@ -137,7 +137,7 @@ def validate_ex(expected_schema,                  # type: Schema
             else:
                 return False
     elif schema_type in ['float', 'double']:
-        if (isinstance(datum, int) or isinstance(datum, int)
+        if (isinstance(datum, six.integer_types)
                 or isinstance(datum, float)):
             return True
         else:
