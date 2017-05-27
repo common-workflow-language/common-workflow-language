@@ -48,7 +48,7 @@ extras_require={                  # TODO: uncomment me, same conditions as above
 # extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
-      version='2.5',
+      version='3.0',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
