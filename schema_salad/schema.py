@@ -9,10 +9,10 @@ import ruamel.yaml as yaml
 import avro.schema
 from . import validate
 import json
-
-from six.moves.urllib import parse
-import six
 import os
+
+import six
+from six.moves import urllib
 
 if six.PY3:
     AvroSchemaFromJSONData = avro.schema.SchemaFromJSONData
@@ -383,7 +383,7 @@ def replace_type(items, spec, loader, found):
 
 
 def avro_name(url):  # type: (AnyStr) -> AnyStr
-    doc_url, frg = parse.urldefrag(url)
+    doc_url, frg = urllib.parse.urldefrag(url)
     if frg != '':
         if '/' in frg:
             return frg[frg.rindex('/') + 1:]

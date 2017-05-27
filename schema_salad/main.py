@@ -6,9 +6,8 @@ import sys
 import traceback
 import json
 import os
-# import urlparse
-from six.moves.urllib import parse
 
+from six.moves import urllib
 
 import pkg_resources  # part of setuptools
 
@@ -112,7 +111,7 @@ def main(argsl=None):  # type: (List[str]) -> int
     # Load schema document and resolve refs
 
     schema_uri = args.schema
-    if not parse.urlparse(schema_uri)[0]:
+    if not urllib.parse.urlparse(schema_uri)[0]:
         schema_uri = "file://" + os.path.abspath(schema_uri)
     schema_raw_doc = metaschema_loader.fetch(schema_uri)
 
@@ -209,7 +208,7 @@ def main(argsl=None):  # type: (List[str]) -> int
     # Load target document and resolve refs
     try:
         uri = args.document
-        if not parse.urlparse(uri)[0]:
+        if not urllib.parse.urlparse(uri)[0]:
             doc = "file://" + os.path.abspath(uri)
         document, doc_metadata = document_loader.resolve_ref(uri)
     except (validate.ValidationException, RuntimeError) as e:

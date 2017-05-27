@@ -8,7 +8,6 @@ import collections
 
 import six
 from six.moves import range
-from six.moves.urllib import parse
 from six.moves import urllib
 from six import StringIO
 
@@ -57,7 +56,7 @@ def file_uri(path, split_frag=False):  # type: (str, bool) -> str
         return "file://%s%s" % (urlpath, frag)
 
 def uri_file_path(url):  # type: (str) -> str
-    split = parse.urlsplit(url)
+    split = urllib.parse.urlsplit(url)
     if split.scheme == "file":
         return urllib.request.url2pathname(
             str(split.path)) + ("#" + urllib.parse.unquote(str(split.fragment))
@@ -129,7 +128,7 @@ class DefaultFetcher(Fetcher):
         if url in self.cache:
             return self.cache[url]
 
-        split = parse.urlsplit(url)
+        split = urllib.parse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
         if scheme in [u'http', u'https'] and self.session is not None:
@@ -159,7 +158,7 @@ class DefaultFetcher(Fetcher):
         if url in self.cache:
             return True
 
-        split = parse.urlsplit(url)
+        split = urllib.parse.urlsplit(url)
         scheme, path = split.scheme, split.path
 
         if scheme in [u'http', u'https'] and self.session is not None:
@@ -175,7 +174,7 @@ class DefaultFetcher(Fetcher):
             raise ValueError('Unsupported scheme in url: %s' % url)
 
     def urljoin(self, base_url, url):  # type: (Text, Text) -> Text
-        return parse.urljoin(base_url, url)
+        return urllib.parse.urljoin(base_url, url)
 
 class Loader(object):
     def __init__(self,
@@ -190,7 +189,7 @@ class Loader(object):
                  ):
         # type: (...) -> None
 
-        normalize = lambda url: parse.urlsplit(url).geturl()
+        normalize = lambda url: urllib.parse.urlsplit(url).geturl()
         if idx is not None:
             self.idx = idx
         else:
@@ -276,20 +275,20 @@ class Loader(object):
             if prefix in self.vocab:
                 url = self.vocab[prefix] + url[len(prefix) + 1:]
 
-        split = parse.urlsplit(url)
+        split = urllib.parse.urlsplit(url)
 
         if (bool(split.scheme) or url.startswith(u"$(")
             or url.startswith(u"${")):
             pass
         elif scoped_id and not bool(split.fragment):
-            splitbase = parse.urlsplit(base_url)
+            splitbase = urllib.parse.urlsplit(base_url)
             frg = u""
             if bool(splitbase.fragment):
                 frg = splitbase.fragment + u"/" + split.path
             else:
                 frg = split.path
             pt = splitbase.path if splitbase.path != '' else "/"
-            url = parse.urlunsplit(
+            url = urllib.parse.urlunsplit(
                 (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
         elif scoped_ref is not None and not split.fragment:
             pass
@@ -496,7 +495,7 @@ class Loader(object):
                 doc_url = url
             else:
                 # Load structured document
-                doc_url, frg = parse.urldefrag(url)
+                doc_url, frg = urllib.parse.urldefrag(url)
                 if doc_url in self.idx and (not mixin):
                     # If the base document is in the index, it was already loaded,
                     # so if we didn't find the reference earlier then it must not
@@ -872,7 +871,7 @@ class Loader(object):
 
     def validate_scoped(self, field, link, docid):
         # type: (Text, Text, Text) -> Text
-        split = parse.urlsplit(docid)
+        split = urllib.parse.urlsplit(docid)
         sp = split.fragment.split(u"/")
         n = self.scoped_ref_fields[field]
         while n > 0 and len(sp) > 0:
@@ -881,7 +880,7 @@ class Loader(object):
         tried = []
         while True:
             sp.append(link)
-            url = parse.urlunsplit((
+            url = urllib.parse.urlunsplit((
                 split.scheme, split.netloc, split.path, split.query,
                 u"/".join(sp)))
             tried.append(url)

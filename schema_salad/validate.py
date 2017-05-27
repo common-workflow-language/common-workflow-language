@@ -3,15 +3,15 @@ import pprint
 import avro.schema
 from avro.schema import Schema
 import sys
-# import urlparse
-from six.moves.urllib import parse
 import re
 import logging
 
+import six
+from six.moves import urllib
+from six.moves import range
+
 from typing import Any, List, Set, Union, Text
 from .sourceline import SourceLine, lineno_re, bullets, indent
-import six
-from six.moves import range
 
 _logger = logging.getLogger("salad")
 
@@ -301,7 +301,7 @@ def validate_ex(expected_schema,                  # type: Schema
                     if (d not in identifiers and strict) and (
                             d not in foreign_properties and strict_foreign_properties) and not raise_ex:
                         return False
-                    split = parse.urlsplit(d)
+                    split = urllib.parse.urlsplit(d)
                     if split.scheme:
                         err = sl.makeError(u"unrecognized extension field `%s`%s."
                                            "  Did you include "

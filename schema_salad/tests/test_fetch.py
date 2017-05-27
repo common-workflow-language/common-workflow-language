@@ -9,8 +9,8 @@ import rdflib
 import ruamel.yaml as yaml
 import json
 import os
-# import urlparse
-from six.moves.urllib import parse
+
+from six.moves import urllib
 
 class TestFetcher(unittest.TestCase):
     def test_fetcher(self):
@@ -33,14 +33,14 @@ class TestFetcher(unittest.TestCase):
                     return False
 
             def urljoin(self, base, url):
-                urlsp = parse.urlsplit(url)
+                urlsp = urllib.parse.urlsplit(url)
                 if urlsp.scheme:
                     return url
-                basesp = parse.urlsplit(base)
+                basesp = urllib.parse.urlsplit(base)
 
                 if basesp.scheme == "keep":
                     return base + "/" + url
-                return parse.urljoin(base, url)
+                return urllib.parse.urljoin(base, url)
 
         loader = schema_salad.ref_resolver.Loader({}, fetcher_constructor=TestFetcher)
         self.assertEqual({"hello": "foo"}, loader.resolve_ref("foo.txt")[0])
