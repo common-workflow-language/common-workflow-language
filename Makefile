@@ -170,7 +170,7 @@ mypy: ${PYSOURCES}
 	ln -s $(shell python -c 'from __future__ import print_function; import ruamel.yaml; import os.path; print(os.path.dirname(ruamel.yaml.__file__))') \
 		typeshed/2.7/ruamel/
 	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls \
-		 --fast-parser --warn-redundant-casts --warn-unused-ignores \
+		 --warn-redundant-casts --warn-unused-ignores \
 		 schema_salad
 
 jenkins:
