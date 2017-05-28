@@ -213,7 +213,7 @@ def validate_ex(expected_schema,                  # type: Schema
                 continue
             elif isinstance(datum, dict) and not isinstance(s, avro.schema.RecordSchema):
                 continue
-            elif isinstance(datum, (bool, int, int, float, int)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):
+            elif isinstance(datum, (bool, six.integer_types, float, six.string_types)) and isinstance(s, (avro.schema.ArraySchema, avro.schema.RecordSchema)):  # type: ignore
                 continue
             elif datum is not None and s.type == "null":
                 continue
