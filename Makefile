@@ -27,6 +27,8 @@ MODULE=schema_salad
 # `[[` conditional expressions.
 PYSOURCES=$(wildcard ${MODULE}/**.py tests/*.py) setup.py
 DEVPKGS=pep8 diff_cover autopep8 pylint coverage pep257 pytest flake8
+COVBASE=coverage run --branch --append --source=${MODULE} \
+	--omit=schema_salad/tests/*
 
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
@@ -103,37 +105,31 @@ diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
 
 .coverage: $(PYSOURCES)
-	coverage run --branch --source=${MODULE} setup.py test
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	rm -f .coverage
+	$(COVBASE) setup.py test
+	$(COVBASE) -m schema_salad.main \
 		--print-jsonld-context schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-rdfs schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-avro schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-rdf schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-pre schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-index schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-metadata schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.makedoc schema_salad/metaschema/metaschema.yml \
+	$(COVBASE) -m schema_salad.makedoc \
+		schema_salad/metaschema/metaschema.yml \
 		> /dev/null
 
 coverage.xml: .coverage
