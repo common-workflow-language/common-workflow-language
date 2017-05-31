@@ -176,7 +176,7 @@ def get_metaschema():
     loader.cache["https://w3id.org/cwl/salad"] = rs.read()
     rs.close()
 
-    j = yaml.round_trip_load(loader.cache["https://w3id.org/cwl/salad"])  # type: ignore
+    j = yaml.round_trip_load(loader.cache["https://w3id.org/cwl/salad"])
     add_lc_filename(j, "metaschema.yml")
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
@@ -429,7 +429,7 @@ def make_valid_avro(items,          # type: Avro
     if isinstance(items, list):
         ret = []
         for i in items:
-            ret.append(make_valid_avro(i, alltypes, found, union=union))
+            ret.append(make_valid_avro(i, alltypes, found, union=union))  # type: ignore
         return ret
     if union and isinstance(items, (str, six.text_type)):
         if items in alltypes and avro_name(items) not in found:

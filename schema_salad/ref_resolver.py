@@ -71,16 +71,16 @@ class NormDict(CommentedMap):
         self.normalize = normalize
 
     def __getitem__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__getitem__(self.normalize(key))  # type:  ignore
+        return super(NormDict, self).__getitem__(self.normalize(key))
 
     def __setitem__(self, key, value):  # type: (Any, Any) -> Any
         return super(NormDict, self).__setitem__(self.normalize(key), value)
 
     def __delitem__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__delitem__(self.normalize(key))  # type: ignore
+        return super(NormDict, self).__delitem__(self.normalize(key))
 
     def __contains__(self, key):  # type: (Any) -> Any
-        return super(NormDict, self).__contains__(self.normalize(key))  # type: ignore
+        return super(NormDict, self).__contains__(self.normalize(key))
 
 
 def merge_properties(a, b):  # type: (List[Any], List[Any]) -> Dict[Any, Any]
@@ -814,7 +814,7 @@ class Loader(object):
                                 document.lc.data[
                                     j - 1] = document.lc.data[j - llen]
                             for item in l:
-                                document.insert(i, item)  # type: ignore
+                                document.insert(i, item)
                                 document.lc.data[i] = lc
                                 i += 1
                         else:
@@ -852,7 +852,7 @@ class Loader(object):
             else:
                 textIO = StringIO(text)
             textIO.name = url    # type: ignore
-            result = yaml.round_trip_load(textIO)  # type: ignore
+            result = yaml.round_trip_load(textIO)
             add_lc_filename(result, url)
         except yaml.parser.ParserError as e:
             raise validate.ValidationException("Syntax error %s" % (e))
@@ -1008,7 +1008,7 @@ def _copy_dict_without_key(from_dict, filtered_key):
     # type: (D, Any) -> D
     new_dict = copy.copy(from_dict)
     if filtered_key in new_dict:
-        del new_dict[filtered_key]  # type: ignore
+        del new_dict[filtered_key]
     if isinstance(from_dict, CommentedMap):
         new_dict.lc.data = copy.copy(from_dict.lc.data)
         new_dict.lc.filename = from_dict.lc.filename
