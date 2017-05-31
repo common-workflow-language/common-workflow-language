@@ -152,6 +152,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
 * Kenzo-Hugo Hillion <kehillio@pasteur.fr>
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
+* Sehrish Kanwal <skanwal@student.unimelb.edu.au>
 * Andrey Kartashov <Andrey.Kartashov@cchmc.org>
 * John Kern <kern3020@gmail.com>
 * Farah Zaib Khan <farahk@student.unimelb.edu.au>
