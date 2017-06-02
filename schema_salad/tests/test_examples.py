@@ -287,7 +287,7 @@ class TestSchemas(unittest.TestCase):
                           }, ra)
 
         g = makerdf(None, ra, ctx)
-        print((g.serialize(format="n3")))
+        print(g.serialize(format="n3"))
 
         ra, _ = ldr.resolve_all(cmap({
             "location": "foo",
@@ -301,7 +301,7 @@ class TestSchemas(unittest.TestCase):
                           }, ra)
 
         g = makerdf(None, ra, ctx)
-        print((g.serialize(format="n3")))
+        print(g.serialize(format="n3"))
 
         ra, _ = ldr.resolve_all(cmap({
             "id": "foo",
@@ -315,7 +315,7 @@ class TestSchemas(unittest.TestCase):
                           }, ra)
 
         g = makerdf(None, ra, ctx)
-        print((g.serialize(format="n3")))
+        print(g.serialize(format="n3"))
 
         ra, _ = ldr.resolve_all(cmap({
             "location": "foo",
@@ -329,7 +329,7 @@ class TestSchemas(unittest.TestCase):
                           }, ra)
 
         g = makerdf(None, ra, ctx)
-        print((g.serialize(format="n3")))
+        print(g.serialize(format="n3"))
 
     def test_mixin(self):
         base_url = "file://" + os.getcwd() + "/tests/"

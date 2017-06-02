@@ -33,5 +33,5 @@ class TestErrors(unittest.TestCase):
                     load_and_validate(document_loader, avsc_names,
                             six.text_type(get_data("tests/"+t)), True)
                 except ValidationException as e:
-                    print(("\n", e))
+                    print("\n", e)
                     raise
