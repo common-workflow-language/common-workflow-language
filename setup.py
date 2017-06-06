@@ -69,7 +69,7 @@ setup(name='schema-salad',
           'console_scripts': ["schema-salad-tool=schema_salad.main:main", "schema-salad-doc=schema_salad.makedoc:main"]
       },
       zip_safe=True,
-      cmdclass={'egg_info': tagger},
+      # cmdclass={'egg_info': tagger},
       classifiers=[
           "Environment :: Console",
           "Intended Audience :: Science/Research",
