@@ -981,3 +981,9 @@
       size: 15
   tool: v1.0/imported-hint.cwl
   doc: Test hints with $import
+
+- job: v1.0/sum-job.json
+  output:
+    result: 12
+  tool: v1.0/sum-wf.cwl
+  doc: Test step input with multiple sources with multiple types
