@@ -6,7 +6,7 @@
 build/
 dist/
 ruamel
-typeshed/2.7/ruamel/yaml
+typeshed/2and3/ruamel/yaml
 # virtualenv 
 venv/
 .cache/
