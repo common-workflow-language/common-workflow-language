@@ -331,9 +331,9 @@ class RenderType(object):
 
             _, frg = urllib.parse.urldefrag(f["name"])
             num = self.toc.add_entry(depth, frg)
-            doc = "%s %s %s\n" % (("#" * depth), num, frg)
+            doc = u"%s %s %s\n" % (("#" * depth), num, frg)
         else:
-            doc = ""
+            doc = u""
 
         if self.title is None and f["doc"]:
             title = f["doc"][0:f["doc"].index("\n")]
