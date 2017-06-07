@@ -40,7 +40,7 @@ def pred(datatype,      # type: Dict[str, Union[Dict, str]]
     # type: (...) -> Union[Dict, Text]
     split = urllib.parse.urlsplit(name)
 
-    vee = None  # type: Optional[Union[str, Text]]
+    vee = None  # type: Optional[Text]
 
     if split.scheme != '':
         vee = name
@@ -207,7 +207,7 @@ def fix_jsonld_ids(obj,     # type: Union[Dict[Text, Any], List[Dict[Text, Any]]
             fix_jsonld_ids(entry, ids)
 
 
-def makerdf(workflow,       # type: Union[str, Text]
+def makerdf(workflow,       # type: Text
             wf,             # type: Union[List[Dict[Text, Any]], Dict[Text, Any]]
             ctx,            # type: ContextType
             graph=None      # type: Graph

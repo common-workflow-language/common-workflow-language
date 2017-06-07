@@ -60,7 +60,7 @@ class MyRenderer(mistune.Renderer):
         ) % (header, body)
 
 
-def to_id(text):  # type: (Union[str, Text]) -> Union[str, Text]
+def to_id(text):  # type: (Text) -> Text
     textid = text
     if text[0] in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
         try:
@@ -231,7 +231,7 @@ class RenderType(object):
                 nbsp=False,             # type: bool
                 jsonldPredicate=None    # type: Optional[Dict[str, str]]
                 ):
-        # type: (...) -> Union[str, Text]
+        # type: (...) -> Text
         if isinstance(tp, list):
             if nbsp and len(tp) <= 3:
                 return "&nbsp;|&nbsp;".join([self.typefmt(n, redirects, jsonldPredicate=jsonldPredicate) for n in tp])
