@@ -9,7 +9,7 @@ import rdflib
 import ruamel.yaml as yaml
 import json
 import os
-
+from typing import Text
 from six.moves import urllib
 
 class TestFetcher(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestFetcher(unittest.TestCase):
             def __init__(self, a, b):
                 pass
 
-            def fetch_text(self, url):    # type: (unicode) -> unicode
+            def fetch_text(self, url):    # type: (Text) -> Text
                 if url == "keep:abc+123/foo.txt":
                     return "hello: keepfoo"
                 if url.endswith("foo.txt"):
@@ -26,7 +26,7 @@ class TestFetcher(unittest.TestCase):
                 else:
                     raise RuntimeError("Not foo.txt")
 
-            def check_exists(self, url):  # type: (unicode) -> bool
+            def check_exists(self, url):  # type: (Text) -> bool
                 if url.endswith("foo.txt"):
                     return True
                 else:

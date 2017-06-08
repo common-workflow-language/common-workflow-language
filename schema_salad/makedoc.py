@@ -21,7 +21,7 @@ from typing import cast, Any, Dict, IO, List, Optional, Set, Text, Union
 _logger = logging.getLogger("salad")
 
 
-def has_types(items):  # type: (Any) -> List[basestring]
+def has_types(items):  # type: (Any) -> List[Text]
     r = []  # type: List
     if isinstance(items, dict):
         if items["type"] == "https://w3id.org/cwl/salad#record":

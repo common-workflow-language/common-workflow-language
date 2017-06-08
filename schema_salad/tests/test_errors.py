@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 from .util import get_data
 import unittest
-from typing import cast
 from schema_salad.schema import load_schema, load_and_validate
 from schema_salad.validate import ValidationException
 from avro.schema import Names
@@ -12,7 +11,6 @@ class TestErrors(unittest.TestCase):
     def test_errors(self):
         document_loader, avsc_names, schema_metadata, metaschema_loader = load_schema(
             get_data(u"tests/test_schema/CommonWorkflowLanguage.yml"))
-        avsc_names = cast(Names, avsc_names)
 
         for t in ("test_schema/test1.cwl",
                   "test_schema/test2.cwl",
