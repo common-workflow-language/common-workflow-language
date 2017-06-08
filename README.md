@@ -138,6 +138,8 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [Texas Advanced Computing Center Life Science Computing Group](https://www.tacc.utexas.edu/life-sciences-computing) / [Agave Platform](https://agaveapi.co/)
 * [CyVerse](http://www.cyverse.org/)
 * [Institute for Systems Biology](https://www.systemsbiology.org/)
+* [ELIXIR Europe](https://www.elixir-europe.org/)
+* [BioExcel CoE](http://bioexcel.eu/)
 
 ## Individual Contributors
 
