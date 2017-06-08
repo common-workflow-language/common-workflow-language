@@ -4,7 +4,7 @@
 
 from typing import Any
 from rdflib.events import Event
-from cStringIO import StringIO as BytesIO
+from io import StringIO as BytesIO
 
 class StoreCreatedEvent(Event): ...
 class TripleAddedEvent(Event): ...
