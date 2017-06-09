@@ -996,3 +996,20 @@
   job: v1.0/empty.json
   tool: v1.0/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+
+- job: v1.0/basename-fields-job.yml
+  output:
+    extFile:
+      checksum: sha1$1334e67fe9eb70db8ae14ccfa6cfb59e2cc24eae
+      class: File
+      size: 4
+      location: Any
+      path: Any
+    rootFile:
+      checksum: sha1$b4a583c391e234cf210e1d576f68f674c8ad7ecd
+      class: File
+      size: 10
+      location: Any
+      path: Any
+  tool: ./v1.0/basename-fields-test.cwl
+  doc: Test that nameroot and nameext are generated from basename at execution time by the runner
