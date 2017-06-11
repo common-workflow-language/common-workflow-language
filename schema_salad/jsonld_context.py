@@ -18,7 +18,7 @@ import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
 import urlparse
 import logging
-from .aslist import aslist
+from schema_salad.utils import aslist
 from typing import (cast, Any, Dict, Iterable, List, Optional, Text, Tuple,
     Union)
 from .ref_resolver import Loader, ContextType
