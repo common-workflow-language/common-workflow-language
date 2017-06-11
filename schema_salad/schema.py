@@ -1,6 +1,6 @@
 import avro
 import copy
-from schema_salad.utils import add_dictlist, aslist
+from schema_salad.utils import add_dictlist, aslist, flatten
 import sys
 import pprint
 from pkg_resources import resource_stream
@@ -15,7 +15,6 @@ AvroSchemaFromJSONData = avro.schema.make_avsc_object
 from avro.schema import Names, SchemaParseException
 from . import ref_resolver
 from .ref_resolver import Loader, DocumentType
-from .flatten import flatten
 import logging
 from . import jsonld_context
 from .sourceline import SourceLine, strip_dup_lineno, add_lc_filename, bullets, relname

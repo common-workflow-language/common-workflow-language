@@ -12,8 +12,7 @@ import urllib
 from StringIO import StringIO
 
 from . import validate
-from schema_salad.utils import aslist
-from .flatten import flatten
+from schema_salad.utils import aslist, flatten
 from .sourceline import SourceLine, add_lc_filename, relname
 
 import requests
