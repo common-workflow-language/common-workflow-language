@@ -1000,9 +1000,9 @@
 - job: v1.0/basename-fields-job.yml
   output:
     extFile:
-      checksum: sha1$1334e67fe9eb70db8ae14ccfa6cfb59e2cc24eae
+      checksum: sha1$301a72c82a835e1737caf30f94d0eec210c4d9f1
       class: File
-      size: 4
+      size: 5
       location: Any
       path: Any
     rootFile:
@@ -1011,5 +1011,5 @@
       size: 10
       location: Any
       path: Any
-  tool: ./v1.0/basename-fields-test.cwl
+  tool: v1.0/basename-fields-test.cwl
   doc: Test that nameroot and nameext are generated from basename at execution time by the runner
