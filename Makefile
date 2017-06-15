@@ -173,7 +173,7 @@ mypy2: ${PYSOURCES}
 		 --warn-redundant-casts --warn-unused-ignores \
 		 schema_salad
 
-mypy: ${PYSOURCES}
+mypy3: ${PYSOURCES}
 	rm -Rf typeshed/2and3/ruamel/yaml
 	ln -s $(shell python -c 'from __future__ import print_function; import ruamel.yaml; import os.path; print(os.path.dirname(ruamel.yaml.__file__))') \
 		typeshed/2and3/ruamel/
