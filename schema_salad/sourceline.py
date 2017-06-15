@@ -20,16 +20,16 @@ def _add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, A
         for d in six.itervalues(r):
             _add_lc_filename(d, source)
 
-def relname(source):  # type: (AnyStr) -> AnyStr
+def relname(source):  # type: (Text) -> Text
     if source.startswith("file://"):
         source = source[7:]
         source = os.path.relpath(source)
     return source
 
-def add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, AnyStr) -> None
+def add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, Text) -> None
     _add_lc_filename(r, relname(source))
 
-def reflow(text, maxline, shift=""):  # type: (AnyStr, int, AnyStr) -> AnyStr
+def reflow(text, maxline, shift=""):  # type: (Text, int, Text) -> Text
     if maxline < 20:
         maxline = 20
     if len(text) > maxline:
