@@ -8,9 +8,13 @@ requirements:
 
 inputs:
   int_1:
-    type: int?
+    type:
+      - int
+      - string
   int_2:
-    type: int?
+    type:
+      - int
+      - string
 
 outputs:
   result:
@@ -43,13 +47,3 @@ steps:
         ${
           return {"result": inputs.data};
         }
-
-
-
-
-
-
-
-
-
-
