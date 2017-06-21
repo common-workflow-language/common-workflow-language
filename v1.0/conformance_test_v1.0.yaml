@@ -305,6 +305,11 @@
 - job: v1.0/empty.json
   output: {count_output: 16}
   tool: v1.0/count-lines11-wf.cwl
+  doc: Test use default value on step input parameter with empty source
+
+- job: v1.0/file1-null.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines11-wf.cwl
   doc: Test use default value on step input parameter with null source
 
 - job: v1.0/cat-job.json
