@@ -103,9 +103,6 @@ join the [mailing list common-workflow-language on Google Groups](https://groups
 [fork the repository](https://github.com/common-workflow-language/common-workflow-language)
 and send a pull request!
 
-Your CWL Community Engineer, Michael R. Crusoe, publishes a blog about his work
-with updates at http://mrc.commonwl.org.
-
 ### Code of Conduct
 
 The CWL Project is dedicated to providing a harassment-free experience for
@@ -169,3 +166,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Stian Soiland-Reyes <soiland-reyes@manchester.ac.uk>
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
+
+
+The CWL Community Engineer, Michael R. Crusoe, publishes a blog about his work
+with updates at http://mrc.commonwl.org.
