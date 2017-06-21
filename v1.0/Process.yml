@@ -3,6 +3,7 @@ $base: "https://w3id.org/cwl/cwl#"
 $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
   sld: "https://w3id.org/cwl/salad#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
 
 $graph:
 
