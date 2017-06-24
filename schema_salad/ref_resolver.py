@@ -96,7 +96,8 @@ def merge_properties(a, b):  # type: (List[Any], List[Any]) -> Dict[Any, Any]
 def SubLoader(loader):  # type: (Loader) -> Loader
     return Loader(loader.ctx, schemagraph=loader.graph,
                   foreign_properties=loader.foreign_properties, idx=loader.idx,
-                  cache=loader.cache, fetcher_constructor=loader.fetcher_constructor)
+                  cache=loader.cache, fetcher_constructor=loader.fetcher_constructor,
+                  skip_schemas=loader.skip_schemas)
 
 class Fetcher(object):
     def fetch_text(self, url):    # type: (unicode) -> unicode
@@ -178,7 +179,8 @@ class Loader(object):
                  idx=None,                  # type: Dict[unicode, Union[CommentedMap, CommentedSeq, unicode, None]]
                  cache=None,                # type: Dict[unicode, Any]
                  session=None,              # type: requests.sessions.Session
-                 fetcher_constructor=None   # type: Callable[[Dict[unicode, unicode], requests.sessions.Session], Fetcher]
+                 fetcher_constructor=None,  # type: Callable[[Dict[unicode, unicode], requests.sessions.Session], Fetcher]
+                 skip_schemas=None          # type: bool
                  ):
         # type: (...) -> None
 
@@ -203,6 +205,11 @@ class Loader(object):
             self.cache = cache
         else:
             self.cache = {}
+
+        if skip_schemas is not None:
+            self.skip_schemas = skip_schemas
+        else:
+            self.skip_schemas = False
 
         if session is None:
             if "HOME" in os.environ:
@@ -304,6 +311,8 @@ class Loader(object):
 
     def add_schemas(self, ns, base_url):
         # type: (Union[List[unicode], unicode], unicode) -> None
+        if self.skip_schemas:
+            return
         for sch in aslist(ns):
             fetchurl = self.fetcher.urljoin(base_url, sch)
             if fetchurl not in self.cache:
