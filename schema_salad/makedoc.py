@@ -8,8 +8,7 @@ import sys
 from StringIO import StringIO
 import logging
 import urlparse
-from .aslist import aslist
-from .add_dictlist import add_dictlist
+from schema_salad.utils import add_dictlist, aslist
 import re
 import argparse
 from typing import cast, Any, Dict, IO, List, Optional, Set, Text, Union
