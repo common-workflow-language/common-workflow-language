@@ -183,6 +183,6 @@ jenkins:
 	. env3/bin/activate ; \
 	pip install -U setuptools pip wheel ; \
 	${MAKE} install-dep ; \
-	pip install -U mypy ; ${MAKE} mypy
+	pip install -U mypy==0.470 typed-ast==0.6.3 ; ${MAKE} mypy
 
 FORCE:
