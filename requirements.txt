@@ -7,5 +7,3 @@ rdflib-jsonld==0.4.0
 mistune==0.7.3
 CacheControl==0.11.7
 lockfile==0.12.2
-mypy==0.470 ;  python_version>="3"
-typed-ast==0.6.3 ; python_version>="3"
