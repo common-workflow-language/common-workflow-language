@@ -32,7 +32,9 @@
 **Important remark** The structure of the CTD file is slightly different, because it explicitely allows the definition of "sub-tools" through a nested structure of NODE/ITEM elements. A node is a subgroup of parameters, and ITEM is a parameter.
 Therefore, to focus on Parameter-level information, we consider only the ITEM element here for parameter description in CTD.
 
-|Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
+|Galaxy information   |Optional   |CTD information   |Optional  |CWL information   |Optional   |
 |---|---|---|---|---|---|
 | *param* or *data* |  | *ITEM* |  | *inputs[n]* or *outputs[n]*  |  |
-||
+|*@name*||*@name*||key of *inp|uts* or *outputs* entry||
+|*@type*||*@type* (Defines the possible types available in the type attribute of ITEM and ITEMLIST.)||type||
+
