@@ -184,7 +184,7 @@ class Loader(object):
                  idx=None,                  # type: Dict[Text, Union[CommentedMap, CommentedSeq, Text, None]]
                  cache=None,                # type: Dict[Text, Any]
                  session=None,              # type: requests.sessions.Session
-                 fetcher_constructor=None,  # type: Callable[[Dict[unicode, unicode], requests.sessions.Session], Fetcher]
+                 fetcher_constructor=None,  # type: Callable[[Dict[Text, Text], requests.sessions.Session], Fetcher]
                  skip_schemas=None          # type: bool
                  ):
         # type: (...) -> None
