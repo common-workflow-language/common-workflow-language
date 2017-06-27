@@ -4,18 +4,18 @@
 
 * Galaxy: https://github.com/galaxyproject/galaxy/blob/dev/lib/galaxy/tools/xsd/galaxy.xsd
 * CTD: https://github.com/WorkflowConversion/CTDSchema/blob/master/CTD.xsd
-* CWL: https://github.com/common-workflow-language/common-workflow-language/blob/master/v1.0/CommandLineTool.yml
+* CWL v1.0: http://www.commonwl.org/v1.0/CommandLineTool.html / https://github.com/common-workflow-language/common-workflow-language/blob/master/v1.0/CommandLineTool.yml
 
 ## Summary
 
 ### Tool description
 CTD reflects the perspective of a tool author targetting the KNIME processing unit approach ("nodes"), whereas 
-Galaxy reflects the perspective of a platform centered around non-developer users.
+Galaxy reflects the perspective of a platform centered around non-developer users interacting with a graphical interface.
 
 ### Parameters description
 
 ### Data/parameter types
-The typing system for parameters in CTD itself is simpler than the other two, providing mainly support for simple types and input/output files, but excluding arrays/lists and complex types. Galaxy adds 
+The typing system for parameters in CTD itself is simpler than the other two, providing mainly support for simple types and input/output files, but excluding arrays/lists and complex types. Galaxy adds GUI specific features (`select`, `drill_down`), domain specific features (`color`, `genome_build`, `data_column`), configuration of web services (`base_url`), and tighter integration with workbench internal data management (`library_data`).
 
 ### Command line generation
 All of the specifications include a flexible set of possibilities for the generation of command lines, reflecting the effective heterogeneity of the bioinformatics tools ecosystem ;)
