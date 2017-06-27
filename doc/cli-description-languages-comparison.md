@@ -2,8 +2,8 @@
 
 ## Compared languages
 
-* Galaxy: https://github.com/galaxyproject/galaxy/blob/dev/lib/galaxy/tools/xsd/galaxy.xsd
-* CTD: https://github.com/WorkflowConversion/CTDSchema/blob/master/CTD.xsd
+* Galaxy v17.05: https://github.com/galaxyproject/galaxy/blob/release_17.05/lib/galaxy/tools/xsd/galaxy.xsd
+* CTD v1.7.0 : https://github.com/WorkflowConversion/CTDSchema/blob/Version_1_7_0/CTD.xsd
 * CWL v1.0: http://www.commonwl.org/v1.0/CommandLineTool.html / https://github.com/common-workflow-language/common-workflow-language/blob/master/v1.0/CommandLineTool.yml
 
 ## Summary
