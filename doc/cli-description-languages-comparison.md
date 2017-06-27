@@ -9,8 +9,8 @@
 ## Summary
 
 ### Tool description
-CTD reflects the perspective of a tool author targetting the KNIME processing unit approach ("nodes"), where 
-Galaxy reflects the perspective of a 
+CTD reflects the perspective of a tool author targetting the KNIME processing unit approach ("nodes"), whereas 
+Galaxy reflects the perspective of a platform centered around non-developer users.
 
 ### Parameters description
 
