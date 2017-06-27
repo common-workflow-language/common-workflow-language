@@ -9,6 +9,8 @@
 
 ## Comparison table
 
+### Tool level
+
 |Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
 |---|---|---|---|---|---|
 |*description*   |X   |description   |X   |label   |X   |
@@ -24,3 +26,9 @@
 |often part of the *help* text|X|*docURL* (URL to documentation)||||
 |*edam_topics* and *edam_operations* - categories are external to tool definition, in per-server config (toolconf.xml)|X|*category* (any string)|X|can use EDAM or other 3rd party annotation or derive via identifier from external registry or datatype|
 |(often part of help text)|X|*tags*|X|||
+
+### Parameters level
+
+|Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
+|---|---|---|---|---|---|
+|  |  |  |  |  |  |
