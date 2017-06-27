@@ -392,7 +392,7 @@ def avro_name(url):  # type: (AnyStr) -> AnyStr
     return url
 
 
-Avro = TypeVar('Avro', Dict[six.text_type, Any], List[Any], six.text_type)
+Avro = TypeVar('Avro', Dict[Text, Any], List[Any], Text)
 
 
 def make_valid_avro(items,          # type: Avro
@@ -416,7 +416,7 @@ def make_valid_avro(items,          # type: Avro
                     "Named schemas must have a non-empty name: %s" % items)
 
             if items["name"] in found:
-                return cast(six.text_type, items["name"])
+                return cast(Text, items["name"])
             else:
                 found.add(items["name"])
         for n in ("type", "items", "values", "fields"):
@@ -431,7 +431,7 @@ def make_valid_avro(items,          # type: Avro
         for i in items:
             ret.append(make_valid_avro(i, alltypes, found, union=union))  # type: ignore
         return ret
-    if union and isinstance(items, (str, six.text_type)):
+    if union and isinstance(items, six.string_types):
         if items in alltypes and avro_name(items) not in found:
             return cast(Dict, make_valid_avro(alltypes[items], alltypes, found,
                                               union=union))
