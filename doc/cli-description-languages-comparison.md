@@ -9,7 +9,7 @@
 
 ## Comparison table
 
-|Galaxy information   |Mandatory   |CTD information   |Mandatory   |CWL information   |Mandatory   |
+|Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
 |---|---|---|---|---|---|
 |*description*   |X   |description   |X   |label   |X   |
 |*help*   |X   |*manual*   |X   |*doc*   |X   |
