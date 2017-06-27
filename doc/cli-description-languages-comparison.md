@@ -27,8 +27,12 @@
 |*edam_topics* and *edam_operations* - categories are external to tool definition, in per-server config (toolconf.xml)|X|*category* (any string)|X|can use EDAM or other 3rd party annotation or derive via identifier from external registry or datatype|
 |(often part of help text)|X|*tags*|X|||
 
-### Parameters level
+### Parameter level 
+
+**Important remark** The structure of the CTD file is slightly different, because it explicitely allows the definition of "sub-tools" through a nested structure of NODE/ITEM elements. A node is a subgroup of parameters, and ITEM is a parameter.
+Therefore, to focus on Parameter-level information, we consider only the ITEM element here for parameter description in CTD.
 
 |Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
 |---|---|---|---|---|---|
-|  |  |  |  |  |  |
+| *param* or *data* |  | *ITEM* |  | *inputs[n]* or *outputs[n]*  |  |
+||
