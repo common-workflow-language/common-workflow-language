@@ -6,17 +6,30 @@
 * CTD: https://github.com/WorkflowConversion/CTDSchema/blob/master/CTD.xsd
 * CWL: https://github.com/common-workflow-language/common-workflow-language/blob/master/v1.0/CommandLineTool.yml
 
+## Summary
+
+### Tool description
+CTD reflects the perspective of a tool author targetting the KNIME processing unit approach ("nodes"), where 
+Galaxy reflects the perspective of a 
+
+### Parameters description
+
+### Data/parameter types
+The typing system for parameters in CTD itself is simpler than the other two, providing mainly support for simple types and input/output files, but excluding arrays/lists and complex types. Galaxy adds 
+
+### Command line generation
+All of the specifications include a flexible set of possibilities for the generation of command lines, reflecting the effective heterogeneity of the bioinformatics tools ecosystem ;)
 
 ## Comparison table
 
 ### Tool level
 
-|Galaxy information   |Optional   |CTD information   |Opti onal  |CWL information   |Optional   |
+|Galaxy information   |Optional   |CTD information   |Optional  |CWL information   |Optional   |
 |---|---|---|---|---|---|
 |*description*   |X   |description   |X   |label   |X   |
 |*help*   |X   |*manual*   |X   |*doc*   |X   |
 |*citation*   |X   |*citation* (for the underlying tool, DOI or doc URL)   |X   |*SoftwareRequirement.name.specs* (URI)   |X  |
-|   |   |*ExecutableName* (overrides the name attribute)   |X   |*SoftwareRequirement.name.baseCommand[0]* |X  |
+|   |   |*ExecutableName* (overrides the name attribute)   |X   |*SoftwareRequirement.name.baseCommand[0]* |X  | 
 |   |   |*ExecutablePath* (specific path to the executable)  |X   | | |
 |*command*+*argument* under parameter |  |*CLItype* list of input commands with elements mapping   |X | *arguments* and/or *inputBindings*  |X   |
 | | |*logs* (retrospective on execution information - if so probably out of scope)|X | | |
