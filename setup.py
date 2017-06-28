@@ -30,24 +30,21 @@ else:
 install_requires = [
     'setuptools',
     'requests >= 1.0',
-    'ruamel.yaml >= 0.12.4',
+    'ruamel.yaml >= 0.12.4, <= 0.15.2',
     'rdflib >= 4.2.2, < 4.3.0',
     'rdflib-jsonld >= 0.3.0, < 0.5.0',
     'mistune >= 0.7.3, < 0.8',
-    'typing >= 3.5.2, < 3.6',
+    'typing >= 3.5.3',
     'CacheControl >= 0.11.7, < 0.12',
-    'lockfile >= 0.9']
+    'lockfile >= 0.9',
+    'six >= 1.8.0']
 
-install_requires.append("avro")  # TODO: remove me once cwltool is
-# available in Debian Stable, Ubuntu 12.04 LTS
-
-# extras_require={                # TODO: uncomment me, same conditions as above
-#        ':python_version<"3"': ['avro'],
-#        ':python_version>="3"': ['avro-python3']}
-extras_require = {}               # TODO: to be removed when the above is added
+extras_require={
+    ':python_version<"3"': ['avro'],
+    ':python_version>="3"': ['avro-python3']}
 
 setup(name='schema-salad',
-      version='2.5',
+      version='2.5.1',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
@@ -75,8 +72,9 @@ setup(name='schema-salad',
           "Operating System :: MacOS :: MacOS X",
           "Development Status :: 4 - Beta",
           "Programming Language :: Python :: 2.7",
-          #"Programming Language :: Python :: 3.3",  # TODO: uncomment these
-          #"Programming Language :: Python :: 3.4",  # lines
-          #"Programming Language :: Python :: 3.5"
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6"
       ]
       )

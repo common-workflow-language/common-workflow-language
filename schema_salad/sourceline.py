@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import ruamel.yaml
 from ruamel.yaml.comments import CommentedBase, CommentedMap, CommentedSeq
 import re
@@ -5,6 +6,7 @@ import os
 
 from typing import (Any, AnyStr, Callable, cast, Dict, List, Iterable, Tuple,
                     TypeVar, Union, Text)
+import six
 
 lineno_re = re.compile(u"^(.*?:[0-9]+:[0-9]+: )(( *)(.*))")
 
@@ -15,19 +17,19 @@ def _add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, A
         for d in r:
             _add_lc_filename(d, source)
     elif isinstance(r, dict):
-        for d in r.itervalues():
+        for d in six.itervalues(r):
             _add_lc_filename(d, source)
 
-def relname(source):  # type: (AnyStr) -> AnyStr
+def relname(source):  # type: (Text) -> Text
     if source.startswith("file://"):
         source = source[7:]
         source = os.path.relpath(source)
     return source
 
-def add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, AnyStr) -> None
+def add_lc_filename(r, source):  # type: (ruamel.yaml.comments.CommentedBase, Text) -> None
     _add_lc_filename(r, relname(source))
 
-def reflow(text, maxline, shift=""):  # type: (AnyStr, int, AnyStr) -> AnyStr
+def reflow(text, maxline, shift=""):  # type: (Text, int, Text) -> Text
     if maxline < 20:
         maxline = 20
     if len(text) > maxline:
@@ -79,7 +81,7 @@ def strip_dup_lineno(text, maxline=None):  # type: (Text, int) -> Text
             msg.append(" " * len(g.group(1)) + g2)
     return "\n".join(msg)
 
-def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, List], List[int], unicode) -> Union[int, float, str, unicode, CommentedMap, CommentedSeq]
+def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, Text, Dict, List], List[int], Text) -> Union[int, float, str, Text, CommentedMap, CommentedSeq]
     if lc is None:
         lc = [0, 0, 0, 0]
     if fn is None:
@@ -87,7 +89,7 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
 
     if isinstance(d, CommentedMap):
         fn = d.lc.filename if hasattr(d.lc, "filename") else fn
-        for k,v in d.iteritems():
+        for k,v in six.iteritems(d):
             if k in d.lc.data:
                 d[k] = cmap(v, lc=d.lc.data[k], fn=fn)
             else:
@@ -132,7 +134,7 @@ def cmap(d, lc=None, fn=None):  # type: (Union[int, float, str, unicode, Dict, L
         return d
 
 class SourceLine(object):
-    def __init__(self, item, key=None, raise_type=unicode):  # type: (Any, Any, Callable) -> None
+    def __init__(self, item, key=None, raise_type=six.text_type):  # type: (Any, Any, Callable) -> None
         self.item = item
         self.key = key
         self.raise_type = raise_type
@@ -147,7 +149,7 @@ class SourceLine(object):
                  ):  # -> Any
         if not exc_value:
             return
-        raise self.makeError(unicode(exc_value))
+        raise self.makeError(six.text_type(exc_value))
 
     def makeLead(self):  # type: () -> Text
         if self.key is None or self.item.lc.data is None or self.key not in self.item.lc.data:

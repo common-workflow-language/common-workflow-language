@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from .util import get_data
 import unittest
 import schema_salad.ref_resolver
@@ -47,7 +49,7 @@ class TestSchemas(unittest.TestCase):
     #         "edam:has_format": "edam:format_1915"
     #         }, "")
 
-    #     self.assertEquals(ra, {
+    #     self.assertEqual(ra, {
     #         "$schemas": ["tests/EDAM.owl"],
     #         "$namespaces": {"edam": "http://edamontology.org/"},
     #         'http://edamontology.org/has_format': 'http://edamontology.org/format_1915'
@@ -112,12 +114,12 @@ class TestSchemas(unittest.TestCase):
         self.assertEqual("http://example2.com/#stuff", ra["id"])
         for item in ra["inputs"]:
             if item["a"] == 2:
-                self.assertEquals(
+                self.assertEqual(
                     'http://example2.com/#stuff/zing', item["id"])
             else:
-                self.assertEquals('http://example2.com/#stuff/zip', item["id"])
-        self.assertEquals(['http://example2.com/#stuff/out'], ra['outputs'])
-        self.assertEquals({'n': 9}, ra['other'])
+                self.assertEqual('http://example2.com/#stuff/zip', item["id"])
+        self.assertEqual(['http://example2.com/#stuff/out'], ra['outputs'])
+        self.assertEqual({'n': 9}, ra['other'])
 
     def test_scoped_ref(self):
         ldr = schema_salad.ref_resolver.Loader({})
@@ -181,7 +183,7 @@ class TestSchemas(unittest.TestCase):
             }
         }), "http://example2.com/")
 
-        self.assertEquals(
+        self.assertEqual(
             {'inputs': [{
                 'id': 'http://example2.com/#inp',
                 'type': 'string'
@@ -360,16 +362,16 @@ class TestSchemas(unittest.TestCase):
     def test_fragment(self):
         ldr = schema_salad.ref_resolver.Loader({"id": "@id"})
         b, _ = ldr.resolve_ref(get_data("tests/frag.yml#foo2"))
-        self.assertEquals({"id": b["id"], "bar":"b2"}, b)
+        self.assertEqual({"id": b["id"], "bar":"b2"}, b)
 
     def test_file_uri(self):
         # Note: this test probably won't pass on Windows.  Someone with a
         # windows box should add an alternate test.
-        self.assertEquals("file:///foo/bar%20baz/quux", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux"))
-        self.assertEquals("/foo/bar baz/quux", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux"))
-        self.assertEquals("file:///foo/bar%20baz/quux%23zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong"))
-        self.assertEquals("file:///foo/bar%20baz/quux#zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong", split_frag=True))
-        self.assertEquals("/foo/bar baz/quux#zing zong", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux#zing%20zong"))
+        self.assertEqual("file:///foo/bar%20baz/quux", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux"))
+        self.assertEqual("/foo/bar baz/quux", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux"))
+        self.assertEqual("file:///foo/bar%20baz/quux%23zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong"))
+        self.assertEqual("file:///foo/bar%20baz/quux#zing%20zong", schema_salad.ref_resolver.file_uri("/foo/bar baz/quux#zing zong", split_frag=True))
+        self.assertEqual("/foo/bar baz/quux#zing zong", schema_salad.ref_resolver.uri_file_path("file:///foo/bar%20baz/quux#zing%20zong"))
 
 
 if __name__ == '__main__':

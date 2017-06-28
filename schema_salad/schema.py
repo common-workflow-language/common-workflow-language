@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import avro
 import copy
 from schema_salad.utils import add_dictlist, aslist, flatten
@@ -8,17 +9,23 @@ import ruamel.yaml as yaml
 import avro.schema
 from . import validate
 import json
-import urlparse
 import os
-AvroSchemaFromJSONData = avro.schema.make_avsc_object
-# AvroSchemaFromJSONData=avro.schema.SchemaFromJSONData
+
+import six
+from six.moves import urllib
+
+if six.PY3:
+    AvroSchemaFromJSONData = avro.schema.SchemaFromJSONData
+else:
+    AvroSchemaFromJSONData = avro.schema.make_avsc_object
+
 from avro.schema import Names, SchemaParseException
 from . import ref_resolver
 from .ref_resolver import Loader, DocumentType
 import logging
 from . import jsonld_context
 from .sourceline import SourceLine, strip_dup_lineno, add_lc_filename, bullets, relname
-from typing import cast, Any, AnyStr, Dict, List, Set, Tuple, TypeVar, Union
+from typing import cast, Any, AnyStr, Dict, List, Set, Tuple, TypeVar, Union, Text
 from ruamel.yaml.comments import CommentedSeq, CommentedMap
 
 _logger = logging.getLogger("salad")
@@ -55,7 +62,7 @@ salad_files = ('metaschema.yml',
 
 
 def get_metaschema():
-    # type: () -> Tuple[Names, List[Dict[unicode, Any]], Loader]
+    # type: () -> Tuple[Names, List[Dict[Text, Any]], Loader]
     loader = ref_resolver.Loader({
         "Any": "https://w3id.org/cwl/salad#Any",
         "ArraySchema": "https://w3id.org/cwl/salad#ArraySchema",
@@ -169,7 +176,7 @@ def get_metaschema():
     loader.cache["https://w3id.org/cwl/salad"] = rs.read()
     rs.close()
 
-    j = yaml.round_trip_load(loader.cache["https://w3id.org/cwl/salad"])  # type: ignore
+    j = yaml.round_trip_load(loader.cache["https://w3id.org/cwl/salad"])
     add_lc_filename(j, "metaschema.yml")
     j, _ = loader.resolve_all(j, "https://w3id.org/cwl/salad#")
 
@@ -184,10 +191,10 @@ def get_metaschema():
     return (sch_names, j, loader)
 
 
-def load_schema(schema_ref,  # type: Union[CommentedMap, CommentedSeq, unicode]
+def load_schema(schema_ref,  # type: Union[CommentedMap, CommentedSeq, Text]
                 cache=None   # type: Dict
                 ):
-    # type: (...) -> Tuple[Loader, Union[Names, SchemaParseException], Dict[unicode, Any], Loader]
+    # type: (...) -> Tuple[Loader, Union[Names, SchemaParseException], Dict[Text, Any], Loader]
     """Load a schema that can be used to validate documents using load_and_validate.
 
     return document_loader, avsc_names, schema_metadata, metaschema_loader"""
@@ -218,10 +225,10 @@ def load_schema(schema_ref,  # type: Union[CommentedMap, CommentedSeq, unicode]
 
 def load_and_validate(document_loader,  # type: Loader
                       avsc_names,       # type: Names
-                      document,         # type: Union[CommentedMap, unicode]
+                      document,         # type: Union[CommentedMap, Text]
                       strict            # type: bool
                       ):
-    # type: (...) -> Tuple[Any, Dict[unicode, Any]]
+    # type: (...) -> Tuple[Any, Dict[Text, Any]]
     """Load a document and validate it with the provided schema.
 
     return data, metadata
@@ -242,12 +249,12 @@ def load_and_validate(document_loader,  # type: Loader
     try:
         document_loader.validate_links(data, u"", {})
     except validate.ValidationException as v:
-        validationErrors = unicode(v) + "\n"
+        validationErrors = six.text_type(v) + "\n"
 
     try:
         validate_doc(avsc_names, data, document_loader, strict, source=source)
     except validate.ValidationException as v:
-        validationErrors += unicode(v)
+        validationErrors += six.text_type(v)
 
     if validationErrors != u"":
         raise validate.ValidationException(validationErrors)
@@ -256,7 +263,7 @@ def load_and_validate(document_loader,  # type: Loader
 
 
 def validate_doc(schema_names,  # type: Names
-                 doc,           # type: Union[Dict[unicode, Any], List[Dict[unicode, Any]], unicode, None]
+                 doc,           # type: Union[Dict[Text, Any], List[Dict[Text, Any]], Text, None]
                  loader,        # type: Loader
                  strict,        # type: bool
                  source=None
@@ -290,7 +297,7 @@ def validate_doc(schema_names,  # type: Names
 
     anyerrors = []
     for pos, item in enumerate(validate_doc):
-        sl = SourceLine(validate_doc, pos, unicode)
+        sl = SourceLine(validate_doc, pos, six.text_type)
         success = False
         for r in roots:
             success = validate.validate_ex(
@@ -300,7 +307,7 @@ def validate_doc(schema_names,  # type: Names
                 break
 
         if not success:
-            errors = []  # type: List[unicode]
+            errors = []  # type: List[Text]
             for r in roots:
                 if hasattr(r, "get_prop"):
                     name = r.get_prop(u"name")
@@ -335,7 +342,7 @@ def validate_doc(schema_names,  # type: Names
 
 
 def replace_type(items, spec, loader, found):
-    # type: (Any, Dict[unicode, Any], Loader, Set[unicode]) -> Any
+    # type: (Any, Dict[Text, Any], Loader, Set[Text]) -> Any
     """ Go through and replace types in the 'spec' mapping"""
 
     if isinstance(items, dict):
@@ -358,7 +365,7 @@ def replace_type(items, spec, loader, found):
     elif isinstance(items, list):
         # recursively transform list
         return [replace_type(i, spec, loader, found) for i in items]
-    elif isinstance(items, (str, unicode)):
+    elif isinstance(items, (str, six.text_type)):
         # found a string which is a symbol corresponding to a type.
         replace_with = None
         if items in loader.vocab:
@@ -376,7 +383,7 @@ def replace_type(items, spec, loader, found):
 
 
 def avro_name(url):  # type: (AnyStr) -> AnyStr
-    doc_url, frg = urlparse.urldefrag(url)
+    doc_url, frg = urllib.parse.urldefrag(url)
     if frg != '':
         if '/' in frg:
             return frg[frg.rindex('/') + 1:]
@@ -385,15 +392,15 @@ def avro_name(url):  # type: (AnyStr) -> AnyStr
     return url
 
 
-Avro = TypeVar('Avro', Dict[unicode, Any], List[Any], unicode)
+Avro = TypeVar('Avro', Dict[Text, Any], List[Any], Text)
 
 
 def make_valid_avro(items,          # type: Avro
-                    alltypes,       # type: Dict[unicode, Dict[unicode, Any]]
-                    found,          # type: Set[unicode]
+                    alltypes,       # type: Dict[Text, Dict[Text, Any]]
+                    found,          # type: Set[Text]
                     union=False     # type: bool
                     ):
-    # type: (...) -> Union[Avro, Dict, unicode]
+    # type: (...) -> Union[Avro, Dict, Text]
     if isinstance(items, dict):
         items = copy.copy(items)
         if items.get("name"):
@@ -409,7 +416,7 @@ def make_valid_avro(items,          # type: Avro
                     "Named schemas must have a non-empty name: %s" % items)
 
             if items["name"] in found:
-                return cast(unicode, items["name"])
+                return cast(Text, items["name"])
             else:
                 found.add(items["name"])
         for n in ("type", "items", "values", "fields"):
@@ -422,9 +429,9 @@ def make_valid_avro(items,          # type: Avro
     if isinstance(items, list):
         ret = []
         for i in items:
-            ret.append(make_valid_avro(i, alltypes, found, union=union))
+            ret.append(make_valid_avro(i, alltypes, found, union=union))  # type: ignore
         return ret
-    if union and isinstance(items, (str, unicode)):
+    if union and isinstance(items, six.string_types):
         if items in alltypes and avro_name(items) not in found:
             return cast(Dict, make_valid_avro(alltypes[items], alltypes, found,
                                               union=union))
@@ -440,30 +447,30 @@ def deepcopy_strip(item):  # type: (Any) -> Any
     """
 
     if isinstance(item, dict):
-        return {k: deepcopy_strip(v) for k,v in item.iteritems()}
+        return {k: deepcopy_strip(v) for k,v in six.iteritems(item)}
     elif isinstance(item, list):
         return [deepcopy_strip(k) for k in item]
     else:
         return item
 
 def extend_and_specialize(items, loader):
-    # type: (List[Dict[unicode, Any]], Loader) -> List[Dict[unicode, Any]]
+    # type: (List[Dict[Text, Any]], Loader) -> List[Dict[Text, Any]]
     """Apply 'extend' and 'specialize' to fully materialize derived record
     types."""
 
     items = deepcopy_strip(items)
-    types = {t["name"]: t for t in items}  # type: Dict[unicode, Any]
+    types = {t["name"]: t for t in items}  # type: Dict[Text, Any]
     n = []
 
     for t in items:
         if "extends" in t:
-            spec = {}  # type: Dict[unicode, unicode]
+            spec = {}  # type: Dict[Text, Text]
             if "specialize" in t:
                 for sp in aslist(t["specialize"]):
                     spec[sp["specializeFrom"]] = sp["specializeTo"]
 
-            exfields = []  # type: List[unicode]
-            exsym = []  # type: List[unicode]
+            exfields = []  # type: List[Text]
+            exsym = []  # type: List[Text]
             for ex in aslist(t["extends"]):
                 if ex not in types:
                     raise Exception("Extends %s in %s refers to invalid base type" % (
@@ -489,7 +496,7 @@ def extend_and_specialize(items, loader):
                 exfields.extend(t.get("fields", []))
                 t["fields"] = exfields
 
-                fieldnames = set()  # type: Set[unicode]
+                fieldnames = set()  # type: Set[Text]
                 for field in t["fields"]:
                     if field["name"] in fieldnames:
                         raise validate.ValidationException(
@@ -509,7 +516,7 @@ def extend_and_specialize(items, loader):
     for t in n:
         ex_types[t["name"]] = t
 
-    extended_by = {}  # type: Dict[unicode, unicode]
+    extended_by = {}  # type: Dict[Text, Text]
     for t in n:
         if "extends" in t:
             for ex in aslist(t["extends"]):
@@ -528,15 +535,15 @@ def extend_and_specialize(items, loader):
 
     return n
 
-def make_avro_schema(i,         # type: List[Dict[unicode, Any]]
+def make_avro_schema(i,         # type: List[Dict[Text, Any]]
                      loader     # type: Loader
                      ):
-    # type: (...) -> Tuple[Union[Names, SchemaParseException], List[Dict[unicode, Any]]]
+    # type: (...) -> Tuple[Union[Names, SchemaParseException], List[Dict[Text, Any]]]
     names = avro.schema.Names()
 
     j = extend_and_specialize(i, loader)
 
-    name_dict = {}  # type: Dict[unicode, Dict[unicode, Any]]
+    name_dict = {}  # type: Dict[Text, Dict[Text, Any]]
     for t in j:
         name_dict[t["name"]] = t
     j2 = make_valid_avro(j, name_dict, set())
