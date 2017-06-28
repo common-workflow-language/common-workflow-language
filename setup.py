@@ -44,7 +44,7 @@ extras_require={
     ':python_version>="3"': ['avro-python3']}
 
 setup(name='schema-salad',
-      version='2.5.1',
+      version='2.6`',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
