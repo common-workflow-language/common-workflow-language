@@ -44,7 +44,7 @@ extras_require={
     ':python_version>="3"': ['avro-python3']}
 
 setup(name='schema-salad',
-      version='3.0',
+      version='2.5.1',
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
@@ -72,8 +72,8 @@ setup(name='schema-salad',
           "Operating System :: MacOS :: MacOS X",
           "Development Status :: 4 - Beta",
           "Programming Language :: Python :: 2.7",
-          #"Programming Language :: Python :: 3.3",  # TODO: uncomment these
-          #"Programming Language :: Python :: 3.4",  # lines
-          #"Programming Language :: Python :: 3.5"
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5"
       ]
       )
