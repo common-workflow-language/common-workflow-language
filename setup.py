@@ -39,14 +39,9 @@ install_requires = [
     'lockfile >= 0.9',
     'six >= 1.8.0']
 
-# install_requires.append("avro")  # TODO: remove me once cwltool is
-# available in Debian Stable, Ubuntu 12.04 LTS
-
-
-extras_require={                  # TODO: uncomment me, same conditions as above
+extras_require={
     ':python_version<"3"': ['avro'],
     ':python_version>="3"': ['avro-python3']}
-# extras_require = {}               # TODO: to be removed when the above is added
 
 setup(name='schema-salad',
       version='3.0',
@@ -69,7 +64,7 @@ setup(name='schema-salad',
           'console_scripts': ["schema-salad-tool=schema_salad.main:main", "schema-salad-doc=schema_salad.makedoc:main"]
       },
       zip_safe=True,
-      # cmdclass={'egg_info': tagger},
+      cmdclass={'egg_info': tagger},
       classifiers=[
           "Environment :: Console",
           "Intended Audience :: Science/Research",
