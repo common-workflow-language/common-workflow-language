@@ -981,3 +981,10 @@
       size: 15
   tool: v1.0/imported-hint.cwl
   doc: Test hints with $import
+
+- output:
+    args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1']
+  job: v1.0/empty.json
+  tool: v1.0/inline-js.cwl
+  doc: Test InlineJavascriptRequirement
+
