@@ -31,6 +31,9 @@ do
         -n*)
             TEST_N=$arg
             ;;
+        -j*)
+            TEST_J=$arg
+            ;;
         -l)
             TEST_L=-l
             ;;
@@ -71,7 +74,7 @@ runtest() {
     (cd $DRAFT
      cwltest --tool "$1" \
 	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
-	     ${TEST_L} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT} -- ${EXTRA}
+	     ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT} -- ${EXTRA}
     )
     checkexit
 }
