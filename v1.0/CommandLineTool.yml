@@ -36,10 +36,11 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to v1.0
+      ## Introduction to CWL Command Line Tool standard v1.0
 
       This specification represents the first full release from the CWL group.
-      Since draft-3, version 1.0 introduces the following changes and additions:
+      Since draft-3, version 1.0 introduces the following changes and additions
+      to the CWL Command Line Tool standard:
 
         * The [Directory](#Directory) type.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: inputs
