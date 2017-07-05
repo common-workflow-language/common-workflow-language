@@ -32,12 +32,7 @@ descriptions.
 
 For developers and advanced users, the current
 [CWL specification (v1.0)](http://www.commonwl.org/v1.0/) provides
-authoritative documentation of the execution of CWL documents.  Links older
-drafts:
-[draft-1](https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-1),
-[draft-2](http://www.commonwl.org/draft-2/),
-[draft-3](http://www.commonwl.org/draft-3/)
-
+authoritative documentation of the execution of CWL documents.
 ### Citation
 
 Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
