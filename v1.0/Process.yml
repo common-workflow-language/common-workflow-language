@@ -563,7 +563,9 @@ $graph:
 
     - name: default
       type: Any?
-      jsonldPredicate: "cwl:default"
+      jsonldPredicate:
+        _id: cwl:default
+        noLinkCheck: true
       doc: |
         The default value for this parameter if not provided in the input
         object.
