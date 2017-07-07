@@ -2,6 +2,7 @@ $base: "https://w3id.org/cwl/cwl#"
 
 $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
 
 $graph:
 
@@ -33,10 +34,11 @@ $graph:
 
     - |
 
-      ## Introduction to v1.0
+      ## Introduction to CWL Workflow standard v1.0
 
       This specification represents the first full release from the CWL group.
-      Since draft-3, this draft introduces the following changes and additions:
+      Since draft-3, this draft introduces the following changes and additions
+      to the CWL Workflow standard:
 
         * The `inputs` and `outputs` fields have been renamed `in` and `out`.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: `in`

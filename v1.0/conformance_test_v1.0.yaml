@@ -155,10 +155,10 @@
 - job: v1.0/wc-job.json
   output:
     output:
+      checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
       class: File
-      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
       location: output
-      size: 15
+      size: 3
   tool: v1.0/wc-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
@@ -987,3 +987,8 @@
   tool: v1.0/default_path.cwl
   doc: Test warning instead of error when default path is not found
 
+- output:
+    args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1']
+  job: v1.0/empty.json
+  tool: v1.0/inline-js.cwl
+  doc: Test InlineJavascriptRequirement with multiple expressions in the same tool

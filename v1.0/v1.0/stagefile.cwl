@@ -13,7 +13,7 @@ outputs:
     type: File
     outputBinding:
       glob: bob.txt
-baseCommand: "python"
+baseCommand: "python2"
 arguments:
   - "-c"
   - |
