@@ -981,3 +981,11 @@
       size: 15
   tool: v1.0/imported-hint.cwl
   doc: Test hints with $import
+
+- job: v1.0/count-lines6-job.json
+  output:
+    count_output: 34
+  tool: v1.0/count-lines11-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, flattened merge behavior. Workflow inputs are set as list
