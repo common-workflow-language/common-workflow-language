@@ -981,3 +981,22 @@
       size: 15
   tool: v1.0/imported-hint.cwl
   doc: Test hints with $import
+
+- job: v1.0/empty.json
+  output:
+    out: {
+        "basename": "emptyWritableDir",
+        "listing": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "basename": "blurg",
+                "location": "blurg",
+                "class": "File",
+                "size": 0
+            }
+        ],
+        "location": "emptyWritableDir",
+        "class": "Directory"
+    }
+  tool: v1.0/writable-dir.cwl
+  doc: Test empty writable dir with InitialWorkDirRequirement
