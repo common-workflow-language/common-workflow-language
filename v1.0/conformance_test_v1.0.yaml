@@ -481,7 +481,9 @@
     "t6": "zab1",
     "t7": "zab1",
     "t8": "zab1",
-    "t9": 2
+    "t9": 2,
+    "t27": null,
+    "t28": 3
     }
   tool: v1.0/params.cwl
   doc: |
@@ -556,7 +558,9 @@
     "t6": "zab1",
     "t7": "zab1",
     "t8": "zab1",
-    "t9": 2
+    "t9": 2,
+    "t27": null,
+    "t28": 3
     }
   tool: v1.0/params2.cwl
   doc: |

@@ -108,3 +108,13 @@
     type: Any
     outputBinding:
       outputEval: $(inputs.bar.buz[1]) $(inputs.bar.buz[1])
+
+  - id: t27
+    type: "null"
+    outputBinding:
+      outputEval: $(null)
+
+  - id: t28
+    type: int
+    outputBinding:
+      outputEval: $(inputs.bar.buz.length)
