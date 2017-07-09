@@ -2,7 +2,7 @@ cwlVersion: v1.0
 $graph:
 - id: index
   class: CommandLineTool
-  baseCommand: python2
+  baseCommand: python
   arguments:
     - valueFrom: input.txt
       position: 1
@@ -12,6 +12,9 @@ $graph:
         - entryname: input.txt
           entry: $(inputs.file)
     - class: InlineJavascriptRequirement
+  hints:
+    - class: DockerRequirement
+      dockerPull: python:2-slim
 
   inputs:
     file:  File
@@ -36,9 +39,12 @@ $graph:
 
 - id: search
   class: CommandLineTool
-  baseCommand: python2
+  baseCommand: python
   requirements:
     - class: InlineJavascriptRequirement
+  hints:
+    - class: DockerRequirement
+      dockerPull: python:2-slim
   inputs:
     file:
       type: File
