@@ -539,13 +539,13 @@
         "output": [
           {
             "size": 0,
-            "location": "/home/peter/work/common-workflow-language/draft-3/examples/foo.txt",
+            "location": "examples/foo.txt",
             "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
             "class": "File"
           },
           {
             "size": 0,
-            "location": "/home/peter/work/common-workflow-language/draft-3/examples/baz.txt",
+            "location": "examples/baz.txt",
             "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
             "class": "File"
           }
