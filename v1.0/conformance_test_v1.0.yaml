@@ -1065,3 +1065,15 @@
       }
   tool: v1.0/recursive-input-directory.cwl
   doc: Test if a writable input directory is recursivly copied and writable
+
+- output:
+    out: "t\n"
+  job: v1.0/empty.json
+  tool: v1.0/null-defined.cwl
+  doc: Test that missing parameters are null (not undefined) in expression
+
+- output:
+    out: "f\n"
+  job: v1.0/cat-job.json
+  tool: v1.0/null-defined.cwl
+  doc: Test that provided parameter is not null in expression
