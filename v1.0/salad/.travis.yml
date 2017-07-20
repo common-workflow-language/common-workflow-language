@@ -1,20 +1,16 @@
+sudo: false
 language: python
-python: 2.7
+python:
+  - 2.7
+  - 3.3
+  - 3.4
+  - 3.5
+  - 3.6
 os:
   - linux
-env:
-  - TOX_ENV=py27-lint
-  - TOX_ENV=py27-unit
-  - TOX_ENV=py34-mypy
-#  - TOX_ENV=py34-lint
-#  - TOX_ENV=py33-lint
-#  - TOX_ENV=py34-unit
-#  - TOX_ENV=py33-unit
 
 install:
-  - pip install tox
-
-script: tox -e $TOX_ENV
-
+  - pip install tox-travis
+script: tox
 notifications:
   email: false

@@ -1,0 +1,36 @@
+- |
+  ## Identifier maps
+
+  The schema may designate certain fields as having a `mapSubject`.  If the
+  value of the field is a JSON object, it must be transformed into an array of
+  JSON objects.  Each key-value pair from the source JSON object is a list
+  item, each list item must be a JSON objects, and the value of the key is
+  assigned to the field specified by `mapSubject`.
+
+  Fields which have `mapSubject` specified may also supply a `mapPredicate`.
+  If the value of a map item is not a JSON object, the item is transformed to a
+  JSON object with the key assigned to the field specified by `mapSubject` and
+  the value assigned to the field specified by `mapPredicate`.
+
+  ### Identifier map example
+
+  Given the following schema:
+
+  ```
+- $include: map_res_schema.yml
+- |
+  ```
+
+  Process the following example:
+
+  ```
+- $include: map_res_src.yml
+- |
+  ```
+
+  This becomes:
+
+  ```
+- $include: map_res_proc.yml
+- |
+  ```
