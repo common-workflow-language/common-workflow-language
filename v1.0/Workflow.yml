@@ -344,12 +344,16 @@ $graph:
 
     The `scatter` field specifies one or more input parameters which will be
     scattered.  An input parameter may be listed more than once.  The declared
-    type of each input parameter is implicitly wrapped in an array for each
-    time it appears in the `scatter` field.  As a result, upstream parameters
-    which are connected to scattered parameters may be arrays.
+    type of each input parameter is implicitly becomes an array of items of the
+    input parameter type.  If a parameter is listed more than once, it becomes
+    a nested array.  As a result, upstream parameters which are connected to
+    scattered parameters must be arrays.
 
     All output parameter types are also implicitly wrapped in arrays.  Each job
     in the scatter results in an entry in the output array.
+
+    If any scattered parameter is empty at runtime, all outputs are set to
+    empty arrays and no work is done for the step.
 
     If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
