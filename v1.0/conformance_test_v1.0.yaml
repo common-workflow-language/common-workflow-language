@@ -1011,3 +1011,57 @@
   job: v1.0/empty.json
   tool: v1.0/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+
+- job: v1.0/recursive-input-directory.yml
+  output:
+    output_dir: {
+        "basename": "work_dir",
+        "class": "Directory",
+        "listing": [
+            {
+                "basename": "a",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/a",
+                "size": 0
+            },
+            {
+                "basename": "b",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/b",
+                "size": 0
+            },
+            {
+                "basename": "c",
+                "class": "Directory",
+                "listing": [
+                    {
+                        "basename": "d",
+                        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                        "class": "File",
+                        "location": "work_dir/c/d",
+                        "size": 0
+                    }
+                ],
+                "location": "work_dir/c",
+            },
+            {
+                "basename": "e",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/e",
+                "size": 0
+            },
+        ],
+        "location": "work_dir",
+      }
+    test_result: {
+        "basename": "output.txt",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": "output.txt",
+        "size": 0
+      }
+  tool: v1.0/recursive-input-directory.cwl
+  doc: Test if a writable input directory is recursivly copied and writable
