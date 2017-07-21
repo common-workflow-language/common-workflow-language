@@ -1104,3 +1104,8 @@
       path: Any
   tool: v1.0/basename-fields-test.cwl
   doc: Test that nameroot and nameext are generated from basename at execution time by the runner
+
+- job: v1.0/wc-job.json
+  output: {}
+  tool: v1.0/initialwork-path.cwl
+  doc: Test that file path in $(inputs) for initialworkdir is in $(outdir).
