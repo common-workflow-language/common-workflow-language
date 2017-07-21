@@ -325,7 +325,7 @@
       location: output.txt
       size: 1111
   tool: v1.0/revsort.cwl
-  doc: Test sample workflows from the specification
+  doc: Test simple workflow
 
 - job: v1.0/cat-job.json
   output:
@@ -1077,3 +1077,13 @@
   job: v1.0/cat-job.json
   tool: v1.0/null-defined.cwl
   doc: Test that provided parameter is not null in expression
+
+- job: v1.0/revsort-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
+      location: output.txt
+      size: 1111
+  tool: v1.0/revsort-packed.cwl#main
+  doc: Test compound workflow document
