@@ -349,28 +349,6 @@ $graph:
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
 
-    - name: format
-      type:
-        - "null"
-        - string
-        - type: array
-          items: string
-        - Expression
-      jsonldPredicate:
-        _id: cwl:format
-        _type: "@id"
-        identity: true
-      doc: |
-        Only valid when `type: File` or is an array of `items: File`.
-
-        For input parameters, this must be one or more IRIs of concept nodes
-        that represents file formats which are allowed as input to this
-        parameter, preferrably defined within an ontology.  If no ontology is
-        available, file formats may be tested by exact match.
-
-        For output parameters, this is the file format that will be assigned to
-        the output parameter.
-
     - name: streamable
       type: boolean?
       doc: |
@@ -554,6 +532,26 @@ $graph:
       jsonldPredicate: "@id"
       doc: "The unique identifier for this parameter object."
 
+    - name: format
+      type:
+        - "null"
+        - string
+        - type: array
+          items: string
+        - Expression
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+        identity: true
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        This must be one or more IRIs of concept nodes
+        that represents file formats which are allowed as input to this
+        parameter, preferrably defined within an ontology.  If no ontology is
+        available, file formats may be tested by exact match.
+
+
     - name: inputBinding
       type: InputBinding?
       jsonldPredicate: "cwl:inputBinding"
@@ -608,6 +606,21 @@ $graph:
       jsonldPredicate: "cwl:outputBinding"
       doc: |
         Describes how to handle the outputs of a process.
+    - name: format
+      type:
+        - "null"
+        - string
+        - Expression
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+        identity: true
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        This is the file format that will be assigned to
+        the output parameter.
+
 
 
 - type: record
