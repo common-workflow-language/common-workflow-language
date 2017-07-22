@@ -66,6 +66,20 @@ $graph:
           ```
         * The common field `description` has been renamed to `doc`.
 
+      ## Errata
+
+      Post v1.0 release changes to the spec.
+
+        * 12 March 2017:
+          * Mark `default` as not required for link checking.
+          * Add note that recursive subworkflows is not allowed.
+          * Fix mistake in discussion of extracting field names from workflow step ids.
+        * 21 July 2017:
+          * Add clarification about scattering over empty arrays.
+          * Clarify interpretation of secondaryFiles on inputs.
+        * 22 July 2017: (v1.0.1)
+          * Expanded discussion of semantics of File and Directory types
+
       ## Purpose
 
       The Common Workflow Language Command Line Tool Description express
