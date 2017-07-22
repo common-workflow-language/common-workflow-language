@@ -1,0 +1,8 @@
+{
+    "fasta_path": [
+        {
+            "class": "File",
+            "location": "ref.fasta"
+        }
+    ]
+}
