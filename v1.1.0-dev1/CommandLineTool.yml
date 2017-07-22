@@ -781,7 +781,7 @@ $graph:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
-        If `entry` is a File or Directory, this overrides `basename`.  Optional.
+        If `entry` is a File or Directory, this overrides `entryname`.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
