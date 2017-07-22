@@ -378,14 +378,12 @@ $graph:
         - CommandInputRecordSchema
         - CommandInputEnumSchema
         - CommandInputArraySchema
-        - string
         - type: array
           items:
             - CWLType
             - CommandInputRecordSchema
             - CommandInputEnumSchema
             - CommandInputArraySchema
-            - string
       jsonldPredicate:
         "_id": "sld:type"
         "_type": "@vocab"
@@ -412,14 +410,12 @@ $graph:
         - CommandOutputRecordSchema
         - CommandOutputEnumSchema
         - CommandOutputArraySchema
-        - string
         - type: array
           items:
             - CWLType
             - CommandOutputRecordSchema
             - CommandOutputEnumSchema
             - CommandOutputArraySchema
-            - string
       jsonldPredicate:
         "_id": "sld:type"
         "_type": "@vocab"
