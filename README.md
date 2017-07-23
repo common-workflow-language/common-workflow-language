@@ -31,7 +31,7 @@ descriptions.
 ## Specification
 
 For developers and advanced users, the current
-[CWL specification (v1.0)](http://www.commonwl.org/v1.0/) provides
+[CWL specification (v1.0.1)](http://www.commonwl.org/v1.0/) provides
 authoritative documentation of the execution of CWL documents.
 ### Citation
 

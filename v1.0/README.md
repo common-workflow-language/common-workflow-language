@@ -1,4 +1,4 @@
-# Common Workflow Language Specifications, v1.0
+# Common Workflow Language Specifications, v1.0.1
 
 The CWL specifications are divided up into several documents.
 
