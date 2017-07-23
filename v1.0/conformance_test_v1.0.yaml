@@ -1,7 +1,7 @@
 - job: v1.0/bwa-mem-job.json
   tool: v1.0/bwa-mem-tool.cwl
   output:
-    args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
+    args: [bwa, mem, -t, '2', -I, '1,2,3,4', -m, '3',
       chr20.fa,
       example_human_Illumina.pe_1.fastq,
       example_human_Illumina.pe_2.fastq]
