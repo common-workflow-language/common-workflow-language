@@ -57,6 +57,7 @@ $graph:
           * Fixed typo "EMACScript" to "ECMAScript"
           * Clarified application of input parameter default values when the input is `null` or undefined.
           * Clarified valid types and meaning of the format field on inputs versus outputs
+          * Clarify that command line arguments must not interpreted as shell except when shellQuote: false
 
       Since draft-3, v1.0 introduces the following changes and additions
       to the CWL Command Line Tool standard:
@@ -225,6 +226,9 @@ $graph:
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
         Use `shellQuote: false` to inject metacharacters for operations such as pipes.
+
+        If `shellQuote` is true or not provided, the implementation must not
+        permit interpretation of any shell metacharacters or directives.
 
 - type: record
   name: CommandOutputBinding
