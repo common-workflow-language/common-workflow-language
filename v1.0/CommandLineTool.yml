@@ -36,10 +36,29 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to CWL Command Line Tool standard v1.0
+      ## Introduction to CWL Command Line Tool standard v1.0.1
 
-      This specification represents the first full release from the CWL group.
-      Since draft-3, version 1.0 introduces the following changes and additions
+      This specification represents the second stable release from the CWL
+      group.  Since v1.0, v1.0.1 introduces the following updates to the CWL
+      Command Line Tool standard.  Documents should continue to use `cwlVersion: v1.0`
+      and existing v1.0 documents remain valid, however CWL documents that
+      relied on previously undefined or underspecified behavior may have
+      slightly different behavior in v1.0.1.
+
+        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 12 March 2017:
+          * Mark `default` as not required for link checking.
+          * Add note that files in InitialWorkDir must have path in output directory.
+          * Add note that writable: true applies recursively.
+        * 23 July 2017: (v1.0.1)
+          * Add clarification about scattering over empty arrays.
+          * Clarify interpretation of `secondaryFiles` on inputs.
+          * Expanded discussion of semantics of `File` and `Directory` types
+          * Fixed typo "EMACScript" to "ECMAScript"
+          * Clarified application of input parameter default values when the input is `null` or undefined.
+          * Clarified valid types and meaning of the format field on inputs versus outputs
+
+      Since draft-3, v1.0 introduces the following changes and additions
       to the CWL Command Line Tool standard:
 
         * The [Directory](#Directory) type.
@@ -75,20 +94,6 @@ $graph:
           dependencies of a tool.
         * The common `description` field has been renamed to `doc`.
 
-      ## Errata
-
-      Post v1.0 release changes to the spec.
-
-        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
-        * 12 March 2017:
-          * Mark `default` as not required for link checking.
-          * Add note that files in InitialWorkDir must have path in output directory.
-          * Add note that writable: true applies recursively.
-        * 21 July 2017:
-          * Add clarification about scattering over empty arrays.
-          * Clarify interpretation of secondaryFiles on inputs.
-        * 22 July 2017: (v1.0.1)
-          * Expanded discussion of semantics of File and Directory types
 
       ## Purpose
 
