@@ -1,7 +1,7 @@
 - job: v1.0/bwa-mem-job.json
   tool: v1.0/bwa-mem-tool.cwl
   output:
-    args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
+    args: [bwa, mem, -t, '2', -I, '1,2,3,4', -m, '3',
       chr20.fa,
       example_human_Illumina.pe_1.fastq,
       example_human_Illumina.pe_2.fastq]
@@ -126,7 +126,7 @@
 - job: v1.0/null-expression1-job.json
   tool: v1.0/null-expression1-tool.cwl
   output:
-    output: 2
+    output: 1
   doc: Test explicitly passing null to Any type inputs with default values.
 
 - job: v1.0/null-expression2-job.json
@@ -256,6 +256,36 @@
   tool: "v1.0/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
 
+- job: v1.0/scatter-empty-job1.json
+  output:
+    out: []
+  tool: v1.0/scatter-wf1.cwl
+  doc: Test workflow scatter with single empty list parameter
+
+- job: v1.0/scatter-empty-job2.json
+  output:
+    out: [[], []]
+  tool: v1.0/scatter-wf2.cwl
+  doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with second list empty
+
+- job: v1.0/scatter-empty-job3.json
+  output:
+    out: []
+  tool: "v1.0/scatter-wf3.cwl#main"
+  doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with first list empty
+
+- job: v1.0/scatter-empty-job2.json
+  output:
+    out: []
+  tool: "v1.0/scatter-wf3.cwl#main"
+  doc: Test workflow scatter with two scatter parameters, one of which is empty and flat_crossproduct join method
+
+- job: v1.0/scatter-empty-job4.json
+  output:
+    out: []
+  tool: "v1.0/scatter-wf4.cwl#main"
+  doc: Test workflow scatter with two empty scatter parameters and dotproduct join method
+
 - tool: v1.0/echo-tool.cwl
   job: v1.0/env-job.json
   output:
@@ -300,7 +330,22 @@
 - job: v1.0/empty.json
   output: {count_output: 16}
   tool: v1.0/count-lines9-wf.cwl
-  doc: Test default value on input parameter
+  doc: Test default value on step input parameter
+
+- job: v1.0/empty.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines11-wf.cwl
+  doc: Test use default value on step input parameter with empty source
+
+- job: v1.0/file1-null.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines11-wf.cwl
+  doc: Test use default value on step input parameter with null source
+
+- job: v1.0/cat-job.json
+  output: {count_output: 1}
+  tool: v1.0/count-lines11-wf.cwl
+  doc: Test default value on step input parameter overridden by provided source
 
 - job: v1.0/revsort-job.json
   output:
@@ -310,7 +355,7 @@
       location: output.txt
       size: 1111
   tool: v1.0/revsort.cwl
-  doc: Test sample workflows from the specification
+  doc: Test simple workflow
 
 - job: v1.0/cat-job.json
   output:
@@ -996,3 +1041,170 @@
   job: v1.0/empty.json
   tool: v1.0/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+
+- job: v1.0/recursive-input-directory.yml
+  output:
+    output_dir: {
+        "basename": "work_dir",
+        "class": "Directory",
+        "listing": [
+            {
+                "basename": "a",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/a",
+                "size": 0
+            },
+            {
+                "basename": "b",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/b",
+                "size": 0
+            },
+            {
+                "basename": "c",
+                "class": "Directory",
+                "listing": [
+                    {
+                        "basename": "d",
+                        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                        "class": "File",
+                        "location": "work_dir/c/d",
+                        "size": 0
+                    }
+                ],
+                "location": "work_dir/c",
+            },
+            {
+                "basename": "e",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "work_dir/e",
+                "size": 0
+            },
+        ],
+        "location": "work_dir",
+      }
+    test_result: {
+        "basename": "output.txt",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": "output.txt",
+        "size": 0
+      }
+  tool: v1.0/recursive-input-directory.cwl
+  doc: Test if a writable input directory is recursivly copied and writable
+
+- output:
+    out: "t\n"
+  job: v1.0/empty.json
+  tool: v1.0/null-defined.cwl
+  doc: Test that missing parameters are null (not undefined) in expression
+
+- output:
+    out: "f\n"
+  job: v1.0/cat-job.json
+  tool: v1.0/null-defined.cwl
+  doc: Test that provided parameter is not null in expression
+
+- job: v1.0/revsort-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
+      location: output.txt
+      size: 1111
+  tool: v1.0/revsort-packed.cwl#main
+  doc: Test compound workflow document
+
+- job: v1.0/basename-fields-job.yml
+  output:
+    extFile:
+      checksum: sha1$301a72c82a835e1737caf30f94d0eec210c4d9f1
+      class: File
+      size: 5
+      location: Any
+      path: Any
+    rootFile:
+      checksum: sha1$b4a583c391e234cf210e1d576f68f674c8ad7ecd
+      class: File
+      size: 10
+      location: Any
+      path: Any
+  tool: v1.0/basename-fields-test.cwl
+  doc: Test that nameroot and nameext are generated from basename at execution time by the runner
+
+- job: v1.0/wc-job.json
+  output: {}
+  tool: v1.0/initialwork-path.cwl
+  doc: Test that file path in $(inputs) for initialworkdir is in $(outdir).
+
+- job: v1.0/count-lines6-job.json
+  output:
+    count_output: 34
+  tool: v1.0/count-lines12-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, flattened merge behavior. Workflow inputs are set as list
+
+- job: v1.0/sum-job.json
+  output:
+    result: 12
+  tool: v1.0/sum-wf.cwl
+  doc: Test step input with multiple sources with multiple types
+
+- job: v1.0/empty.json
+  output: {
+    "stderr_file": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": Any,
+        "class": "File",
+        "size": 0
+    },
+    "stdout_file": {
+        "checksum": "sha1$1555252d52d4ec3262538a4426a83a99cfff4402",
+        "location": Any,
+        "class": "File",
+        "size": 9
+    }
+  }
+  tool: v1.0/shellchar.cwl
+  doc: "Test that shell directives are not interpreted."
+
+- job: v1.0/empty.json
+  output: {
+    "stderr_file": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "location": Any,
+        "class": "File",
+        "size": 0
+    },
+    "stdout_file": {
+        "checksum": "sha1$1555252d52d4ec3262538a4426a83a99cfff4402",
+        "location": Any,
+        "class": "File",
+        "size": 9
+    }
+  }
+  tool: v1.0/shellchar2.cwl
+  doc: "Test that shell directives are quoted."
+
+- job: v1.0/empty.json
+  output:
+    out: {
+        "basename": "emptyWritableDir",
+        "listing": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "basename": "blurg",
+                "location": "blurg",
+                "class": "File",
+                "size": 0
+            }
+        ],
+        "location": "emptyWritableDir",
+        "class": "Directory"
+    }
+  tool: v1.0/writable-dir.cwl
+  doc: Test empty writable dir with InitialWorkDirRequirement

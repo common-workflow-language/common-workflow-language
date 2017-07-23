@@ -8,6 +8,12 @@ $namespaces:
   xsd:  "http://www.w3.org/2001/XMLSchema#"
 
 $graph:
+
+- name: "Schema"
+  type: documentation
+  doc: |
+    # Schema
+
 - name: PrimitiveType
   type: enum
   symbols:
@@ -35,6 +41,7 @@ $graph:
 - name: Any
   type: enum
   symbols: ["#Any"]
+  docAfter: "#PrimitiveType"
   doc: |
     The **Any** type validates for any non-null value.
 

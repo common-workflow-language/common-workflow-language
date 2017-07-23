@@ -26,7 +26,9 @@ MODULE=schema_salad
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
 PYSOURCES=$(wildcard ${MODULE}/**.py tests/*.py) setup.py
-DEVPKGS=pep8 diff_cover autopep8 pylint coverage pep257
+DEVPKGS=pep8 diff_cover autopep8 pylint coverage pep257 pytest flake8
+COVBASE=coverage run --branch --append --source=${MODULE} \
+	--omit=schema_salad/tests/*
 
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
@@ -46,7 +48,7 @@ install-dependencies:
 
 ## install     : install the ${MODULE} module and schema-salad-tool
 install: FORCE
-	./setup.py build install
+	pip install .
 
 ## dist        : create a module package for distribution
 dist: dist/${MODULE}-$(VERSION).tar.gz
@@ -103,37 +105,31 @@ diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
 
 .coverage: $(PYSOURCES)
-	coverage run --branch --source=${MODULE} setup.py test
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	rm -f .coverage
+	$(COVBASE) setup.py test
+	$(COVBASE) -m schema_salad.main \
 		--print-jsonld-context schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-rdfs schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-avro schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-rdf schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-pre schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-index schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.main \
+	$(COVBASE) -m schema_salad.main \
 		--print-metadata schema_salad/metaschema/metaschema.yml \
 		> /dev/null
-	coverage run --append --branch --source=${MODULE} \
-		-m schema_salad.makedoc schema_salad/metaschema/metaschema.yml \
+	$(COVBASE) -m schema_salad.makedoc \
+		schema_salad/metaschema/metaschema.yml \
 		> /dev/null
 
 coverage.xml: .coverage
@@ -169,17 +165,33 @@ list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root'
 
-mypy: ${PYSOURCES}
-	MYPYPATH=typeshed/2.7 mypy --py2 --disallow-untyped-calls schema_salad
+mypy2: ${PYSOURCES}
+	rm -Rf typeshed/2and3/ruamel/yaml
+	ln -s $(shell python -c 'from __future__ import print_function; import ruamel.yaml; import os.path; print(os.path.dirname(ruamel.yaml.__file__))') \
+		typeshed/2and3/ruamel/
+	MYPYPATH=$MYPYPATH:typeshed/2.7:typeshed/2and3 mypy --py2 --disallow-untyped-calls \
+		 --warn-redundant-casts \
+		 schema_salad
+
+mypy3: ${PYSOURCES}
+	rm -Rf typeshed/2and3/ruamel/yaml
+	ln -s $(shell python -c 'from __future__ import print_function; import ruamel.yaml; import os.path; print(os.path.dirname(ruamel.yaml.__file__))') \
+		typeshed/2and3/ruamel/
+	MYPYPATH=$MYPYPATH:typeshed/3:typeshed/2and3 mypy --disallow-untyped-calls \
+		 --warn-redundant-casts \
+		 schema_salad
 
 jenkins:
-	if ! test -d env ; then virtualenv env ; fi
+	rm -Rf env && virtualenv env
 	. env/bin/activate ; \
 	pip install -U setuptools pip wheel ; \
 	${MAKE} install-dep coverage.html coverage.xml pep257_report.txt \
 		sloccount.sc pep8_report.txt pylint_report.txt
 	if ! test -d env3 ; then virtualenv -p python3 env3 ; fi
 	. env3/bin/activate ; \
-	pip install -U mypy-lang; ${MAKE} mypy
+	pip install -U setuptools pip wheel ; \
+	${MAKE} install-dep ; \
+	pip install -U -r mypy_requirements.txt ; ${MAKE} mypy2
+	# pip install -U -r mypy_requirements.txt ; ${MAKE} mypy3
 
 FORCE:

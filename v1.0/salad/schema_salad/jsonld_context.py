@@ -1,6 +1,11 @@
+from __future__ import absolute_import
 import collections
 import shutil
 import json
+
+import six
+from six.moves import urllib
+
 import ruamel.yaml as yaml
 try:
     from ruamel.yaml import CSafeLoader as SafeLoader
@@ -16,36 +21,44 @@ import rdflib
 from rdflib import Graph, URIRef
 import rdflib.namespace
 from rdflib.namespace import RDF, RDFS
-import urlparse
 import logging
-from .aslist import aslist
-from typing import Any, cast, Dict, Iterable, Tuple, Union
-from .ref_resolver import Loader
+from schema_salad.utils import aslist
+from typing import (cast, Any, Dict, Iterable, List, Optional, Text, Tuple,
+    Union)
+from .ref_resolver import Loader, ContextType
 
 _logger = logging.getLogger("salad")
 
 
-def pred(datatype, field, name, context, defaultBase, namespaces):
-    # type: (Dict[str, Union[Dict, str]], Dict, str, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace]) -> Union[Dict, str]
-    split = urlparse.urlsplit(name)
+def pred(datatype,      # type: Dict[str, Union[Dict, str]]
+         field,         # type: Optional[Dict]
+         name,          # type: str
+         context,       # type: ContextType
+         defaultBase,   # type: str
+         namespaces     # type: Dict[str, rdflib.namespace.Namespace]
+         ):
+    # type: (...) -> Union[Dict, Text]
+    split = urllib.parse.urlsplit(name)
 
-    vee = None  # type: Union[str, unicode]
+    vee = None  # type: Optional[Text]
 
-    if split.scheme:
+    if split.scheme != '':
         vee = name
-        (ns, ln) = rdflib.namespace.split_uri(unicode(vee))
+        (ns, ln) = rdflib.namespace.split_uri(six.text_type(vee))
         name = ln
         if ns[0:-1] in namespaces:
-            vee = unicode(namespaces[ns[0:-1]][ln])
+            vee = six.text_type(namespaces[ns[0:-1]][ln])
         _logger.debug("name, v %s %s", name, vee)
 
-    v = None  # type: Any
+    v = None  # type: Optional[Dict]
 
-    if field and "jsonldPredicate" in field:
+    if field is not None and "jsonldPredicate" in field:
         if isinstance(field["jsonldPredicate"], dict):
             v = {}
             for k, val in field["jsonldPredicate"].items():
                 v[("@" + k[1:] if k.startswith("_") else k)] = val
+            if "@id" not in v:
+                v["@id"] = vee
         else:
             v = field["jsonldPredicate"]
     elif "jsonldPredicate" in datatype:
@@ -60,11 +73,6 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
                         "Dictionaries")
         else:
             raise Exception("jsonldPredicate must be a List of Dictionaries.")
-    # if not v:
-    #     if field and "jsonldPrefix" in field:
-    #         defaultBase = field["jsonldPrefix"]
-    #     elif "jsonldPrefix" in datatype:
-    #         defaultBase = datatype["jsonldPrefix"]
 
     ret = v or vee
 
@@ -82,8 +90,14 @@ def pred(datatype, field, name, context, defaultBase, namespaces):
     return ret
 
 
-def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
-    # type: (Dict[str, Any], Graph, Loader.ContextType, str, Dict[str, rdflib.namespace.Namespace], str) -> None
+def process_type(t,             # type: Dict[str, Any]
+                 g,             # type: Graph
+                 context,       # type: ContextType
+                 defaultBase,   # type: str
+                 namespaces,    # type: Dict[str, rdflib.namespace.Namespace]
+                 defaultPrefix  # type: str
+                 ):
+    # type: (...) -> None
     if t["type"] == "record":
         recordname = t["name"]
 
@@ -92,15 +106,15 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
         classnode = URIRef(recordname)
         g.add((classnode, RDF.type, RDFS.Class))
 
-        split = urlparse.urlsplit(recordname)
-        if "jsonldPrefix" in t:
-            predicate = "%s:%s" % (t["jsonldPrefix"], recordname)
-        elif split.scheme:
-            (ns, ln) = rdflib.namespace.split_uri(unicode(recordname))
-            predicate = recordname
-            recordname = ln
-        else:
-            predicate = "%s:%s" % (defaultPrefix, recordname)
+        split = urllib.parse.urlsplit(recordname)
+        predicate = recordname
+        if t.get("inVocab", True):
+            if split.scheme:
+                (ns, ln) = rdflib.namespace.split_uri(six.text_type(recordname))
+                predicate = recordname
+                recordname = ln
+            else:
+                predicate = "%s:%s" % (defaultPrefix, recordname)
 
         if context.get(recordname, predicate) != predicate:
             raise Exception("Predicate collision on '%s', '%s' != '%s'" % (
@@ -118,15 +132,16 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
             _logger.debug("Processing field %s", i)
 
-            v = pred(t, i, fieldname, context, defaultPrefix, namespaces)
+            v = pred(t, i, fieldname, context, defaultPrefix,
+                    namespaces)  # type: Union[Dict[Any, Any], Text, None]
 
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_types):
                 v = v if v[0] != "@" else None
-            else:
+            elif v is not None:
                 v = v["_@id"] if v.get("_@id", "@")[0] != "@" else None
 
-            if v:
-                (ns, ln) = rdflib.namespace.split_uri(unicode(v))
+            if bool(v):
+                (ns, ln) = rdflib.namespace.split_uri(six.text_type(v))
                 if ns[0:-1] in namespaces:
                     propnode = namespaces[ns[0:-1]][ln]
                 else:
@@ -152,8 +167,8 @@ def process_type(t, g, context, defaultBase, namespaces, defaultPrefix):
 
 
 def salad_to_jsonld_context(j, schema_ctx):
-    # type: (Iterable, Dict[str, Any]) -> Tuple[Loader.ContextType, Graph]
-    context = {}  # type: Loader.ContextType
+    # type: (Iterable, Dict[str, Any]) -> Tuple[ContextType, Graph]
+    context = {}  # type: ContextType
     namespaces = {}
     g = Graph()
     defaultPrefix = ""
@@ -176,8 +191,11 @@ def salad_to_jsonld_context(j, schema_ctx):
 
     return (context, g)
 
-def fix_jsonld_ids(obj, ids):
-    # type: (Union[Dict[unicode, Any], List[Dict[unicode, Any]]], List[unicode]) -> None
+
+def fix_jsonld_ids(obj,     # type: Union[Dict[Text, Any], List[Dict[Text, Any]]]
+                   ids      # type: List[Text]
+                   ):
+    # type: (...) -> None
     if isinstance(obj, dict):
         for i in ids:
             if i in obj:
@@ -188,39 +206,47 @@ def fix_jsonld_ids(obj, ids):
         for entry in obj:
             fix_jsonld_ids(entry, ids)
 
-def makerdf(workflow, wf, ctx):
-    # type: (Union[str, unicode], Union[List[Dict[unicode, Any]], Dict[unicode, Any]], Loader.ContextType) -> Graph
+
+def makerdf(workflow,       # type: Text
+            wf,             # type: Union[List[Dict[Text, Any]], Dict[Text, Any]]
+            ctx,            # type: ContextType
+            graph=None      # type: Graph
+            ):
+    # type: (...) -> Graph
     prefixes = {}
     idfields = []
-    for k,v in ctx.iteritems():
+    for k, v in six.iteritems(ctx):
         if isinstance(v, dict):
             url = v["@id"]
         else:
             url = v
         if url == "@id":
             idfields.append(k)
-        doc_url, frg = urlparse.urldefrag(url)
+        doc_url, frg = urllib.parse.urldefrag(url)
         if "/" in frg:
-            p, _ = frg.split("/")
+            p = frg.split("/")[0]
             prefixes[p] = u"%s#%s/" % (doc_url, p)
-
-    if isinstance(wf, list):
-        wf = {
-            "@context": ctx,
-            "@graph": wf
-        }
-    else:
-        wf["@context"] = ctx
 
     fix_jsonld_ids(wf, idfields)
 
-    g = Graph().parse(data=json.dumps(wf), format='json-ld', location=workflow)
+    if graph is None:
+        g = Graph()
+    else:
+        g = graph
+
+    if isinstance(wf, list):
+        for w in wf:
+            w["@context"] = ctx
+            g.parse(data=json.dumps(w), format='json-ld', publicID=str(workflow))
+    else:
+        wf["@context"] = ctx
+        g.parse(data=json.dumps(wf), format='json-ld', publicID=str(workflow))
 
     # Bug in json-ld loader causes @id fields to be added to the graph
-    for s,p,o in g.triples((None, URIRef("@id"), None)):
-        g.remove((s, p, o))
+    for sub, pred, obj in g.triples((None, URIRef("@id"), None)):
+        g.remove((sub, pred, obj))
 
-    for k2,v2 in prefixes.iteritems():
+    for k2, v2 in six.iteritems(prefixes):
         g.namespace_manager.bind(k2, v2)
 
     return g
