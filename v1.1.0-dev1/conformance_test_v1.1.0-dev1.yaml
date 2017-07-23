@@ -1,7 +1,7 @@
 - job: v1.1.0-dev1/bwa-mem-job.json
   tool: v1.1.0-dev1/bwa-mem-tool.cwl
   output:
-    args: [bwa, mem, -t, '4', -I, '1,2,3,4', -m, '3',
+    args: [bwa, mem, -t, '2', -I, '1,2,3,4', -m, '3',
       chr20.fa,
       example_human_Illumina.pe_1.fastq,
       example_human_Illumina.pe_2.fastq]
@@ -137,7 +137,7 @@
 - job: v1.1.0-dev1/null-expression1-job.json
   tool: v1.1.0-dev1/null-expression1-tool.cwl
   output:
-    output: 2
+    output: 1
   doc: Test explicitly passing null to Any type inputs with default values.
 
 - job: v1.1.0-dev1/null-expression2-job.json
@@ -341,7 +341,7 @@
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines9-wf.cwl
-  doc: Test default value on input parameter
+  doc: Test default value on step input parameter
 
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 16}
@@ -1047,6 +1047,12 @@
   tool: v1.1.0-dev1/default_path.cwl
   doc: Test warning instead of error when default path is not found
 
+- output:
+    args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1']
+  job: v1.1.0-dev1/empty.json
+  tool: v1.1.0-dev1/inline-js.cwl
+  doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+
 - job: v1.1.0-dev1/recursive-input-directory.yml
   output:
     output_dir: {
@@ -1112,6 +1118,52 @@
   job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/null-defined.cwl
   doc: Test that provided parameter is not null in expression
+
+- job: v1.1.0-dev1/revsort-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$b9214658cc453331b62c2282b772a5c063dbd284
+      location: output.txt
+      size: 1111
+  tool: v1.1.0-dev1/revsort-packed.cwl#main
+  doc: Test compound workflow document
+
+- job: v1.1.0-dev1/basename-fields-job.yml
+  output:
+    extFile:
+      checksum: sha1$301a72c82a835e1737caf30f94d0eec210c4d9f1
+      class: File
+      size: 5
+      location: Any
+      path: Any
+    rootFile:
+      checksum: sha1$b4a583c391e234cf210e1d576f68f674c8ad7ecd
+      class: File
+      size: 10
+      location: Any
+      path: Any
+  tool: v1.1.0-dev1/basename-fields-test.cwl
+  doc: Test that nameroot and nameext are generated from basename at execution time by the runner
+
+- job: v1.1.0-dev1/wc-job.json
+  output: {}
+  tool: v1.1.0-dev1/initialwork-path.cwl
+  doc: Test that file path in $(inputs) for initialworkdir is in $(outdir).
+
+- job: v1.1.0-dev1/count-lines6-job.json
+  output:
+    count_output: 34
+  tool: v1.1.0-dev1/count-lines12-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, flattened merge behavior. Workflow inputs are set as list
+
+- job: v1.1.0-dev1/sum-job.json
+  output:
+    result: 12
+  tool: v1.1.0-dev1/sum-wf.cwl
+  doc: Test step input with multiple sources with multiple types
 
 - job: v1.1.0-dev1/empty.json
   output: {

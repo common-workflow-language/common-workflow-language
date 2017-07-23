@@ -6,7 +6,7 @@
 
 **YAML**: http://yaml.org
 
-**Avro**: https://avro.apache.org/docs/current/spec.html
+**Avro**: https://avro.apache.org/docs/1.8.1/spec.html
 
 **Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)
 

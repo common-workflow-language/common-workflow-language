@@ -36,7 +36,7 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to v1.1.0-dev1
+      ## Introduction to CWL Command Line Tool standard draft v1.1.0-dev1
 
       This is the in progress first development version of the first
       maintenance release of the CWL CommandLineTool specification.
@@ -44,10 +44,34 @@ $graph:
 
         * Addition of `stdin` type shortcut for `CommandInputParamater`s.
 
-      ## Introduction to v1.0
+      ## Introduction to CWL Command Line Tool standard v1.0.1
 
-      This specification represents the first full release from the CWL group.
-      Since draft-3, version 1.0 introduces the following changes and additions:
+      This specification represents the second stable release from the CWL
+      group.  Since v1.0, v1.0.1 introduces the following updates to the CWL
+      Command Line Tool standard.  Documents should continue to use `cwlVersion: v1.0`
+      and existing v1.0 documents remain valid, however CWL documents that
+      relied on previously undefined or underspecified behavior may have
+      slightly different behavior in v1.0.1.
+
+        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 14 November 2016: Clarify [SoftwareRequirement](#SoftwareRequirement)
+          `spec` fields.
+        * 12 March 2017:
+          * Mark `default` as not required for link checking.
+          * Add note that files in InitialWorkDir must have path in output directory.
+          * Add note that writable: true applies recursively.
+        * 23 July 2017: (v1.0.1)
+          * Add clarification about scattering over empty arrays.
+          * Clarify interpretation of `secondaryFiles` on inputs.
+          * Expanded discussion of semantics of `File` and `Directory` types
+          * Fixed typo "EMACScript" to "ECMAScript"
+          * Clarified application of input parameter default values when the input is `null` or undefined.
+          * Clarified valid types and meaning of the format field on inputs versus outputs
+          * Clarify that command line arguments must not interpreted as shell except when shellQuote: false
+          * Clarify behavior of `entryname`
+
+      Since draft-3, v1.0 introduces the following changes and additions
+      to the CWL Command Line Tool standard:
 
         * The [Directory](#Directory) type.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: inputs
@@ -82,14 +106,6 @@ $graph:
           dependencies of a tool.
         * The common `description` field has been renamed to `doc`.
 
-      ## Errata
-
-      Post v1.0 release changes to the spec.
-
-        * 13 July 2016: Mark `baseCommand` as optional and update descriptive
-          text.
-        * 14 November 2016: Clarify [SoftwareRequirement](#SoftwareRequirement)
-          `spec` fields.
 
       ## Purpose
 
@@ -207,17 +223,23 @@ $graph:
         If `valueFrom` is an expression, evaluate the expression to yield the
         actual value to use to build the command line and apply the binding
         rules above.  If the inputBinding is associated with an input
-        parameter, the value of `self` in the expression will be the value of the
-        input parameter.
+        parameter, the value of `self` in the expression will be the value of
+        the input parameter.  Input parameter defaults (as specified by the
+        `InputParameter.default` field) must be applied before evaluating the
+        expression.
 
         When a binding is part of the `CommandLineTool.arguments` field,
         the `valueFrom` field is required.
+
     - name: shellQuote
       type: boolean?
       doc: |
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
         Use `shellQuote: false` to inject metacharacters for operations such as pipes.
+
+        If `shellQuote` is true or not provided, the implementation must not
+        permit interpretation of any shell metacharacters or directives.
 
 - type: record
   name: CommandOutputBinding
@@ -818,7 +840,8 @@ $graph:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
-        If `entry` is a File or Directory, this overrides `basename`.  Optional.
+        If `entry` is a File or Directory, the `entryname` field overrides the value
+        of `basename` of the File or Directory object.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
@@ -849,6 +872,7 @@ $graph:
 
         A directory marked as `writable: true` implies that all files and
         subdirectories are recursively writable as well.
+
 
 - name: InitialWorkDirRequirement
   type: record
