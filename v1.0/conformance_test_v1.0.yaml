@@ -1109,3 +1109,11 @@
   output: {}
   tool: v1.0/initialwork-path.cwl
   doc: Test that file path in $(inputs) for initialworkdir is in $(outdir).
+
+- job: v1.0/count-lines6-job.json
+  output:
+    count_output: 34
+  tool: v1.0/count-lines12-wf.cwl
+  doc: |
+    Test single step workflow with Scatter step and two data links connected to
+    same input, flattened merge behavior. Workflow inputs are set as list
