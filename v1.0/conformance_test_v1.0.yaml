@@ -996,3 +996,9 @@
   job: v1.0/empty.json
   tool: v1.0/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+
+- job: v1.0/sum-job.json
+  output:
+    result: 12
+  tool: v1.0/sum-wf.cwl
+  doc: Test step input with multiple sources with multiple types
