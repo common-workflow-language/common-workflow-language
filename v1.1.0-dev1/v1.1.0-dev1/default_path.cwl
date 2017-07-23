@@ -1,4 +1,4 @@
-cwlVersion: v1.0
+cwlVersion: v1.1.0-dev1
 class: CommandLineTool
 inputs:
   - id: "file1"
