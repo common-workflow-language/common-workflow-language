@@ -356,6 +356,9 @@ $graph:
     All output parameter types are also implicitly wrapped in arrays.  Each job
     in the scatter results in an entry in the output array.
 
+    If a scattered input is an empty list, step can be skipped, and all of it's
+    outputs set to an empty list(s), according to applicable scattering rules.
+
     If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
 
