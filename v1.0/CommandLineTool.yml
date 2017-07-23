@@ -58,6 +58,7 @@ $graph:
           * Clarified application of input parameter default values when the input is `null` or undefined.
           * Clarified valid types and meaning of the format field on inputs versus outputs
           * Clarify that command line arguments must not interpreted as shell except when shellQuote: false
+          * Clarify behavior of `entryname`
 
       Since draft-3, v1.0 introduces the following changes and additions
       to the CWL Command Line Tool standard:
@@ -750,7 +751,8 @@ $graph:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
-        If `entry` is a File or Directory, this overrides `basename`.  Optional.
+        If `entry` is a File or Directory, the `entryname` field overrides the value
+        of `basename` of the File or Directory object.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
