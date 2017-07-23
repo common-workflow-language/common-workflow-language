@@ -1,0 +1,17 @@
+{
+  "$graph": [
+  {"$import": "metaschema_base.yml"},
+  {
+    "name": "TypeDSLExample",
+    "type": "record",
+    "documentRoot": true,
+    "fields": [{
+      "name": "extype",
+      "type": "string",
+      "jsonldPredicate": {
+        _type: "@vocab",
+        "typeDSL": true
+      }
+    }]
+  }]
+}

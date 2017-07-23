@@ -9,7 +9,7 @@ outputs:
     type: File
     outputBinding:
       glob: output.txt
-arguments: ["cd", "$(inputs.inf.dirname)",
+arguments: ["cd", "$(inputs.inf.dirname)/xtestdir",
   {shellQuote: false, valueFrom: "&&"},
   "find", ".",
   {shellQuote: false, valueFrom: "|"},

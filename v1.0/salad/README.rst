@@ -27,6 +27,13 @@ Usage
    $ python
    >>> import schema_salad
 
+To install from source::
+
+  git clone https://github.com/common-workflow-language/schema_salad 
+  cd schema_salad 
+  python setup.py install
+ 
+
 Documentation
 -------------
 
@@ -70,6 +77,6 @@ provides for robust support of inline documentation.
 .. _JSON-LD: http://json-ld.org
 .. _Avro: http://avro.apache.org
 .. _metaschema: https://github.com/common-workflow-language/schema_salad/blob/master/schema_salad/metaschema/metaschema.yml
-.. _specification: http://www.commonwl.org/draft-3/SchemaSalad.html
-.. _Language: https://github.com/common-workflow-language/common-workflow-language/blob/master/draft-3/CommandLineTool.yml
+.. _specification: http://www.commonwl.org/v1.0/SchemaSalad.html
+.. _Language: https://github.com/common-workflow-language/common-workflow-language/blob/master/v1.0/CommandLineTool.yml
 .. _RDF: https://www.w3.org/RDF/

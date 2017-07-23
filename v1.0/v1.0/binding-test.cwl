@@ -2,7 +2,9 @@
 
 class: CommandLineTool
 cwlVersion: v1.0
-
+hints:
+  - class: DockerRequirement
+    dockerPull: python:2-slim
 inputs:
   - id: reference
     type: File
@@ -23,7 +25,8 @@ inputs:
     inputBinding:
       position: -1
 
-outputs: []
+outputs:
+  args: string[]
 
 baseCommand: python
 arguments: ["bwa", "mem"]

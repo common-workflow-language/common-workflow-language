@@ -5,6 +5,9 @@ $schemas:
 class: CommandLineTool
 cwlVersion: v1.0
 doc: "Reverse each line using the `rev` command"
+hints:
+  DockerRequirement:
+    dockerPull: "debian:wheezy"
 
 inputs:
   input:

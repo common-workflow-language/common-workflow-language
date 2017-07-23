@@ -6,7 +6,7 @@
 
 **YAML**: http://yaml.org
 
-**Avro**: https://avro.apache.org/docs/current/spec.html
+**Avro**: https://avro.apache.org/docs/1.8.1/spec.html
 
 **Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)
 
@@ -89,7 +89,7 @@ preprocessing steps described in the
 [Semantic Annotations for Linked Avro Data (SALAD) Specification](SchemaSalad.html).
 An implementation may formally validate the structure of a CWL document using
 SALAD schemas located at
-https://github.com/common-workflow-language/common-workflow-language/tree/master/draft-4
+https://github.com/common-workflow-language/common-workflow-language/tree/master/v1.0
 
 ## Identifiers
 
@@ -322,7 +322,7 @@ Expressions are denoted by the syntax `$(...)` or `${...}`.  A code
 fragment wrapped in the `$(...)` syntax must be evaluated as a
 [ECMAScript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).  A
 code fragment wrapped in the `${...}` syntax must be evaluated as a
-[EMACScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
+[ECMAScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
 for an anonymous, zero-argument function.  Expressions must return a valid JSON
 data type: one of null, string, number, boolean, array, object. Other return
 values must result in a `permanentFailure`. Implementations must permit any

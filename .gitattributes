@@ -1,0 +1,4 @@
+*.txt text eol=lf
+*.fastq text eol=lf
+*.fai text eol=lf
+*.fasta text eol=lf

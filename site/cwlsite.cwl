@@ -37,7 +37,7 @@ outputs:
     outputSource: merge/dir
   report:
     type: File
-    outputSource: report/out
+    outputSource: generate_report/out
 
 requirements:
   - class: ScatterFeatureRequirement
@@ -100,7 +100,7 @@ steps:
     out: [dir]
     run: mergesecondary.cwl
 
-  report:
+  generate_report:
     in:
       inp: merge/dir
       target: { default: "linkchecker-report.txt"}

@@ -18,6 +18,8 @@ $graph:
     - $import: link_res.yml
     - $import: vocab_res.yml
     - $include: import_include.md
+    - $import: map_res.yml
+    - $import: typedsl_res.yml
 
 - name: "Link_Validation"
   type: documentation
@@ -154,16 +156,24 @@ $graph:
 - name: NamedType
   type: record
   abstract: true
+  docParent: "#Schema"
   fields:
     - name: name
       type: string
       jsonldPredicate: "@id"
       doc: "The identifier for this type"
+    - name: inVocab
+      type: boolean?
+      doc: |
+        By default or if "true", include the short name of this type in the
+        vocabulary (the keys of the JSON-LD context).  If false, do not include
+        the short name in the vocabulary.
 
 
 - name: DocType
   type: record
   abstract: true
+  docParent: "#Schema"
   fields:
     - name: doc
       type:
@@ -240,6 +250,7 @@ $graph:
 
 
 - name: SaladRecordSchema
+  docParent: "#Schema"
   type: record
   extends: [NamedType, RecordSchema, SchemaDefinedType]
   documentRoot: true
@@ -277,6 +288,7 @@ $graph:
         mapPredicate: specializeTo
 
 - name: SaladEnumSchema
+  docParent: "#Schema"
   type: record
   extends: [EnumSchema, SchemaDefinedType]
   documentRoot: true
@@ -297,6 +309,7 @@ $graph:
 
 - name: Documentation
   type: record
+  docParent: "#Schema"
   extends: [NamedType, DocType]
   documentRoot: true
   doc: |

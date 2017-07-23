@@ -18,18 +18,24 @@
             }
         },
         {
-        id: "args.py",
-        type: File,
-        default: {
-          class: File,
-          path: args.py
+        "id": "args.py",
+        "type": "File",
+        "default": {
+          "class": "File",
+          "path": "args.py"
         },
-        inputBinding: {
-          position: -1
+        "inputBinding": {
+          "position": -1
         }
       }
     ],
-    "outputs": [],
+    "outputs": [{
+        "id": "args",
+        "type": {
+            "type": "array",
+            "items": "string"
+        }
+    }],
     "baseCommand": "python",
     "arguments": ["cat"]
 }

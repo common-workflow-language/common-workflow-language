@@ -9,7 +9,7 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Command Line Tool Description, v1.0
+      # Common Workflow Language (CWL) Command Line Tool Description, v1.0.1
 
       This version:
         * https://w3id.org/cwl/v1.0/
@@ -36,10 +36,34 @@ $graph:
     - {$include: intro.md}
 
     - |
-      ## Introduction to v1.0
+      ## Introduction to CWL Command Line Tool standard v1.0.1
 
-      This specification represents the first full release from the CWL group.
-      Since draft-3, version 1.0 introduces the following changes and additions:
+      This specification represents the second stable release from the CWL
+      group.  Since v1.0, v1.0.1 introduces the following updates to the CWL
+      Command Line Tool standard.  Documents should continue to use `cwlVersion: v1.0`
+      and existing v1.0 documents remain valid, however CWL documents that
+      relied on previously undefined or underspecified behavior may have
+      slightly different behavior in v1.0.1.
+
+        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
+        * 14 November 2016: Clarify [SoftwareRequirement](#SoftwareRequirement)
+          `spec` fields.
+        * 12 March 2017:
+          * Mark `default` as not required for link checking.
+          * Add note that files in InitialWorkDir must have path in output directory.
+          * Add note that writable: true applies recursively.
+        * 23 July 2017: (v1.0.1)
+          * Add clarification about scattering over empty arrays.
+          * Clarify interpretation of `secondaryFiles` on inputs.
+          * Expanded discussion of semantics of `File` and `Directory` types
+          * Fixed typo "EMACScript" to "ECMAScript"
+          * Clarified application of input parameter default values when the input is `null` or undefined.
+          * Clarified valid types and meaning of the format field on inputs versus outputs
+          * Clarify that command line arguments must not interpreted as shell except when shellQuote: false
+          * Clarify behavior of `entryname`
+
+      Since draft-3, v1.0 introduces the following changes and additions
+      to the CWL Command Line Tool standard:
 
         * The [Directory](#Directory) type.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: inputs
@@ -74,11 +98,6 @@ $graph:
           dependencies of a tool.
         * The common `description` field has been renamed to `doc`.
 
-      ## Errata
-
-      Post v1.0 release changes to the spec.
-
-        * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.
 
       ## Purpose
 
@@ -196,17 +215,23 @@ $graph:
         If `valueFrom` is an expression, evaluate the expression to yield the
         actual value to use to build the command line and apply the binding
         rules above.  If the inputBinding is associated with an input
-        parameter, the value of `self` in the expression will be the value of the
-        input parameter.
+        parameter, the value of `self` in the expression will be the value of
+        the input parameter.  Input parameter defaults (as specified by the
+        `InputParameter.default` field) must be applied before evaluating the
+        expression.
 
         When a binding is part of the `CommandLineTool.arguments` field,
         the `valueFrom` field is required.
+
     - name: shellQuote
       type: boolean?
       doc: |
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
         Use `shellQuote: false` to inject metacharacters for operations such as pipes.
+
+        If `shellQuote` is true or not provided, the implementation must not
+        permit interpretation of any shell metacharacters or directives.
 
 - type: record
   name: CommandOutputBinding
@@ -693,27 +718,59 @@ $graph:
   fields:
     - name: package
       type: string
-      doc: "The common name of the software to be configured."
-      jsonldPredicate: "@id"
+      doc: |
+        The name of the software to be made available. If the name is
+        common, inconsistent, or otherwise ambiguous it should be combined with
+        one or more identifiers in the `specs` field.
     - name: version
       type: string[]?
-      doc: "The (optional) version of the software to configured."
+      doc: |
+        The (optional) versions of the software that are known to be
+        compatible.
     - name: specs
       type: string[]?
       doc: |
-        Must be one or more IRIs identifying resources for installing or
-        enabling the software.  Implementations may provide resolvers which map
-        well-known software spec IRIs to some configuration action.
+        One or more [IRI](https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier)s
+        identifying resources for installing or enabling the software named in
+        the `package` field. Implementations may provide resolvers which map
+        these software identifer IRIs to some configuration action; or they can
+        use only the name from the `package` field on a best effort basis.
 
-        For example, an IRI `https://packages.debian.org/jessie/bowtie` could
-        be resolved with `apt-get install bowtie`.  An IRI
-        `https://anaconda.org/bioconda/bowtie` could be resolved with `conda
+        For example, the IRI https://packages.debian.org/bowtie could
+        be resolved with `apt-get install bowtie`. The IRI
+        https://anaconda.org/bioconda/bowtie could be resolved with `conda
         install -c bioconda bowtie`.
 
-        Tools may also provide IRIs to index entries such as
-        [RRID](http://www.identifiers.org/rrid/), such as
-        `http://identifiers.org/rrid/RRID:SCR_005476`
+        IRIs can also be system independent and used to map to a specific
+        software installation or selection mechanism.
+        Using [RRID](https://www.identifiers.org/rrid/) as an example:
+        https://identifiers.org/rrid/RRID:SCR_005476
+        could be fulfilled using the above mentioned Debian or bioconda
+        package, a local installation managed by [Environement Modules](http://modules.sourceforge.net/),
+        or any other mechanism the platform chooses. IRIs can also be from
+        identifer sources that are discipline specific yet still system
+        independent. As an example, the equivalent [ELIXIR Tools and Data
+        Service Registry](https://bio.tools) IRI to the previous RRID example is
+        https://bio.tools/tool/bowtie2/version/2.2.8.
+        If supported by a given registry, implementations are encouraged to
+        query these system independent sofware identifier IRIs directly for
+        links to packaging systems.
 
+        A site specific IRI can be listed as well. For example, an academic
+        computing cluster using Environement Modules could list the IRI
+        `https://hpc.example.edu/modules/bowtie-tbb/1.22` to indicate that
+        `module load bowtie-tbb/1.1.2` should be executed to make available
+        `bowtie` version 1.1.2 compiled with the TBB library prior to running
+        the accompanying Workflow or CommandLineTool. Note that the example IRI
+        is specific to a particular institution and computing environment as
+        the Environment Modules system does not have a common namespace or
+        standardized naming convention.
+
+        This last example is the least portable and should only be used if
+        mechanisms based off of the `package` field or more generic IRIs are
+        unavailable or unsuitable. While harmless to other sites, site specific
+        software IRIs should be left out of shared CWL descriptions to avoid
+        clutter.
 
 - name: Dirent
   type: record
@@ -729,7 +786,8 @@ $graph:
         _id: cwl:entryname
       doc: |
         The name of the file or subdirectory to create in the output directory.
-        If `entry` is a File or Directory, this overrides `basename`.  Optional.
+        If `entry` is a File or Directory, the `entryname` field overrides the value
+        of `basename` of the File or Directory object.  Optional.
     - name: entry
       type: [string, Expression]
       jsonldPredicate:
@@ -757,6 +815,9 @@ $graph:
         CommandLineTool process.  This may be implemented by making a copy of
         the original file or directory.  Default false (files and directories
         read-only by default).
+
+        A directory marked as `writable: true` implies that all files and
+        subdirectories are recursively writable as well.
 
 
 - name: InitialWorkDirRequirement
@@ -787,6 +848,13 @@ $graph:
 
         May be an expression.  If so, the expression return value must validate
         as `{type: array, items: [File, Directory]}`.
+
+        Files or Directories which are listed in the input parameters and
+        appear in the `InitialWorkDirRequirement` listing must have their
+        `path` set to their staged location in the designated output directory.
+        If the same File or Directory appears more than once in the
+        `InitialWorkDirRequirement` listing, the implementation must choose
+        exactly one value for `path`; how this value is chosen is undefined.
 
 
 - name: EnvVarRequirement

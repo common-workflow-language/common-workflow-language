@@ -2,6 +2,7 @@ $base: "https://w3id.org/cwl/cwl#"
 
 $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
 
 $graph:
 
@@ -9,7 +10,7 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Workflow Description, v1.0
+      # Common Workflow Language (CWL) Workflow Description, v1.0.1
 
       This version:
         * https://w3id.org/cwl/v1.0/
@@ -33,10 +34,28 @@ $graph:
 
     - |
 
-      ## Introduction to v1.0
+      ## Introduction to CWL Workflow standard v1.0.1
 
-      This specification represents the first full release from the CWL group.
-      Since draft-3, this draft introduces the following changes and additions:
+      This specification represents the second stable release from the CWL
+      group.  Since v1.0, v1.0.1 introduces the following updates to the CWL
+      Workflow standard.  Documents should continue to use `cwlVersion: v1.0`
+      and existing v1.0 documents remain valid, however CWL documents that
+      relied on previously undefined or underspecified behavior may have
+      slightly different behavior in v1.0.1.
+
+        * 12 March 2017:
+          * Mark `default` as not required for link checking.
+          * Add note that recursive subworkflows is not allowed.
+          * Fix mistake in discussion of extracting field names from workflow step ids.
+        * 23 July 2017: (v1.0.1)
+          * Add clarification about scattering over empty arrays.
+          * Clarify interpretation of `secondaryFiles` on inputs.
+          * Expanded discussion of semantics of `File` and `Directory` types
+          * Fixed typo "EMACScript" to "ECMAScript"
+          * Clarified application of input parameter default values when the input is `null` or undefined.
+
+      Since draft-3, v1.0 introduces the following changes and additions
+      to the CWL Workflow standard:
 
         * The `inputs` and `outputs` fields have been renamed `in` and `out`.
         * Syntax simplifcations: denoted by the `map<>` syntax. Example: `in`
@@ -217,10 +236,11 @@ $graph:
     ## Input object
 
     A WorkflowStepInput object must contain an `id` field in the form
-    `#fieldname` or `#stepname.fieldname`.  When the `id` field contains a
-    period `.` the field name consists of the characters following the final
-    period.  This defines a field of the workflow step input object with the
-    value of the `source` parameter(s).
+    `#fieldname` or `#prefix/fieldname`.  When the `id` field contains a slash
+    `/` the field name consists of the characters following the final slash
+    (the prefix portion may contain one or more slashes to indicate scope).
+    This defines a field of the workflow step input object with the value of
+    the `source` parameter(s).
 
     ## Merging
 
@@ -257,9 +277,12 @@ $graph:
     - name: default
       type: ["null", Any]
       doc: |
-        The default value for this parameter if there is no `source`
-        field.
-      jsonldPredicate: "cwl:default"
+        The default value for this parameter to use if either there is no
+        `source` field, or the value produced by the `source` is `null`.  The
+        default must be applied prior to scattering or evaluating `valueFrom`.
+      jsonldPredicate:
+        _id: "cwl:default"
+        noLinkCheck: true
     - name: valueFrom
       type:
         - "null"
@@ -282,10 +305,10 @@ $graph:
 
         The value of `inputs` in the parameter reference or expression must be
         the input object to the workflow step after assigning the `source`
-        values and then scattering.  The order of evaluating `valueFrom` among
-        step input parameters is undefined and the result of evaluating
-        `valueFrom` on a parameter must not be visible to evaluation of
-        `valueFrom` on other parameters.
+        values, applying `default`, and then scattering.  The order of
+        evaluating `valueFrom` among step input parameters is undefined and the
+        result of evaluating `valueFrom` on a parameter must not be visible to
+        evaluation of `valueFrom` on other parameters.
 
 
 - type: record
@@ -338,12 +361,17 @@ $graph:
 
     The `scatter` field specifies one or more input parameters which will be
     scattered.  An input parameter may be listed more than once.  The declared
-    type of each input parameter is implicitly wrapped in an array for each
-    time it appears in the `scatter` field.  As a result, upstream parameters
-    which are connected to scattered parameters may be arrays.
+    type of each input parameter is implicitly becomes an array of items of the
+    input parameter type.  If a parameter is listed more than once, it becomes
+    a nested array.  As a result, upstream parameters which are connected to
+    scattered parameters must be arrays.
 
     All output parameter types are also implicitly wrapped in arrays.  Each job
     in the scatter results in an entry in the output array.
+
+    If any scattered parameter runtime value is an empty array, all outputs are
+    set to empty arrays and no work is done for the step, according to
+    applicable scattering rules.
 
     If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
@@ -367,6 +395,9 @@ $graph:
     To specify a nested workflow as part of a workflow step,
     [SubworkflowFeatureRequirement](#SubworkflowFeatureRequirement) must be
     specified in the workflow or workflow step requirements.
+
+    It is a fatal error if a workflow directly or indirectly invokes itself as
+    a subworkflow (recursive workflows are not allowed).
 
   fields:
     - name: id

@@ -8,17 +8,14 @@
                 },
                 {
                     "basename": "salad",
-                    "location": "_:0600cfcc-4e4b-4213-a821-1009e8a44f5a",
                     "class": "Directory",
                     "listing": [
                         {
                             "basename": "schema_salad",
-                            "location": "_:1b18d943-4f8f-4c39-80ba-b30d2656d64e",
                             "class": "Directory",
                             "listing": [
                                 {
                                     "basename": "metaschema",
-                                    "location": "_:ae5f64e3-e9d7-41db-b59e-97c1611182ee",
                                     "class": "Directory",
                                     "listing": [
                                         {

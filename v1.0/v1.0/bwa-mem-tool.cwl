@@ -6,9 +6,9 @@ class: CommandLineTool
 
 hints:
   - class: ResourceRequirement
-    coresMin: 4
+    coresMin: 2
   - class: DockerRequirement
-    dockerPull: python
+    dockerPull: python:2-slim
 
 inputs:
   - id: reference

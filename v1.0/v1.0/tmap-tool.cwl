@@ -3,7 +3,12 @@
     "cwlVersion": "v1.0",
 
     "class": "CommandLineTool",
-
+    "hints": [
+        {
+            "class": "DockerRequirement",
+            "dockerPull": "python:2-slim"
+        }
+    ],
     "inputs": [
         {
             "id": "reads",
@@ -38,7 +43,8 @@
                 "glob": "output.sam"
             },
             "type": ["null", "File"]
-        }
+        },
+        {"id": "args", "type": "string[]"}
     ],
     "requirements": [
     {"class": "SchemaDefRequirement",

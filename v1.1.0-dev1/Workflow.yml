@@ -2,6 +2,7 @@ $base: "https://w3id.org/cwl/cwl#"
 
 $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
 
 $graph:
 
@@ -224,10 +225,11 @@ $graph:
     ## Input object
 
     A WorkflowStepInput object must contain an `id` field in the form
-    `#fieldname` or `#stepname.fieldname`.  When the `id` field contains a
-    period `.` the field name consists of the characters following the final
-    period.  This defines a field of the workflow step input object with the
-    value of the `source` parameter(s).
+    `#fieldname` or `#prefix/fieldname`.  When the `id` field contains a slash
+    `/` the field name consists of the characters following the final slash
+    (the prefix portion may contain one or more slashes to indicate scope).
+    This defines a field of the workflow step input object with the value of
+    the `source` parameter(s).
 
     ## Merging
 
@@ -264,9 +266,11 @@ $graph:
     - name: default
       type: ["null", Any]
       doc: |
-        The default value for this parameter if there is no `source`
-        field.
-      jsonldPredicate: "cwl:default"
+        The default value for this parameter to use if either there is no
+        `source` field, or the value produced by the `source` is `null`.
+      jsonldPredicate:
+        _id: "cwl:default"
+        noLinkCheck: true
     - name: valueFrom
       type:
         - "null"
@@ -352,6 +356,9 @@ $graph:
     All output parameter types are also implicitly wrapped in arrays.  Each job
     in the scatter results in an entry in the output array.
 
+    If a scattered input is an empty list, step can be skipped, and all of it's
+    outputs set to an empty list(s), according to applicable scattering rules.
+
     If `scatter` declares more than one input parameter, `scatterMethod`
     describes how to decompose the input into a discrete set of jobs.
 
@@ -374,6 +381,9 @@ $graph:
     To specify a nested workflow as part of a workflow step,
     [SubworkflowFeatureRequirement](#SubworkflowFeatureRequirement) must be
     specified in the workflow or workflow step requirements.
+
+    It is a fatal error if a workflow directly or indirectly invokes itself as
+    a subworkflow (recursive workflows are not allowed).
 
   fields:
     - name: id

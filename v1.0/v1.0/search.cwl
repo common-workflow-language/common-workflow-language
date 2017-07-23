@@ -12,6 +12,9 @@ $graph:
         - entryname: input.txt
           entry: $(inputs.file)
     - class: InlineJavascriptRequirement
+  hints:
+    - class: DockerRequirement
+      dockerPull: python:2-slim
 
   inputs:
     file:  File
@@ -39,6 +42,9 @@ $graph:
   baseCommand: python
   requirements:
     - class: InlineJavascriptRequirement
+  hints:
+    - class: DockerRequirement
+      dockerPull: python:2-slim
   inputs:
     file:
       type: File

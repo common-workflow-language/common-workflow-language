@@ -13,9 +13,6 @@
         class: Directory
         listing:
         - {basename: metaschema_base.yml, class: File, location: ../v1.1.0-dev1/salad/schema_salad/metaschema/metaschema_base.yml}
-        location: _:8d932277-54ee-49f7-b7b3-007108151ed4
-      location: _:31c5c0f1-dfcb-4a68-a5e1-063d03e85d3a
-    location: _:4a097285-861e-42ac-9322-20244d69dc96
 - basename: CommandLineTool.yml
   class: File
   location: ../v1.1.0-dev1/CommandLineTool.yml
