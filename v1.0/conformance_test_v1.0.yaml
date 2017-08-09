@@ -408,6 +408,12 @@
                 "class": "File",
                 "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
                 "size": 0
+            },
+            {
+                "location": "input.idx6.txt",
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
             }
         ],
         "size": 1111
