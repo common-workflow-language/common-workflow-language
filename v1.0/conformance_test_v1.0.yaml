@@ -1910,6 +1910,21 @@
   tool: v1.0/count-lines14-wf.cwl
   doc: Test simple multiple input scatter over an embedded subworkflow
 
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines15-wf.cwl
+  doc: Test twice nested subworkflow
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines16-wf.cwl
+  doc: Test subworkflow of mixed depth with tool first
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines17-wf.cwl
+  doc: Test subworkflow of mixed depth with tool after
+
 - job: v1.0/record-output-job.json
   output:
     "orec": {
