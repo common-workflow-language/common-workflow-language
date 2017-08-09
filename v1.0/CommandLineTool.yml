@@ -61,6 +61,8 @@ $graph:
           * Clarified valid types and meaning of the format field on inputs versus outputs
           * Clarify that command line arguments must not interpreted as shell except when shellQuote: false
           * Clarify behavior of `entryname`
+        * 9 August 2017:
+          * Clarify behavior resolving expressions in `secondaryFile`
 
       Since draft-3, v1.0 introduces the following changes and additions
       to the CWL Command Line Tool standard:
