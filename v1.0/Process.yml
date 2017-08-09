@@ -448,12 +448,12 @@ $graph:
 
         If the value is an expression, the value of `self` in the expression
         must be the primary input or output File object to which this binding
-        applies.  The `basename` field must be present in `self`.  For
-        `CommandLineTool` outputs the `path` field must also be present.  The
-        expression must return a filename string relative to the path to the
-        primary File, or a File object with either `path` or `location` and
-        `basename` fields set.  It is legal to reference an unchanged File
-        object taken from input as a secondaryFile.
+        applies.  The `basename`, `nameroot` and `nameext` fields must be
+        present in `self`.  For `CommandLineTool` outputs the `path` field must
+        also be present.  The expression must return a filename string relative
+        to the path to the primary File, or a File object with either `path` or
+        `location` and `basename` fields set.  It is legal to reference an
+        unchanged File object taken from input as a secondaryFile.
 
         To work on non-filename-preserving storage systems, portable tool
         descriptions should avoid constructing new values using `location`, but

@@ -36,6 +36,7 @@ $graph:
         - '$(self.basename).idx3'
         - '${ return self.basename+".idx4"; }'
         - '$({"path": self.path+".idx5", "class": "File"})'
+        - '$(self.nameroot).idx6$(self.nameext)'
 
 - id: search
   class: CommandLineTool
@@ -55,6 +56,8 @@ $graph:
         - "^.idx2"
         - '$(self.basename).idx3'
         - '${ return self.basename+".idx4"; }'
+        - '$(self.nameroot).idx6$(self.nameext)'
+
     search.py:
       type: File
       default:
