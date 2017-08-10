@@ -1237,14 +1237,14 @@
     }
   tool: v1.0/writable-dir.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement
+
 - job: v1.0/dynresreq-job.json
   tool: v1.0/dynresreq.cwl
   doc: Test dynamic resource reqs referencing inputs
   output:
      output: {
-        "path": "cores.txt",
-        "basename": "cores.txt",
+        "location": "cores.txt",
         "size": 2,
         "class": "File",
-        "checksum": "sha1$a3db5c13ff90a36963278c6a39e4ee3c22e2a436"
+        "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
