@@ -238,12 +238,12 @@ $graph:
           items: [File, Directory]
       jsonldPredicate: "cwl:secondaryFiles"
       doc: |
-        A list of additional files that are associated with the primary file
-        and must be transferred alongside the primary file.  Examples include
-        indexes of the primary file, or external references which must be
-        included when loading primary document.  A file object listed in
-        `secondaryFiles` may itself include `secondaryFiles` for which the same
-        rules apply.
+        A list of additional files or directories that are associated with the
+        primary file and must be transferred alongside the primary file.
+        Examples include indexes of the primary file, or external references
+        which must be included when loading primary document.  A file object
+        listed in `secondaryFiles` may itself include `secondaryFiles` for
+        which the same rules apply.
     - name: format
       type: string?
       jsonldPredicate:
@@ -442,15 +442,29 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        Describes files that must be included alongside the primary file(s).
-        All listed secondary files must be present.  An implementation may
-        fail workflow execution if a secondary file does not exist.
+        Provides a pattern or expression specifying files or directories that
+        must be included alongside the primary file.  All listed secondary
+        files must be present.  An implementation may fail workflow execution
+        if an expected secondary file does not exist.
 
         If the value is an expression, the value of `self` in the expression
-        must be the primary input or output File to which this binding applies.
+        must be the primary input or output File object to which this binding
+        applies.  The `basename`, `nameroot` and `nameext` fields must be
+        present in `self`.  For `CommandLineTool` outputs the `path` field must
+        also be present.  The expression must return a filename string relative
+        to the path to the primary File, a File or Directory object with either
+        `path` or `location` and `basename` fields set, or an array consisting
+        of strings or File or Directory objects.  It is legal to reference an
+        unchanged File or Directory object taken from input as a secondaryFile.
 
-        If the value is a string, it specifies that the following pattern
-        should be applied to the `location` of the primary file:
+        To work on non-filename-preserving storage systems, portable tool
+        descriptions should avoid constructing new values from `location`, but
+        should construct relative references using `basename` or `nameroot`
+        instead.
+
+        If a value in `secondaryFiles` is a string that is not an expression,
+        it specifies that the following pattern should be applied to the path
+        of the primary file to yield a filename relative to the primary File:
 
           1. If string begins with one or more caret `^` characters, for each
             caret, remove the last file extension from the path (the last

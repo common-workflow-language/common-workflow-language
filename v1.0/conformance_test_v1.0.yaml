@@ -408,7 +408,36 @@
                 "class": "File",
                 "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
                 "size": 0
-            }
+            },
+            {
+                "location": "input.idx6.txt",
+                "class": "File",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "size": 0
+            },
+            {
+            "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "class": "File",
+            "location": "input.txt.idx7",
+            "size": 0
+            },
+            {
+            "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
+            "class": "File",
+            "location": "hello.txt",
+            "size": 13
+            },
+            {
+            "class": "Directory",
+            "listing": [{
+               "basename": "index",
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "class": "File",
+                "location": "index",
+                "size": 0
+            }],
+            "location": "input.txt_idx8",
+          }
         ],
         "size": 1111
     }
