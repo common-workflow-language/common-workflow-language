@@ -1973,7 +1973,6 @@
   output: {"o": {
             "class": "File",
             "basename": "output",
-            "nameext": "",
             "nameroot": "output",
             "size": 1111,
             "location": Any,
@@ -1986,7 +1985,6 @@
   output: {"o": {
                 "class": "File",
                 "basename": "output",
-                "nameext": "",
                 "nameroot": "output",
                 "location": Any,
                 "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
