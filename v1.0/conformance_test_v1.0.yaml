@@ -2052,3 +2052,13 @@
   output: {"o": "File"}
   tool: v1.0/io-union-input-default-wf.cwl
   doc: Test union type input to workflow with default specified as file
+
+- job: v1.0/empty.json
+  output: {"val": "moocow\n"}
+  tool: v1.0/step-valuefrom4-wf.cwl
+  doc: Test valueFrom on workflow step from literal (string).
+
+- job: v1.0/wc-job.json
+  output: {"val1": "whale.txt\n", "val2": "step1_out\n"}
+  tool: v1.0/step-valuefrom5-wf.cwl
+  doc: Test valueFrom on workflow step using basename.
