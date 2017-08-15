@@ -45,7 +45,7 @@
       class: CommandLineTool
       ```
 
-      The 'cwlVersion` field indicates the version of the CWL spec used by the
+      The `cwlVersion` field indicates the version of the CWL spec used by the
       document.  The `class` field indicates this document describes a command
       line tool.
 
