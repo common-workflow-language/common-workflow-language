@@ -2062,3 +2062,33 @@
   output: {"val1": "whale.txt\n", "val2": "step1_out\n"}
   tool: v1.0/step-valuefrom5-wf.cwl
   doc: Test valueFrom on workflow step using basename.
+
+- job: v1.0/output-arrays-int-job.json
+  output: {"o": 12}
+  tool: v1.0/output-arrays-int-wf.cwl
+  doc: Test output arrays in a workflow (with ints).
+
+- job: v1.0/output-arrays-file-job.json
+  output: {"o": [
+    {
+        "basename": "moo",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": Any,
+        "nameext": "",
+        "nameroot": "moo",
+        "size": 0
+    },
+    {
+        "basename": "cow",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "http://commonwl.org/cwltool#generation": 0,
+        "location": Any,
+        "nameext": "",
+        "nameroot": "cow",
+        "size": 0
+    }
+  ]}
+  tool: v1.0/output-arrays-file-wf.cwl
+  doc: Test output arrays in a workflow (with Files).
