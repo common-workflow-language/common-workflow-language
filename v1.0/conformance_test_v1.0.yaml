@@ -1248,3 +1248,22 @@
         "class": "File",
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
+
+- job: v1.0/scatter-valueFrom.json
+  tool: v1.0/scatter-valueFrom-workflow.cwl
+  doc: Test valueFrom on a scattered input parameter
+  output:
+    out_message: [
+        {
+            "checksum": "sha1$98030575f6fc40e5021be5a8803a6bef94aee11f",
+            "location": Any,
+            "class": "File",
+            "size": 16
+        },
+        {
+            "checksum": "sha1$edcacd50778d98ae113015406b3195c165059dd8",
+            "location": Any,
+            "class": "File",
+            "size": 16
+        }
+    ]
