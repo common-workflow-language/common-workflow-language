@@ -2064,6 +2064,11 @@
   doc: Test valueFrom on workflow step using basename.
 
 - job: v1.0/output-arrays-int-job.json
+  output: {"o": [0, 1, 2]}
+  tool: v1.0/output-arrays-int.cwl
+  doc: Test output arrays in a tool (with ints).
+
+- job: v1.0/output-arrays-int-job.json
   output: {"o": 12}
   tool: v1.0/output-arrays-int-wf.cwl
   doc: Test output arrays in a workflow (with ints).
