@@ -1267,3 +1267,14 @@
             "size": 16
         }
     ]
+
+- job: v1.0/file-literal.yml
+  output:
+    output_file:
+      class: File
+      checksum: sha1$d0e04ff6c413c7d57f9a0ca0a33cd3ab52e2dd9c
+      location: output.txt
+      size: 18
+  tool: v1.0/cat3-nodocker.cwl
+  doc: Test file literal as input without Docker
+
