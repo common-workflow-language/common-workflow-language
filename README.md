@@ -33,9 +33,15 @@ descriptions.
 For developers and advanced users, the current
 [CWL specification (v1.0.2)](http://www.commonwl.org/v1.0/) provides
 authoritative documentation of the execution of CWL documents.
+
 ### Citation
 
-Please cite https://dx.doi.org/10.6084/m9.figshare.3115156.v2
+Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016): 
+**Common Workflow Language, v1.0**.
+Specification, _Common Workflow Language working group_. 
+[https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
+doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156.v2)
+
 
 ## Implementations
 
@@ -113,7 +119,7 @@ Anyone who violates this code of conduct may be sanctioned or expelled from
 these spaces at the discretion of the leadership team.
 
 For more details, see our [Code of
-Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md)
+Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md).
 
 ## Participating Organizations
 
