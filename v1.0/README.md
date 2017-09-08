@@ -2,8 +2,8 @@
 
 The CWL specifications are divided up into several documents.
 
-The [User Guide](UserGuide.html) provides a gentle introduction to writing CWL
-command line tools and workflows.
+The [User Guide](http://www.commonwl.org/user_guide/) provides a gentle
+introduction to writing CWL command line tools and workflows.
 
 The [Command Line Tool Description Specification](CommandLineTool.html)
 specifies the document schema and execution semantics for wrapping and
