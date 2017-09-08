@@ -146,31 +146,67 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 
 (Alphabetical)
 
-* Peter Amstutz <peter.amstutz@curoverse.com>
-* Robin Andeer <robin.andeer@gmail.com>
-* Brad Chapman <bchapman@hsph.harvard.edu>
-* John Chilton <jmchilton@gmail.com>
-* Michael R. Crusoe <michael.crusoe@gmail.com>
-* Roman Valls Guimerà <brainstorm@nopcode.org>
+* Peter Amstutz, Curoverse Inc. / Arvados; https://orcid.org/0000-0003-3566-7705
+* Robin Andeer; https://orcid.org/0000-0003-1132-5305
+* Brad Chapman; https://orcid.org/0000-0002-3026-1856
+* John Chilton, Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-6794-0756
+* Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
+* Roman Valls Guimerà; https://orcid.org/0000-0002-0034-9697
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
-* Kenzo-Hugo Hillion <kehillio@pasteur.fr>
+* Kenzo-Hugo Hillion; https://orcid.org/0000-0002-6517-6934
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
-* Sehrish Kanwal <skanwal@student.unimelb.edu.au>
-* Andrey Kartashov <Andrey.Kartashov@cchmc.org>
+* Sehrish Kanwal; https://orcid.org/0000-0002-5044-4692
+* Andrey Kartashov; https://orcid.org/0000-0001-9102-5681
 * John Kern <kern3020@gmail.com>
-* Farah Zaib Khan <farahk@student.unimelb.edu.au>
-* Dan Leehr <dan.leehr@duke.edu>
-* Hervé Ménager <herve.menager@gmail.com>
+* Farah Zaib Khan; https://orcid.org/0000-0002-6337-3037
+* Dan Leehr; https://orcid.org/0000-0003-3221-9579
+* Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Michael Miller <mmiller@systemsbiology.org>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall <joshua.randall@sanger.ac.uk>
 * Mark Robinson <mark.robinson-4@student.manchester.ac.uk>
 * Janko Simonović <janko.simonovic@sbgenomics.com>
-* Stian Soiland-Reyes <soiland-reyes@manchester.ac.uk>
+* Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
 
+## CWL Advisors
 
-The CWL Community Engineer, Michael R. Crusoe, publishes a blog about his work
-with updates at http://mrc.commonwl.org.
+(Alphabetical)
+
+* Peter Amstutz, Curoverse Inc. / Arvados; https://orcid.org/0000-0003-3566-7705
+* Artem Barski, Cincinnati Children's Hospital Medical Center / University of Cincinnati College of Medicine; https://orcid.org/0000-0002-1861-5316
+* John Chilton, Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-6794-0756
+* Kyle Cranmer, New York University; https://orcid.org/0000-0002-5769-7094
+* Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
+* Brandi Davis Dusenbery, Seven Bridges Genomics, Inc.; https://orcid.org/0000-0001-7811-8613
+* Niels Drost, Netherland eScience Center; https://orcid.org/0000-0001-9795-7981
+* Rob Finn, EMBL-EBI; http://orcid.org/0000-0001-8626-2148
+* Marc Fiume, DNAstack
+* Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
+* Carole Goble, The University of Manchester; https://orcid.org/0000-0003-1219-2137
+* Oliver Hofmann, University of Melbourne / bcbio-nextgen; http://orcid.org/0000-0002-7738-1513
+* Gaurav Kaushik, Seven Bridges Genomics, Inc
+* Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
+* Folker Meyer, Argonne / University of Chicago; http://orcid.org/0000-0003-1112-2284
+* Tom Morris, Curoverse
+* Anton Nekrutenko, The Pennsylvania State University / Galaxy Project; http://orcid.org/0000-0002-5987-8032
+* Brian O'Connor, University of California Santa Cruz; http://orcid.org/0000-0002-7681-6415
+* Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
+* James Taylor, Johns Hopkins University / Galaxy Project
+* Nebojša Tijanić, Seven Bridges
+* Ward Vandewege, Curoverse Inc. / Arvados
+* Alexander Wait Zaranek, Curoverse Inc. / Arvados; http://orcid.org/0000-0002-0415-9655
+
+## CWL Leadership Team
+
+(Alphabetical)
+
+* Peter Amstutz, Curoverse Inc. / Arvados; https://orcid.org/0000-0003-3566-7705
+* John Chilton, Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-6794-0756
+* Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
+* Brandi Davis Dusenbery, Seven Bridges Genomics, Inc.; https://orcid.org/0000-0001-7811-8613
+* Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
+* Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
+* Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
