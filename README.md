@@ -187,7 +187,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
 * Carole Goble, The University of Manchester; https://orcid.org/0000-0003-1219-2137
 * Oliver Hofmann, University of Melbourne / bcbio-nextgen; http://orcid.org/0000-0002-7738-1513
-* Gaurav Kaushik, Seven Bridges Genomics, Inc
+* Gaurav Kaushik, Seven Bridges Genomics, Inc; https://orcid.org/0000-0002-8461-1647
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Folker Meyer, Argonne / University of Chicago; http://orcid.org/0000-0003-1112-2284
 * Tom Morris, Curoverse
