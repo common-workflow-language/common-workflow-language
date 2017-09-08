@@ -194,9 +194,9 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Anton Nekrutenko, The Pennsylvania State University / Galaxy Project; http://orcid.org/0000-0002-5987-8032
 * Brian O'Connor, University of California Santa Cruz; http://orcid.org/0000-0002-7681-6415
 * Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
-* James Taylor, Johns Hopkins University / Galaxy Project
+* James Taylor, Johns Hopkins University / Galaxy Project; http://orcid.org/0000-0001-5079-840X
 * Nebojša Tijanić, Seven Bridges
-* Ward Vandewege, Curoverse Inc. / Arvados
+* Ward Vandewege, Curoverse Inc. / Arvados; http://orcid.org/0000-0002-2527-6949
 * Alexander Wait Zaranek, Curoverse Inc. / Arvados; http://orcid.org/0000-0002-0415-9655
 
 ## CWL Leadership Team
