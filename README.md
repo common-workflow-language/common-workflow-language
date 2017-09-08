@@ -24,7 +24,7 @@ environments.
 
 ## User Guide
 
-The [CWL user guide (v1.0)](http://www.commonwl.org/v1.0/UserGuide.html) provides a
+The [CWL user guide](http://www.commonwl.org/user_guide) provides a
 gentle introduction to learning how to write CWL command line tool and workflow
 descriptions.
 
