@@ -164,8 +164,8 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Michael Miller <mmiller@systemsbiology.org>
 * Tim Pierce <twp@unchi.org>
-* Josh Randall <joshua.randall@sanger.ac.uk>
-* Mark Robinson <mark.robinson-4@student.manchester.ac.uk>
+* Josh Randall; https://orcid.org/0000-0003-1540-203X
+* Mark Robinson; https://orcid.org/0000-0002-8184-7507
 * Janko Simonović <janko.simonovic@sbgenomics.com>
 * Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
@@ -190,7 +190,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Gaurav Kaushik, Seven Bridges Genomics, Inc; https://orcid.org/0000-0002-8461-1647
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Folker Meyer, Argonne / University of Chicago; https://orcid.org/0000-0003-1112-2284
-* Tom Morris, Curoverse
+* Tom Morris, Curoverse; https://orcid.org/0000-0003-0435-7851
 * Anton Nekrutenko, The Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-5987-8032
 * Brian O'Connor, University of California Santa Cruz; https://orcid.org/0000-0002-7681-6415
 * Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
