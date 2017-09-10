@@ -157,7 +157,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
 * Sehrish Kanwal; https://orcid.org/0000-0002-5044-4692
 * Andrey Kartashov; https://orcid.org/0000-0001-9102-5681
-* John Kern <kern3020@gmail.com>
+* John Kern; http://orcid.org/0000-0001-6977-458X
 * Farah Zaib Khan; https://orcid.org/0000-0002-6337-3037
 * Dan Leehr; https://orcid.org/0000-0003-3221-9579
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
