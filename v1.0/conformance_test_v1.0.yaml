@@ -1970,6 +1970,11 @@
   doc: Test default integer workflow inputs (unspecified)
 
 - job: v1.0/empty.json
+  output: {"o": 13}
+  tool: v1.0/io-int-default-tool-and-wf.cwl
+  doc: Test default integer tool and workflow inputs (unspecified)
+
+- job: v1.0/empty.json
   output: {"o": {
             "class": "File",
             "basename": "output",
