@@ -1978,7 +1978,6 @@
   output: {"o": {
             "class": "File",
             "basename": "output",
-            "nameroot": "output",
             "size": 1111,
             "location": Any,
             "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
@@ -1990,7 +1989,6 @@
   output: {"o": {
                 "class": "File",
                 "basename": "output",
-                "nameroot": "output",
                 "location": Any,
                 "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
                 "size": 13
@@ -2085,18 +2083,13 @@
         "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
         "class": "File",
         "location": Any,
-        "nameext": "",
-        "nameroot": "moo",
         "size": 0
     },
     {
         "basename": "cow",
         "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
         "class": "File",
-        "http://commonwl.org/cwltool#generation": 0,
         "location": Any,
-        "nameext": "",
-        "nameroot": "cow",
         "size": 0
     }
   ]}
