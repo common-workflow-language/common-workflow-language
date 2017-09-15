@@ -2102,3 +2102,15 @@
   ]}
   tool: v1.0/output-arrays-file-wf.cwl
   doc: Test output arrays in a workflow (with Files).
+
+- job: "v1.0/empty.json"
+  output: {"cow":
+    {
+        "checksum": "sha1$7a788f56fa49ae0ba5ebde780efe4d6a89b5db47",
+        "basename": "cow",
+        "class": "File",
+        "size": 4,
+        "location": Any
+  }}
+  tool: "v1.0/docker-run-cmd.cwl"
+  doc: Test Docker ENTRYPOINT usage
