@@ -1200,6 +1200,30 @@
   doc: Test directories in secondaryFiles
   tags: [ shell_command, command_line_tool ]
 
+- job: v1.0/dir4-subdir-1-job.yml
+  output: {
+    "outlist": {
+      "checksum": "sha1$9d9bc8f5252d39274b5dfbac64216c6e888f5dfc",
+      "size": 14,
+      "location": "output.txt",
+      "class": "File"
+    }
+  }
+  tool: v1.0/dir4.cwl
+  doc: Test specifying secondaryFiles in subdirectories of the job input document.
+
+- job: v1.0/dir4-subdir-2-job.yml
+  output: {
+    "outlist": {
+      "checksum": "sha1$9d9bc8f5252d39274b5dfbac64216c6e888f5dfc",
+      "size": 14,
+      "location": "output.txt",
+      "class": "File"
+    }
+  }
+  tool: v1.0/dir4.cwl
+  doc: Test specifying secondaryFiles in same subdirectory of the job input as the primary input file.
+
 - job: v1.0/dir-job.yml
   output: {
     "outlist": {
