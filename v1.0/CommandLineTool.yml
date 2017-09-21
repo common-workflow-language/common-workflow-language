@@ -440,8 +440,8 @@ $graph:
     The following
     ```
     outputs:
-       an_output_name:
-       type: stdout
+      an_output_name:
+        type: stdout
 
     stdout: a_stdout_file
     ```
