@@ -2020,6 +2020,54 @@
   tool: v1.0/io-file-default-wf.cwl
   doc: Test File input with default specified to workflow
 
+- job: v1.0/job-input-array-one-empty-file.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 0
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  doc: Test input union type or File or File array to a tool with one file in array specified.
+
+- job: v1.0/job-input-array-few-files.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$6d1723861ad5a1260f1c3c07c93076c5a215f646",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 1114
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  doc: Test input union type or File or File array to a tool with a few files in array specified.
+
+- job: v1.0/job-input-one-file.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 1111
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  doc: Test input union type or File or File array to a tool with one file specified.
+
+- job: v1.0/job-input-null.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$503458abf7614be3fb26d85ff5d8f3e17aa0a552",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 10
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  doc: Test input union type or File or File array to a tool with null specified.
+
 - job: v1.0/io-any-int.json
   output: {"t1": 7}
   tool: v1.0/io-any-1.cwl
