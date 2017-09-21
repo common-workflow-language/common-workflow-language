@@ -881,7 +881,7 @@
         ],
     }
   tool: v1.0/dir3.cwl
-  doc: Test directory input in Docker
+  doc: Test directory output
 
 - job: v1.0/dir4-job.yml
   output: {
