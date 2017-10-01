@@ -2,7 +2,7 @@ class: CommandLineTool
 cwlVersion: v1.0
 requirements:
   DockerRequirement:
-    dockerPull: debian:8
+    dockerPull: debian:stretch-slim
     dockerOutputDirectory: /other
 inputs: []
 outputs:

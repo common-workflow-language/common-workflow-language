@@ -10,7 +10,7 @@ cwlVersion: v1.0
 # in which the command line tools will execute.
 hints:
   - class: DockerRequirement
-    dockerPull: debian:8
+    dockerPull: debian:stretch-slim
 
 
 # The inputs array defines the structure of the input object that describes

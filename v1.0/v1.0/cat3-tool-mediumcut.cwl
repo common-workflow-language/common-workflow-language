@@ -4,7 +4,7 @@ cwlVersion: v1.0
 doc: "Print the contents of a file to stdout using 'cat' running in a docker container."
 hints:
   DockerRequirement:
-    dockerPull: debian:wheezy
+    dockerPull: debian:stretch-slim
 inputs:
   file1:
     type: File
