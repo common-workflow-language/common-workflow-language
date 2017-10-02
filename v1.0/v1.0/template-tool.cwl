@@ -12,7 +12,7 @@ requirements:
         entry: $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
 hints:
   DockerRequirement:
-    dockerPull: "debian:8"
+    dockerPull: "debian:stretch-slim"
 inputs:
   - id: file1
     type: File
