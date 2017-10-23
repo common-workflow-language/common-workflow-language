@@ -59,6 +59,7 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|Go|
 |[Xenon](http://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
 |[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
+|[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine|?|Go|
 
 ## Repositories of CWL Tools and Workflows
 
@@ -66,6 +67,11 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |----|-----------|
 |[Workflows repository](https://github.com/common-workflow-language/workflows)|Git repository of user contributed tools and workflows.|
 |[Dockstore tool registry](http://dockstore.org)|An open platform for sharing Docker-based tools described with the Common Workflow Language used by the GA4GH.|
+|[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
+
+On github, it is easy way to search for CWL documents in the search box using
+`cwlVersion extension:cwl + <your search terms>`, for example `cwlVersion
+extension:cwl picard`.
 
 ## Software for working with CWL
 
@@ -78,7 +84,9 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[atom-cwl](https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
 |[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
 |[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
+|[vscode-cwl](https://github.com/manabuishii/vscode-cwl)|CWL support in Visual Studio Code|
 |[IntelliJ CWL plugin](https://github.com/AleksandrSl/cwl-plugin)|CWL plugin for IntelliJ|
+
 
 ### Converters and code generators
 
@@ -107,8 +115,10 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[CWL for R](https://github.com/jefferys/cwl)|Parse and work with CWL from R|
 |[CWL for Julia](https://github.com/BioJulia/CWL.jl)|Utilities for working with CWL from Julia|
 |[cwl-inspector](https://github.com/tom-tan/cwl-inspector)|Tool to inspect properties of tools or workflows written in CWL|
-|[cwl-proto](https://github.com/broadinstitute/cwl-proto)|Reading and writing Common Workflow Language to Protocol Buffers|
+|[CWL for Go](https://github.com/otiai10/cwl.go)|
 |[CWL for Scala](https://github.com/broadinstitute/wdl4s)|CWL object model for Scala|
+|[cwl-proto](https://github.com/broadinstitute/cwl-proto)|Reading and writing Common Workflow Language to Protocol Buffers|
+|[Cerise](https://github.com/MD-Studio/cerise)|A REST service for running CWL workflows on remote clusters|
 
 ## Projects the CWL community is participating in
 
