@@ -36,9 +36,9 @@ authoritative documentation of the execution of CWL documents.
 
 ### Citation
 
-Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016): 
+Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016):
 **Common Workflow Language, v1.0**.
-Specification, _Common Workflow Language working group_. 
+Specification, _Common Workflow Language working group_.
 [https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
 doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156.v2)
 
@@ -69,19 +69,37 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 
 ## Software for working with CWL
 
+### Editors and viewers
+
 |Software|Description|
 |--------|-----------|
-|[cwltest](https://github.com/common-workflow-language/cwltest)|CWL testing framework,  automated testing of tools and workflows written with CWL|
+|[Rabix Composer](https://github.com/rabix/composer)|Graphical CWL editor|
+|[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
+|[atom-cwl]|(https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
+|[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
+|[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
+
+### Converters and code generators
+
+|Software|Description|
+|--------|-----------|
 |[cwl-upgrader](https://github.com/common-workflow-language/cwl-upgrader)|Upgrade CWL documents from draft-3 to v1.0|
 |[argparse2tool](https://github.com/erasche/argparse2tool#cwl-specific-functionality)|Generate CWL CommandLineTool wrappers (and/or Galaxy tool descriptions) from Python programs that use argparse.  Also supports the [click](http://click.pocoo.org/5/) argument parser.|
 |[cwl2argparse](https://github.com/common-workflow-language/cwl2argparse)|Generate Python argparse code from CWL CommandLineTool description.|
 |[pypi2cwl](https://github.com/common-workflow-language/pypi2cwl)|Automatically run argparse2cwl on any package in PyPi|
-|[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|CWL generator for ACD (EMBOSS) files |
-|[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
-|[cwl2zshcomp](https://github.com/kloetzl/cwl2zshcomp)|generates ZSH auto completions from CWL command line tool descriptions|
+|[CTD converter](https://github.com/WorkflowConversion/CTDConverter]|Common Tool Definition (CTD) to CWL converter|
+|[WDL converter](https://github.com/common-workflow-language/wdl2cwl]|Workflow Definition Language (WDL) to CWL converter|
 |[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
-|[python-cwlgen](https://github.com/common-workflow-language/python-cwlgen)|Generation of CWL programmatically from Python.|
+|[python-cwlgen](https://github.com/common-workflow-language/python-cwlgen)|Generate of CWL programmatically from Python.|
+
+### Loading and running CWL
+
+|Software|Description|
+|--------|-----------|
+|[cwltest](https://github.com/common-workflow-language/cwltest)|CWL testing framework,  automated testing of tools and workflows written with CWL|
+|[cwl2zshcomp](https://github.com/kloetzl/cwl2zshcomp)|generates ZSH auto completions from CWL command line tool descriptions|
+|[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 
 ## Projects the CWL community is participating in
 
