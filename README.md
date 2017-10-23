@@ -47,7 +47,7 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 
 |Software|Description|CWL support|Platform support|
 |--------|-----------|-----------|--------|
-|[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, local execution only|
+|[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, Windows, local execution only|
 |[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](http://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](http://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|
 |[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, Azure, GCP, Grid Engine, LSF, Mesos, OpenStack, Slurm|
 |[Rabix Bunny](https://github.com/rabix/bunny)|An open-source, Java-based implementation of Common Workflow Language with support for multiple drafts/versions. See [Rabix.io](http://rabix.io) for details.|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=rabix-conformance)](https://ci.commonwl.org/job/rabix-conformance/)|Linux, OS X, [GA4GH TES](https://github.com/ga4gh/task-execution-server) (experimental)|
@@ -58,7 +58,7 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|Python|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|Go|
 |[Xenon](http://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
-
+|[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
 
 ## Repositories of CWL Tools and Workflows
 
@@ -75,9 +75,10 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |--------|-----------|
 |[Rabix Composer](https://github.com/rabix/composer)|Graphical CWL editor|
 |[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
-|[atom-cwl]|(https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
+|[atom-cwl](https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
 |[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
 |[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
+|[IntelliJ CWL plugin](https://github.com/AleksandrSl/cwl-plugin)|CWL plugin for IntelliJ|
 
 ### Converters and code generators
 
@@ -88,10 +89,13 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[cwl2argparse](https://github.com/common-workflow-language/cwl2argparse)|Generate Python argparse code from CWL CommandLineTool description.|
 |[pypi2cwl](https://github.com/common-workflow-language/pypi2cwl)|Automatically run argparse2cwl on any package in PyPi|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|CWL generator for ACD (EMBOSS) files |
-|[CTD converter](https://github.com/WorkflowConversion/CTDConverter]|Common Tool Definition (CTD) to CWL converter|
-|[WDL converter](https://github.com/common-workflow-language/wdl2cwl]|Workflow Definition Language (WDL) to CWL converter|
+|[CTD converter](https://github.com/WorkflowConversion/CTDConverter)|Common Tool Definition (CTD) to CWL converter|
+|[WDL converter](https://github.com/common-workflow-language/wdl2cwl)|Workflow Definition Language (WDL) to CWL converter|
 |[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
 |[python-cwlgen](https://github.com/common-workflow-language/python-cwlgen)|Generate of CWL programmatically from Python.|
+|[cwl2nxf](https://github.com/nextflow-io/cwl2nxf)|Convert CWL to run on Nextflow|
+|[cwl-to-parsl](https://github.com/benhg/cwl-to-parsl)|Convert CWL to Parsl|
+|[Beatrice](https://github.com/Parsoa/Beatrice)|Pipeline Assembler For CWL|
 
 ### Loading and running CWL
 
@@ -100,6 +104,11 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[cwltest](https://github.com/common-workflow-language/cwltest)|CWL testing framework,  automated testing of tools and workflows written with CWL|
 |[cwl2zshcomp](https://github.com/kloetzl/cwl2zshcomp)|generates ZSH auto completions from CWL command line tool descriptions|
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
+|[CWL for R](https://github.com/jefferys/cwl)|Parse and work with CWL from R|
+|[CWL for Julia](https://github.com/BioJulia/CWL.jl)|Utilities for working with CWL from Julia|
+|[cwl-inspector](https://github.com/tom-tan/cwl-inspector)|Tool to inspect properties of tools or workflows written in CWL|
+|[cwl-proto](https://github.com/broadinstitute/cwl-proto)|Reading and writing Common Workflow Language to Protocol Buffers|
+|[CWL for Scala](https://github.com/broadinstitute/wdl4s)|CWL object model for Scala|
 
 ## Projects the CWL community is participating in
 
