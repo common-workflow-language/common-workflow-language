@@ -68,10 +68,8 @@ doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156
 |[Workflows repository](https://github.com/common-workflow-language/workflows)|Git repository of user contributed tools and workflows.|
 |[Dockstore tool registry](http://dockstore.org)|An open platform for sharing Docker-based tools described with the Common Workflow Language used by the GA4GH.|
 |[CWLviewer](https://view.commonwl.org/workflows)|A web application to view and share Common Workflow Language workflows|
-
-On github, it is easy way to search for CWL documents in the search box using
-`cwlVersion extension:cwl + <your search terms>`, for example `cwlVersion
-extension:cwl picard`.
+|[GitHub](https://github.com/search)|Search for CWL documents using `extension:cwl cwlVersion + <your search terms>`, for example `extension:cwl cwlVersion picard`.|
+|[Google](https://google.com)|Search for CWL documents using `filetype:cwl cwlVersion + <your search terms>`, for example `filetype:cwl cwlVersion picard`.|
 
 ## Software for working with CWL
 
