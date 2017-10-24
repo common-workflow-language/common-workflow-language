@@ -117,7 +117,7 @@ extension:cwl picard`.
 
 |Software|Description|
 |--------|-----------|
-|[cwltool](https://github.com/common-workflow-language/cwltool)|[cwltool can be [imported as a Python module]((https://github.com/common-workflow-language/cwltool#import-as-a-module)) and [extended to create custom cwl runners](https://github.com/common-workflow-language/cwltool#extension-points)|
+|[cwltool](https://github.com/common-workflow-language/cwltool)|cwltool can be [imported as a Python module]((https://github.com/common-workflow-language/cwltool#import-as-a-module)) and [extended to create custom cwl runners](https://github.com/common-workflow-language/cwltool#extension-points)|
 |[schema salad](https://github.com/common-workflow-language/schema_salad)|Python module and tools for working with the CWL schema.|
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[CWL for R](https://github.com/jefferys/cwl)|Parse and work with CWL from R|
