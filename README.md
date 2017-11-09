@@ -36,12 +36,15 @@ authoritative documentation of the execution of CWL documents.
 
 ### Citation
 
+To reference the CWL standards in a scholary work, please use the following citation inclusive of the DOI:
+
 Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016):
 **Common Workflow Language, v1.0**.
 Specification, _Common Workflow Language working group_.
 [https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
 doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156.v2)
 
+A collection of existing references to CWL can be found at http://www.citeulike.org/group/20713
 
 ## Implementations
 
