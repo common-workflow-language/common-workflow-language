@@ -28,6 +28,8 @@ The [CWL user guide](http://www.commonwl.org/user_guide) provides a
 gentle introduction to learning how to write CWL command line tool and workflow
 descriptions.
 
+[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP)
+
 ## Specification
 
 For developers and advanced users, the current
