@@ -12,6 +12,7 @@ Options:
 EOF
 
 DRAFT=v1.0
+DRAFT_DIR="$(cd $(dirname $0); pwd)/${DRAFT}"
 TEST_N=""
 JUNIT_XML=""
 RUNNER=cwl-runner
@@ -71,10 +72,10 @@ runtest() {
     "$1" --version
 
     runs=$((runs+1))
-    (cd $DRAFT
+    (cd $DRAFT_DIR
      cwltest --tool "$1" \
 	     --test=conformance_test_${DRAFT}.yaml ${TEST_N} \
-	     ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT} -- ${EXTRA}
+	     ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} --basedir ${DRAFT_DIR} -- ${EXTRA}
     )
     checkexit
 }
