@@ -1,8 +1,9 @@
 Common Workflow Language
 ========================
 
-[![Build Status](https://travis-ci.org/common-workflow-language/common-workflow-language.svg?branch=master)](https://travis-ci.org/common-workflow-language/common-workflow-language)
-[![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [**Support**](#Support)
+[**Support**](#Support) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Syntax Check](https://travis-ci.org/common-workflow-language/common-workflow-language.svg?branch=master)](https://travis-ci.org/common-workflow-language/common-workflow-language)
+[![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
 
 <a href="https://www.youtube.com/watch?v=86eY8xs-Vo8"><img align="right" src="https://github.com/common-workflow-language/logo/raw/master/intro_video_screenshot_413x193.png" alt="[Video] Common Workflow Language explained in 64 seconds"></a>
 The Common Workflow Language (CWL) is a specification for describing analysis
