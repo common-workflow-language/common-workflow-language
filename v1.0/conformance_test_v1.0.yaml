@@ -929,14 +929,14 @@
   tool: v1.0/cat3-tool.cwl
   doc: Test file literal as input
 
-- job: examples/arguments-job.yml
+- job: v1.0/arguments-job.yml
   output:
     classfile:
         checksum: sha1$e68df795c0686e9aa1a1195536bd900f5f417b18
         location: Hello.class
         class: File
         size: 184
-  tool: examples/linkfile.cwl
+  tool: v1.0/linkfile.cwl
   doc: Test expression in InitialWorkDir listing
 
 - job: v1.0/wc-job.json
