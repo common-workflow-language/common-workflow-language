@@ -185,6 +185,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [ELIXIR Europe](https://www.elixir-europe.org/)
 * [BioExcel CoE](http://bioexcel.eu/)
 * [BD2K](https://commonfund.nih.gov/bd2k)
+* [EMBL Australia Bioinformatics Resource](https://www.embl-abr.org.au/)
 
 ## Individual Contributors
 
