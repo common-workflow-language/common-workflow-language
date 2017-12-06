@@ -86,7 +86,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
 |[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
 |[vscode-cwl](https://github.com/manabuishii/vscode-cwl)|CWL support in Visual Studio Code|
-|[IntelliJ CWL plugin](https://github.com/AleksandrSl/cwl-plugin)|CWL plugin for IntelliJ|
+|[IntelliJ CWL plugin](https://gitlab.com/AleksandrSl/cwl-plugin)|CWL plugin for [IntelliJ and other JetBrains editors](https://plugins.jetbrains.com/plugin/10040-cwl-plugin)|
 
 ### Utilities
 
