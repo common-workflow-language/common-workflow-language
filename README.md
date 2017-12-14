@@ -65,6 +65,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|-|
 |[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
 |[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine|-|-|
+|[REANA](https://reana.readthedocs.io/en/latest/index.html)|RE usable ANAlyses|[alpha](https://github.com/reanahub/reana-workflow-engine-cwl/issues/9#issuecomment-351472835)|Kubernetes, [CERN OpenStack](http://clouddocs.web.cern.ch/clouddocs/containers/index.html) ([OpenStack Magnum](https://wiki.openstack.org/wiki/Magnum))|
 
 ## Repositories of CWL Tools and Workflows
 
