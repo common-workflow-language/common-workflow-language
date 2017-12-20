@@ -1277,3 +1277,36 @@
       size: 18
   tool: v1.0/cat3-nodocker.cwl
   doc: Test file literal as input without Docker
+- job: v1.0/empty.json
+  tool: v1.0/glob_test.cwl
+  doc: Test that OutputBinding.glob is sorted as specified by POSIX
+  output:
+    letters:
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: a
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: b
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: c
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: w
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: x
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: y
+        class: File
+        size: 0
+      - checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
+        location: z
+        class: File
+        size: 0
