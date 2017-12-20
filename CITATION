@@ -3,10 +3,11 @@ To cite the Common Workflow Language standard in a publication, please use:
 Amstutz, Peter; Crusoe, Michael R; Tijanić, Nebojša; Chapman, Brad;
 Chilton, John; Heuer, Michael; Kartashov, Andrey; Kern, John; Leehr, Dan;
 Ménager, Hervé; Nedeljkovich, Maya; Scales, Matt; Soiland-Reyes, Stian;
-Stojanovic, Luka (2016): Common Workflow Language, v1.0. figshare.
+Stojanovic, Luka (2016): Common Workflow Language, v1.0. Specification,
+Common Workflow Language working group. https://w3id.org/cwl/v1.0/
 https://dx.doi.org/10.6084/m9.figshare.3115156.v2
 
-@data{common-workflow-language-draft3,
+@data{cwl,
   doi = {10.6084/m9.figshare.3115156.v2},
   url = {http://dx.doi.org/10.6084/m9.figshare.3115156.v2},
   author = {Peter Amstutz; Michael R. Crusoe; Nebojša Tijanić; Brad Chapman;
@@ -15,6 +16,13 @@ Hervé Ménager; Maya Nedeljkovich; Matt Scales; Stian Soiland-Reyes;
 Luka Stojanovic
  },
   publisher = {Figshare},
+  institution = {Common Workflow Language working group},
   title = {Common Workflow Language, v1.0},
   year = {2016}
 }
+
+# Are you editing this file?
+# Synchronize any changes made with
+# README.md
+# and
+# https://github.com/common-workflow-language/user_guide/blob/gh-pages/CITATION
