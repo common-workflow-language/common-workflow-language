@@ -141,7 +141,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 <a name="Support"></a>
 ## Support, Community and Contributing
 
-The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [Post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl) 
+The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl) 
 
 [![Biostars CWL](https://www.biostars.org/static/biostar2.logo.png)](https://www.biostars.org/t/cwl/)
 
