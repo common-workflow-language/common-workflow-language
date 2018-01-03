@@ -61,11 +61,11 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|-|
 |[cwl-tes](https://github.com/common-workflow-language/cwl-tes)|CWL engine backended by the [GA4GH Task Execution API](https://github.com/ga4gh/task-execution-schemas)|[![Build Status](https://travis-ci.org/common-workflow-language/cwl-tes.svg?branch=master)](https://travis-ci.org/common-workflow-language/cwl-tes)|Local, GCP, AWS, HTCondor, Grid Engine, PBS/Torque, Slurm|
 |[CWL-Airflow](https://github.com/Barski-lab/cwl-airflow)|Package to run CWL workflows in Apache-Airflow (supported by BioWardrobe Team, CCHMC)|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=airflow-conformance)](https://ci.commonwl.org/job/airflow-conformance)|Linux, OS X|
+|[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=cromwell)](https://ci.commonwl.org/job/cromwell) [alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
 |[Xenon](http://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
 |[Consonance](https://github.com/Consonance/consonance)|orchestration tool for running SeqWare workflows and CWL tools|-|AWS, OpenStack, Azure|
 |[Apache Taverna](http://taverna.incubator.apache.org/)|Domain-independent Workflow Management System|[alpha](https://issues.apache.org/jira/browse/TAVERNA-900)|-|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|-|
-|[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
 |[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine|-|-|
 |[REANA](https://reana.readthedocs.io/en/latest/index.html)|RE usable ANAlyses|[alpha](https://github.com/reanahub/reana-workflow-engine-cwl/issues/9#issuecomment-351472835)|Kubernetes, [CERN OpenStack](http://clouddocs.web.cern.ch/clouddocs/containers/index.html) ([OpenStack Magnum](https://wiki.openstack.org/wiki/Magnum))|
 
