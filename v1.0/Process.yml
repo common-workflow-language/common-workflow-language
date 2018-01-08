@@ -103,7 +103,7 @@ $graph:
 
     When collecting CommandLineTool outputs, `glob` matching returns file paths
     (with the `path` property) and the derived properties. This can all be
-    modified by `outputEval`.  Alternately, if the file `cwl.outputs.json` is
+    modified by `outputEval`.  Alternately, if the file `cwl.output.json` is
     present in the output, `outputBinding` is ignored.
 
     File objects in the output must provide either a `location` URI or a `path`
