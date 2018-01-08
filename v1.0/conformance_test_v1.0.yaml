@@ -222,6 +222,11 @@
   tool: v1.0/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (provided)
 
+- job: v1.0/empty.json
+  output: {default_output: workflow_default}
+  tool: v1.0/echo-wf-default.cwl
+  doc: Test that workflow defaults override tool defaults
+
 - job: v1.0/env-job.json
   output:
     out:
