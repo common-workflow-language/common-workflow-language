@@ -43,11 +43,3 @@
     'https://w3id.org/cwl/salad#Documentation']
   source: {$import: v1.1.0-dev1-metaschema.yaml}
   target: v1.1.0-dev1/SchemaSalad.html
-- brandimg: '<img src=''../CWL-Logo-Header.png'' style=''height: 61px; margin-top:
-    -20px; margin-left: -20px''></img>'
-  brandlink: index.html
-  primtype: null
-  redirect: []
-  renderlist: []
-  source: {$import: userguide-v1.1.0-dev1-input.yaml}
-  target: v1.1.0-dev1/UserGuide.html

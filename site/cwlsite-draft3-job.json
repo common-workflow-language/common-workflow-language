@@ -62,14 +62,5 @@
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null
-        },
-        {
-            "source": {"$import": "userguide-input.json"},
-            "target": "draft-3/UserGuide.html",
-            "renderlist": [],
-            "redirect": [],
-            "brandlink": "index.html",
-            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
         }
     ]
