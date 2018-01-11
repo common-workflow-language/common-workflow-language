@@ -27,13 +27,15 @@ steps:
       baseCommand: [ touch, deeply/nested/dir/structure/ya ]
       requirements:
         InitialWorkDirRequirement:
-          listing: [ $(inputs.dir) ]
+          listing:
+            - entry: $(inputs.dir)
+              writable: true
       inputs:
         dir: Directory
       outputs:
         ya:
           type: File
           outputBinding: { glob: deeply/nested/dir/structure/ya }
- 
+
     in: { dir: first/deep_dir }
     out: [ ya ]
