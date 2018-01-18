@@ -4,7 +4,7 @@ requirements:
   - class: ShellCommandRequirement
 hints:
   DockerRequirement:
-    dockerPull: "debian:wheezy"
+    dockerPull: "debian:stretch-slim"
 
 inputs: []
 

@@ -3,7 +3,12 @@
     "cwlVersion": "v1.1.0-dev1",
 
     "class": "CommandLineTool",
-
+    "hints": [
+        {
+            "class": "DockerRequirement",
+            "dockerPull": "python:2-slim"
+        }
+    ],
     "inputs": [
         {
             "id": "reads",

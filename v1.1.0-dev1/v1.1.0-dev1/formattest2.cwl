@@ -5,6 +5,9 @@ $schemas:
 class: CommandLineTool
 cwlVersion: v1.1.0-dev1
 doc: "Reverse each line using the `rev` command"
+hints:
+  DockerRequirement:
+    dockerPull: "debian:stretch-slim"
 
 inputs:
   input:

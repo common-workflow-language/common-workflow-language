@@ -4,7 +4,7 @@ cwlVersion: v1.1.0-dev1
 
 requirements:
   - class: DockerRequirement
-    dockerPull: debian:8
+    dockerPull: debian:stretch-slim
   - class: InitialWorkDirRequirement
     listing:
       - $(inputs.INPUT)
