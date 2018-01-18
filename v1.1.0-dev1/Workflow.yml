@@ -141,6 +141,7 @@ $graph:
     - name: linkMerge
       type: ["null", LinkMergeMethod]
       jsonldPredicate: "cwl:linkMerge"
+      default: merge_nested
       doc: |
         The method to use to merge multiple sources into a single array.
         If not specified, the default method is "merge_nested".
@@ -186,6 +187,7 @@ $graph:
     - name: linkMerge
       type: LinkMergeMethod?
       jsonldPredicate: "cwl:linkMerge"
+      default: merge_nested
       doc: |
         The method to use to merge multiple inbound links into a single array.
         If not specified, the default method is "merge_nested".
@@ -248,7 +250,7 @@ $graph:
         `source` field, or the value produced by the `source` is `null`.  The
         default must be applied prior to scattering or evaluating `valueFrom`.
       jsonldPredicate:
-        _id: "cwl:default"
+        _id: "sld:default"
         noLinkCheck: true
     - name: valueFrom
       type:

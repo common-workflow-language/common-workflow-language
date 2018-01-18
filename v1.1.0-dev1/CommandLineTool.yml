@@ -144,6 +144,7 @@ $graph:
       doc: "Command line prefix to add before the value."
     - name: separate
       type: boolean?
+      default: true
       doc: |
         If true (default), then the prefix and value must be added as separate
         command line arguments; if false, prefix and value must be concatenated
@@ -176,12 +177,13 @@ $graph:
 
     - name: shellQuote
       type: boolean?
+      default: true
       doc: |
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
         Use `shellQuote: false` to inject metacharacters for operations such as pipes.
 
-        If `shellQuote` is true or not provided, the implementation must not
+        If `shellQuote` is true or null, the implementation must not
         permit interpretation of any shell metacharacters or directives.
 
 - type: record
@@ -806,6 +808,7 @@ $graph:
         file.
     - name: writable
       type: boolean?
+      default: false
       doc: |
         If true, the file or directory must be writable by the tool.  Changes
         to the file or directory must be isolated and not visible by any other
@@ -834,7 +837,7 @@ $graph:
     - name: listing
       type:
         - type: array
-          items: [File, Directory, Dirent, string, Expression]
+          items: ["null", File, Directory, Dirent, string, Expression]
         - string
         - Expression
       jsonldPredicate:
@@ -844,7 +847,7 @@ $graph:
         designated output directory prior to executing the command line tool.
 
         May be an expression.  If so, the expression return value must validate
-        as `{type: array, items: [File, Directory]}`.
+        as `{type: array, items: ["null", File, Directory, Dirent]}`.
 
         Files or Directories which are listed in the input parameters and
         appear in the `InitialWorkDirRequirement` listing must have their

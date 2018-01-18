@@ -238,7 +238,6 @@ $graph:
         Annotate this type with linked data context.
       jsonldPredicate: "sld:jsonldPredicate"
 
-
 - name: SaladRecordSchema
   type: record
   extends: [NamedType, RecordSchema, SchemaDefinedType]

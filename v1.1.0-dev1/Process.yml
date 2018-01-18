@@ -688,7 +688,7 @@ $graph:
     - name: default
       type: Any?
       jsonldPredicate:
-        _id: cwl:default
+        _id: sld:default
         noLinkCheck: true
       doc: |
         The default value to use for this parameter if the parameter is missing
