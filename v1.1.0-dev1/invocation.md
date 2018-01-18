@@ -54,9 +54,12 @@ system or transfer files via explicit download to the host.  Implementations
 may choose not to provide access to files not explicitly specified in the input
 object or process requirements.
 
-Output files produced by tool execution must be written to the **designated
-output directory**.  The initial current working directory when executing
-the tool must be the designated output directory.
+Output files produced by tool execution must be written to the
+**designated output directory**.  The initial current working
+directory when executing the tool must be the designated output
+directory.  The designated output directory should be empty, except
+for files or directories specified using
+[InitialWorkDirRequirement](InitialWorkDirRequirement).
 
 Files may also be written to the **designated temporary directory**.  This
 directory must be isolated and not shared with other processes.  Any files
