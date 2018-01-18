@@ -1,4 +1,4 @@
-lagunage: python
+language: python
 python:
   - 2.7
 before_script:
