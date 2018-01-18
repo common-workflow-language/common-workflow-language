@@ -160,7 +160,6 @@ The CWL Project is dedicated to providing a harassment-free experience for
 everyone, regardless of gender, gender identity and expression, sexual
 orientation, disability, physical appearance, body size, age, race, or
 religion. We do not tolerate harassment of participants in any form.
-
 This code of conduct applies to all CWL Project spaces, including the Google
 Group, the Gitter chat room, the Google Hangouts chats, both online and off.
 Anyone who violates this code of conduct may be sanctioned or expelled from
@@ -211,7 +210,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Dan Leehr; https://orcid.org/0000-0003-3221-9579
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Maxim Mikheev <mikhmv@biodatomics.com>
-* Michael Miller <mmiller@systemsbiology.org>
+* Michael Miller <mdmiller53@comcast.net>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall; https://orcid.org/0000-0003-1540-203X
 * Mark Robinson; https://orcid.org/0000-0002-8184-7507
