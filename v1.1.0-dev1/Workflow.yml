@@ -86,12 +86,39 @@ $graph:
       doc: |
         Specify valid types of data that may be assigned to this parameter.
 
+- name: WorkflowInputParameter
+  type: record
+  extends: InputParameter
+  fields:
+    - name: type
+      type:
+        - "null"
+        - CWLType
+        - InputRecordSchema
+        - InputEnumSchema
+        - InputArraySchema
+        - string
+        - type: array
+          items:
+            - CWLType
+            - InputRecordSchema
+            - InputEnumSchema
+            - InputArraySchema
+            - string
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
+
 - type: record
   name: ExpressionTool
   extends: Process
   specialize:
     - specializeFrom: InputParameter
-      specializeTo: RegularInputParameter
+      specializeTo: WorkflowInputParameter
     - specializeFrom: OutputParameter
       specializeTo: ExpressionToolOutputParameter
   documentRoot: true
@@ -195,7 +222,7 @@ $graph:
 
 - type: record
   name: WorkflowStepInput
-  extends: Sink
+  extends: [Identified, Sink]
   docParent: "#WorkflowStep"
   doc: |
     The input of a workflow step connects an upstream parameter (from the
@@ -239,10 +266,6 @@ $graph:
          single elements.
 
   fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "A unique identifier for this workflow input parameter."
     - name: default
       type: ["null", Any]
       doc: |
@@ -283,19 +306,16 @@ $graph:
 - type: record
   name: WorkflowStepOutput
   docParent: "#WorkflowStep"
+  extends: Identified
   doc: |
     Associate an output parameter of the underlying process with a workflow
     parameter.  The workflow parameter (given in the `id` field) be may be used
     as a `source` to connect with input parameters of other workflow steps, or
     with an output parameter of the process.
-  fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: |
-        A unique identifier for this workflow output parameter.  This is the
-        identifier to use in the `source` field of `WorkflowStepInput` to
-        connect the output value to downstream parameters.
+
+    A unique identifier for this workflow output parameter.  This is
+    the identifier to use in the `source` field of `WorkflowStepInput`
+    to connect the output value to downstream parameters.
 
 
 - name: ScatterMethod
@@ -310,6 +330,7 @@ $graph:
 
 - name: WorkflowStep
   type: record
+  extends: [Identified, Labeled, sld:Documented]
   docParent: "#Workflow"
   doc: |
     A workflow step is an executable element of a workflow.  It specifies the
@@ -369,10 +390,6 @@ $graph:
     a subworkflow (recursive workflows are not allowed).
 
   fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this workflow step."
     - name: in
       type: WorkflowStepInput[]
       jsonldPredicate:
@@ -419,19 +436,12 @@ $graph:
         workflow engine that may be helpful in executing this workflow step.  It is
         not an error if an implementation cannot satisfy all hints, however
         the implementation may report a warning.
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this process object."
-    - name: doc
-      type: string?
-      jsonldPredicate: "rdfs:comment"
-      doc: "A long, human-readable description of this process object."
     - name: run
       type: [string, Process]
       jsonldPredicate:
-        "_id": "cwl:run"
-        "_type": "@id"
+        _id: "cwl:run"
+        _type: "@id"
+        subscope: run
       doc: |
         Specifies the process to run.
     - name: scatter
@@ -458,7 +468,7 @@ $graph:
   documentRoot: true
   specialize:
     - specializeFrom: InputParameter
-      specializeTo: RegularInputParameter
+      specializeTo: WorkflowInputParameter
     - specializeFrom: OutputParameter
       specializeTo: WorkflowOutputParameter
   doc: |

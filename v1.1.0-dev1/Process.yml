@@ -412,7 +412,7 @@ $graph:
       jsonldPredicate:
         _id: "cwl:listing"
 
-- name: SchemaBase
+- name: Labeled
   type: record
   abstract: true
   fields:
@@ -424,15 +424,21 @@ $graph:
       doc: "A short, human-readable label of this object."
 
 
-- name: Parameter
+- name: Identified
   type: record
-  extends: SchemaBase
   abstract: true
-  doc: |
-    Define an input or output parameter to a process.
-
   fields:
-    - name: secondaryFiles
+    - name: id
+      type: string?
+      jsonldPredicate: "@id"
+      doc: "The unique identifier for this object."
+
+- name: FieldBase
+  type: record
+  extends: Labeled
+  abstract: true
+  fields:
+    secondaryFiles:
       type:
         - "null"
         - string
@@ -473,7 +479,7 @@ $graph:
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
 
-    - name: format
+    format:
       type:
         - "null"
         - string
@@ -495,7 +501,7 @@ $graph:
         For output parameters, this is the file format that will be assigned to
         the output parameter.
 
-    - name: streamable
+    streamable:
       type: boolean?
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
@@ -505,12 +511,13 @@ $graph:
         indicate whether it is valid to stream file contents using a named
         pipe.  Default: `false`.
 
-    - name: doc
-      type:
-        - string?
-        - string[]?
-      doc: "A documentation string for this type, or an array of strings which should be concatenated."
-      jsonldPredicate: "rdfs:comment"
+
+- name: Parameter
+  type: record
+  extends: [FieldBase, sld:Documented, Identified]
+  abstract: true
+  doc: |
+    Define an input or output parameter to a process.
 
 
 - type: enum
@@ -546,20 +553,42 @@ $graph:
 
 
 - name: InputSchema
-  extends: SchemaBase
+  extends: [Labeled, BindsInput]
   type: record
   abstract: true
+  fields:
+    - name: name
+      type: string?
+      jsonldPredicate: "@id"
+      doc: "The identifier for this type"
 
 
 - name: OutputSchema
-  extends: SchemaBase
+  extends: [Labeled, BindsOutput]
   type: record
   abstract: true
+
+- name: BindsInput
+  type: record
+  abstract: true
+  fields:
+    - name: inputBinding
+      type: InputBinding?
+      jsonldPredicate: "cwl:inputBinding"
+
+- name: BindsOutput
+  type: record
+  abstract: true
+  fields:
+    - name: outputBinding
+      type: OutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputRecordField
   type: record
-  extends: "sld:RecordField"
+  abstract: true
+  extends: [sld:RecordField, FieldBase, BindsInput]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -569,14 +598,6 @@ $graph:
       specializeTo: InputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this process object."
 
 
 - name: InputRecordSchema
@@ -590,10 +611,6 @@ $graph:
 - name: InputEnumSchema
   type: record
   extends: ["sld:EnumSchema", InputSchema]
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: InputArraySchema
@@ -608,15 +625,12 @@ $graph:
       specializeTo: InputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: OutputRecordField
   type: record
-  extends: "sld:RecordField"
+  extends: [sld:RecordField, FieldBase, BindsOutput]
+  abstract: true
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: OutputRecordSchema
@@ -626,10 +640,6 @@ $graph:
       specializeTo: OutputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: OutputRecordSchema
@@ -645,10 +655,7 @@ $graph:
   type: record
   extends: ["sld:EnumSchema", OutputSchema]
   docParent: "#OutputParameter"
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
+
 
 - name: OutputArraySchema
   type: record
@@ -663,27 +670,13 @@ $graph:
       specializeTo: OutputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputParameter
   type: record
-  extends: Parameter
+  abstract: true
+  extends: [Parameter, BindsInput]
   fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this parameter object."
-
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-      doc: |
-        Describes how to handle the inputs of a process and convert them
-        into a concrete form for execution, such as command line parameters.
 
     - name: default
       type: Any?
@@ -696,46 +689,11 @@ $graph:
         object is `null`.  Default values are applied before evaluating expressions
         (e.g. dependent `valueFrom` fields).
 
-- name: RegularInputParameter
-  type: record
-  extends: InputParameter
-  fields:
-    - name: type
-      type:
-        - "null"
-        - CWLType
-        - InputRecordSchema
-        - InputEnumSchema
-        - InputArraySchema
-        - string
-        - type: array
-          items:
-            - CWLType
-            - InputRecordSchema
-            - InputEnumSchema
-            - InputArraySchema
-            - string
-      jsonldPredicate:
-        "_id": "sld:type"
-        "_type": "@vocab"
-        refScope: 2
-        typeDSL: True
-      doc: |
-        Specify valid types of data that may be assigned to this parameter.
 
 - name: OutputParameter
   type: record
-  extends: Parameter
-  fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this parameter object."
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
-      doc: |
-        Describes how to handle the outputs of a process.
+  extends: [Parameter, BindsOutput]
+  abstract: true
 
 
 - type: record
@@ -752,6 +710,7 @@ $graph:
 
 - type: record
   name: Process
+  extends: [Identified, Labeled, sld:Documented]
   abstract: true
   doc: |
 
@@ -760,10 +719,6 @@ $graph:
     directly executed.
 
   fields:
-    - name: id
-      type: string?
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this process object."
     - name: inputs
       type:
         type: array
@@ -819,14 +774,6 @@ $graph:
         _id: cwl:hints
         noLinkCheck: true
         mapSubject: class
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this process object."
-    - name: doc
-      type: string?
-      jsonldPredicate: "rdfs:comment"
-      doc: "A long, human-readable description of this process object."
     - name: cwlVersion
       type: CWLVersion?
       doc: |
