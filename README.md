@@ -89,7 +89,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
 |[atom-cwl](https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
 |[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
-|[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
+|[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs (instructions [english](https://qiita.com/tm_tn/items/6c9653847412d115bec0), [日本語](https://qiita.com/tm_tn/items/79eec754338d152b092d)) |
 |[vscode-cwl](https://github.com/manabuishii/vscode-cwl)|CWL support in Visual Studio Code|
 |[IntelliJ CWL plugin](https://gitlab.com/AleksandrSl/cwl-plugin)|CWL plugin for [IntelliJ and other JetBrains editors](https://plugins.jetbrains.com/plugin/10040-cwl-plugin)|
 
@@ -143,7 +143,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 <a name="Support"></a>
 ## Support, Community and Contributing
 
-The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl) 
+The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl)
 
 [![Biostars CWL](https://www.biostars.org/static/biostar2.logo.png)](https://www.biostars.org/t/cwl/)
 
