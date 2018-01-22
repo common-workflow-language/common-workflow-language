@@ -384,5 +384,5 @@ To discover CWL documents look in the following locations:
 
 `$XDG_DATA_HOME/commonwl/` (usually `$HOME/.local/share/commonwl`)
 
-`$XDF_DATA_HOME` is from the [XDG Base Directory
+`$XDG_DATA_HOME` is from the [XDG Base Directory
 Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html)

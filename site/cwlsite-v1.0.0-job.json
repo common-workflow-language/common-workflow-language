@@ -66,16 +66,6 @@
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
             "primtype": null,
 	    "extra": { "class": "File", "path": "empty" }
-        },
-        {
-            "source": {"$import": "userguide-v1.0-input.json"},
-            "target": "v1.0/UserGuide.html",
-            "renderlist": [],
-            "redirect": [],
-            "brandlink": "index.html",
-            "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null,
-	    "extra": { "class": "File", "path": "empty" }
         }
 
     ]

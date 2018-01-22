@@ -10,7 +10,7 @@ $graph:
   type: documentation
   doc:
     - |
-      # Common Workflow Language (CWL) Workflow Description, v1.0.1
+      # Common Workflow Language (CWL) Workflow Description, v1.0.2
 
       This version:
         * https://w3id.org/cwl/v1.0/
@@ -34,14 +34,14 @@ $graph:
 
     - |
 
-      ## Introduction to CWL Workflow standard v1.0.1
+      ## Introduction to CWL Workflow standard v1.0.2
 
-      This specification represents the second stable release from the CWL
-      group.  Since v1.0, v1.0.1 introduces the following updates to the CWL
-      Workflow standard.  Documents should continue to use `cwlVersion: v1.0`
-      and existing v1.0 documents remain valid, however CWL documents that
-      relied on previously undefined or underspecified behavior may have
-      slightly different behavior in v1.0.1.
+      This specification represents the third stable release from the CWL
+      group.  Since the initial v1.0 release, v1.0.2 introduces the following
+      updates to the CWL Command Line Tool standard.  Documents should continue
+      to use `cwlVersion: v1.0` and existing v1.0 documents remain valid,
+      however CWL documents that relied on previously undefined or
+      underspecified behavior may have slightly different behavior in v1.0.2.
 
         * 12 March 2017:
           * Mark `default` as not required for link checking.
@@ -53,6 +53,8 @@ $graph:
           * Expanded discussion of semantics of `File` and `Directory` types
           * Fixed typo "EMACScript" to "ECMAScript"
           * Clarified application of input parameter default values when the input is `null` or undefined.
+        * 10 August 2017: (v1.0.2)
+          * Clarify behavior resolving expressions in `secondaryFile`
 
       Since draft-3, v1.0 introduces the following changes and additions
       to the CWL Workflow standard:

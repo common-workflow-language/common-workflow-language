@@ -18,6 +18,7 @@ $graph:
 
   inputs:
     file:  File
+    secondfile:  File
     index.py:
       type: File
       default:
@@ -33,9 +34,12 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.location+".idx3")'
-        - '$({"location": self.location+".idx4", "class": "File"})'
-        - '${ return self.location+".idx5"; }'
+        - '$(self.basename).idx3'
+        - '${ return self.basename+".idx4"; }'
+        - '$({"path": self.path+".idx5", "class": "File"})'
+        - '$(self.nameroot).idx6$(self.nameext)'
+        - '${ return [self.basename+".idx7", inputs.secondfile]; }'
+        - "_idx8"
 
 - id: search
   class: CommandLineTool
@@ -53,9 +57,11 @@ $graph:
       secondaryFiles:
         - ".idx1"
         - "^.idx2"
-        - '$(self.location+".idx3")'
-        - '$({"location": self.location+".idx4", "class": "File"})'
-        - '${ return self.location+".idx5"; }'
+        - '$(self.basename).idx3'
+        - '${ return self.basename+".idx4"; }'
+        - '$(self.nameroot).idx6$(self.nameext)'
+        - '${ return [self.basename+".idx7"]; }'
+        - "_idx8"
     search.py:
       type: File
       default:
@@ -78,6 +84,7 @@ $graph:
   class: Workflow
   inputs:
     infile: File
+    secondfile: File
     term: string
   outputs:
     outfile:
@@ -91,12 +98,13 @@ $graph:
     index:
       run: "#index"
       in:
-        file: "#main/infile"
+        file: infile
+        secondfile: secondfile
       out: [result]
 
     search:
       run: "#search"
       in:
-        file: "#main/index/result"
-        term: "#main/term"
+        file: index/result
+        term: term
       out: [result]

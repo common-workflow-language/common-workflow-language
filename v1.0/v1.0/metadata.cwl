@@ -18,7 +18,7 @@ dct:creator:
 
 hints:
   DockerRequirement:
-    dockerPull: debian:wheezy
+    dockerPull: debian:stretch-slim
 inputs:
   file1:
     type: File
