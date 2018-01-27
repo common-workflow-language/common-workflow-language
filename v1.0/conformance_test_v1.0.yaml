@@ -1261,6 +1261,17 @@
   tool: v1.0/writable-dir.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement
 
+- job: v1.0/empty.json
+  output:
+    out: {
+          "basename": "emptyWritableDir",
+          "location": "emptyWritableDir",
+          "listing": [],
+          "class": "Directory"
+      }
+  tool: v1.0/writable-dir-docker.cwl
+  doc: Test empty writable dir with InitialWorkDirRequirement inside Docker
+
 - job: v1.0/dynresreq-job.json
   tool: v1.0/dynresreq.cwl
   doc: Test dynamic resource reqs referencing inputs
