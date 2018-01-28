@@ -20,3 +20,4 @@ outputs:
     type: Directory
     outputBinding:
       glob: emptyWritableDir
+arguments: [touch, emptyWritableDir/blurg]

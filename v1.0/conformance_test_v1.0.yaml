@@ -1264,11 +1264,19 @@
 - job: v1.0/empty.json
   output:
     out: {
-          "basename": "emptyWritableDir",
-          "location": "emptyWritableDir",
-          "listing": [],
-          "class": "Directory"
-      }
+        "basename": "emptyWritableDir",
+        "listing": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "basename": "blurg",
+                "location": "blurg",
+                "class": "File",
+                "size": 0
+            }
+        ],
+        "location": "emptyWritableDir",
+        "class": "Directory"
+    }
   tool: v1.0/writable-dir-docker.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement inside Docker
 
