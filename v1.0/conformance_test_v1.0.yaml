@@ -1342,7 +1342,13 @@
       location: ya
       size: 0
   tool: v1.0/iwdr_with_nested_dirs.cwl
-
+- job: v1.0/bool-empty-inputbinding-job.json
+  output: {
+    "args": [
+    ]
+  }
+  tool: v1.0/bool-empty-inputbinding.cwl
+  doc: "Test that boolean flags do not appear on command line if inputBinding is empty and not null"
 - job: v1.0/empty.json
   output: {
     "args": []
