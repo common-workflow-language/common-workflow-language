@@ -152,14 +152,14 @@
     output: 2
   doc: Testing the string 'null' does not trip up an Any without a default value.
 
-- job: v1.0/wc-job.json
+- job: v1.0/cat-job.json
   output:
     output:
-      checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
+      checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       class: File
       location: output
-      size: 3
-  tool: v1.0/wc-tool.cwl
+      size: 13
+  tool: v1.0/cat-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
 
 - job: v1.0/parseInt-job.json
@@ -1261,6 +1261,25 @@
   tool: v1.0/writable-dir.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement
 
+- job: v1.0/empty.json
+  output:
+    out: {
+        "basename": "emptyWritableDir",
+        "listing": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "basename": "blurg",
+                "location": "blurg",
+                "class": "File",
+                "size": 0
+            }
+        ],
+        "location": "emptyWritableDir",
+        "class": "Directory"
+    }
+  tool: v1.0/writable-dir-docker.cwl
+  doc: Test empty writable dir with InitialWorkDirRequirement inside Docker
+
 - job: v1.0/dynresreq-job.json
   tool: v1.0/dynresreq.cwl
   doc: Test dynamic resource reqs referencing inputs
@@ -1323,7 +1342,6 @@
       location: ya
       size: 0
   tool: v1.0/iwdr_with_nested_dirs.cwl
-
 - job: v1.0/bool-empty-inputbinding-job.json
   output: {
     "args": [
@@ -1331,3 +1349,10 @@
   }
   tool: v1.0/bool-empty-inputbinding.cwl
   doc: "Test that boolean flags do not appear on command line if inputBinding is empty and not null"
+- job: v1.0/empty.json
+  output: {
+    "args": []
+  }
+  tool: v1.0/stage-unprovided-file.cwl
+  doc: Test that expression engine does not fail to evaluate reference to self
+       with unprovided input

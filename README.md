@@ -56,7 +56,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |--------|-----------|-----------|----------------|
 |[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, Windows, local execution only|
 |[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](http://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](http://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|
-|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, Azure, GCP, Grid Engine, LSF, Mesos, OpenStack, Slurm|
+|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, Azure, GCP, Grid Engine, LSF, Mesos, OpenStack, Slurm, PBS/Torque|
 |[Rabix Bunny](https://github.com/rabix/bunny)|An open-source, Java-based implementation of Common Workflow Language with support for multiple drafts/versions. See [Rabix.io](http://rabix.io) for details.|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=rabix-conformance)](https://ci.commonwl.org/job/rabix-conformance/)|Linux, OS X, [GA4GH TES](https://github.com/ga4gh/task-execution-server) (experimental)|
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|-|
 |[cwl-tes](https://github.com/common-workflow-language/cwl-tes)|CWL engine backended by the [GA4GH Task Execution API](https://github.com/ga4gh/task-execution-schemas)|[![Build Status](https://travis-ci.org/common-workflow-language/cwl-tes.svg?branch=master)](https://travis-ci.org/common-workflow-language/cwl-tes)|Local, GCP, AWS, HTCondor, Grid Engine, PBS/Torque, Slurm|
@@ -89,7 +89,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[CWLviewer](https://view.commonwl.org/)|A web application to view and share Common Workflow Language workflows|
 |[atom-cwl](https://github.com/manabuishii/language-cwl)|CWL editing mode for Atom|
 |[vim-cwl](https://github.com/manabuishii/vim-cwl)|CWL editing mode for Vim|
-|[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs|
+|[cwl-mode](https://github.com/tom-tan/cwl-mode)|CWL editing mode for Emacs (instructions [english](https://qiita.com/tm_tn/items/6c9653847412d115bec0), [日本語](https://qiita.com/tm_tn/items/79eec754338d152b092d)) |
 |[vscode-cwl](https://github.com/manabuishii/vscode-cwl)|CWL support in Visual Studio Code|
 |[IntelliJ CWL plugin](https://gitlab.com/AleksandrSl/cwl-plugin)|CWL plugin for [IntelliJ and other JetBrains editors](https://plugins.jetbrains.com/plugin/10040-cwl-plugin)|
 
@@ -143,7 +143,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 <a name="Support"></a>
 ## Support, Community and Contributing
 
-The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl) 
+The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl)
 
 [![Biostars CWL](https://www.biostars.org/static/biostar2.logo.png)](https://www.biostars.org/t/cwl/)
 
@@ -160,7 +160,6 @@ The CWL Project is dedicated to providing a harassment-free experience for
 everyone, regardless of gender, gender identity and expression, sexual
 orientation, disability, physical appearance, body size, age, race, or
 religion. We do not tolerate harassment of participants in any form.
-
 This code of conduct applies to all CWL Project spaces, including the Google
 Group, the Gitter chat room, the Google Hangouts chats, both online and off.
 Anyone who violates this code of conduct may be sanctioned or expelled from
@@ -211,7 +210,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Dan Leehr; https://orcid.org/0000-0003-3221-9579
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Maxim Mikheev <mikhmv@biodatomics.com>
-* Michael Miller <mmiller@systemsbiology.org>
+* Michael Miller <mdmiller53@comcast.net>
 * Tim Pierce <twp@unchi.org>
 * Josh Randall; https://orcid.org/0000-0003-1540-203X
 * Mark Robinson; https://orcid.org/0000-0002-8184-7507
