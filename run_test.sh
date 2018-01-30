@@ -21,7 +21,6 @@ Options:
 EOF
 
 DRAFT=v1.0
-DRAFT_DIR="$(cd $(dirname $0); pwd)/${DRAFT}"
 TEST_N=""
 JUNIT_XML=""
 RUNNER=cwl-runner
@@ -66,6 +65,8 @@ do
             ;;
     esac
 done
+
+DRAFT_DIR="$(cd $(dirname $0); pwd)/${DRAFT}"
 
 if ! runner="$(which $RUNNER)" ; then
     echo >&2 "$helpmessage"
