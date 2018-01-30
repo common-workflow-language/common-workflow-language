@@ -5,6 +5,7 @@ $(basename $0): Run common workflow tool description language conformance tests.
 
 Syntax:
         $(basename $0) [RUNNER=/path/to/cwl-runner] [DRAFT=cwl-draft-version]
+                       [EXTRA=--optional-arguments-to-cwl-runner]
 
 Options:
   -nT                   Run a specific test.
@@ -18,6 +19,10 @@ Options:
                         CLASSNAME
   --verbose             Print the cwltest invocation and pass --verbose to
                         cwltest
+
+Note:
+  EXTRA is useful for passing --enable-dev to the CWL reference runner:
+  Example: RUNNER=cwltool EXTRA=--enable-dev
 EOF
 
 DRAFT=v1.0
