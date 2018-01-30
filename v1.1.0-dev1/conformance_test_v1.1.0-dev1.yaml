@@ -1149,11 +1149,11 @@
   tool: v1.1.0-dev1/shellchar2.cwl
   doc: "Test that shell directives are quoted."
 
-- job: v1.0/empty.json
-  tool: v1.0/steplevel-resreq.cwl
+- job: v1.1.0-dev1/empty.json
+  tool: v1.1.0-dev1/steplevel-resreq.cwl
   doc: Test that ResourceRequirement on a step level redefines requirement on the workflow level
   output:
-     output: {
+     out: {
         "location": "cores.txt",
         "size": 2,
         "class": "File",

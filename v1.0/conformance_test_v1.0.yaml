@@ -1323,3 +1323,14 @@
       location: ya
       size: 0
   tool: v1.0/iwdr_with_nested_dirs.cwl
+
+- job: v1.0/empty.json
+  tool: v1.0/steplevel-resreq.cwl
+  doc: Test that ResourceRequirement on a step level redefines requirement on the workflow level
+  output:
+     out: {
+        "location": "cores.txt",
+        "size": 2,
+        "class": "File",
+        "checksum": "sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e"
+     }
