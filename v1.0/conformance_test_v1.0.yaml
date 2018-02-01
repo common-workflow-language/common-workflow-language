@@ -1300,6 +1300,7 @@
       size: 18
   tool: v1.0/cat3-nodocker.cwl
   doc: Test file literal as input without Docker
+
 - doc: Test that OutputBinding.glob is sorted as specified by POSIX
   job: v1.0/empty.json
   tool: v1.0/glob_test.cwl
@@ -1333,6 +1334,7 @@
         location: z
         class: File
         size: 0
+
 - doc: Test InitialWorkDirRequirement with a nested directory structure from another step
   job: v1.0/empty.json
   output:
@@ -1342,6 +1344,7 @@
       location: ya
       size: 0
   tool: v1.0/iwdr_with_nested_dirs.cwl
+
 - job: v1.0/bool-empty-inputbinding-job.json
   output: {
     "args": [
@@ -1349,6 +1352,7 @@
   }
   tool: v1.0/bool-empty-inputbinding.cwl
   doc: "Test that boolean flags do not appear on command line if inputBinding is empty and not null"
+
 - job: v1.0/empty.json
   output: {
     "args": []
@@ -1356,3 +1360,11 @@
   tool: v1.0/stage-unprovided-file.cwl
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
+
+- job: v1.0/array-of-strings-job.yml
+  output: {
+    "args": ["replacementValue"]
+  }
+  tool: v1.0/valueFrom-constant.cwl
+  doc: Test valueFrom with constant value overriding provided array inputs
+
