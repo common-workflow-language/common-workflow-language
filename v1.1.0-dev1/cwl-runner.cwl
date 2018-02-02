@@ -21,6 +21,12 @@ inputs:
    inputBinding:
     prefix: "--quiet"
 
+ version:
+   type: boolean?
+     doc: report the name & version, then quit without further processing
+     inputBinding:
+       prefix: "--version"
+
  processfile:
    type: File?
    doc: |
