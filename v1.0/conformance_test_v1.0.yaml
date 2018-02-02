@@ -462,6 +462,17 @@
   doc: |
     Test InitialWorkDirRequirement with expression in filename.
 
+- job: v1.0/string-job.json
+  output:
+    out:
+        class: File
+        checksum: sha1$6a47aa22b2a9d13a66a24b3ee5eaed95ce4753cf
+        location: example.conf
+        size: 16
+
+  tool: v1.0/iwdr-entry.cwl
+  doc: Test if trailing newline is present in file entry in InitialWorkDir
+
 - job: v1.0/wc-job.json
   output:
     output: 16
