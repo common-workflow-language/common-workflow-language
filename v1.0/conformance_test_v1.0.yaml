@@ -135,22 +135,29 @@
     output: 2
   doc: Testing the string 'null' does not trip up an Any with a default value.
 
-## TODO: Upgrade framework to allow specifying negative tests.
-# - job: v1.0/empty.json
-#   tool: v1.0/null-expression2-tool.cwl
-#   failure: true
-#   doc: Test Any without defaults can be unspecified.
+- job: v1.0/empty.json
+  tool: v1.0/null-expression2-tool.cwl
+  should_fail: true
+  doc: Test Any without defaults can be unspecified.
 
-# - job: v1.0/null-expression1-job.json
-#   tool: v1.0/null-expression2-tool.cwl
-#   failure: true
-#   doc: Test explicitly passing null to Any type without a default value.
+- job: v1.0/null-expression1-job.json
+  tool: v1.0/null-expression2-tool.cwl
+  should_fail: true
+  doc: Test explicitly passing null to Any type without a default value.
 
 - job: v1.0/null-expression2-job.json
   tool: v1.0/null-expression2-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any without a default value.
+
+- job: v1.0/any-type-job.json
+  tool: v1.0/any-type-compat.cwl
+  output:
+    output1: ["hello", "world"]
+    output2: ["foo", "bar"]
+    output3: hello
+  doc: Testing Any type compatibility in outputSource
 
 - job: v1.0/cat-job.json
   output:
