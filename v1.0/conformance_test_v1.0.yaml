@@ -1356,3 +1356,7 @@
   tool: v1.0/stage-unprovided-file.cwl
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
+- tool: v1.0/exit-success.cwl
+  doc: Test successCodes
+  job: v1.0/empty.json
+  output: {}
