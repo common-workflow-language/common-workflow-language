@@ -3,7 +3,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 inputs: []
-baseCommand: /bin/false
+baseCommand: "false"
 outputs: []
 
 successCodes: [ 1 ]
