@@ -1356,7 +1356,10 @@
   tool: v1.0/stage-unprovided-file.cwl
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
-
+- tool: v1.0/exit-success.cwl
+  doc: Test successCodes
+  job: v1.0/empty.json
+  output: {}
 - job: v1.0/dynresreq-job.json
   doc: Test simple workflow with a dynamic resource requirement
   tool: v1.0/dynresreq-workflow.cwl
@@ -1367,5 +1370,3 @@
         "class": "File",
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
-
-
