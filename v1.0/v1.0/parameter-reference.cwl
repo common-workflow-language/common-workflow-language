@@ -8,6 +8,6 @@ inputs:
   - id: parameter
     inputBinding:
       valueFrom: $(true)
-    type: string?
+    type: boolean?
 
 outputs: []
