@@ -1370,3 +1370,7 @@
         "class": "File",
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
+
+- job: v1.0/parameter-reference.cwl
+  tool: v1.0/empty.json
+  doc: Test errors similar to https://github.com/common-workflow-language/cwltool/issues/648 are fixed
