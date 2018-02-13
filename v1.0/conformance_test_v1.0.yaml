@@ -1090,7 +1090,7 @@
   doc: Test warning instead of error when default path is not found
 
 - output:
-    args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1']
+    args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1',-D]
   job: v1.0/empty.json
   tool: v1.0/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
