@@ -1383,6 +1383,13 @@
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
 
+- job: v1.0/empty-array-job.json
+  output: {
+    "args": []
+  }
+  tool: v1.0/empty-array-input.cwl
+  doc: "Test that empty array input does not add anything to command line" 
+
 - job: v1.0/empty.json
   tool: v1.0/steplevel-resreq.cwl
   doc: Test that ResourceRequirement on a step level redefines requirement on the workflow level
