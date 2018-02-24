@@ -212,6 +212,14 @@
     Test single step workflow with Scatter step and two data links connected to
     same input, flattened merge behavior
 
+- job: v1.0/count-lines6-job.json
+  output:
+    count_output: 32
+  tool: v1.0/count-lines13-wf.cwl
+  doc: |
+    Test that no MultipleInputFeatureRequirement is necessary when
+    workflow step source is a single-item list
+
 - job: v1.0/empty.json
   output: {count_output: 1}
   tool: v1.0/count-lines5-wf.cwl
