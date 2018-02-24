@@ -17,5 +17,4 @@ steps:
     in:
       file1:
         source: [file1]
-        linkMerge: merge_flattened
     out: [output]
