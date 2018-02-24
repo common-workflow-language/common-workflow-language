@@ -698,6 +698,14 @@
   doc: |
     Test optional output file and optional secondaryFile on output.
 
+
+- job: v1.0/empty.json
+  output: {
+    "out": "a string\n"
+  }
+  tool: v1.0/vf-concat.cwl
+  doc: Test that second expression in concatenated valueFrom is not ignored
+
 - job: v1.0/step-valuefrom-wf.json
   output: {count_output: 16}
   tool: v1.0/step-valuefrom-wf.cwl
