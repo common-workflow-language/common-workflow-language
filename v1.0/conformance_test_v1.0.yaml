@@ -873,15 +873,15 @@
         "listing": [
             {
               "class": "File",
-              "location": "hello.txt",
-                "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
-                "size": 13
-            },
-            {
-              "class": "File",
               "location": "goodbye.txt",
                 "checksum": "sha1$dd0a4c4c49ba43004d6611771972b6cf969c1c01",
                 "size": 24
+            },
+            {
+              "class": "File",
+              "location": "hello.txt",
+                "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
+                "size": 13
             }
         ],
     }
@@ -1300,7 +1300,6 @@
       size: 18
   tool: v1.0/cat3-nodocker.cwl
   doc: Test file literal as input without Docker
-
 - doc: Test that OutputBinding.glob is sorted as specified by POSIX
   job: v1.0/empty.json
   tool: v1.0/glob_test.cwl
@@ -1361,10 +1360,36 @@
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
 
+- tool: v1.0/exit-success.cwl
+  doc: Test successCodes
+  job: v1.0/empty.json
+  output: {}
+
+- job: v1.0/dynresreq-job.json
+  doc: Test simple workflow with a dynamic resource requirement
+  tool: v1.0/dynresreq-workflow.cwl
+  output:
+     cores: {
+        "location": "output",
+        "size": 2,
+        "class": "File",
+        "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
+     }
+
+- job: v1.0/empty.json
+  tool: v1.0/steplevel-resreq.cwl
+  doc: Test that ResourceRequirement on a step level redefines requirement on the workflow level
+  output:
+     out: {
+        "location": "cores.txt",
+        "size": 2,
+        "class": "File",
+        "checksum": "sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e"
+     }
+
 - job: v1.0/array-of-strings-job.yml
   output: {
     "args": ["replacementValue"]
   }
   tool: v1.0/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
-

@@ -1148,3 +1148,14 @@
   }
   tool: v1.1.0-dev1/shellchar2.cwl
   doc: "Test that shell directives are quoted."
+
+- job: v1.1.0-dev1/empty.json
+  tool: v1.1.0-dev1/steplevel-resreq.cwl
+  doc: Test that ResourceRequirement on a step level redefines requirement on the workflow level
+  output:
+     out: {
+        "location": "cores.txt",
+        "size": 2,
+        "class": "File",
+        "checksum": "sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e"
+     }
