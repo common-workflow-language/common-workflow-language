@@ -1356,6 +1356,7 @@
         location: z
         class: File
         size: 0
+
 - doc: Test InitialWorkDirRequirement with a nested directory structure from another step
   job: v1.0/empty.json
   output:
@@ -1415,3 +1416,10 @@
         "class": "File",
         "checksum": "sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e"
      }
+
+- job: v1.0/array-of-strings-job.yml
+  output: {
+    "args": ["replacementValue"]
+  }
+  tool: v1.0/valueFrom-constant.cwl
+  doc: Test valueFrom with constant value overriding provided array inputs
