@@ -1,7 +1,13 @@
 class: CommandLineTool
 cwlVersion: v1.0
+
 requirements:
-- class: InlineJavascriptRequirement
+  - class: InlineJavascriptRequirement
+
+hints:
+  - class: DockerRequirement
+    dockerPull: python:2-slim
+
 inputs:
   - id: array_input
     type:
@@ -9,7 +15,6 @@ inputs:
         items: string
     inputBinding:
       valueFrom: replacementValue
-
 
   - id: args.py
     type: File
@@ -22,4 +27,5 @@ inputs:
 outputs:
   - id: args
     type: string[]
+
 baseCommand: python
