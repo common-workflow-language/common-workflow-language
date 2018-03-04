@@ -926,8 +926,8 @@
 - job: v1.0/dir-job.yml
   output: {
     "outlist": {
-        "checksum": "sha1$907a866a3e0b7f1fc5a2222531c5fb9063704438",
-        "size": 33,
+        "checksum": "sha1$13cda8661796ae241da3a18668fb552161a72592",
+        "size": 20,
         "location": "output.txt",
         "class": "File"
     }

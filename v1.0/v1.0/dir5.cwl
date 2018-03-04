@@ -11,7 +11,7 @@ outputs:
     type: File
     outputBinding:
       glob: output.txt
-arguments: ["find", "-L", ".",
+arguments: ["find", "-L", ".", "!", "-path", "*.txt",
   {shellQuote: false, valueFrom: "|"},
   "sort"]
 stdout: output.txt
