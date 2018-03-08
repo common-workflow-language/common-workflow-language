@@ -10,7 +10,7 @@ Syntax:
 Options:
   -nT                   Run a specific test.
   -l                    List tests
-  -j J                  Specifies the number of tests to run simultaneously
+  -jJ                   Specifies the number of tests to run simultaneously
                         (defaults to one).
   --only-tools          Only test CommandLineTools
   --junit-xml=FILENAME  Store results in JUnit XML format using the given
