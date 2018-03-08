@@ -189,6 +189,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [BioExcel CoE](http://bioexcel.eu/)
 * [BD2K](https://commonfund.nih.gov/bd2k)
 * [EMBL Australia Bioinformatics Resource](https://www.embl-abr.org.au/)
+* [IBM Spectrum Computing](https://www.ibm.com/spectrum-computing)
 
 ## Individual Contributors
 
