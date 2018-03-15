@@ -1,3 +1,5 @@
 array_input:
-  - "item1"
-  - "item2"
+  - class: File
+    path: ./hello.txt
+  - class: File
+    path: ./hello.2.txt

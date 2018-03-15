@@ -12,7 +12,7 @@ inputs:
   - id: array_input
     type:
       - type: array
-        items: string
+        items: File
     inputBinding:
       valueFrom: replacementValue
 
