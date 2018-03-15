@@ -190,6 +190,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [BD2K](https://commonfund.nih.gov/bd2k)
 * [EMBL Australia Bioinformatics Resource](https://www.embl-abr.org.au/)
 * [IBM Spectrum Computing](https://www.ibm.com/spectrum-computing)
+* [DNAnexus](https://www.dnanexus.com/)
 
 ## Individual Contributors
 
@@ -231,6 +232,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
 * Brandi Davis Dusenbery, Seven Bridges Genomics, Inc.; https://orcid.org/0000-0001-7811-8613
 * Niels Drost, Netherland eScience Center; https://orcid.org/0000-0001-9795-7981
+* Geet Duggal, DNAnexus; 
 * Rob Finn, EMBL-EBI; https://orcid.org/0000-0001-8626-2148
 * Marc Fiume, DNAstack; https://orcid.org/0000-0002-9769-375X
 * Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
@@ -242,6 +244,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Tom Morris, Curoverse; https://orcid.org/0000-0003-0435-7851
 * Anton Nekrutenko, The Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-5987-8032
 * Brian O'Connor, University of California Santa Cruz; https://orcid.org/0000-0002-7681-6415
+* Nihar Sheth, DNAnexus; https://orcid.org/0000-0003-4128-4364
 * Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
 * James Taylor, Johns Hopkins University / Galaxy Project; https://orcid.org/0000-0001-5079-840X
 * Nebojša Tijanić, Seven Bridges
