@@ -232,7 +232,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
 * Brandi Davis Dusenbery, Seven Bridges Genomics, Inc.; https://orcid.org/0000-0001-7811-8613
 * Niels Drost, Netherland eScience Center; https://orcid.org/0000-0001-9795-7981
-* Geet Duggal, DNAnexus; 
+* Geet Duggal, DNAnexus; https://orcid.org/0000-0003-3485-359X
 * Rob Finn, EMBL-EBI; https://orcid.org/0000-0001-8626-2148
 * Marc Fiume, DNAstack; https://orcid.org/0000-0002-9769-375X
 * Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
