@@ -8,7 +8,8 @@
             "redirect": [],
             "brandlink": "../index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
+            "primtype": null,
+            "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {
@@ -24,7 +25,8 @@
             "redirect": [],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": "#CWLType"
+            "primtype": "#CWLType",
+            "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {
@@ -47,7 +49,8 @@
             ],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": "#CWLType"
+            "primtype": "#CWLType",
+            "extra": { "class": "File", "path": "empty" }
         },
         {
             "source": {$import: v1.0.0-metaschema.json},
@@ -61,7 +64,8 @@
             "redirect": [],
             "brandlink": "index.html",
             "brandimg": "<img src='../CWL-Logo-Header.png' style='height: 61px; margin-top: -20px; margin-left: -20px'></img>",
-            "primtype": null
+            "primtype": null,
+            "extra": { "class": "File", "path": "empty" }
         }
 
     ]

@@ -33,6 +33,7 @@ inputs:
   primtype:
     type: ["null", string]
     inputBinding: {prefix: "--primtype"}
+  extra: File
 outputs:
   out: stdout
   targetdir:
@@ -46,5 +47,9 @@ outputs:
           else
             return "";
         }
+  extra_out:
+    type: File
+    outputBinding:
+      outputEval: ${ return inputs.extra; }
 baseCommand: [python, "-mschema_salad.makedoc"]
 stdout: $(inputs.target)

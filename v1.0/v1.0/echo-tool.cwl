@@ -3,7 +3,7 @@
 class: CommandLineTool
 cwlVersion: v1.0
 inputs:
-  in:
+  text:
     type: Any
     inputBinding: {}
 outputs:
