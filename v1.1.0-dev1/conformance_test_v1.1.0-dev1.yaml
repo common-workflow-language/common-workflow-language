@@ -6,6 +6,7 @@
       example_human_Illumina.pe_1.fastq,
       example_human_Illumina.pe_2.fastq]
   doc: General test of command line generation
+  tags: [ required ]
 
 - output:
     args: [bwa, mem, chr20.fa,
@@ -15,6 +16,7 @@
   job: v1.1.0-dev1/bwa-mem-job.json
   tool: v1.1.0-dev1/binding-test.cwl
   doc: Test nested prefixes with arrays
+  tags: [ required ]
 
 - output:
     args: [tmap, mapall, stage1, map1, --min-seq-length, '20', map2, --min-seq-length,
@@ -23,18 +25,21 @@
   job: v1.1.0-dev1/tmap-job.json
   tool: v1.1.0-dev1/tmap-tool.cwl
   doc: Test nested command line bindings
+  tags: [ schema_def ]
 
 - output:
     args: [cat, hello.txt]
   job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/cat1-testcli.cwl
   doc: Test command line with optional input (missing)
+  tags: [ required ]
 
 - output:
     args: [cat, -n, hello.txt]
   job: v1.1.0-dev1/cat-n-job.json
   tool: v1.1.0-dev1/cat1-testcli.cwl
   doc: Test command line with optional input (provided)
+  tags: [ required ]
 
 - output:
     "foo": {
@@ -46,6 +51,7 @@
   job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/template-tool.cwl
   doc: Test InitialWorkDirRequirement ExpressionEngineRequirement.engineConfig feature
+  tags: [ initial_work_dir, inline_javascript ]
 
 - job: v1.1.0-dev1/cat-job.json
   output:
@@ -56,6 +62,7 @@
       size: 13
   tool: v1.1.0-dev1/cat3-tool.cwl
   doc: Test command execution in Docker with stdout redirection
+  tags: [ required ]
 
 - job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/cat3-tool-shortcut.cwl
@@ -66,6 +73,7 @@
       location: Any
       size: 13
   doc: Test command execution in Docker with simplified syntax stdout redirection
+  tags: [ required ]
 
 - job: v1.1.0-dev1/cat-job.json
   output:
@@ -76,6 +84,7 @@
       size: 13
   tool: v1.1.0-dev1/cat3-tool-mediumcut.cwl
   doc: Test command execution in Docker with stdout redirection
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/stderr.cwl
@@ -86,6 +95,7 @@
       checksum: sha1$f1d2d2f924e986ac86fdf7b36c94bcdf32beec15
       size: 4
       location: error.txt
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/stderr-shortcut.cwl
@@ -96,6 +106,7 @@
       checksum: sha1$f1d2d2f924e986ac86fdf7b36c94bcdf32beec15
       size: 4
       location: Any
+  tags: [ shell_command ]
 
 - output:
     output_file:
@@ -106,6 +117,7 @@
   job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/stderr-mediumcut.cwl
   doc: Test command line with stderr redirection, named brief syntax
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/cat-job.json
   output:
@@ -116,40 +128,58 @@
       size: 13
   tool: v1.1.0-dev1/cat4-tool.cwl
   doc: Test command execution in Docker with stdin and stdout redirection
+  tags: [ required ]
+
+- job: v1.1.0-dev1/wc-job.json
+  output:
+    output:
+      class: File
+      checksum: sha1$631bfbac524e2d04cdcc5ec33ade827fc10b06ae
+      location: output
+      size: 15
+  tool: v1.1.0-dev1/wc-tool-shortcut.cwl
+  doc: Test command execution in with stdin and stdout redirection using stdin shortcut
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/null-expression1-tool.cwl
   output:
     output: 1
   doc: Test default usage of Any in expressions.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/null-expression1-job.json
   tool: v1.1.0-dev1/null-expression1-tool.cwl
   output:
     output: 1
   doc: Test explicitly passing null to Any type inputs with default values.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/null-expression2-job.json
   tool: v1.1.0-dev1/null-expression1-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any with a default value.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/null-expression2-tool.cwl
   should_fail: true
   doc: Test Any without defaults can be unspecified.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/null-expression1-job.json
   tool: v1.1.0-dev1/null-expression2-tool.cwl
   should_fail: true
   doc: Test explicitly passing null to Any type without a default value.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/null-expression2-job.json
   tool: v1.1.0-dev1/null-expression2-tool.cwl
   output:
     output: 2
   doc: Testing the string 'null' does not trip up an Any without a default value.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/any-type-job.json
   tool: v1.1.0-dev1/any-type-compat.cwl
@@ -158,6 +188,7 @@
     output2: ["foo", "bar"]
     output3: hello
   doc: Testing Any type compatibility in outputSource
+  tags: [ required ]
 
 - job: v1.1.0-dev1/cat-job.json
   output:
@@ -168,32 +199,38 @@
       size: 13
   tool: v1.1.0-dev1/cat-tool.cwl
   doc: Test command execution in with stdin and stdout redirection
+  tags: [ required ]
 
 - job: v1.1.0-dev1/parseInt-job.json
   output: {output: 42}
   tool: v1.1.0-dev1/parseInt-tool.cwl
   doc: Test ExpressionTool with Docker-based expression engine
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {output: 16}
   tool: v1.1.0-dev1/wc2-tool.cwl
   doc: Test outputEval to transform output
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines1-wf.cwl
   doc: Test two step workflow with imported tools
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines2-wf.cwl
   doc: Test two step workflow with inline tools
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/count-lines3-job.json
   output:
     count_output: [16, 1]
   tool: v1.1.0-dev1/count-lines3-wf.cwl
   doc: Test single step workflow with Scatter step
+  tags: [ scatter, inline_javascript ]
 
 - job: v1.1.0-dev1/count-lines4-job.json
   output:
@@ -202,6 +239,7 @@
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, default merge behavior
+  tags: [ scatter, multiple_input, inline_javascript ]
 
 - job: v1.1.0-dev1/count-lines6-job.json
   output:
@@ -210,6 +248,7 @@
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, nested merge behavior
+  tags: [ scatter, multiple_input, inline_javascript ]
 
 - job: v1.1.0-dev1/count-lines6-job.json
   output:
@@ -218,6 +257,7 @@
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, flattened merge behavior
+  tags: [ multiple_input, inline_javascript ]
 
 - job: v1.1.0-dev1/count-lines6-job.json
   output:
@@ -226,21 +266,25 @@
   doc: |
     Test that no MultipleInputFeatureRequirement is necessary when
     workflow step source is a single-item list
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 1}
   tool: v1.1.0-dev1/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (missing)
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines5-wf.cwl
   doc: Test workflow with default value for input parameter (provided)
+  tags: [ inline_javacscript ]
 
 - job: v1.1.0-dev1/empty.json
   output: {default_output: workflow_default}
   tool: v1.1.0-dev1/echo-wf-default.cwl
   doc: Test that workflow defaults override tool defaults
+  tags: [ required ]
 
 - job: v1.1.0-dev1/env-job.json
   output:
@@ -251,71 +295,83 @@
       size: 15
   tool: v1.1.0-dev1/env-tool1.cwl
   doc: Test EnvVarRequirement
+  tags: [ env_var ]
 
 - job: v1.1.0-dev1/scatter-job1.json
   output:
     out: ["foo one", "foo two", "foo three", "foo four"]
   tool: v1.1.0-dev1/scatter-wf1.cwl
   doc: Test workflow scatter with single scatter parameter
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-job2.json
   output:
     out: [["foo one three", "foo one four"], ["foo two three", "foo two four"]]
   tool: v1.1.0-dev1/scatter-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-job2.json
   output:
     out: ["foo one three", "foo one four", "foo two three", "foo two four"]
   tool: "v1.1.0-dev1/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-job2.json
   output:
     out: ["foo one three", "foo two four"]
   tool: "v1.1.0-dev1/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-empty-job1.json
   output:
     out: []
   tool: v1.1.0-dev1/scatter-wf1.cwl
   doc: Test workflow scatter with single empty list parameter
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-empty-job2.json
   output:
     out: [[], []]
   tool: v1.1.0-dev1/scatter-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with second list empty
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-empty-job3.json
   output:
     out: []
   tool: "v1.1.0-dev1/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method with first list empty
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-empty-job2.json
   output:
     out: []
   tool: "v1.1.0-dev1/scatter-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters, one of which is empty and flat_crossproduct join method
+  tags: [ scatter ]
 
 - job: v1.1.0-dev1/scatter-empty-job4.json
   output:
     out: []
   tool: "v1.1.0-dev1/scatter-wf4.cwl#main"
   doc: Test workflow scatter with two empty scatter parameters and dotproduct join method
+  tags: [ scatter ]
 
 - tool: v1.1.0-dev1/echo-tool.cwl
   job: v1.1.0-dev1/env-job.json
   output:
     {"out": "hello test env\n"}
   doc: Test Any type input parameter
+  tags: [ required ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines8-wf.cwl
   doc: Test nested workflow
+  tags: [ subworkflow ]
 
 - job: v1.1.0-dev1/env-job.json
   output:
@@ -326,6 +382,7 @@
       size: 15
   tool: v1.1.0-dev1/env-wf1.cwl
   doc: Test requirement priority
+  tags: [ env_var ]
 
 - job: v1.1.0-dev1/env-job.json
   output:
@@ -336,6 +393,7 @@
       size: 9
   tool: v1.1.0-dev1/env-wf2.cwl
   doc: Test requirements override hints
+  tags: [ env_var ]
 
 - job: v1.1.0-dev1/env-job.json
   output:
@@ -346,26 +404,31 @@
       size: 9
   tool: v1.1.0-dev1/env-wf3.cwl
   doc: Test requirements on workflow steps
+  tags: [ env_var ]
 
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines9-wf.cwl
   doc: Test default value on step input parameter
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/empty.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines11-wf.cwl
   doc: Test use default value on step input parameter with empty source
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/file1-null.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines11-wf.cwl
   doc: Test use default value on step input parameter with null source
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/cat-job.json
   output: {count_output: 1}
   tool: v1.1.0-dev1/count-lines11-wf.cwl
   doc: Test default value on step input parameter overridden by provided source
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/revsort-job.json
   output:
@@ -376,6 +439,7 @@
       size: 1111
   tool: v1.1.0-dev1/revsort.cwl
   doc: Test simple workflow
+  tags: [ required ]
 
 - job: v1.1.0-dev1/cat-job.json
   output:
@@ -386,6 +450,7 @@
       size: 13
   tool: v1.1.0-dev1/cat5-tool.cwl
   doc: Test unknown hints are ignored.
+  tags: [ required ]
 
 - job: v1.1.0-dev1/search-job.json
   output:
@@ -465,6 +530,7 @@
   doc: |
     Test InitialWorkDirRequirement linking input files and capturing secondaryFiles
     on input and output.
+  tags: [ initial_work_dir, inline_javascript ]
 
 - job: v1.1.0-dev1/rename-job.json
   output:
@@ -476,6 +542,7 @@
   tool: v1.1.0-dev1/rename.cwl
   doc: |
     Test InitialWorkDirRequirement with expression in filename.
+  tags: [ initial_work_dir ]
 
 - job: v1.1.0-dev1/wc-job.json
   output:
@@ -483,6 +550,7 @@
   tool: v1.1.0-dev1/wc4-tool.cwl
   doc: |
     Test inline expressions
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/schemadef-job.json
   output:
@@ -494,6 +562,7 @@
   tool: v1.1.0-dev1/schemadef-tool.cwl
   doc: |
     Test SchemaDefRequirement definition used in tool parameter
+  tags: [ schema_def, inline_javascript ]
 
 - job: v1.1.0-dev1/schemadef-job.json
   output:
@@ -505,6 +574,7 @@
   tool: v1.1.0-dev1/schemadef-wf.cwl
   doc: |
     Test SchemaDefRequirement definition used in workflow parameter
+  tags: [ schema_def ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -582,6 +652,7 @@
   tool: v1.1.0-dev1/params.cwl
   doc: |
     Test parameter evaluation, no support for JS expressions
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -659,11 +730,13 @@
   tool: v1.1.0-dev1/params2.cwl
   doc: |
     Test parameter evaluation, with support for JS expressions
+  tags: [ inline_javascript ]
 
 - output: {}
   job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/metadata.cwl
   doc: Test metadata
+  tags: [ required ]
 
 - job: v1.1.0-dev1/formattest-job.json
   output:
@@ -676,6 +749,7 @@
   tool: v1.1.0-dev1/formattest.cwl
   doc: |
     Test simple format checking.
+  tags: [ required ]
 
 - job: v1.1.0-dev1/formattest2-job.json
   output:
@@ -688,6 +762,7 @@
   tool: v1.1.0-dev1/formattest2.cwl
   doc: |
     Test format checking against ontology using subclassOf.
+  tags: [ required ]
 
 - job: v1.1.0-dev1/formattest2-job.json
   output:
@@ -700,6 +775,7 @@
   tool: v1.1.0-dev1/formattest3.cwl
   doc: |
     Test format checking against ontology using equivalentClass.
+  tags: [ required ]
 
 - tool: v1.1.0-dev1/optional-output.cwl
   job: v1.1.0-dev1/cat-job.json
@@ -712,6 +788,7 @@
         checksum: "sha1$47a013e660d408619d894b20806b1d5086aab03b"
   doc: |
     Test optional output file and optional secondaryFile on output.
+  tags: [ docker ]
 
 
 - job: v1.1.0-dev1/empty.json
@@ -720,21 +797,25 @@
   }
   tool: v1.1.0-dev1/vf-concat.cwl
   doc: Test that second expression in concatenated valueFrom is not ignored
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/step-valuefrom-wf.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/step-valuefrom-wf.cwl
   doc: Test valueFrom on workflow step.
+  tags: [ step_input, inline_javascript ]
 
 - job: v1.1.0-dev1/step-valuefrom-job.json
   output: {val: "3\n"}
   tool: v1.1.0-dev1/step-valuefrom2-wf.cwl
   doc: Test valueFrom on workflow step with multiple sources
+  tags: [ step_input, inline_javascript, multiple_input ]
 
 - job: v1.1.0-dev1/step-valuefrom-job.json
   output: {val: "3\n"}
   tool: v1.1.0-dev1/step-valuefrom3-wf.cwl
   doc: Test valueFrom on workflow step referencing other inputs
+  tags: [ step_input, inline_javascript ]
 
 - job: v1.1.0-dev1/record-output-job.json
   output:
@@ -754,6 +835,7 @@
     }
   tool: v1.1.0-dev1/record-output.cwl
   doc: Test record type output binding.
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -768,6 +850,7 @@
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
     and just 'path' is provided.
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -782,6 +865,7 @@
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
     and just 'location' is provided.
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/abc.json
   output:
@@ -805,36 +889,42 @@
     }]
   tool: v1.1.0-dev1/glob-expr-list.cwl
   doc: Test support for returning multiple glob patterns from expression
+  tags: [ required ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job1.json
   output:
     out: ["foo one one", "foo one two", "foo one three", "foo one four"]
   tool: v1.1.0-dev1/scatter-valuefrom-wf1.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job2.json
   output:
     out: [["foo one one three", "foo one one four"], ["foo one two three", "foo one two four"]]
   tool: v1.1.0-dev1/scatter-valuefrom-wf2.cwl
   doc: Test workflow scatter with two scatter parameters and nested_crossproduct join method and valueFrom on step input
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one one four", "foo one two three", "foo one two four"]
   tool: "v1.1.0-dev1/scatter-valuefrom-wf3.cwl#main"
   doc: Test workflow scatter with two scatter parameters and flat_crossproduct join method and valueFrom on step input
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job2.json
   output:
     out: ["foo one one three", "foo one two four"]
   tool: "v1.1.0-dev1/scatter-valuefrom-wf4.cwl#main"
   doc: Test workflow scatter with two scatter parameters and dotproduct join method and valueFrom on step input
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job1.json
   output:
     out: ["foo one one", "foo two two", "foo three three", "foo four four"]
   tool: v1.1.0-dev1/scatter-valuefrom-wf5.cwl
   doc: Test workflow scatter with single scatter parameter and valueFrom on step input
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/scatter-valuefrom-job3.json
   tool: v1.1.0-dev1/scatter-valuefrom-wf6.cwl
@@ -854,6 +944,7 @@
             "size": 16
         }
     ]
+  tags: [ scatter, step_input ]
 
 - job: v1.1.0-dev1/conflict-job.json
   output: {
@@ -866,6 +957,7 @@
   }
   tool: "v1.1.0-dev1/conflict-wf.cwl#collision"
   doc: Test workflow two input files with same name.
+  tags: [ required ]
 
 - job: v1.1.0-dev1/dir-job.yml
   output:
@@ -877,6 +969,7 @@
     }
   tool: v1.1.0-dev1/dir.cwl
   doc: Test directory input with parameter reference
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/dir-job.yml
   output:
@@ -888,6 +981,7 @@
     }
   tool: v1.1.0-dev1/dir2.cwl
   doc: Test directory input in Docker
+  tags: [ required ]
 
 - job: v1.1.0-dev1/dir3-job.yml
   output:
@@ -910,6 +1004,7 @@
     }
   tool: v1.1.0-dev1/dir3.cwl
   doc: Test directory output
+  tags: [ required ]
 
 - job: v1.1.0-dev1/dir4-job.yml
   output: {
@@ -922,6 +1017,7 @@
   }
   tool: v1.1.0-dev1/dir4.cwl
   doc: Test directories in secondaryFiles
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/dir-job.yml
   output: {
@@ -934,6 +1030,7 @@
   }
   tool: v1.1.0-dev1/dir5.cwl
   doc: Test dynamic initial work dir
+  tags: [ shell_command, initial_work_dir ]
 
 - job: v1.1.0-dev1/stagefile-job.yml
   output: {
@@ -946,6 +1043,7 @@
   }
   tool: v1.1.0-dev1/stagefile.cwl
   doc: Test writable staged files.
+  tags: [ initial_work_dir ]
 
 - job: v1.1.0-dev1/file-literal.yml
   output:
@@ -956,6 +1054,7 @@
       size: 18
   tool: v1.1.0-dev1/cat3-tool.cwl
   doc: Test file literal as input
+  tags: [ required ]
 
 - job: v1.1.0-dev1/arguments-job.yml
   output:
@@ -966,6 +1065,7 @@
         size: 184
   tool: v1.1.0-dev1/linkfile.cwl
   doc: Test expression in InitialWorkDir listing
+  tags: [ inline_javascript, initial_work_dir ]
 
 - job: v1.1.0-dev1/wc-job.json
   output:
@@ -976,6 +1076,7 @@
         size: 21
   tool: v1.1.0-dev1/nameroot.cwl
   doc: Test nameroot/nameext expression in arguments, stdout
+  tags: [ required ]
 
 - job: v1.1.0-dev1/dir-job.yml
   output:
@@ -987,6 +1088,7 @@
     }
   tool: v1.1.0-dev1/dir6.cwl
   doc: Test directory input with inputBinding
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/nested-array-job.yml
   output:
@@ -997,16 +1099,19 @@
         size: 2
   tool: v1.1.0-dev1/nested-array.cwl
   doc: Test command line generation of array-of-arrays
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   output: {}
   tool: v1.1.0-dev1/envvar.cwl
   doc: Test $HOME and $TMPDIR are set correctly
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   output: {}
   tool: v1.1.0-dev1/envvar2.cwl
   doc: Test $HOME and $TMPDIR are set correctly in Docker
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1018,6 +1123,7 @@
     }
   tool: "v1.1.0-dev1/js-expr-req-wf.cwl#wf"
   doc: Test that expressionLib requirement of individual tool step overrides expressionLib of workflow.
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/initialworkdirrequirement-docker-out-job.json
   output:
@@ -1034,11 +1140,13 @@
       "size": 12010
   tool: v1.1.0-dev1/initialworkdirrequirement-docker-out.cwl
   doc: Test output of InitialWorkDir
+  tags: [ docker, initial_work_dir ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {count_output: 16}
   tool: v1.1.0-dev1/count-lines10-wf.cwl
   doc: Test embedded subworkflow
+  tags: [ subworkflow ]
 
 - job: v1.1.0-dev1/docker-array-secondaryfiles-job.json
   output: {
@@ -1051,6 +1159,7 @@
   }
   tool: v1.1.0-dev1/docker-array-secondaryfiles.cwl
   doc: Test secondaryFiles on array of files.
+  tags: [ docker, inline_javascript, shell_command ]
 
 - job: v1.1.0-dev1/dir7.yml
   output: {
@@ -1075,6 +1184,7 @@
   }
   tool: v1.1.0-dev1/dir7.cwl
   doc: Test directory literal output created by ExpressionTool
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1085,6 +1195,7 @@
       size: 19
   tool: v1.1.0-dev1/file-literal-ex.cwl
   doc: Test file literal output created by ExpressionTool
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1096,6 +1207,7 @@
     }
   tool: v1.1.0-dev1/docker-output-dir.cwl
   doc: Test dockerOutputDirectory
+  tags: [ docker ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1106,17 +1218,20 @@
       size: 15
   tool: v1.1.0-dev1/imported-hint.cwl
   doc: Test hints with $import
+  tags: [ required ]
 
 - output: {}
   job: v1.1.0-dev1/default_path_job.yml
   tool: v1.1.0-dev1/default_path.cwl
   doc: Test warning instead of error when default path is not found
+  tags: [ required ]
 
 - output:
     args: [-A,'2',-B,baz,-C,'10','9','8','7','6','5','4','3','2','1']
   job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/inline-js.cwl
   doc: Test InlineJavascriptRequirement with multiple expressions in the same tool
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/recursive-input-directory.yml
   output:
@@ -1170,18 +1285,21 @@
       }
   tool: v1.1.0-dev1/recursive-input-directory.cwl
   doc: Test if a writable input directory is recursivly copied and writable
+  tags: [ inline_javascript, initial_work_dir, shell_command ]
 
 - output:
     out: "t\n"
   job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/null-defined.cwl
   doc: Test that missing parameters are null (not undefined) in expression
+  tags: [ inline_javascript ]
 
 - output:
     out: "f\n"
   job: v1.1.0-dev1/cat-job.json
   tool: v1.1.0-dev1/null-defined.cwl
   doc: Test that provided parameter is not null in expression
+  tags: [ inline_javascript ]
 
 - job: v1.1.0-dev1/revsort-job.json
   output:
@@ -1192,6 +1310,7 @@
       size: 1111
   tool: v1.1.0-dev1/revsort-packed.cwl#main
   doc: Test compound workflow document
+  tags: [ required ]
 
 - job: v1.1.0-dev1/basename-fields-job.yml
   output:
@@ -1209,11 +1328,13 @@
       path: Any
   tool: v1.1.0-dev1/basename-fields-test.cwl
   doc: Test that nameroot and nameext are generated from basename at execution time by the runner
+  tags: [ step_input_expression ]
 
 - job: v1.1.0-dev1/wc-job.json
   output: {}
   tool: v1.1.0-dev1/initialwork-path.cwl
   doc: Test that file path in $(inputs) for initialworkdir is in $(outdir).
+  tags: [ initial_work_dir ]
 
 - job: v1.1.0-dev1/count-lines6-job.json
   output:
@@ -1222,12 +1343,14 @@
   doc: |
     Test single step workflow with Scatter step and two data links connected to
     same input, flattened merge behavior. Workflow inputs are set as list
+  tags: [ multiple_input, inline_javascript ]
 
 - job: v1.1.0-dev1/sum-job.json
   output:
     result: 12
   tool: v1.1.0-dev1/sum-wf.cwl
   doc: Test step input with multiple sources with multiple types
+  tags: [ step_input, inline_javascript, multiple_input ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -1246,6 +1369,7 @@
   }
   tool: v1.1.0-dev1/shellchar.cwl
   doc: "Test that shell directives are not interpreted."
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -1264,6 +1388,7 @@
   }
   tool: v1.1.0-dev1/shellchar2.cwl
   doc: "Test that shell directives are quoted."
+  tags: [ shell_command ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1283,6 +1408,7 @@
     }
   tool: v1.1.0-dev1/writable-dir.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement
+  tags: [ inline_javascript, initial_work_dir ]
 
 - job: v1.1.0-dev1/empty.json
   output:
@@ -1302,6 +1428,7 @@
     }
   tool: v1.1.0-dev1/writable-dir-docker.cwl
   doc: Test empty writable dir with InitialWorkDirRequirement inside Docker
+  tags: [ inline_javascript, initial_work_dir ]
 
 - job: v1.1.0-dev1/dynresreq-job.json
   tool: v1.1.0-dev1/dynresreq.cwl
@@ -1313,6 +1440,7 @@
         "class": "File",
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
+  tags: [ resource ]
 
 - job: v1.1.0-dev1/file-literal.yml
   output:
@@ -1323,6 +1451,8 @@
       size: 18
   tool: v1.1.0-dev1/cat3-nodocker.cwl
   doc: Test file literal as input without Docker
+  tags: [ required ]
+
 - doc: Test that OutputBinding.glob is sorted as specified by POSIX
   job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/glob_test.cwl
@@ -1356,6 +1486,7 @@
         location: z
         class: File
         size: 0
+  tags: [ required ]
 
 - doc: Test InitialWorkDirRequirement with a nested directory structure from another step
   job: v1.1.0-dev1/empty.json
@@ -1366,6 +1497,7 @@
       location: ya
       size: 0
   tool: v1.1.0-dev1/iwdr_with_nested_dirs.cwl
+  tags: [ initial_work_dir ]
 
 - job: v1.1.0-dev1/bool-empty-inputbinding-job.json
   output: {
@@ -1374,6 +1506,7 @@
   }
   tool: v1.1.0-dev1/bool-empty-inputbinding.cwl
   doc: "Test that boolean flags do not appear on command line if inputBinding is empty and not null"
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   output: {
@@ -1382,11 +1515,13 @@
   tool: v1.1.0-dev1/stage-unprovided-file.cwl
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
+  tags: [ inline_javascript ]
 
 - tool: v1.1.0-dev1/exit-success.cwl
   doc: Test successCodes
   job: v1.1.0-dev1/empty.json
   output: {}
+  tags: [ required ]
 
 - job: v1.1.0-dev1/dynresreq-job.json
   doc: Test simple workflow with a dynamic resource requirement
@@ -1398,6 +1533,7 @@
         "class": "File",
         "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
      }
+  tags: [ resource ]
 
 - job: v1.1.0-dev1/empty-array-job.json
   output: {
@@ -1405,6 +1541,7 @@
   }
   tool: v1.1.0-dev1/empty-array-input.cwl
   doc: "Test that empty array input does not add anything to command line"
+  tags: [ required ]
 
 - job: v1.1.0-dev1/empty.json
   tool: v1.1.0-dev1/steplevel-resreq.cwl
@@ -1416,6 +1553,7 @@
         "class": "File",
         "checksum": "sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e"
      }
+  tags: [ resource ]
 
 - job: v1.1.0-dev1/array-of-strings-job.yml
   output: {
@@ -1423,3 +1561,4 @@
   }
   tool: v1.1.0-dev1/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
+  tags: [ inline_javascript ]
