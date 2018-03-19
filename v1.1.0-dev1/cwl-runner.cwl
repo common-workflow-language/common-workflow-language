@@ -47,9 +47,12 @@ baseCommand: cwl-runner
 outputs:
   log: stderr
   output_object_document: stdout  # in the CWL Output Object Document format
+  format: iana:application/json
 
 successCodes:
  - 0  # success
 
 permanentFailCodes:
   - 33 # failure due to unimplemented feature
+
+$namespaces: { iana: https://www.iana.org/assignments/media-types/ }
