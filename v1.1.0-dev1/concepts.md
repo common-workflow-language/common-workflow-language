@@ -376,11 +376,7 @@ document that should be executed using the fields of the input object as
 input parameters.
 
 The `cwl-runner` interface is required for conformance testing and is
-documented in [cwl-runner.cwl](cwl-runner.cwl) which is reproduced below:
-
-<pre>
-$include: cwl-runner.cwl
-</pre>
+documented in [cwl-runner.cwl](cwl-runner.cwl).
 
 ## Discovering CWL documents on a local filesystem
 

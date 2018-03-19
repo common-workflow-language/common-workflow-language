@@ -94,7 +94,7 @@ steps:
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
       dirs:
-        source: [docs/targetdir, rdfs/targetdir, context/targetdir, empty]
+        source: [docs/targetdir, rdfs/targetdir, context/targetdir, empty, docs/targetdir]
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
     out: [dir]
