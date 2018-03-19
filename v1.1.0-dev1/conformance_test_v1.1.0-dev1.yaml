@@ -1562,3 +1562,15 @@
   tool: v1.1.0-dev1/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
   tags: [ inline_javascript ]
+
+- job: v1.1.0-dev1/record-secondaryFiles-job.yml
+  output: {}
+  tool: v1.1.0-dev1/record-secondaryFiles.cwl
+  doc: Test secondaryFiles on anonymous record fields
+  tags: [ required ]
+
+- job: v1.1.0-dev1/record-secondaryFiles-job.yml
+  output: {}
+  tool: v1.1.0-dev1/record-secondaryFiles-sd.cwl
+  doc: Test secondaryFiles on SchemaDefRequirement record fields
+  tags: [ required ]
