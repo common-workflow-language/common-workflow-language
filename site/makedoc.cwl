@@ -47,7 +47,7 @@ outputs:
           else
             return "";
         }
-  extra:
+  extra_out:
     type: File
     outputBinding:
       outputEval: ${ return inputs.extra; }

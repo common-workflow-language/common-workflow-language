@@ -81,7 +81,7 @@ steps:
       brand: { valueFrom: $(inputs.render.brandimg) }
       primtype: { valueFrom: $(inputs.render.primtype) }
       extra: { valueFrom: $(inputs.render.extra) }
-    out: [out, targetdir, extra]
+    out: [out, targetdir, extra_out]
     run:  makedoc.cwl
 
   merge:
@@ -90,7 +90,7 @@ steps:
         source: docs/out
         valueFrom: $(self[0])
       secondary:
-        source: [docs/out, rdfs/out, context/out, brandimg, docs/extra]
+        source: [docs/out, rdfs/out, context/out, brandimg, docs/extra_out]
         linkMerge: merge_flattened
         valueFrom: $(self.slice(1))
       dirs:
