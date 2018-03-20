@@ -1,0 +1,649 @@
+[
+    {
+        "name": "https://w3id.org/cwl/salad#Semantic_Annotations_for_Linked_Avro_Data",
+        "type": "documentation",
+        "doc": [
+            "# Semantic Annotations for Linked Avro Data (SALAD)\n\nAuthor:\n\n* Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse\n\nContributors:\n\n* The developers of Apache Avro\n* The developers of JSON-LD\n* Neboj\u0161a Tijani\u0107 <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics\n\n# Abstract\n\nSalad is a schema language for describing structured linked data documents\nin JSON or YAML documents.  A Salad schema provides rules for\npreprocessing, structural validation, and link checking for documents\ndescribed by a Salad schema.  Salad builds on JSON-LD and the Apache Avro\ndata serialization system, and extends Avro with features for rich data\nmodeling such as inheritance, template specialization, object identifiers,\nand object references.  Salad was developed to provide a bridge between the\nrecord oriented data modeling supported by Apache Avro and the Semantic\nWeb.\n\n# Status of This Document\n\nThis document is the product of the [Common Workflow Language working\ngroup](https://groups.google.com/forum/#!forum/common-workflow-language).  The\nlatest version of this document is available in the \"schema_salad\" repository at\n\nhttps://github.com/common-workflow-language/schema_salad\n\nThe products of the CWL working group (including this document) are made available\nunder the terms of the Apache License, version 2.0.\n\n<!--ToC-->\n\n# Introduction\n\nThe JSON data model is an extremely popular way to represent structured\ndata.  It is attractive because of its relative simplicity and is a\nnatural fit with the standard types of many programming languages.\nHowever, this simplicity means that basic JSON lacks expressive features\nuseful for working with complex data structures and document formats, such\nas schemas, object references, and namespaces.\n\nJSON-LD is a W3C standard providing a way to describe how to interpret a\nJSON document as Linked Data by means of a \"context\".  JSON-LD provides a\npowerful solution for representing object references and namespaces in JSON\nbased on standard web URIs, but is not itself a schema language.  Without a\nschema providing a well defined structure, it is difficult to process an\narbitrary JSON-LD document as idiomatic JSON because there are many ways to\nexpress the same data that are logically equivalent but structurally\ndistinct.\n\nSeveral schema languages exist for describing and validating JSON data,\nsuch as the Apache Avro data serialization system, however none understand\nlinked data.  As a result, to fully take advantage of JSON-LD to build the\nnext generation of linked data applications, one must maintain separate\nJSON schema, JSON-LD context, RDF schema, and human documentation, despite\nsignificant overlap of content and obvious need for these documents to stay\nsynchronized.\n\nSchema Salad is designed to address this gap.  It provides a schema\nlanguage and processing rules for describing structured JSON content\npermitting URI resolution and strict document validation.  The schema\nlanguage supports linked data through annotations that describe the linked\ndata interpretation of the content, enables generation of JSON-LD context\nand RDF schema, and production of RDF triples by applying the JSON-LD\ncontext.  The schema language also provides for robust support of inline\ndocumentation.\n\n## Introduction to v1.0\n\nThis is the second version of of the Schema Salad specification.  It is\ndeveloped concurrently with v1.0 of the Common Workflow Language for use in\nspecifying the Common Workflow Language, however Schema Salad is intended to be\nuseful to a broader audience.  Compared to the draft-1 schema salad\nspecification, the following changes have been made:\n\n* Use of [mapSubject and mapPredicate](#Identifier_maps) to transform maps to lists of records.\n* Resolution of the [domain Specific Language for types](#Domain_Specific_Language_for_types)\n* Consolidation of the formal [schema into section 5](#Schema).\n\n## References to Other Specifications\n\n**Javascript Object Notation (JSON)**: http://json.org\n\n**JSON Linked Data (JSON-LD)**: http://json-ld.org\n\n**YAML**: http://yaml.org\n\n**Avro**: https://avro.apache.org/docs/current/spec.html\n\n**Uniform Resource Identifier (URI) Generic Syntax**: https://tools.ietf.org/html/rfc3986)\n\n**Resource Description Framework (RDF)**: http://www.w3.org/RDF/\n\n**UTF-8**: https://www.ietf.org/rfc/rfc2279.txt)\n\n## Scope\n\nThis document describes the syntax, data model, algorithms, and schema\nlanguage for working with Salad documents.  It is not intended to document\na specific implementation of Salad, however it may serve as a reference for\nthe behavior of conforming implementations.\n\n## Terminology\n\nThe terminology used to describe Salad documents is defined in the Concepts\nsection of the specification. The terms defined in the following list are\nused in building those definitions and in describing the actions of an\nSalad implementation:\n\n**may**: Conforming Salad documents and Salad implementations are permitted but\nnot required to be interpreted as described.\n\n**must**: Conforming Salad documents and Salad implementations are required\nto be interpreted as described; otherwise they are in error.\n\n**error**: A violation of the rules of this specification; results are\nundefined. Conforming implementations may detect and report an error and may\nrecover from it.\n\n**fatal error**: A violation of the rules of this specification; results\nare undefined. Conforming implementations must not continue to process the\ndocument and may report an error.\n\n**at user option**: Conforming software may or must (depending on the modal verb in\nthe sentence) behave as described; if it does, it must provide users a means to\nenable or disable the behavior described.\n\n# Document model\n\n## Data concepts\n\nAn **object** is a data structure equivalent to the \"object\" type in JSON,\nconsisting of a unordered set of name/value pairs (referred to here as\n**fields**) and where the name is a string and the value is a string, number,\nboolean, array, or object.\n\nA **document** is a file containing a serialized object, or an array of\nobjects.\n\nA **document type** is a class of files that share a common structure and\nsemantics.\n\nA **document schema** is a formal description of the grammar of a document type.\n\nA **base URI** is a context-dependent URI used to resolve relative references.\n\nAn **identifier** is a URI that designates a single document or single\nobject within a document.\n\nA **vocabulary** is the set of symbolic field names and enumerated symbols defined\nby a document schema, where each term maps to absolute URI.\n\n## Syntax\n\nConforming Salad documents are serialized and loaded using YAML syntax and\nUTF-8 text encoding.  Salad documents are written using the JSON-compatible\nsubset of YAML.  Features of YAML such as headers and type tags that are\nnot found in the standard JSON data model must not be used in conforming\nSalad documents.  It is a fatal error if the document is not valid YAML.\n\nA Salad document must consist only of either a single root object or an\narray of objects.\n\n## Document context\n\n### Implied context\n\nThe implicit context consists of the vocabulary defined by the schema and\nthe base URI.  By default, the base URI must be the URI that was used to\nload the document.  It may be overridden by an explicit context.\n\n### Explicit context\n\nIf a document consists of a root object, this object may contain the\nfields `$base`, `$namespaces`, `$schemas`, and `$graph`:\n\n  * `$base`: Must be a string.  Set the base URI for the document used to\n    resolve relative references.\n\n  * `$namespaces`: Must be an object with strings as values.  The keys of\n    the object are namespace prefixes used in the document; the values of\n    the object are the prefix expansions.\n\n  * `$schemas`: Must be an array of strings.  This field may list URI\n    references to documents in RDF-XML format which will be queried for RDF\n    schema data.  The subjects and predicates described by the RDF schema\n    may provide additional semantic context for the document, and may be\n    used for validation of prefixed extension fields found in the document.\n\nOther directives beginning with `$` must be ignored.\n\n## Document graph\n\nIf a document consists of a single root object, this object may contain the\nfield `$graph`.  This field must be an array of objects.  If present, this\nfield holds the primary content of the document.  A document that consists\nof array of objects at the root is an implicit graph.\n\n## Document metadata\n\nIf a document consists of a single root object, metadata about the\ndocument, such as authorship, may be declared in the root object.\n\n## Document schema\n\nDocument preprocessing, link validation and schema validation require a\ndocument schema.  A schema may consist of:\n\n  * At least one record definition object which defines valid fields that\n  make up a record type.  Record field definitions include the valid types\n  that may be assigned to each field and annotations to indicate fields\n  that represent identifiers and links, described below in \"Semantic\n  Annotations\".\n\n  * Any number of enumerated type objects which define a set of finite set of symbols that are\n  valid value of the type.\n\n  * Any number of documentation objects which allow in-line documentation of the schema.\n\nThe schema for defining a salad schema (the metaschema) is described in\ndetail in \"Schema validation\".\n\n### Record field annotations\n\nIn a document schema, record field definitions may include the field\n`jsonldPredicate`, which may be either a string or object.  Implementations\nmust use the following document preprocessing of fields by the following\nrules:\n\n  * If the value of `jsonldPredicate` is `@id`, the field is an identifier\n  field.\n\n  * If the value of `jsonldPredicate` is an object, and contains that\n  object contains the field `_type` with the value `@id`, the field is a\n  link field.\n\n  * If the value of `jsonldPredicate` is an object, and contains that\n  object contains the field `_type` with the value `@vocab`, the field is a\n  vocabulary field, which is a subtype of link field.\n\n## Document traversal\n\nTo perform document document preprocessing, link validation and schema\nvalidation, the document must be traversed starting from the fields or\narray items of the root object or array and recursively visiting each child\nitem which contains an object or arrays.\n\n# Document preprocessing\n\nAfter processing the explicit context (if any), document preprocessing\nbegins.  Starting from the document root, object fields values or array\nitems which contain objects or arrays are recursively traversed\ndepth-first.  For each visited object, field names, identifier fields, link\nfields, vocabulary fields, and `$import` and `$include` directives must be\nprocessed as described in this section.  The order of traversal of child\nnodes within a parent node is undefined.\n",
+            "## Field name resolution\n\nThe document schema declares the vocabulary of known field names.  During\npreprocessing traversal, field name in the document which are not part of\nthe schema vocabulary must be resolved to absolute URIs.  Under \"strict\"\nvalidation, it is an error for a document to include fields which are not\npart of the vocabulary and not resolvable to absolute URIs.  Fields names\nwhich are not part of the vocabulary are resolved using the following\nrules:\n\n* If an field name URI begins with a namespace prefix declared in the\ndocument context (`@context`) followed by a colon `:`, the prefix and\ncolon must be replaced by the namespace declared in `@context`.\n\n* If there is a vocabulary term which maps to the URI of a resolved\nfield, the field name must be replace with the vocabulary term.\n\n* If a field name URI is an absolute URI consisting of a scheme and path\nand is not part of the vocabulary, no processing occurs.\n\nField name resolution is not relative.  It must not be affected by the\nbase URI.\n\n### Field name resolution example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$namespaces\": {\n    \"acid\": \"http://example.com/acid#\"\n  },\n  \"$graph\": [{\n    \"name\": \"ExampleType\",\n    \"type\": \"record\",\n    \"fields\": [{\n      \"name\": \"base\",\n      \"type\": \"string\",\n      \"jsonldPredicate\": \"http://example.com/base\"\n    }]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "    {\n      \"base\": \"one\",\n      \"form\": {\n        \"http://example.com/base\": \"two\",\n        \"http://example.com/three\": \"three\",\n      },\n      \"acid:four\": \"four\"\n    }\n",
+            "```\n\nThis becomes:\n\n```\n",
+            "    {\n      \"base\": \"one\",\n      \"form\": {\n        \"base\": \"two\",\n        \"http://example.com/three\": \"three\",\n      },\n      \"http://example.com/acid#four\": \"four\"\n    }\n",
+            "```\n",
+            "## Identifier resolution\n\nThe schema may designate one or more fields as identifier fields to identify\nspecific objects.  Processing must resolve relative identifiers to absolute\nidentifiers using the following rules:\n\n  * If an identifier URI is prefixed with `#` it is a URI relative\n    fragment identifier.  It is resolved relative to the base URI by setting\n    or replacing the fragment portion of the base URI.\n\n  * If an identifier URI does not contain a scheme and is not prefixed `#` it\n    is a parent relative fragment identifier.  It is resolved relative to the\n    base URI by the following rule: if the base URI does not contain a\n    document fragment, set the fragment portion of the base URI.  If the base\n    URI does contain a document fragment, append a slash `/` followed by the\n    identifier field to the fragment portion of the base URI.\n\n  * If an identifier URI begins with a namespace prefix declared in\n    `$namespaces` followed by a colon `:`, the prefix and colon must be\n    replaced by the namespace declared in `$namespaces`.\n\n  * If an identifier URI is an absolute URI consisting of a scheme and path,\n    no processing occurs.\n\nWhen preprocessing visits a node containing an identifier, that identifier\nmust be used as the base URI to process child nodes.\n\nIt is an error for more than one object in a document to have the same\nabsolute URI.\n\n### Identifier resolution example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$namespaces\": {\n    \"acid\": \"http://example.com/acid#\"\n  },\n  \"$graph\": [{\n    \"name\": \"ExampleType\",\n    \"type\": \"record\",\n    \"fields\": [{\n      \"name\": \"id\",\n      \"type\": \"string\",\n      \"jsonldPredicate\": \"@id\"\n    }]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "    {\n      \"id\": \"http://example.com/base\",\n      \"form\": {\n        \"id\": \"one\",\n        \"things\": [\n          {\n            \"id\": \"two\"\n          },\n          {\n            \"id\": \"#three\",\n          },\n          {\n            \"id\": \"four#five\",\n          },\n          {\n            \"id\": \"acid:six\",\n          }\n        ]\n      }\n    }\n",
+            "```\n\nThis becomes:\n\n```\n",
+            "{\n  \"id\": \"http://example.com/base\",\n  \"form\": {\n    \"id\": \"http://example.com/base#one\",\n    \"things\": [\n      {\n        \"id\": \"http://example.com/base#one/two\"\n      },\n      {\n        \"id\": \"http://example.com/base#three\"\n      },\n      {\n        \"id\": \"http://example.com/four#five\",\n      },\n      {\n        \"id\": \"http://example.com/acid#six\",\n      }\n    ]\n  }\n}\n",
+            "```\n",
+            "## Link resolution\n\nThe schema may designate one or more fields as link fields reference other\nobjects.  Processing must resolve links to either absolute URIs using the\nfollowing rules:\n\n* If a reference URI is prefixed with `#` it is a relative\nfragment identifier.  It is resolved relative to the base URI by setting\nor replacing the fragment portion of the base URI.\n\n* If a reference URI does not contain a scheme and is not prefixed with `#`\nit is a path relative reference.  If the reference URI contains `#` in any\nposition other than the first character, the reference URI must be divided\ninto a path portion and a fragment portion split on the first instance of\n`#`.  The path portion is resolved relative to the base URI by the following\nrule: if the path portion of the base URI ends in a slash `/`, append the\npath portion of the reference URI to the path portion of the base URI.  If\nthe path portion of the base URI does not end in a slash, replace the final\npath segment with the path portion of the reference URI.  Replace the\nfragment portion of the base URI with the fragment portion of the reference\nURI.\n\n* If a reference URI begins with a namespace prefix declared in `$namespaces`\nfollowed by a colon `:`, the prefix and colon must be replaced by the\nnamespace declared in `$namespaces`.\n\n* If a reference URI is an absolute URI consisting of a scheme and path,\nno processing occurs.\n\nLink resolution must not affect the base URI used to resolve identifiers\nand other links.\n\n### Link resolution example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$namespaces\": {\n    \"acid\": \"http://example.com/acid#\"\n  },\n  \"$graph\": [{\n    \"name\": \"ExampleType\",\n    \"type\": \"record\",\n    \"fields\": [{\n      \"name\": \"link\",\n      \"type\": \"string\",\n      \"jsonldPredicate\": {\n        \"_type\": \"@id\"\n      }\n    }]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "{\n  \"$base\": \"http://example.com/base\",\n  \"link\": \"http://example.com/base/zero\",\n  \"form\": {\n    \"link\": \"one\",\n    \"things\": [\n      {\n        \"link\": \"two\"\n      },\n      {\n        \"link\": \"#three\",\n      },\n      {\n        \"link\": \"four#five\",\n      },\n      {\n        \"link\": \"acid:six\",\n      }\n    ]\n  }\n}\n",
+            "```\n\nThis becomes:\n\n```\n",
+            "{\n  \"$base\": \"http://example.com/base\",\n  \"link\": \"http://example.com/base/zero\",\n  \"form\": {\n    \"link\": \"http://example.com/one\",\n    \"things\": [\n      {\n        \"link\": \"http://example.com/two\"\n      },\n      {\n        \"link\": \"http://example.com/base#three\"\n      },\n      {\n        \"link\": \"http://example.com/four#five\",\n      },\n      {\n        \"link\": \"http://example.com/acid#six\",\n      }\n    ]\n  }\n}\n",
+            "```\n",
+            "## Vocabulary resolution\n\n  The schema may designate one or more vocabulary fields which use terms\n  defined in the vocabulary.  Processing must resolve vocabulary fields to\n  either vocabulary terms or absolute URIs by first applying the link\n  resolution rules defined above, then applying the following additional\n  rule:\n\n    * If a reference URI is a vocabulary field, and there is a vocabulary\n    term which maps to the resolved URI, the reference must be replace with\n    the vocabulary term.\n\n### Vocabulary resolution example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$namespaces\": {\n    \"acid\": \"http://example.com/acid#\"\n  },\n  \"$graph\": [{\n    \"name\": \"Colors\",\n    \"type\": \"enum\",\n    \"symbols\": [\"acid:red\"]\n  },\n  {\n    \"name\": \"ExampleType\",\n    \"type\": \"record\",\n    \"fields\": [{\n      \"name\": \"voc\",\n      \"type\": \"string\",\n      \"jsonldPredicate\": {\n        \"_type\": \"@vocab\"\n      }\n    }]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "    {\n      \"form\": {\n        \"things\": [\n          {\n            \"voc\": \"red\",\n          },\n          {\n            \"voc\": \"http://example.com/acid#red\",\n          },\n          {\n            \"voc\": \"http://example.com/acid#blue\",\n          }\n        ]\n      }\n    }\n",
+            "```\n\nThis becomes:\n\n```\n",
+            "    {\n      \"form\": {\n        \"things\": [\n          {\n            \"voc\": \"red\",\n          },\n          {\n            \"voc\": \"red\",\n          },\n          {\n            \"voc\": \"http://example.com/acid#blue\",\n          }\n        ]\n      }\n    }\n",
+            "```\n",
+            "## Import\n\nDuring preprocessing traversal, an implementation must resolve `$import`\ndirectives.  An `$import` directive is an object consisting of exactly one\nfield `$import` specifying resource by URI string.  It is an error if there\nare additional fields in the `$import` object, such additional fields must\nbe ignored.\n\nThe URI string must be resolved to an absolute URI using the link\nresolution rules described previously.  Implementations must support\nloading from `file`, `http` and `https` resources.  The URI referenced by\n`$import` must be loaded and recursively preprocessed as a Salad document.\nThe external imported document does not inherit the context of the\nimporting document, and the default base URI for processing the imported\ndocument must be the URI used to retrieve the imported document.  If the\n`$import` URI includes a document fragment, the fragment must be excluded\nfrom the base URI used to preprocess the imported document.\n\nOnce loaded and processed, the `$import` node is replaced in the document\nstructure by the object or array yielded from the import operation.\n\nURIs may reference document fragments which refer to specific an object in\nthe target document.  This indicates that the `$import` node must be\nreplaced by only the object with the appropriate fragment identifier.\n\nIt is a fatal error if an import directive refers to an external resource\nor resource fragment which does not exist or is not accessible.\n\n### Import example\n\nimport.yml:\n```\n{\n  \"hello\": \"world\"\n}\n\n```\n\nparent.yml:\n```\n{\n  \"form\": {\n    \"bar\": {\n      \"$import\": \"import.yml\"\n      }\n  }\n}\n\n```\n\nThis becomes:\n\n```\n{\n  \"form\": {\n    \"bar\": {\n      \"hello\": \"world\"\n    }\n  }\n}\n```\n\n## Include\n\nDuring preprocessing traversal, an implementation must resolve `$include`\ndirectives.  An `$include` directive is an object consisting of exactly one\nfield `$include` specifying a URI string.  It is an error if there are\nadditional fields in the `$include` object, such additional fields must be\nignored.\n\nThe URI string must be resolved to an absolute URI using the link\nresolution rules described previously.  The URI referenced by `$include` must\nbe loaded as a text data.  Implementations must support loading from\n`file`, `http` and `https` resources.  Implementations may transcode the\ncharacter encoding of the text data to match that of the parent document,\nbut must not interpret or parse the text document in any other way.\n\nOnce loaded, the `$include` node is replaced in the document structure by a\nstring containing the text data loaded from the resource.\n\nIt is a fatal error if an import directive refers to an external resource\nwhich does not exist or is not accessible.\n\n### Include example\n\nparent.yml:\n```\n{\n  \"form\": {\n    \"bar\": {\n      \"$include\": \"include.txt\"\n      }\n  }\n}\n\n```\n\ninclude.txt:\n```\nhello world\n\n```\n\nThis becomes:\n\n```\n{\n  \"form\": {\n    \"bar\": \"hello world\"\n  }\n}\n```\n\n\n## Mixin\n\nDuring preprocessing traversal, an implementation must resolve `$mixin`\ndirectives.  An `$mixin` directive is an object consisting of the field\n`$mixin` specifying resource by URI string.  If there are additional fields in\nthe `$mixin` object, these fields override fields in the object which is loaded\nfrom the `$mixin` URI.\n\nThe URI string must be resolved to an absolute URI using the link resolution\nrules described previously.  Implementations must support loading from `file`,\n`http` and `https` resources.  The URI referenced by `$mixin` must be loaded\nand recursively preprocessed as a Salad document.  The external imported\ndocument must inherit the context of the importing document, however the file\nURI for processing the imported document must be the URI used to retrieve the\nimported document.  The `$mixin` URI must not include a document fragment.\n\nOnce loaded and processed, the `$mixin` node is replaced in the document\nstructure by the object or array yielded from the import operation.\n\nURIs may reference document fragments which refer to specific an object in\nthe target document.  This indicates that the `$mixin` node must be\nreplaced by only the object with the appropriate fragment identifier.\n\nIt is a fatal error if an import directive refers to an external resource\nor resource fragment which does not exist or is not accessible.\n\n### Mixin example\n\nmixin.yml:\n```\n{\n  \"hello\": \"world\",\n  \"carrot\": \"orange\"\n}\n\n```\n\nparent.yml:\n```\n{\n  \"form\": {\n    \"bar\": {\n      \"$mixin\": \"mixin.yml\"\n      \"carrot\": \"cake\"\n      }\n  }\n}\n\n```\n\nThis becomes:\n\n```\n{\n  \"form\": {\n    \"bar\": {\n      \"hello\": \"world\",\n      \"carrot\": \"cake\"\n    }\n  }\n}\n```\n",
+            "## Identifier maps\n\nThe schema may designate certain fields as having a `mapSubject`.  If the\nvalue of the field is a JSON object, it must be transformed into an array of\nJSON objects.  Each key-value pair from the source JSON object is a list\nitem, each list item must be a JSON objects, and the value of the key is\nassigned to the field specified by `mapSubject`.\n\nFields which have `mapSubject` specified may also supply a `mapPredicate`.\nIf the value of a map item is not a JSON object, the item is transformed to a\nJSON object with the key assigned to the field specified by `mapSubject` and\nthe value assigned to the field specified by `mapPredicate`.\n\n### Identifier map example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$graph\": [{\n    \"name\": \"MappedType\",\n    \"type\": \"record\",\n    \"documentRoot\": true,\n    \"fields\": [{\n      \"name\": \"mapped\",\n      \"type\": {\n        \"type\": \"array\",\n        \"items\": \"ExampleRecord\"\n      },\n      \"jsonldPredicate\": {\n        \"mapSubject\": \"key\",\n        \"mapPredicate\": \"value\"\n      }\n    }],\n  },\n  {\n    \"name\": \"ExampleRecord\",\n    \"type\": \"record\",\n    \"fields\": [{\n      \"name\": \"key\",\n      \"type\": \"string\"\n      }, {\n      \"name\": \"value\",\n      \"type\": \"string\"\n      }\n    ]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "{\n  \"mapped\": {\n    \"shaggy\": {\n      \"value\": \"scooby\"\n    },\n    \"fred\": \"daphne\"\n  }\n}",
+            "```\n\nThis becomes:\n\n```\n",
+            "{\n    \"mapped\": [\n        {\n            \"value\": \"daphne\",\n            \"key\": \"fred\"\n        },\n        {\n            \"value\": \"scooby\",\n            \"key\": \"shaggy\"\n        }\n    ]\n}",
+            "```\n",
+            "## Domain Specific Language for types\n\nFields may be tagged `typeDSL: true`.  If so, the field is expanded using the\nfollowing micro-DSL for schema salad types:\n\n* If the type ends with a question mark `?` it is expanded to a union with `null`\n* If the type ends with square brackets `[]` it is expanded to an array with items of the preceeding type symbol\n* The type may end with both `[]?` to indicate it is an optional array.\n* Identifier resolution is applied after type DSL expansion.\n\n### Type DSL example\n\nGiven the following schema:\n\n```\n",
+            "{\n  \"$graph\": [\n  {\"$import\": \"metaschema_base.yml\"},\n  {\n    \"name\": \"TypeDSLExample\",\n    \"type\": \"record\",\n    \"documentRoot\": true,\n    \"fields\": [{\n      \"name\": \"extype\",\n      \"type\": \"string\",\n      \"jsonldPredicate\": {\n        _type: \"@vocab\",\n        \"typeDSL\": true\n      }\n    }]\n  }]\n}\n",
+            "```\n\nProcess the following example:\n\n```\n",
+            "[{\n  \"extype\": \"string\"\n}, {\n  \"extype\": \"string?\"\n}, {\n  \"extype\": \"string[]\"\n}, {\n  \"extype\": \"string[]?\"\n}]\n",
+            "```\n\nThis becomes:\n\n```\n",
+            "[\n    {\n        \"extype\": \"string\"\n    }, \n    {\n        \"extype\": [\n            \"null\", \n            \"string\"\n        ]\n    }, \n    {\n        \"extype\": {\n            \"type\": \"array\", \n            \"items\": \"string\"\n        }\n    }, \n    {\n        \"extype\": [\n            \"null\", \n            {\n                \"type\": \"array\", \n                \"items\": \"string\"\n            }\n        ]\n    }\n]\n",
+            "```\n"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Link_Validation",
+        "type": "documentation",
+        "doc": "# Link validation\n\nOnce a document has been preprocessed, an implementation may validate\nlinks.  The link validation traversal may visit fields which the schema\ndesignates as link fields and check that each URI references an existing\nobject in the current document, an imported document, file system, or\nnetwork resource.  Failure to validate links may be a fatal error.  Link\nvalidation behavior for individual fields may be modified by `identity` and\n`noLinkCheck` in the `jsonldPredicate` section of the field schema.\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Schema_validation",
+        "type": "documentation",
+        "doc": ""
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Schema",
+        "type": "documentation",
+        "doc": "# Schema\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Documented",
+        "type": "record",
+        "abstract": true,
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#Documented/doc",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "A documentation string for this object, or an array of strings which should be concatenated.",
+                "jsonldPredicate": "rdfs:comment"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#PrimitiveType",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/salad#null",
+            "http://www.w3.org/2001/XMLSchema#boolean",
+            "http://www.w3.org/2001/XMLSchema#int",
+            "http://www.w3.org/2001/XMLSchema#long",
+            "http://www.w3.org/2001/XMLSchema#float",
+            "http://www.w3.org/2001/XMLSchema#double",
+            "http://www.w3.org/2001/XMLSchema#string"
+        ],
+        "doc": [
+            "Salad data types are based on Avro schema declarations.  Refer to the\n[Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for\ndetailed information.\n",
+            "null: no value",
+            "boolean: a binary value",
+            "int: 32-bit signed integer",
+            "long: 64-bit signed integer",
+            "float: single precision (32-bit) IEEE 754 floating-point number",
+            "double: double precision (64-bit) IEEE 754 floating-point number",
+            "string: Unicode character sequence"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Any",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/salad#Any"
+        ],
+        "docAfter": "https://w3id.org/cwl/salad#PrimitiveType",
+        "doc": "The **Any** type validates for any non-null value.\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#RecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#Documented",
+        "doc": "A field of a record.",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#RecordField/name",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The name of the field\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#RecordField/type",
+                "type": [
+                    "PrimitiveType",
+                    "RecordSchema",
+                    "EnumSchema",
+                    "ArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "PrimitiveType",
+                            "RecordSchema",
+                            "EnumSchema",
+                            "ArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "doc": "The field type\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#RecordSchema",
+        "type": "record",
+        "fields": [
+            {
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "RecordField"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#fields",
+                    "mapSubject": "name",
+                    "mapPredicate": "type"
+                },
+                "doc": "Defines the fields of the record.",
+                "name": "https://w3id.org/cwl/salad#RecordSchema/fields"
+            },
+            {
+                "doc": "Must be `record`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#record"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#RecordSchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#EnumSchema",
+        "type": "record",
+        "doc": "Define an enumerated type.\n",
+        "fields": [
+            {
+                "type": {
+                    "type": "array",
+                    "items": "string"
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#symbols",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "Defines the set of valid symbols.",
+                "name": "https://w3id.org/cwl/salad#EnumSchema/symbols"
+            },
+            {
+                "doc": "Must be `enum`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#enum"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#EnumSchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#ArraySchema",
+        "type": "record",
+        "fields": [
+            {
+                "type": [
+                    "PrimitiveType",
+                    "RecordSchema",
+                    "EnumSchema",
+                    "ArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "PrimitiveType",
+                            "RecordSchema",
+                            "EnumSchema",
+                            "ArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#items",
+                    "_type": "@vocab",
+                    "refScope": 2
+                },
+                "doc": "Defines the type of the array elements.",
+                "name": "https://w3id.org/cwl/salad#ArraySchema/items"
+            },
+            {
+                "doc": "Must be `array`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#array"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#ArraySchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#JsonldPredicate",
+        "type": "record",
+        "doc": "Attached to a record field to define how the parent record field is handled for\nURI resolution and JSON-LD context generation.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/_id",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#_id",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "The predicate URI that this field corresponds to.\nCorresponds to JSON-LD `@id` directive.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/_type",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The context type hint, corresponds to JSON-LD `@type` directive.\n\n* If the value of this field is `@id` and `identity` is false or\nunspecified, the parent field must be resolved using the link\nresolution rules.  If `identity` is true, the parent field must be\nresolved using the identifier expansion rules.\n\n* If the value of this field is `@vocab`, the parent field must be\n  resolved using the vocabulary resolution rules.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/_container",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Structure hint, corresponds to JSON-LD `@container` directive.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/identity",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true and `_type` is `@id` this indicates that the parent field must\nbe resolved according to identity resolution rules instead of link\nresolution rules.  In addition, the field value is considered an\nassertion that the linked value exists; absence of an object in the loaded document\nwith the URI is not an error.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/noLinkCheck",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true, this indicates that link validation traversal must stop at\nthis field.  This field (it is is a URI) or any fields under it (if it\nis an object or array) are not subject to link checking.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/mapSubject",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "If the value of the field is a JSON object, it must be transformed\ninto an array of JSON objects, where each key-value pair from the\nsource JSON object is a list item, the list items must be JSON objects,\nand the key is assigned to the field specified by `mapSubject`.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/mapPredicate",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Only applies if `mapSubject` is also provided.  If the value of the\nfield is a JSON object, it is transformed as described in `mapSubject`,\nwith the addition that when the value of a map item is not an object,\nthe item is transformed to a JSON object with the key assigned to the\nfield specified by `mapSubject` and the value assigned to the field\nspecified by `mapPredicate`.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/refScope",
+                "type": [
+                    "null",
+                    "int"
+                ],
+                "doc": "If the field contains a relative reference, it must be resolved by\nsearching for valid document references in each successive parent scope\nin the document fragment.  For example, a reference of `foo` in the\ncontext `#foo/bar/baz` will first check for the existence of\n`#foo/bar/baz/foo`, followed by `#foo/bar/foo`, then `#foo/foo` and\nthen finally `#foo`.  The first valid URI in the search order shall be\nused as the fully resolved value of the identifier.  The value of the\nrefScope field is the specified number of levels from the containing\nidentifer scope before starting the search, so if `refScope: 2` then\n\"baz\" and \"bar\" must be stripped to get the base `#foo` and search\n`#foo/foo` and the `#foo`.  The last scope searched must be the top\nlevel scope before determining if the identifier cannot be resolved.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/typeDSL",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "Field must be expanded based on the the Schema Salad type DSL.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#JsonldPredicate/subscope",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Append the subscope to the current scope when performing\nidentifier resolution to objects under this field.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#SpecializeDef",
+        "type": "record",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#SpecializeDef/specializeFrom",
+                "type": "string",
+                "doc": "The data type to be replaced",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#specializeFrom",
+                    "_type": "@id",
+                    "refScope": 1
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#SpecializeDef/specializeTo",
+                "type": "string",
+                "doc": "The new data type to replace with",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#specializeTo",
+                    "_type": "@id",
+                    "refScope": 1
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#NamedType",
+        "type": "record",
+        "abstract": true,
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#NamedType/name",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The identifier for this type"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#NamedType/inVocab",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "By default or if \"true\", include the short name of this type in the\nvocabulary (the keys of the JSON-LD context).  If false, do not include\nthe short name in the vocabulary.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#DocType",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#Documented",
+        "abstract": true,
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#DocType/docParent",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Hint to indicate that during documentation generation, documentation\nfor this type should appear in a subsection under `docParent`.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#docParent",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#DocType/docChild",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "Hint to indicate that during documentation generation, documentation\nfor `docChild` should appear in a subsection under this type.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#docChild",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#DocType/docAfter",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Hint to indicate that during documentation generation, documentation\nfor this type should appear after the `docAfter` section at the same\nlevel.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#docAfter",
+                    "_type": "@id"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#SchemaDefinedType",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#DocType",
+        "doc": "Abstract base for schema-defined types.\n",
+        "abstract": true,
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#SchemaDefinedType/jsonldPredicate",
+                "type": [
+                    "null",
+                    "string",
+                    "JsonldPredicate"
+                ],
+                "doc": "Annotate this type with linked data context.\n",
+                "jsonldPredicate": "sld:jsonldPredicate"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#SchemaDefinedType/documentRoot",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true, indicates that the type is a valid at the document root.  At\nleast one type in a schema must be tagged with `documentRoot: true`.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#SaladRecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#RecordField",
+        "doc": "A field of a record.",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#SaladRecordField/jsonldPredicate",
+                "type": [
+                    "null",
+                    "string",
+                    "JsonldPredicate"
+                ],
+                "doc": "Annotate this type with linked data context.\n",
+                "jsonldPredicate": "sld:jsonldPredicate"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#SaladRecordField/default",
+                "type": [
+                    "null",
+                    "Any"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#default",
+                    "noLinkCheck": true
+                },
+                "doc": "The default value to use for this field if the field is missing or \"null\".\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#SaladRecordSchema",
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#NamedType",
+            "https://w3id.org/cwl/salad#RecordSchema",
+            "https://w3id.org/cwl/salad#SchemaDefinedType"
+        ],
+        "documentRoot": true,
+        "specialize": [
+            {
+                "specializeTo": "https://w3id.org/cwl/salad#SaladRecordField",
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordField"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#SaladRecordSchema/abstract",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true, this record is abstract and may be used as a base for other\nrecords, but is not valid on its own.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#SaladRecordSchema/extends",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#extends",
+                    "_type": "@id",
+                    "refScope": 1
+                },
+                "doc": "Indicates that this record inherits fields from one or more base records.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#SaladRecordSchema/specialize",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "SpecializeDef"
+                    }
+                ],
+                "doc": "Only applies if `extends` is declared.  Apply type specialization using the\nbase record as a template.  For each field inherited from the base\nrecord, replace any instance of the type `specializeFrom` with\n`specializeTo`.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#specialize",
+                    "mapSubject": "specializeFrom",
+                    "mapPredicate": "specializeTo"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#SaladEnumSchema",
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#NamedType",
+            "https://w3id.org/cwl/salad#EnumSchema",
+            "https://w3id.org/cwl/salad#SchemaDefinedType"
+        ],
+        "documentRoot": true,
+        "doc": "Define an enumerated type.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#SaladEnumSchema/extends",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#extends",
+                    "_type": "@id",
+                    "refScope": 1
+                },
+                "doc": "Indicates that this enum inherits symbols from a base enum.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Documentation",
+        "type": "record",
+        "docParent": "https://w3id.org/cwl/salad#Schema",
+        "extends": [
+            "https://w3id.org/cwl/salad#NamedType",
+            "https://w3id.org/cwl/salad#DocType"
+        ],
+        "documentRoot": true,
+        "doc": "A documentation section.  This type exists to facilitate self-documenting\nschemas but has no role in formal validation.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#Documentation/type",
+                "doc": "Must be `documentation`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#documentation"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                }
+            }
+        ]
+    }
+]

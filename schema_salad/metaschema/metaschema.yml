@@ -18,6 +18,8 @@ $graph:
     - $import: link_res.yml
     - $import: vocab_res.yml
     - $include: import_include.md
+    - $import: map_res.yml
+    - $import: typedsl_res.yml
 
 - name: "Link_Validation"
   type: documentation
@@ -129,7 +131,11 @@ $graph:
       type: boolean?
       doc: |
         Field must be expanded based on the the Schema Salad type DSL.
-
+    - name: subscope
+      type: string?
+      doc: |
+        Append the subscope to the current scope when performing
+        identifier resolution to objects under this field.
 
 - name: SpecializeDef
   type: record
@@ -154,24 +160,26 @@ $graph:
 - name: NamedType
   type: record
   abstract: true
+  docParent: "#Schema"
   fields:
     - name: name
       type: string
       jsonldPredicate: "@id"
       doc: "The identifier for this type"
+    - name: inVocab
+      type: boolean?
+      doc: |
+        By default or if "true", include the short name of this type in the
+        vocabulary (the keys of the JSON-LD context).  If false, do not include
+        the short name in the vocabulary.
 
 
 - name: DocType
   type: record
+  extends: Documented
   abstract: true
+  docParent: "#Schema"
   fields:
-    - name: doc
-      type:
-        - string?
-        - string[]?
-      doc: "A documentation string for this type, or an array of strings which should be concatenated."
-      jsonldPredicate: "rdfs:comment"
-
     - name: docParent
       type: string?
       doc: |
@@ -237,9 +245,17 @@ $graph:
       doc: |
         Annotate this type with linked data context.
       jsonldPredicate: "sld:jsonldPredicate"
+    - name: default
+      type: Any?
+      jsonldPredicate:
+        _id: sld:default
+        noLinkCheck: true
+      doc: |
+        The default value to use for this field if the field is missing or "null".
 
 
 - name: SaladRecordSchema
+  docParent: "#Schema"
   type: record
   extends: [NamedType, RecordSchema, SchemaDefinedType]
   documentRoot: true
@@ -277,8 +293,9 @@ $graph:
         mapPredicate: specializeTo
 
 - name: SaladEnumSchema
+  docParent: "#Schema"
   type: record
-  extends: [EnumSchema, SchemaDefinedType]
+  extends: [NamedType, EnumSchema, SchemaDefinedType]
   documentRoot: true
   doc: |
     Define an enumerated type.
@@ -297,6 +314,7 @@ $graph:
 
 - name: Documentation
   type: record
+  docParent: "#Schema"
   extends: [NamedType, DocType]
   documentRoot: true
   doc: |
@@ -306,7 +324,6 @@ $graph:
     - name: type
       doc: "Must be `documentation`"
       type:
-        name: Documentation_symbol
         type: enum
         symbols:
           - "sld:documentation"

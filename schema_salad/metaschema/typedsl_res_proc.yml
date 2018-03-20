@@ -1,0 +1,26 @@
+[
+    {
+        "extype": "string"
+    }, 
+    {
+        "extype": [
+            "null", 
+            "string"
+        ]
+    }, 
+    {
+        "extype": {
+            "type": "array", 
+            "items": "string"
+        }
+    }, 
+    {
+        "extype": [
+            "null", 
+            {
+                "type": "array", 
+                "items": "string"
+            }
+        ]
+    }
+]

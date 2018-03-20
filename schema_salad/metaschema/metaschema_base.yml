@@ -8,6 +8,25 @@ $namespaces:
   xsd:  "http://www.w3.org/2001/XMLSchema#"
 
 $graph:
+
+- name: "Schema"
+  type: documentation
+  doc: |
+    # Schema
+
+- name: Documented
+  type: record
+  abstract: true
+  docParent: "#Schema"
+  fields:
+    - name: doc
+      type:
+        - string?
+        - string[]?
+      doc: "A documentation string for this object, or an array of strings which should be concatenated."
+      jsonldPredicate: "rdfs:comment"
+
+
 - name: PrimitiveType
   type: enum
   symbols:
@@ -35,12 +54,14 @@ $graph:
 - name: Any
   type: enum
   symbols: ["#Any"]
+  docAfter: "#PrimitiveType"
   doc: |
     The **Any** type validates for any non-null value.
 
 
 - name: RecordField
   type: record
+  extends: Documented
   doc: A field of a record.
   fields:
     - name: name
@@ -48,12 +69,6 @@ $graph:
       jsonldPredicate: "@id"
       doc: |
         The name of the field
-
-    - name: doc
-      type: string?
-      doc: |
-        A documentation string for this field
-      jsonldPredicate: "rdfs:comment"
 
     - name: type
       type:
@@ -84,7 +99,6 @@ $graph:
     type:
       doc: "Must be `record`"
       type:
-        name: Record_symbol
         type: enum
         symbols:
           - "sld:record"
@@ -110,7 +124,6 @@ $graph:
     type:
       doc: "Must be `enum`"
       type:
-        name: Enum_symbol
         type: enum
         symbols:
           - "sld:enum"
@@ -134,7 +147,6 @@ $graph:
     type:
       doc: "Must be `array`"
       type:
-        name: Array_symbol
         type: enum
         symbols:
           - "sld:array"
