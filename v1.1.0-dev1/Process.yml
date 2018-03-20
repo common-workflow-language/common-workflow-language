@@ -553,7 +553,7 @@ $graph:
 
 
 - name: InputSchema
-  extends: [Labeled, BindsInput]
+  extends: [Labeled, sld:Documented, BindsInput]
   type: record
   abstract: true
   fields:
