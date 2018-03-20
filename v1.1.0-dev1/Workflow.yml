@@ -37,16 +37,21 @@ $graph:
       ## Introduction to CWL Workflow standard v1.1.0-dev1
 
       This specification represents the latest stable release from the
-      CWL group.  Since the v1.0 release, v1.1 introduces the
+      CWL group.  Since the v1.0 release, v1.1.0-dev1 introduces the
       following updates to the CWL Workflow standard.
-      Documents should to use `cwlVersion: v1.1` to make use of new
-      syntax and features introduced in v1.1.  Existing v1.0 documents
+      Documents should to use `cwlVersion: v1.1.0-dev1` to make use of new
+      syntax and features introduced in v1.1.0-dev1.  Existing v1.0 documents
       should be trivially updatable by changing `cwlVersion`, however
       CWL documents that relied on previously undefined or
       underspecified behavior may have slightly different behavior in
-      v1.1.
+      v1.1.0-dev1.
 
-        * ...
+        * Default values for some fields are now expressed in the schema
+        * When defining record types, fields of type `File` may now include `secondaryFiles` and `format`.
+        * InputSchema now permits a `doc` field
+        * The `run` field now introduces a subscope so that embedded
+          definitions do not have identifier conflicts with the
+          outer workflow.
 
       ## Purpose
 

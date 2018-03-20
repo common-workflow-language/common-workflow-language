@@ -38,17 +38,26 @@ $graph:
     - |
       ## Introduction to CWL Command Line Tool standard v1.1.0-dev1
 
-      This specification represents the latest stable release from the
+      This specification represents the latest development release from the
       CWL group.  Since the v1.0 release, v1.1 introduces the
       following updates to the CWL Command Line Tool standard.
-      Documents should to use `cwlVersion: v1.1` to make use of new
-      syntax and features introduced in v1.1.  Existing v1.0 documents
-      should be trivially updatable by changing `cwlVersion`, however
+      Documents should to use `cwlVersion: v1.1.0-dev1` to make use of new
+      syntax and features introduced in v1.1.0-dev1.  Existing v1.0 documents
+      should be trivially updatav1.1.0-dev1ble by changing `cwlVersion`, however
       CWL documents that relied on previously undefined or
       underspecified behavior may have slightly different behavior in
-      v1.1.
+      v1.1.0-dev1.
 
-        * Addition of `stdin` type shortcut for `CommandInputParamater`.
+        * Default values for some fields are now expressed in the schema.
+        * When defining record types, fields of type `File` may now include `secondaryFiles` and `format`.
+        * InputSchema now permits a `doc` field
+        * Addition of `stdin` type shortcut for `CommandInputParameter`.
+        * Clarify that the designated output directory should be empty
+          except for files or directories specified using
+          [InitialWorkDirRequirement](#InitialWorkDirRequirement).
+        * Clarify semantics of `shellQuote`
+        * Expressions are now allowed to evaluate to `null` or `Dirent` in
+          [InitialWorkDirRequirement.listing](#InitialWorkDirRequirement).
 
       ## Purpose
 
