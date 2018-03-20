@@ -569,11 +569,6 @@ $graph:
         "contents" field of the file object for use by expressions.
 
 
-- name: OutputBinding
-  type: record
-  abstract: true
-
-
 - name: InputSchema
   extends: [Labeled, sld:Documented, BindsInput]
   type: record
@@ -586,7 +581,7 @@ $graph:
 
 
 - name: OutputSchema
-  extends: [Labeled, BindsOutput]
+  extends: [Labeled]
   type: record
   abstract: true
 
@@ -597,14 +592,6 @@ $graph:
     - name: inputBinding
       type: InputBinding?
       jsonldPredicate: "cwl:inputBinding"
-
-- name: BindsOutput
-  type: record
-  abstract: true
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputRecordField
@@ -651,7 +638,7 @@ $graph:
 
 - name: OutputRecordField
   type: record
-  extends: [sld:RecordField, FieldBase, BindsOutput, OutputFormat]
+  extends: [sld:RecordField, FieldBase, OutputFormat]
   abstract: true
   specialize:
     - specializeFrom: "sld:RecordSchema"
@@ -714,7 +701,7 @@ $graph:
 
 - name: OutputParameter
   type: record
-  extends: [Parameter, BindsOutput, OutputFormat]
+  extends: [Parameter, OutputFormat]
   abstract: true
 
 

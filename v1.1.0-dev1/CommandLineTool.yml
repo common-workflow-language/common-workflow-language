@@ -195,9 +195,9 @@ $graph:
         If `shellQuote` is true or null, the implementation must not
         permit interpretation of any shell metacharacters or directives.
 
+
 - type: record
   name: CommandOutputBinding
-  extends: OutputBinding
   doc: |
     Describes how to generate an output parameter based on the files produced
     by a CommandLineTool.
@@ -302,8 +302,10 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
+  fields:
+    - name: outputBinding
+      type: CommandOutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: CommandOutputRecordSchema
@@ -324,8 +326,6 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
 
 
 - name: CommandOutputArraySchema
@@ -338,8 +338,6 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
 
 
 - type: record
@@ -378,9 +376,6 @@ $graph:
   name: CommandOutputParameter
   extends: OutputParameter
   doc: An output parameter for a CommandLineTool.
-  specialize:
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
   fields:
     - name: type
       type:
@@ -406,6 +401,9 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+    - name: outputBinding
+      type: CommandOutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
 
 - name: stdin
   type: enum
