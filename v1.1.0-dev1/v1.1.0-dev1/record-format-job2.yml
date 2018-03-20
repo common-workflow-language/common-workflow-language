@@ -1,7 +1,7 @@
 regular_input:
   class: File
   location: rec/D
-  format: http://example.com/format1
+  format: http://example.com/formatZ
 record_input:
   f1:
     class: File

@@ -1630,9 +1630,39 @@
 
 - job: v1.1.0-dev1/record-secondaryFiles-job.yml
   output: {}
+  tool: v1.1.0-dev1/record-in-secondaryFiles-wf.cwl
+  doc: Test secondaryFiles propagation through workflow
+  tags: [ required ]
+
+- job: v1.1.0-dev1/record-secondaryFiles-job.yml
+  should_fail: true
+  tool: v1.1.0-dev1/record-in-secondaryFiles-missing-wf.cwl
+  doc: Test checking when secondaryFiles are missing
+  tags: [ required ]
+
+- job: v1.1.0-dev1/record-format-job.yml
+  output: {}
   tool: v1.1.0-dev1/record-in-format.cwl
   doc: Test format on anonymous record fields
   tags: [ required ]
+
+- job: v1.1.0-dev1/record-format-job2.yml
+  should_fail: true
+  tool: v1.1.0-dev1/record-in-format.cwl
+  doc: Test file format checking on parameter
+  tags: [ format_checking ]
+
+- job: v1.1.0-dev1/record-format-job3.yml
+  should_fail: true
+  tool: v1.1.0-dev1/record-in-format.cwl
+  doc: Test file format checking on record field
+  tags: [ format_checking ]
+
+- job: v1.1.0-dev1/record-format-job4.yml
+  should_fail: true
+  tool: v1.1.0-dev1/record-in-format.cwl
+  doc: Test file format checking on array item
+  tags: [ format_checking ]
 
 - job: v1.1.0-dev1/record-secondaryFiles-job.yml
   output: {

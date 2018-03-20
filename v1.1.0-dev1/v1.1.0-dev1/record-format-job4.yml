@@ -13,4 +13,4 @@ record_input:
       format: http://example.com/format2
     - class: File
       location: rec/C
-      format: http://example.com/format2
+      format: http://example.com/formatZ

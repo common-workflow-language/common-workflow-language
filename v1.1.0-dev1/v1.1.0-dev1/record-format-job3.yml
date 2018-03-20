@@ -6,7 +6,7 @@ record_input:
   f1:
     class: File
     location: rec/A
-    format: http://example.com/format1
+    format: http://example.com/formatZ
   f2:
     - class: File
       location: rec/B
