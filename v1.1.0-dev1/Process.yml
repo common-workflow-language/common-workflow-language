@@ -479,6 +479,21 @@ $graph:
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
 
+    streamable:
+      type: boolean?
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        A value of `true` indicates that the file is read or written
+        sequentially without seeking.  An implementation may use this flag to
+        indicate whether it is valid to stream file contents using a named
+        pipe.  Default: `false`.
+
+
+- name: InputFormat
+  type: record
+  abstract: true
+  fields:
     format:
       type:
         - "null"
@@ -498,18 +513,25 @@ $graph:
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
 
-        For output parameters, this is the file format that will be assigned to
-        the output parameter.
 
-    streamable:
-      type: boolean?
+- name: OutputFormat
+  type: record
+  abstract: true
+  fields:
+    format:
+      type:
+        - "null"
+        - string
+        - Expression
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+        identity: true
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        A value of `true` indicates that the file is read or written
-        sequentially without seeking.  An implementation may use this flag to
-        indicate whether it is valid to stream file contents using a named
-        pipe.  Default: `false`.
+        This is the file format that will be assigned to the output
+        File object.
 
 
 - name: Parameter
@@ -588,7 +610,7 @@ $graph:
 - name: InputRecordField
   type: record
   abstract: true
-  extends: [sld:RecordField, FieldBase, BindsInput]
+  extends: [sld:RecordField, FieldBase, BindsInput, InputFormat]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -629,7 +651,7 @@ $graph:
 
 - name: OutputRecordField
   type: record
-  extends: [sld:RecordField, FieldBase, BindsOutput]
+  extends: [sld:RecordField, FieldBase, BindsOutput, OutputFormat]
   abstract: true
   specialize:
     - specializeFrom: "sld:RecordSchema"
@@ -675,7 +697,7 @@ $graph:
 - name: InputParameter
   type: record
   abstract: true
-  extends: [Parameter, BindsInput]
+  extends: [Parameter, BindsInput, InputFormat]
   fields:
 
     - name: default
@@ -692,7 +714,7 @@ $graph:
 
 - name: OutputParameter
   type: record
-  extends: [Parameter, BindsOutput]
+  extends: [Parameter, BindsOutput, OutputFormat]
   abstract: true
 
 
