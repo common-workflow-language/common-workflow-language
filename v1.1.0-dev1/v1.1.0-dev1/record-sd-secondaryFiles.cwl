@@ -5,6 +5,7 @@ requirements:
     types:
       - name: RecordTestType
         type: record
+        doc: Type test record
         fields:
           f1:
             type: File
