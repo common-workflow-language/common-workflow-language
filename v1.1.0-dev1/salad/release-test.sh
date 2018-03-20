@@ -5,63 +5,104 @@ set -x
 
 package=schema-salad
 module=schema_salad
-repo=https://github.com/common-workflow-language/schema_salad.git
-run_tests="py.test --pyarg ${module}"
-pipver=6.0 # minimum required version of pip
+slug=${TRAVIS_PULL_REQUEST_SLUG:=common-workflow-language/schema_salad}
+repo=https://github.com/${slug}.git
+run_tests="bin/py.test --pyarg ${module}"
+pipver=8.0.1 # minimum required version of pip
+setupver=20.10.1 # minimum required version of setuptools
+PYVER=${PYVER:=2.7}
 
-rm -Rf testenv? || /bin/true
+rm -Rf "testenv${PYVER}_"? || /bin/true
 
-export HEAD=`git rev-parse HEAD`
-virtualenv testenv1
-virtualenv testenv2
-virtualenv testenv3
-virtualenv testenv4
+export HEAD=${TRAVIS_PULL_REQUEST_SHA:-$(git rev-parse HEAD)}
 
-# First we test the head
-source testenv1/bin/activate
-rm testenv1/lib/python-wheels/setuptools* \
-	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
-make install-dependencies
-make test
-pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
-mkdir testenv1/not-${module}
-# if there is a subdir named '${module}' py.test will execute tests
-# there instead of the installed module's tests
-pushd testenv1/not-${module}; ../bin/${run_tests}; popd
+if [ "${RELEASE_SKIP}" != "head" ]
+then
+	virtualenv "testenv${PYVER}_1" -p "python${PYVER}"
+	# First we test the head
+	# shellcheck source=/dev/null
+	source "testenv${PYVER}_1/bin/activate"
+	rm "testenv${PYVER}_1/lib/python-wheels/setuptools"* \
+		&& pip install --force-reinstall -U pip==${pipver} \
+	        && pip install setuptools==${setupver} wheel
+	make install-dependencies
+	make test
+	pip uninstall -y ${package} || true; pip uninstall -y ${package} \
+		|| true; make install
+	mkdir "testenv${PYVER}_1/not-${module}"
+	# if there is a subdir named '${module}' py.test will execute tests
+	# there instead of the installed module's tests
+	
+	pushd "testenv${PYVER}_1/not-${module}"
+	# shellcheck disable=SC2086
+	../${run_tests}; popd
+fi
+
+
+virtualenv "testenv${PYVER}_2" -p "python${PYVER}"
+virtualenv "testenv${PYVER}_3" -p "python${PYVER}"
+virtualenv "testenv${PYVER}_4" -p "python${PYVER}"
+virtualenv "testenv${PYVER}_5" -p "python${PYVER}"
 
 
 # Secondly we test via pip
 
-cd testenv2
+pushd "testenv${PYVER}_2"
+# shellcheck source=/dev/null
 source bin/activate
 rm lib/python-wheels/setuptools* \
 	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
-pip install -e git+${repo}@${HEAD}#egg=${package}
-cd src/${package}
+        && pip install setuptools==${setupver} wheel
+# The following can fail if you haven't pushed your commits to ${repo}
+pip install -e "git+${repo}@${HEAD}#egg=${package}"
+pushd src/${package}
 make install-dependencies
 make dist
 make test
-cp dist/${package}*tar.gz ../../../testenv3/
+cp dist/${package}*tar.gz "../../../testenv${PYVER}_3/"
+cp dist/${module}*whl "../../../testenv${PYVER}_4/"
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
-cd ../.. # no subdir named ${proj} here, safe for py.testing the installed module
-bin/${run_tests}
+popd # ../.. no subdir named ${proj} here, safe for py.testing the installed module
+# shellcheck disable=SC2086
+${run_tests}
+popd
 
-# Is the distribution in testenv2 complete enough to build another
-# functional distribution?
+# Is the source distribution in testenv${PYVER}_2 complete enough to build
+# another functional distribution?
 
-cd ../testenv3/
+pushd "testenv${PYVER}_3/"
+# shellcheck source=/dev/null
 source bin/activate
 rm lib/python-wheels/setuptools* \
 	&& pip install --force-reinstall -U pip==${pipver} \
-        && pip install setuptools==20.10.1
+        && pip install setuptools==${setupver} wheel
 pip install ${package}*tar.gz
 pip install pytest
-tar xzf ${package}*tar.gz
-cd ${package}*
+mkdir out
+tar --extract --directory=out -z -f ${package}*.tar.gz
+pushd out/${package}*
 make dist
 make test
 pip uninstall -y ${package} || true; pip uninstall -y ${package} || true; make install
 mkdir ../not-${module}
-pushd ../not-${module} ; ../bin/${run_tests}; popd
+pushd ../not-${module}
+# shellcheck disable=SC2086
+../../${run_tests}; popd
+popd
+popd
+
+# Is the wheel in testenv${PYVER}_2 installable and will it pass the tests
+
+pushd "testenv${PYVER}_4/"
+# shellcheck source=/dev/null
+source bin/activate
+rm lib/python-wheels/setuptools* \
+	&& pip install --force-reinstall -U pip==${pipver} \
+        && pip install setuptools==${setupver} wheel
+pip install ${module}*.whl
+pip install pytest
+mkdir not-${module}
+pushd not-${module}
+# shellcheck disable=SC2086
+../${run_tests}; popd
+popd

@@ -99,7 +99,6 @@ $graph:
     type:
       doc: "Must be `record`"
       type:
-        name: Record_symbol
         type: enum
         symbols:
           - "sld:record"
@@ -125,7 +124,6 @@ $graph:
     type:
       doc: "Must be `enum`"
       type:
-        name: Enum_symbol
         type: enum
         symbols:
           - "sld:enum"
@@ -149,7 +147,6 @@ $graph:
     type:
       doc: "Must be `array`"
       type:
-        name: Array_symbol
         type: enum
         symbols:
           - "sld:array"

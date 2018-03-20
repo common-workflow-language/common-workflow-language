@@ -324,7 +324,6 @@ $graph:
     - name: type
       doc: "Must be `documentation`"
       type:
-        name: Documentation_symbol
         type: enum
         symbols:
           - "sld:documentation"

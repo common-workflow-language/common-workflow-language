@@ -1,0 +1,7 @@
+$graph:
+- name: "Semantic_Annotations_for_Linked_Avro_Data"
+  type: documentation
+  doc:
+    - $include: d2.md
+    - $import: d3.yml
+    - $import: d4.yml

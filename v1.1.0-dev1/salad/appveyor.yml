@@ -1,0 +1,34 @@
+version: .{build}-{branch}
+
+environment:
+
+  matrix:
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7.x" 
+      PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: "2.7.x" 
+      PYTHON_ARCH: "64"
+
+    - PYTHON: "C:\\Python34-x64"
+      PYTHON_VERSION: "3.4.x"
+      PYTHON_ARCH: "64"
+
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "64"
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "python --version"
+  - "pip install --disable-pip-version-check --user --upgrade pip"
+  - "pip install --disable-pip-version-check --user --upgrade setuptools"
+
+build_script:
+  - "%CMD_IN_ENV% pip install ."
+
+
+test_script:
+  - "%CMD_IN_ENV% python setup.py test"
+
