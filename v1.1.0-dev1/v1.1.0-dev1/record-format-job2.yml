@@ -1,0 +1,16 @@
+regular_input:
+  class: File
+  location: rec/D
+  format: http://example.com/formatZ
+record_input:
+  f1:
+    class: File
+    location: rec/A
+    format: http://example.com/format1
+  f2:
+    - class: File
+      location: rec/B
+      format: http://example.com/format2
+    - class: File
+      location: rec/C
+      format: http://example.com/format2

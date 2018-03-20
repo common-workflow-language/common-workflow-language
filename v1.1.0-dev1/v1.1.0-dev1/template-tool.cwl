@@ -5,14 +5,14 @@ requirements:
   - class: InlineJavascriptRequirement
     expressionLib:
       - { $include: underscore.js }
-      - "var t = function(s) { return _.template(s)({'inputs': inputs}); };"
+      - "var t = function(s) { return _.template(s, {variable: 'data'})({'inputs': inputs}); };"
   - class: InitialWorkDirRequirement
     listing:
       - entryname: foo.txt
-        entry: $(t("The file is <%= inputs.file1.path.split('/').slice(-1)[0] %>\n"))
+        entry: $(t("The file is <%= data.inputs.file1.path.split('/').slice(-1)[0] %>\n"))
 hints:
   DockerRequirement:
-    dockerPull: "debian:8"
+    dockerPull: "debian:stretch-slim"
 inputs:
   - id: file1
     type: File

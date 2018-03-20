@@ -2,7 +2,7 @@ class: CommandLineTool
 cwlVersion: v1.1.0-dev1
 hints:
   DockerRequirement:
-    dockerPull: debian:8
+    dockerPull: debian:stretch-slim
   ShellCommandRequirement: {}
 inputs:
   indir: Directory

@@ -54,9 +54,73 @@ $graph:
   type: record
   docParent: "#CWLType"
   doc: |
-    Represents a file (or group of files if `secondaryFiles` is specified) that
-    must be accessible by tools using standard POSIX file system call API such as
+    Represents a file (or group of files when `secondaryFiles` is provided) that
+    will be accessible by tools using standard POSIX file system call API such as
     open(2) and read(2).
+
+    Files are represented as objects with `class` of `File`.  File objects have
+    a number of properties that provide metadata about the file.
+
+    The `location` property of a File is a URI that uniquely identifies the
+    file.  Implementations must support the file:// URI scheme and may support
+    other schemes such as http://.  The value of `location` may also be a
+    relative reference, in which case it must be resolved relative to the URI
+    of the document it appears in.  Alternately to `location`, implementations
+    must also accept the `path` property on File, which must be a filesystem
+    path available on the same host as the CWL runner (for inputs) or the
+    runtime environment of a command line tool execution (for command line tool
+    outputs).
+
+    If no `location` or `path` is specified, a file object must specify
+    `contents` with the UTF-8 text content of the file.  This is a "file
+    literal".  File literals do not correspond to external resources, but are
+    created on disk with `contents` with when needed for a executing a tool.
+    Where appropriate, expressions can return file literals to define new files
+    on a runtime.  The maximum size of `contents` is 64 kilobytes.
+
+    The `basename` property defines the filename on disk where the file is
+    staged.  This may differ from the resource name.  If not provided,
+    `basename` must be computed from the last path part of `location` and made
+    available to expressions.
+
+    The `secondaryFiles` property is a list of File or Directory objects that
+    must be staged in the same directory as the primary file.  It is an error
+    for file names to be duplicated in `secondaryFiles`.
+
+    The `size` property is the size in bytes of the File.  It must be computed
+    from the resource and made available to expressions.  The `checksum` field
+    contains a cryptographic hash of the file content for use it verifying file
+    contents.  Implementations may, at user option, enable or disable
+    computation of the `checksum` field for performance or other reasons.
+    However, the ability to compute output checksums is required to pass the
+    CWL conformance test suite.
+
+    When executing a CommandLineTool, the files and secondary files may be
+    staged to an arbitrary directory, but must use the value of `basename` for
+    the filename.  The `path` property must be file path in the context of the
+    tool execution runtime (local to the compute node, or within the executing
+    container).  All computed properties should be available to expressions.
+    File literals also must be staged and `path` must be set.
+
+    When collecting CommandLineTool outputs, `glob` matching returns file paths
+    (with the `path` property) and the derived properties. This can all be
+    modified by `outputEval`.  Alternately, if the file `cwl.output.json` is
+    present in the output, `outputBinding` is ignored.
+
+    File objects in the output must provide either a `location` URI or a `path`
+    property in the context of the tool execution runtime (local to the compute
+    node, or within the executing container).
+
+    When evaluating an ExpressionTool, file objects must be referenced via
+    `location` (the expression tool does not have access to files on disk so
+    `path` is meaningless) or as file literals.  It is legal to return a file
+    object with an existing `location` but a different `basename`.  The
+    `loadContents` field of ExpressionTool inputs behaves the same as on
+    CommandLineTool inputs, however it is not meaningful on the outputs.
+
+    An ExpressionTool may forward file references from input to output by using
+    the same value for `location`.
+
   fields:
     - name: class
       type:
@@ -175,12 +239,12 @@ $graph:
           items: [File, Directory]
       jsonldPredicate: "cwl:secondaryFiles"
       doc: |
-        A list of additional files that are associated with the primary file
-        and must be transferred alongside the primary file.  Examples include
-        indexes of the primary file, or external references which must be
-        included when loading primary document.  A file object listed in
-        `secondaryFiles` may itself include `secondaryFiles` for which the same
-        rules apply.
+        A list of additional files or directories that are associated with the
+        primary file and must be transferred alongside the primary file.
+        Examples include indexes of the primary file, or external references
+        which must be included when loading primary document.  A file object
+        listed in `secondaryFiles` may itself include `secondaryFiles` for
+        which the same rules apply.
     - name: format
       type: string?
       jsonldPredicate:
@@ -222,6 +286,49 @@ $graph:
   docAfter: "#File"
   doc: |
     Represents a directory to present to a command line tool.
+
+    Directories are represented as objects with `class` of `Directory`.  Directory objects have
+    a number of properties that provide metadata about the directory.
+
+    The `location` property of a Directory is a URI that uniquely identifies
+    the directory.  Implementations must support the file:// URI scheme and may
+    support other schemes such as http://.  Alternately to `location`,
+    implementations must also accept the `path` property on Direcotry, which
+    must be a filesystem path available on the same host as the CWL runner (for
+    inputs) or the runtime environment of a command line tool execution (for
+    command line tool outputs).
+
+    A Directory object may have a `listing` field.  This is a list of File and
+    Directory objects that are contained in the Directory.  For each entry in
+    `listing`, the `basename` property defines the name of the File or
+    Subdirectory when staged to disk.  If `listing` is not provided, the
+    implementation must have some way of fetching the Directory listing at
+    runtime based on the `location` field.
+
+    If a Directory does not have `location`, it is a Directory literal.  A
+    Directory literal must provide `listing`.  Directory literals must be
+    created on disk at runtime as needed.
+
+    The resources in a Directory literal do not need to have any implied
+    relationship in their `location`.  For example, a Directory listing may
+    contain two files located on different hosts.  It is the responsibility of
+    the runtime to ensure that those files are staged to disk appropriately.
+    Secondary files associated with files in `listing` must also be staged to
+    the same Directory.
+
+    When executing a CommandLineTool, Directories must be recursively staged
+    first and have local values of `path` assigend.
+
+    Directory objects in CommandLineTool output must provide either a
+    `location` URI or a `path` property in the context of the tool execution
+    runtime (local to the compute node, or within the executing container).
+
+    An ExpressionTool may forward file references from input to output by using
+    the same value for `location`.
+
+    Name conflicts (the same `basename` appearing multiple times in `listing`
+    or in any entry in `secondaryFiles` in the listing) is a fatal error.
+
   fields:
     - name: class
       type:
@@ -305,7 +412,7 @@ $graph:
       jsonldPredicate:
         _id: "cwl:listing"
 
-- name: SchemaBase
+- name: Labeled
   type: record
   abstract: true
   fields:
@@ -317,15 +424,21 @@ $graph:
       doc: "A short, human-readable label of this object."
 
 
-- name: Parameter
+- name: Identified
   type: record
-  extends: SchemaBase
   abstract: true
-  doc: |
-    Define an input or output parameter to a process.
-
   fields:
-    - name: secondaryFiles
+    - name: id
+      type: string?
+      jsonldPredicate: "@id"
+      doc: "The unique identifier for this object."
+
+- name: FieldBase
+  type: record
+  extends: Labeled
+  abstract: true
+  fields:
+    secondaryFiles:
       type:
         - "null"
         - string
@@ -336,13 +449,29 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        Describes files that must be included alongside the primary file(s).
+        Provides a pattern or expression specifying files or directories that
+        must be included alongside the primary file.  All listed secondary
+        files must be present.  An implementation may fail workflow execution
+        if an expected secondary file does not exist.
 
         If the value is an expression, the value of `self` in the expression
-        must be the primary input or output File to which this binding applies.
+        must be the primary input or output File object to which this binding
+        applies.  The `basename`, `nameroot` and `nameext` fields must be
+        present in `self`.  For `CommandLineTool` outputs the `path` field must
+        also be present.  The expression must return a filename string relative
+        to the path to the primary File, a File or Directory object with either
+        `path` or `location` and `basename` fields set, or an array consisting
+        of strings or File or Directory objects.  It is legal to reference an
+        unchanged File or Directory object taken from input as a secondaryFile.
 
-        If the value is a string, it specifies that the following pattern
-        should be applied to the primary file:
+        To work on non-filename-preserving storage systems, portable tool
+        descriptions should avoid constructing new values from `location`, but
+        should construct relative references using `basename` or `nameroot`
+        instead.
+
+        If a value in `secondaryFiles` is a string that is not an expression,
+        it specifies that the following pattern should be applied to the path
+        of the primary file to yield a filename relative to the primary File:
 
           1. If string begins with one or more caret `^` characters, for each
             caret, remove the last file extension from the path (the last
@@ -350,7 +479,22 @@ $graph:
             extensions, the path is unchanged.
           2. Append the remainder of the string to the end of the file path.
 
-    - name: format
+    streamable:
+      type: boolean?
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        A value of `true` indicates that the file is read or written
+        sequentially without seeking.  An implementation may use this flag to
+        indicate whether it is valid to stream file contents using a named
+        pipe.  Default: `false`.
+
+
+- name: InputFormat
+  type: record
+  abstract: true
+  fields:
+    format:
       type:
         - "null"
         - string
@@ -364,30 +508,38 @@ $graph:
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        For input parameters, this must be one or more IRIs of concept nodes
+        This must be one or more IRIs of concept nodes
         that represents file formats which are allowed as input to this
         parameter, preferrably defined within an ontology.  If no ontology is
         available, file formats may be tested by exact match.
 
-        For output parameters, this is the file format that will be assigned to
-        the output parameter.
 
-    - name: streamable
-      type: boolean?
+- name: OutputFormat
+  type: record
+  abstract: true
+  fields:
+    format:
+      type:
+        - "null"
+        - string
+        - Expression
+      jsonldPredicate:
+        _id: cwl:format
+        _type: "@id"
+        identity: true
       doc: |
         Only valid when `type: File` or is an array of `items: File`.
 
-        A value of `true` indicates that the file is read or written
-        sequentially without seeking.  An implementation may use this flag to
-        indicate whether it is valid to stream file contents using a named
-        pipe.  Default: `false`.
+        This is the file format that will be assigned to the output
+        File object.
 
-    - name: doc
-      type:
-        - string?
-        - string[]?
-      doc: "A documentation string for this type, or an array of strings which should be concatenated."
-      jsonldPredicate: "rdfs:comment"
+
+- name: Parameter
+  type: record
+  extends: [FieldBase, sld:Documented, Identified]
+  abstract: true
+  doc: |
+    Define an input or output parameter to a process.
 
 
 - type: enum
@@ -423,20 +575,42 @@ $graph:
 
 
 - name: InputSchema
-  extends: SchemaBase
+  extends: [Labeled, sld:Documented, BindsInput]
   type: record
   abstract: true
+  fields:
+    - name: name
+      type: string?
+      jsonldPredicate: "@id"
+      doc: "The identifier for this type"
 
 
 - name: OutputSchema
-  extends: SchemaBase
+  extends: [Labeled, BindsOutput]
   type: record
   abstract: true
+
+- name: BindsInput
+  type: record
+  abstract: true
+  fields:
+    - name: inputBinding
+      type: InputBinding?
+      jsonldPredicate: "cwl:inputBinding"
+
+- name: BindsOutput
+  type: record
+  abstract: true
+  fields:
+    - name: outputBinding
+      type: OutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputRecordField
   type: record
-  extends: "sld:RecordField"
+  abstract: true
+  extends: [sld:RecordField, FieldBase, BindsInput, InputFormat]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -446,14 +620,6 @@ $graph:
       specializeTo: InputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this process object."
 
 
 - name: InputRecordSchema
@@ -467,10 +633,6 @@ $graph:
 - name: InputEnumSchema
   type: record
   extends: ["sld:EnumSchema", InputSchema]
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: InputArraySchema
@@ -485,15 +647,12 @@ $graph:
       specializeTo: InputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: OutputRecordField
   type: record
-  extends: "sld:RecordField"
+  extends: [sld:RecordField, FieldBase, BindsOutput, OutputFormat]
+  abstract: true
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: OutputRecordSchema
@@ -503,10 +662,6 @@ $graph:
       specializeTo: OutputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: OutputRecordSchema
@@ -522,10 +677,7 @@ $graph:
   type: record
   extends: ["sld:EnumSchema", OutputSchema]
   docParent: "#OutputParameter"
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
+
 
 - name: OutputArraySchema
   type: record
@@ -540,78 +692,30 @@ $graph:
       specializeTo: OutputArraySchema
     - specializeFrom: "sld:PrimitiveType"
       specializeTo: CWLType
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputParameter
   type: record
-  extends: Parameter
+  abstract: true
+  extends: [Parameter, BindsInput, InputFormat]
   fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this parameter object."
-
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-      doc: |
-        Describes how to handle the inputs of a process and convert them
-        into a concrete form for execution, such as command line parameters.
 
     - name: default
       type: Any?
       jsonldPredicate:
-        _id: cwl:default
+        _id: sld:default
         noLinkCheck: true
       doc: |
         The default value to use for this parameter if the parameter is missing
         from the input object, or if the value of the parameter in the input
-        object is `null`.
+        object is `null`.  Default values are applied before evaluating expressions
+        (e.g. dependent `valueFrom` fields).
 
-- name: RegularInputParameter
-  type: record
-  extends: InputParameter
-  fields:
-    - name: type
-      type:
-        - "null"
-        - CWLType
-        - InputRecordSchema
-        - InputEnumSchema
-        - InputArraySchema
-        - string
-        - type: array
-          items:
-            - CWLType
-            - InputRecordSchema
-            - InputEnumSchema
-            - InputArraySchema
-            - string
-      jsonldPredicate:
-        "_id": "sld:type"
-        "_type": "@vocab"
-        refScope: 2
-        typeDSL: True
-      doc: |
-        Specify valid types of data that may be assigned to this parameter.
 
 - name: OutputParameter
   type: record
-  extends: Parameter
-  fields:
-    - name: id
-      type: string
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this parameter object."
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
-      doc: |
-        Describes how to handle the outputs of a process.
+  extends: [Parameter, BindsOutput, OutputFormat]
+  abstract: true
 
 
 - type: record
@@ -628,6 +732,7 @@ $graph:
 
 - type: record
   name: Process
+  extends: [Identified, Labeled, sld:Documented]
   abstract: true
   doc: |
 
@@ -636,10 +741,6 @@ $graph:
     directly executed.
 
   fields:
-    - name: id
-      type: string?
-      jsonldPredicate: "@id"
-      doc: "The unique identifier for this process object."
     - name: inputs
       type:
         type: array
@@ -695,14 +796,6 @@ $graph:
         _id: cwl:hints
         noLinkCheck: true
         mapSubject: class
-    - name: label
-      type: string?
-      jsonldPredicate: "rdfs:label"
-      doc: "A short, human-readable label of this process object."
-    - name: doc
-      type: string?
-      jsonldPredicate: "rdfs:comment"
-      doc: "A long, human-readable description of this process object."
     - name: cwlVersion
       type: CWLVersion?
       doc: |

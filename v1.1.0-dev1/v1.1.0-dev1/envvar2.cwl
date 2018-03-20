@@ -6,7 +6,7 @@ requirements:
   ShellCommandRequirement: {}
 hints:
   DockerRequirement:
-    dockerPull: debian:8
+    dockerPull: debian:stretch-slim
 arguments: [
   echo, {valueFrom: '"HOME=$HOME"', shellQuote: false}, {valueFrom: '"TMPDIR=$TMPDIR"', shellQuote: false},
   {valueFrom: '&&', shellQuote: false},
