@@ -19,6 +19,7 @@ inputs:
     type: RecordTestType
 
 outputs: []
-arguments: [test, -f, $(inputs.record_input.f1.path).s2,
+baseCommand: test
+arguments: [-f, $(inputs.record_input.f1.path).s2,
   '-a', '-f', '$(inputs.record_input.f2[0].path).s3',
   '-a', '-f', '$(inputs.record_input.f2[1].path).s3']

@@ -1565,12 +1565,77 @@
 
 - job: v1.1.0-dev1/record-secondaryFiles-job.yml
   output: {}
-  tool: v1.1.0-dev1/record-secondaryFiles.cwl
+  tool: v1.1.0-dev1/record-in-secondaryFiles.cwl
   doc: Test secondaryFiles on anonymous record fields
   tags: [ required ]
 
 - job: v1.1.0-dev1/record-secondaryFiles-job.yml
   output: {}
-  tool: v1.1.0-dev1/record-secondaryFiles-sd.cwl
+  tool: v1.1.0-dev1/record-sd-secondaryFiles.cwl
   doc: Test secondaryFiles on SchemaDefRequirement record fields
+  tags: [ required ]
+
+- job: v1.1.0-dev1/empty.json
+  output: {
+    "record_output": {
+        "f1": {
+            "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "location": "A",
+            "secondaryFiles": [
+                {
+                    "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                    "location": "A.s2",
+                    "class": "File",
+                    "size": 0
+                }
+            ],
+            "class": "File",
+            "size": 0
+        },
+        "f2": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "location": "B",
+                "secondaryFiles": [
+                    {
+                        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                        "location": "B.s3",
+                        "class": "File",
+                        "size": 0
+                    }
+                ],
+                "class": "File",
+                "size": 0
+            },
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "location": "C",
+                "secondaryFiles": [
+                    {
+                        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                        "location": "C.s3",
+                        "class": "File",
+                        "size": 0
+                    }
+                ],
+                "class": "File",
+                "size": 0
+            }
+        ]
+    }
+  }
+  tool: v1.1.0-dev1/record-out-secondaryFiles.cwl
+  doc: Test secondaryFiles on output record fields
+  tags: [ required ]
+
+- job: v1.1.0-dev1/record-secondaryFiles-job.yml
+  output: {}
+  tool: v1.1.0-dev1/record-in-format.cwl
+  doc: Test format on anonymous record fields
+  tags: [ required ]
+
+- job: v1.1.0-dev1/record-secondaryFiles-job.yml
+  output: {}
+  tool: v1.1.0-dev1/record-out-format.cwl
+  doc: Test format on output record fields
   tags: [ required ]

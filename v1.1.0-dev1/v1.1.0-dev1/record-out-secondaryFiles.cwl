@@ -1,19 +1,23 @@
 class: CommandLineTool
 cwlVersion: v1.1.0-dev1
-inputs:
-  record_input:
+inputs: []
+outputs:
+  record_output:
     type:
       type: record
       fields:
         f1:
           type: File
           secondaryFiles: .s2
+          outputBinding:
+            glob: A
         f2:
           type:
             type: array
             items: File
           secondaryFiles: .s3
-outputs: []
-arguments: [test, -f, $(inputs.record_input.f1.path).s2,
-  '-a', '-f', '$(inputs.record_input.f2[0].path).s3',
-  '-a', '-f', '$(inputs.record_input.f2[1].path).s3']
+          outputBinding:
+            glob: [B, C]
+
+baseCommand: touch
+arguments: [A, A.s2, B, B.s3, C, C.s3]
