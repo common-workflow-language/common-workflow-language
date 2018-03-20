@@ -1635,7 +1635,24 @@
   tags: [ required ]
 
 - job: v1.1.0-dev1/record-secondaryFiles-job.yml
-  output: {}
+  output: {
+    "f1out": {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": "A",
+        "size": 0,
+        "format": "http://example.com/format1"
+    },
+    "record_output": {
+        "f2out": {
+            "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "class": "File",
+            "location": "B",
+            "size": 0,
+            "format": "http://example.com/format2"
+        }
+    }
+  }
   tool: v1.1.0-dev1/record-out-format.cwl
   doc: Test format on output record fields
   tags: [ required ]
