@@ -91,17 +91,10 @@ $graph:
       doc: |
         Specify valid types of data that may be assigned to this parameter.
 
-- type: record
-  name: WorkflowInputBinding
-  extends: InputBinding
-
 
 - name: WorkflowInputParameter
   type: record
   extends: InputParameter
-  specialize:
-    - specializeFrom: InputBinding
-      specializeTo: WorkflowInputBinding
   fields:
     - name: type
       type:

@@ -555,7 +555,6 @@ $graph:
 
 - name: InputBinding
   type: record
-  abstract: true
   fields:
     - name: loadContents
       type:
@@ -596,7 +595,6 @@ $graph:
 
 - name: InputRecordField
   type: record
-  abstract: true
   extends: [sld:RecordField, FieldBase, BindsInput, InputFormat]
   specialize:
     - specializeFrom: "sld:RecordSchema"
@@ -639,7 +637,6 @@ $graph:
 - name: OutputRecordField
   type: record
   extends: [sld:RecordField, FieldBase, OutputFormat]
-  abstract: true
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: OutputRecordSchema
@@ -814,6 +811,10 @@ $graph:
         be called from CWL expressions.
 
 
+- name: CommandInputSchema
+  type: record
+  abstract: true
+
 - name: SchemaDefRequirement
   type: record
   extends: ProcessRequirement
@@ -835,5 +836,5 @@ $graph:
     - name: types
       type:
         type: array
-        items: InputSchema
+        items: CommandInputSchema
       doc: The list of type definitions.

@@ -264,15 +264,17 @@ $graph:
 
 - name: CommandInputRecordSchema
   type: record
-  extends: InputRecordSchema
+  extends: [InputRecordSchema, CommandInputSchema]
   specialize:
     - specializeFrom: InputRecordField
       specializeTo: CommandInputRecordField
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 
 - name: CommandInputEnumSchema
   type: record
-  extends: InputEnumSchema
+  extends: [InputEnumSchema, CommandInputSchema]
   specialize:
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
@@ -280,7 +282,7 @@ $graph:
 
 - name: CommandInputArraySchema
   type: record
-  extends: InputArraySchema
+  extends: [InputArraySchema, CommandInputSchema]
   specialize:
     - specializeFrom: InputRecordSchema
       specializeTo: CommandInputRecordSchema
