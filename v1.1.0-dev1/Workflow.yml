@@ -118,6 +118,11 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+    - name: inputBinding
+      type: InputBinding?
+      doc: Deprecated.  Preserved for v1.0 backwards compatability.  Use `InputParameter.loadContents` instead.
+      jsonldPredicate: "cwl:inputBinding"
+
 
 - type: record
   name: ExpressionTool
@@ -228,7 +233,7 @@ $graph:
 
 - type: record
   name: WorkflowStepInput
-  extends: [Identified, Sink]
+  extends: [Identified, Sink, LoadContents]
   docParent: "#WorkflowStep"
   doc: |
     The input of a workflow step connects an upstream parameter (from the

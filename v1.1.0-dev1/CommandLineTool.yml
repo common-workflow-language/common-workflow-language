@@ -198,6 +198,7 @@ $graph:
 
 - type: record
   name: CommandOutputBinding
+  extends: LoadContents
   doc: |
     Describes how to generate an output parameter based on the files produced
     by a CommandLineTool.
@@ -224,15 +225,6 @@ $graph:
         return a string or an array of strings, which will then be evaluated as
         one or more glob patterns.  Must only match and return files which
         actually exist.
-    - name: loadContents
-      type:
-        - "null"
-        - boolean
-      jsonldPredicate: "cwl:loadContents"
-      doc: |
-        For each file matched in `glob`, read up to
-        the first 64 KiB of text from the file and place it in the `contents`
-        field of the file object for manipulation by `outputEval`.
     - name: outputEval
       type:
         - "null"
@@ -346,9 +338,6 @@ $graph:
   name: CommandInputParameter
   extends: InputParameter
   doc: An input parameter for a CommandLineTool.
-  specialize:
-    - specializeFrom: InputBinding
-      specializeTo: CommandLineBinding
   fields:
     - name: type
       type:
@@ -373,6 +362,9 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+    - name: inputBinding
+      type: CommandLineBinding?
+      jsonldPredicate: "cwl:inputBinding"
 
 - type: record
   name: CommandOutputParameter

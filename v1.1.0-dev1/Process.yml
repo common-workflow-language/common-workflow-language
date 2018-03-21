@@ -433,6 +433,23 @@ $graph:
       jsonldPredicate: "@id"
       doc: "The unique identifier for this object."
 
+
+- name: LoadContents
+  type: record
+  abstract: true
+  fields:
+    - name: loadContents
+      type:
+        - "null"
+        - boolean
+      jsonldPredicate: "cwl:loadContents"
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        Read up to the first 64 KiB of text from the file and place it in the
+        "contents" field of the file object for use by expressions.
+
+
 - name: FieldBase
   type: record
   extends: Labeled
@@ -562,6 +579,10 @@ $graph:
         - boolean
       jsonldPredicate: "cwl:loadContents"
       doc: |
+        Use of `loadContents` in `InputBinding` is deprecated.
+        Preserved for v1.0 backwards compatability.  May be removed in
+        a future spec.  Use `InputParameter.loadContents` instead.
+
         Only valid when `type: File` or is an array of `items: File`.
 
         Read up to the first 64 KiB of text from the file and place it in the
@@ -569,7 +590,7 @@ $graph:
 
 
 - name: InputSchema
-  extends: [Labeled, sld:Documented, BindsInput]
+  extends: [Labeled, sld:Documented]
   type: record
   abstract: true
   fields:
@@ -584,18 +605,10 @@ $graph:
   type: record
   abstract: true
 
-- name: BindsInput
-  type: record
-  abstract: true
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-
 
 - name: InputRecordField
   type: record
-  extends: [sld:RecordField, FieldBase, BindsInput, InputFormat]
+  extends: [sld:RecordField, FieldBase, InputFormat, LoadContents]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -681,9 +694,8 @@ $graph:
 - name: InputParameter
   type: record
   abstract: true
-  extends: [Parameter, BindsInput, InputFormat]
+  extends: [Parameter, InputFormat, LoadContents]
   fields:
-
     - name: default
       type: Any?
       jsonldPredicate:
