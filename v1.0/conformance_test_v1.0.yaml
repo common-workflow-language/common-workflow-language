@@ -1555,10 +1555,10 @@
 - job: v1.0/new-dir-job.yml
   output: {
     "out": {
-        "checksum": "sha1$789c490926d9ccfbf4992056265d02f7cf81c61a",
+        "checksum": "sha1$ada861e58d3ca64224d5b8ded8cd0e1e7f775057",
         "class": "File",
         "location": "output.txt",
-        "size": 12
+        "size": 26
     },
     "outdir": {
         "location": "sample1",
@@ -1566,6 +1566,12 @@
             {
                 "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
                 "location": "sample1.bam",
+                "class": "File",
+                "size": 0
+            },
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "location": "sample1.other",
                 "class": "File",
                 "size": 0
             }

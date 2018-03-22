@@ -1,3 +1,4 @@
 input:
   class: Directory
   location: bams
+#  location: keep:d287705ded77ef04295b906135fad6b8+53
