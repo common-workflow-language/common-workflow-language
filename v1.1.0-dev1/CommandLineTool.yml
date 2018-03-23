@@ -252,6 +252,10 @@ $graph:
       specializeTo: CommandInputArraySchema
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
+  fields:
+    inputBinding:
+      type: CommandLineBinding?
+      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: CommandInputRecordSchema
