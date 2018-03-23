@@ -239,10 +239,16 @@ $graph:
         the File objects must include up to the first 64 KiB of file contents
         in the `contents` field.
 
+- name: CommandLineBindable
+  type: record
+  fields:
+    inputBinding:
+      type: CommandLineBinding?
+      jsonldPredicate: "cwl:inputBinding"
 
 - name: CommandInputRecordField
   type: record
-  extends: InputRecordField
+  extends: [InputRecordField, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordSchema
       specializeTo: CommandInputRecordSchema
@@ -252,15 +258,11 @@ $graph:
       specializeTo: CommandInputArraySchema
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
-  fields:
-    inputBinding:
-      type: CommandLineBinding?
-      jsonldPredicate: "cwl:inputBinding"
 
 
 - name: CommandInputRecordSchema
   type: record
-  extends: [InputRecordSchema, CommandInputSchema]
+  extends: [InputRecordSchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordField
       specializeTo: CommandInputRecordField
@@ -270,7 +272,7 @@ $graph:
 
 - name: CommandInputEnumSchema
   type: record
-  extends: [InputEnumSchema, CommandInputSchema]
+  extends: [InputEnumSchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
@@ -278,7 +280,7 @@ $graph:
 
 - name: CommandInputArraySchema
   type: record
-  extends: [InputArraySchema, CommandInputSchema]
+  extends: [InputArraySchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordSchema
       specializeTo: CommandInputRecordSchema
