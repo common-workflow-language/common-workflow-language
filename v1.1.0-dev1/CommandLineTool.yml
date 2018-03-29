@@ -370,6 +370,9 @@ $graph:
         Specify valid types of data that may be assigned to this parameter.
     - name: inputBinding
       type: CommandLineBinding?
+      doc: |
+        Describes how to turns the input parameters of a process into
+        command line arguments.
       jsonldPredicate: "cwl:inputBinding"
 
 - type: record
