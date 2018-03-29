@@ -111,6 +111,7 @@ $graph:
 - type: record
   name: CommandLineBinding
   extends: InputBinding
+  docParent: "#CommandInputParameter"
   doc: |
 
     When listed under `inputBinding` in the input schema, the term
