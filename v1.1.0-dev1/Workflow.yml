@@ -49,6 +49,7 @@ $graph:
         * Default values for some fields are now expressed in the schema
         * When defining record types, fields of type `File` may now include `secondaryFiles` and `format`.
         * InputSchema now permits a `doc` field
+        * The `doc` field may be an array of strings
         * The `run` field now introduces a subscope so that embedded
           definitions do not have identifier conflicts with the
           outer workflow.
