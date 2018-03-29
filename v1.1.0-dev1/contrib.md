@@ -1,7 +1,7 @@
 Authors:
 
 * Peter Amstutz <pamstutz@veritasgenetics.com>, Arvados Project, Veritas Genetics
-* Michael R. Crusoe <michael.crusoe@gmail.com>, Common Workflow Language
+* Michael R. Crusoe <mrc@commonwl.org>, Common Workflow Language
   project
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
 
@@ -15,5 +15,5 @@ Contributors:
 * Hervé Ménager <herve.menager@gmail.com>, Institut Pasteur
 * Maya Nedeljkovich <maja.nedeljkovic@sbgenomics.com>, Seven Bridges Genomics
 * Matt Scales <mscales@icr.ac.uk>, Institute of Cancer Research, London
-* Stian Soiland-Reyes <[soiland-reyes@cs.manchester.ac.uk](mailto:soiland-reyes@cs.manchester.ac.uk)>, University of Manchester
+* Stian Soiland-Reyes <soiland-reyes@cs.manchester.ac.uk>, University of Manchester
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>, Seven Bridges Genomics
