@@ -580,8 +580,8 @@ $graph:
       jsonldPredicate: "cwl:loadContents"
       doc: |
         Use of `loadContents` in `InputBinding` is deprecated.
-        Preserved for v1.0 backwards compatability.  May be removed in
-        a future spec.  Use `InputParameter.loadContents` instead.
+        Preserved for v1.0 backwards compatability.  Will be removed in
+        CWL v2.0.  Use `InputParameter.loadContents` instead.
 
         Only valid when `type: File` or is an array of `items: File`.
 
