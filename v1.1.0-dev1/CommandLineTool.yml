@@ -1107,10 +1107,10 @@ $graph:
     Enabling network access does not imply a publically routable IP
     address or the ability to accept inbound connections.
 
-    If `networkWhitelist` is provided, the implementation should limit
+    If `acceptlist` is provided, the implementation should limit
     the process to contacting only those hosts listed in
-    `networkWhitelist` and deny any other connection attempts.  The
-    `networkWhitelist` must be applied in addition to (not as a
+    `acceptlist` and deny any other connection attempts.  The
+    `acceptlist` must be applied in addition to (not as a
     substitute for) implementation and site specific security
     policies.
 
@@ -1124,5 +1124,5 @@ $graph:
         "_type": "@vocab"
     - name: networkAccess
       type: [boolean, string, Expression]
-    - name: networkWhitelist
+    - name: acceptlist
       type: ["null", string, string[], Expression]
