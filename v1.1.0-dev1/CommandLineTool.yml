@@ -253,6 +253,7 @@ $graph:
     inputBinding:
       type: CommandLineBinding?
       jsonldPredicate: "cwl:inputBinding"
+      doc: Describes how to turn this object into command line arguments.
 
 - name: CommandInputRecordField
   type: record
@@ -314,6 +315,9 @@ $graph:
     - name: outputBinding
       type: CommandOutputBinding?
       jsonldPredicate: "cwl:outputBinding"
+      doc: |
+        Describes how to generate this output object based on the files
+        produced by a CommandLineTool
 
 
 - name: CommandOutputRecordSchema
@@ -415,6 +419,8 @@ $graph:
     - name: outputBinding
       type: CommandOutputBinding?
       jsonldPredicate: "cwl:outputBinding"
+      doc: Describes how to generate this output object based on the files
+        produced by a CommandLineTool
 
 - name: stdin
   type: enum
