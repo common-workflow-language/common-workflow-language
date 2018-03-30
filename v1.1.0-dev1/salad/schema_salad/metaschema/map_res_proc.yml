@@ -1,0 +1,12 @@
+{
+    "mapped": [
+        {
+            "value": "daphne",
+            "key": "fred"
+        },
+        {
+            "value": "scooby",
+            "key": "shaggy"
+        }
+    ]
+}

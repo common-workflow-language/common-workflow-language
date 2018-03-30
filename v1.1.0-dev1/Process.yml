@@ -433,6 +433,23 @@ $graph:
       jsonldPredicate: "@id"
       doc: "The unique identifier for this object."
 
+
+- name: LoadContents
+  type: record
+  abstract: true
+  fields:
+    - name: loadContents
+      type:
+        - "null"
+        - boolean
+      jsonldPredicate: "cwl:loadContents"
+      doc: |
+        Only valid when `type: File` or is an array of `items: File`.
+
+        Read up to the first 64 KiB of text from the file and place it in the
+        "contents" field of the file object for use by expressions.
+
+
 - name: FieldBase
   type: record
   extends: Labeled
@@ -555,7 +572,6 @@ $graph:
 
 - name: InputBinding
   type: record
-  abstract: true
   fields:
     - name: loadContents
       type:
@@ -563,19 +579,18 @@ $graph:
         - boolean
       jsonldPredicate: "cwl:loadContents"
       doc: |
+        Use of `loadContents` in `InputBinding` is deprecated.
+        Preserved for v1.0 backwards compatability.  Will be removed in
+        CWL v2.0.  Use `InputParameter.loadContents` instead.
+
         Only valid when `type: File` or is an array of `items: File`.
 
         Read up to the first 64 KiB of text from the file and place it in the
         "contents" field of the file object for use by expressions.
 
 
-- name: OutputBinding
-  type: record
-  abstract: true
-
-
 - name: InputSchema
-  extends: [Labeled, sld:Documented, BindsInput]
+  extends: [Labeled, sld:Documented]
   type: record
   abstract: true
   fields:
@@ -586,31 +601,14 @@ $graph:
 
 
 - name: OutputSchema
-  extends: [Labeled, BindsOutput]
+  extends: [Labeled]
   type: record
   abstract: true
-
-- name: BindsInput
-  type: record
-  abstract: true
-  fields:
-    - name: inputBinding
-      type: InputBinding?
-      jsonldPredicate: "cwl:inputBinding"
-
-- name: BindsOutput
-  type: record
-  abstract: true
-  fields:
-    - name: outputBinding
-      type: OutputBinding?
-      jsonldPredicate: "cwl:outputBinding"
 
 
 - name: InputRecordField
   type: record
-  abstract: true
-  extends: [sld:RecordField, FieldBase, BindsInput, InputFormat]
+  extends: [sld:RecordField, FieldBase, InputFormat, LoadContents]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: InputRecordSchema
@@ -651,8 +649,7 @@ $graph:
 
 - name: OutputRecordField
   type: record
-  extends: [sld:RecordField, FieldBase, BindsOutput, OutputFormat]
-  abstract: true
+  extends: [sld:RecordField, FieldBase, OutputFormat]
   specialize:
     - specializeFrom: "sld:RecordSchema"
       specializeTo: OutputRecordSchema
@@ -697,9 +694,8 @@ $graph:
 - name: InputParameter
   type: record
   abstract: true
-  extends: [Parameter, BindsInput, InputFormat]
+  extends: [Parameter, InputFormat, LoadContents]
   fields:
-
     - name: default
       type: Any?
       jsonldPredicate:
@@ -714,7 +710,7 @@ $graph:
 
 - name: OutputParameter
   type: record
-  extends: [Parameter, BindsOutput, OutputFormat]
+  extends: [Parameter, OutputFormat]
   abstract: true
 
 
@@ -827,6 +823,10 @@ $graph:
         be called from CWL expressions.
 
 
+- name: CommandInputSchema
+  type: record
+  abstract: true
+
 - name: SchemaDefRequirement
   type: record
   extends: ProcessRequirement
@@ -848,5 +848,5 @@ $graph:
     - name: types
       type:
         type: array
-        items: InputSchema
+        items: CommandInputSchema
       doc: The list of type definitions.

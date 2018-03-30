@@ -26,7 +26,7 @@ Web.
 
 This document is the product of the [Common Workflow Language working
 group](https://groups.google.com/forum/#!forum/common-workflow-language).  The
-latest version of this document is available in the "schema_salad" directory at
+latest version of this document is available in the "schema_salad" repository at
 
 https://github.com/common-workflow-language/schema_salad
 
@@ -38,7 +38,7 @@ under the terms of the Apache License, version 2.0.
 # Introduction
 
 The JSON data model is an extremely popular way to represent structured
-data.  It is attractive because of it's relative simplicity and is a
+data.  It is attractive because of its relative simplicity and is a
 natural fit with the standard types of many programming languages.
 However, this simplicity means that basic JSON lacks expressive features
 useful for working with complex data structures and document formats, such
@@ -70,12 +70,17 @@ and RDF schema, and production of RDF triples by applying the JSON-LD
 context.  The schema language also provides for robust support of inline
 documentation.
 
-## Introduction to draft 1
+## Introduction to v1.0
 
-This is the first version of Schema Salad.  It is developed concurrently
-with draft 3 of the Common Workflow Language for use in specifying the
-Common Workflow Language, however Schema Salad is intended to be useful to
-a broader audience.
+This is the second version of of the Schema Salad specification.  It is
+developed concurrently with v1.0 of the Common Workflow Language for use in
+specifying the Common Workflow Language, however Schema Salad is intended to be
+useful to a broader audience.  Compared to the draft-1 schema salad
+specification, the following changes have been made:
+
+* Use of [mapSubject and mapPredicate](#Identifier_maps) to transform maps to lists of records.
+* Resolution of the [domain Specific Language for types](#Domain_Specific_Language_for_types)
+* Consolidation of the formal [schema into section 5](#Schema).
 
 ## References to Other Specifications
 

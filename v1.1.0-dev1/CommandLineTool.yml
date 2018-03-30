@@ -48,9 +48,19 @@ $graph:
       underspecified behavior may have slightly different behavior in
       v1.1.0-dev1.
 
+      ## Changelog
+
         * Default values for some fields are now expressed in the schema.
-        * When defining record types, fields of type `File` may now include `secondaryFiles` and `format`.
-        * InputSchema now permits a `doc` field
+        * When defining record types with `CommandInputRecordSchema`, fields of
+          type `File` may now include `format`, `loadContents`,
+          `secondaryFiles` and `streamable`.
+        * `CommandInputRecordSchema`, `CommandInputEnumSchema`, and
+          `CommandInputArraySchema` now have an optional `doc` field.
+        * `inputBinding` has been added as an optional field for
+          `CommandInputRecordSchema` (was previously in CWL `draft-3` but
+          disappeared in `v1.0`)
+        * Any `doc` field may be an array of strings in addition to the
+          previously allowed single string.
         * Addition of `stdin` type shortcut for `CommandInputParameter`.
         * Clarify that the designated output directory should be empty
           except for files or directories specified using
@@ -58,6 +68,8 @@ $graph:
         * Clarify semantics of `shellQuote`
         * Expressions are now allowed to evaluate to `null` or `Dirent` in
           [InitialWorkDirRequirement.listing](#InitialWorkDirRequirement).
+
+      See also the [CWL Workflow Description, v1.1.0-dev1 changelog](Workflow.html#Changelog).
 
       ## Purpose
 
@@ -111,6 +123,7 @@ $graph:
 - type: record
   name: CommandLineBinding
   extends: InputBinding
+  docParent: "#CommandInputParameter"
   doc: |
 
     When listed under `inputBinding` in the input schema, the term
@@ -195,9 +208,10 @@ $graph:
         If `shellQuote` is true or null, the implementation must not
         permit interpretation of any shell metacharacters or directives.
 
+
 - type: record
   name: CommandOutputBinding
-  extends: OutputBinding
+  extends: LoadContents
   doc: |
     Describes how to generate an output parameter based on the files produced
     by a CommandLineTool.
@@ -224,15 +238,6 @@ $graph:
         return a string or an array of strings, which will then be evaluated as
         one or more glob patterns.  Must only match and return files which
         actually exist.
-    - name: loadContents
-      type:
-        - "null"
-        - boolean
-      jsonldPredicate: "cwl:loadContents"
-      doc: |
-        For each file matched in `glob`, read up to
-        the first 64 KiB of text from the file and place it in the `contents`
-        field of the file object for manipulation by `outputEval`.
     - name: outputEval
       type:
         - "null"
@@ -247,10 +252,17 @@ $graph:
         the File objects must include up to the first 64 KiB of file contents
         in the `contents` field.
 
+- name: CommandLineBindable
+  type: record
+  fields:
+    inputBinding:
+      type: CommandLineBinding?
+      jsonldPredicate: "cwl:inputBinding"
+      doc: Describes how to turn this object into command line arguments.
 
 - name: CommandInputRecordField
   type: record
-  extends: InputRecordField
+  extends: [InputRecordField, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordSchema
       specializeTo: CommandInputRecordSchema
@@ -264,15 +276,17 @@ $graph:
 
 - name: CommandInputRecordSchema
   type: record
-  extends: InputRecordSchema
+  extends: [InputRecordSchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordField
       specializeTo: CommandInputRecordField
+    - specializeFrom: InputBinding
+      specializeTo: CommandLineBinding
 
 
 - name: CommandInputEnumSchema
   type: record
-  extends: InputEnumSchema
+  extends: [InputEnumSchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
@@ -280,7 +294,7 @@ $graph:
 
 - name: CommandInputArraySchema
   type: record
-  extends: InputArraySchema
+  extends: [InputArraySchema, CommandInputSchema, CommandLineBindable]
   specialize:
     - specializeFrom: InputRecordSchema
       specializeTo: CommandInputRecordSchema
@@ -302,8 +316,13 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
+  fields:
+    - name: outputBinding
+      type: CommandOutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
+      doc: |
+        Describes how to generate this output object based on the files
+        produced by a CommandLineTool
 
 
 - name: CommandOutputRecordSchema
@@ -324,8 +343,6 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
 
 
 - name: CommandOutputArraySchema
@@ -338,17 +355,12 @@ $graph:
       specializeTo: CommandOutputEnumSchema
     - specializeFrom: OutputArraySchema
       specializeTo: CommandOutputArraySchema
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
 
 
 - type: record
   name: CommandInputParameter
   extends: InputParameter
   doc: An input parameter for a CommandLineTool.
-  specialize:
-    - specializeFrom: InputBinding
-      specializeTo: CommandLineBinding
   fields:
     - name: type
       type:
@@ -373,14 +385,17 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+    - name: inputBinding
+      type: CommandLineBinding?
+      doc: |
+        Describes how to turns the input parameters of a process into
+        command line arguments.
+      jsonldPredicate: "cwl:inputBinding"
 
 - type: record
   name: CommandOutputParameter
   extends: OutputParameter
   doc: An output parameter for a CommandLineTool.
-  specialize:
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
   fields:
     - name: type
       type:
@@ -406,6 +421,11 @@ $graph:
         typeDSL: True
       doc: |
         Specify valid types of data that may be assigned to this parameter.
+    - name: outputBinding
+      type: CommandOutputBinding?
+      jsonldPredicate: "cwl:outputBinding"
+      doc: Describes how to generate this output object based on the files
+        produced by a CommandLineTool
 
 - name: stdin
   type: enum

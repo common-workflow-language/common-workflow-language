@@ -1,0 +1,2354 @@
+[
+    {
+        "name": "https://w3id.org/cwl/cwl#Common Workflow Language, v1.0",
+        "type": "documentation",
+        "doc": "\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#PrimitiveType",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/salad#null",
+            "http://www.w3.org/2001/XMLSchema#boolean",
+            "http://www.w3.org/2001/XMLSchema#int",
+            "http://www.w3.org/2001/XMLSchema#long",
+            "http://www.w3.org/2001/XMLSchema#float",
+            "http://www.w3.org/2001/XMLSchema#double",
+            "http://www.w3.org/2001/XMLSchema#string"
+        ],
+        "doc": [
+            "Salad data types are based on Avro schema declarations.  Refer to the\n[Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for\ndetailed information.\n",
+            "null: no value",
+            "boolean: a binary value",
+            "int: 32-bit signed integer",
+            "long: 64-bit signed integer",
+            "float: single precision (32-bit) IEEE 754 floating-point number",
+            "double: double precision (64-bit) IEEE 754 floating-point number",
+            "string: Unicode character sequence"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#Any",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/salad#Any"
+        ],
+        "doc": "The **Any** type validates for any non-null value.\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#RecordField",
+        "type": "record",
+        "doc": "A field of a record.",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/salad#RecordField/name",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The name of the field\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#RecordField/doc",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "A documentation string for this field\n",
+                "jsonldPredicate": "rdfs:comment"
+            },
+            {
+                "name": "https://w3id.org/cwl/salad#RecordField/type",
+                "type": [
+                    "PrimitiveType",
+                    "RecordSchema",
+                    "EnumSchema",
+                    "ArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "PrimitiveType",
+                            "RecordSchema",
+                            "EnumSchema",
+                            "ArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "doc": "The field type\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#RecordSchema",
+        "type": "record",
+        "fields": [
+            {
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "RecordField"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#fields",
+                    "mapSubject": "name",
+                    "mapPredicate": "type"
+                },
+                "doc": "Defines the fields of the record.",
+                "name": "https://w3id.org/cwl/salad#RecordSchema/fields"
+            },
+            {
+                "doc": "Must be `record`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#record"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#RecordSchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#EnumSchema",
+        "type": "record",
+        "doc": "Define an enumerated type.\n",
+        "fields": [
+            {
+                "type": {
+                    "type": "array",
+                    "items": "string"
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#symbols",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "Defines the set of valid symbols.",
+                "name": "https://w3id.org/cwl/salad#EnumSchema/symbols"
+            },
+            {
+                "doc": "Must be `enum`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#enum"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#EnumSchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/salad#ArraySchema",
+        "type": "record",
+        "fields": [
+            {
+                "type": [
+                    "PrimitiveType",
+                    "RecordSchema",
+                    "EnumSchema",
+                    "ArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "PrimitiveType",
+                            "RecordSchema",
+                            "EnumSchema",
+                            "ArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#items",
+                    "_type": "@vocab",
+                    "refScope": 2
+                },
+                "doc": "Defines the type of the array elements.",
+                "name": "https://w3id.org/cwl/salad#ArraySchema/items"
+            },
+            {
+                "doc": "Must be `array`",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/salad#array"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "typeDSL": true,
+                    "refScope": 2
+                },
+                "name": "https://w3id.org/cwl/salad#ArraySchema/type"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#BaseTypesDoc",
+        "type": "documentation",
+        "doc": "## Base types\n",
+        "docChild": [
+            "https://w3id.org/cwl/cwl#CWLType",
+            "https://w3id.org/cwl/cwl#Process"
+        ]
+    },
+    {
+        "type": "enum",
+        "name": "https://w3id.org/cwl/cwl#CWLVersion",
+        "doc": "Version symbols for published CWL document versions.",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#draft-2",
+            "https://w3id.org/cwl/cwl#draft-3.dev1",
+            "https://w3id.org/cwl/cwl#draft-3.dev2",
+            "https://w3id.org/cwl/cwl#draft-3.dev3",
+            "https://w3id.org/cwl/cwl#draft-3.dev4",
+            "https://w3id.org/cwl/cwl#draft-3.dev5",
+            "https://w3id.org/cwl/cwl#draft-3",
+            "https://w3id.org/cwl/cwl#draft-4.dev1",
+            "https://w3id.org/cwl/cwl#draft-4.dev2",
+            "https://w3id.org/cwl/cwl#draft-4.dev3",
+            "https://w3id.org/cwl/cwl#v1.0.dev4",
+            "https://w3id.org/cwl/cwl#v1.0"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CWLType",
+        "type": "enum",
+        "extends": "https://w3id.org/cwl/salad#PrimitiveType",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#File",
+            "https://w3id.org/cwl/cwl#Directory"
+        ],
+        "doc": [
+            "Extends primitive types with the concept of a file and directory as a builtin type.",
+            "File: A File object",
+            "Directory: A Directory object"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#File",
+        "type": "record",
+        "docParent": "https://w3id.org/cwl/cwl#CWLType",
+        "doc": "Represents a file (or group of files if `secondaryFiles` is specified) that\nmust be accessible by tools using standard POSIX file system call API such as\nopen(2) and read(2).\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#File/class",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/cwl#File"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                },
+                "doc": "Must be `File` to indicate this object describes a file."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/location",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "An IRI that identifies the file resource.  This may be a relative\nreference, in which case it must be resolved using the base IRI of the\ndocument.  The location may refer to a local or remote resource; the\nimplementation must use the IRI to retrieve file content.  If an\nimplementation is unable to retrieve the file content stored at a\nremote resource (due to unsupported protocol, access denied, or other\nissue) it must signal an error.\n\nIf the `location` field is not provided, the `contents` field must be\nprovided.  The implementation must assign a unique identifier for\nthe `location` field.\n\nIf the `path` field is provided but the `location` field is not, an\nimplementation may assign the value of the `path` field to `location`,\nthen follow the rules above.\n",
+                "jsonldPredicate": {
+                    "_id": "@id",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/path",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The local host path where the File is available when a CommandLineTool is\nexecuted.  This field must be set by the implementation.  The final\npath component must match the value of `basename`.  This field\nmust not be used in any other context.  The command line tool being\nexecuted must be able to to access the file at `path` using the POSIX\n`open(2)` syscall.\n\nAs a special case, if the `path` field is provided but the `location`\nfield is not, an implementation may assign the value of the `path`\nfield to `location`, and remove the `path` field.\n\nIf the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)\n(`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\\`, `\"`, `'`,\n`<space>`, `<tab>`, and `<newline>`) or characters\n[not allowed](http://www.iana.org/assignments/idna-tables-6.3.0/idna-tables-6.3.0.xhtml)\nfor [Internationalized Domain Names for Applications](https://tools.ietf.org/html/rfc6452)\nthen implementations may terminate the process with a\n`permanentFailure`.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#path",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/basename",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The base name of the file, that is, the name of the file without any\nleading directory path.  The base name must not contain a slash `/`.\n\nIf not provided, the implementation must set this field based on the\n`location` field by taking the final path component after parsing\n`location` as an IRI.  If `basename` is provided, it is not required to\nmatch the value from `location`.\n\nWhen this file is made available to a CommandLineTool, it must be named\nwith `basename`, i.e. the final component of the `path` field must match\n`basename`.\n",
+                "jsonldPredicate": "cwl:basename"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/dirname",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The name of the directory containing file, that is, the path leading up\nto the final slash in the path such that `dirname + '/' + basename ==\npath`.\n\nThe implementation must set this field based on the value of `path`\nprior to evaluating parameter references or expressions in a\nCommandLineTool document.  This field must not be used in any other\ncontext.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/nameroot",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The basename root such that `nameroot + nameext == basename`, and\n`nameext` is empty or begins with a period and contains at most one\nperiod.  For the purposess of path splitting leading periods on the\nbasename are ignored; a basename of `.cshrc` will have a nameroot of\n`.cshrc`.\n\nThe implementation must set this field automatically based on the value\nof `basename` prior to evaluating parameter references or expressions.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/nameext",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The basename extension such that `nameroot + nameext == basename`, and\n`nameext` is empty or begins with a period and contains at most one\nperiod.  Leading periods on the basename are ignored; a basename of\n`.cshrc` will have an empty `nameext`.\n\nThe implementation must set this field automatically based on the value\nof `basename` prior to evaluating parameter references or expressions.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/checksum",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Optional hash code for validating file integrity.  Currently must be in the form\n\"sha1$ + hexadecimal string\" using the SHA-1 algorithm.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/size",
+                "type": [
+                    "null",
+                    "long"
+                ],
+                "doc": "Optional file size"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/secondaryFiles",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#File",
+                            "https://w3id.org/cwl/cwl#Directory"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": "cwl:secondaryFiles",
+                "doc": "A list of additional files that are associated with the primary file\nand must be transferred alongside the primary file.  Examples include\nindexes of the primary file, or external references which must be\nincluded when loading primary document.  A file object listed in\n`secondaryFiles` may itself include `secondaryFiles` for which the same\nrules apply.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/format",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#format",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "The format of the file: this must be an IRI of a concept node that\nrepresents the file format, preferrably defined within an ontology.\nIf no ontology is available, file formats may be tested by exact match.\n\nReasoning about format compatability must be done by checking that an\ninput file format is the same, `owl:equivalentClass` or\n`rdfs:subClassOf` the format required by the input parameter.\n`owl:equivalentClass` is transitive with `rdfs:subClassOf`, e.g. if\n`<B> owl:equivalentClass <C>` and `<B> owl:subclassOf <A>` then infer\n`<C> owl:subclassOf <A>`.\n\nFile format ontologies may be provided in the \"$schema\" metadata at the\nroot of the document.  If no ontologies are specified in `$schema`, the\nruntime may perform exact file format matches.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#File/contents",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "File contents literal.  Maximum of 64 KiB.\n\nIf neither `location` nor `path` is provided, `contents` must be\nnon-null.  The implementation must assign a unique identifier for the\n`location` field.  When the file is staged as input to CommandLineTool,\nthe value of `contents` must be written to a file.\n\nIf `loadContents` of `inputBinding` or `outputBinding` is true and\n`location` is valid, the implementation must read up to the first 64\nKiB of text from the file and place it in the \"contents\" field.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#Directory",
+        "type": "record",
+        "docAfter": "https://w3id.org/cwl/cwl#File",
+        "doc": "Represents a directory to present to a command line tool.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Directory/class",
+                "type": {
+                    "type": "enum",
+                    "symbols": [
+                        "https://w3id.org/cwl/cwl#Directory"
+                    ]
+                },
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                },
+                "doc": "Must be `Directory` to indicate this object describes a Directory."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Directory/location",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "An IRI that identifies the directory resource.  This may be a relative\nreference, in which case it must be resolved using the base IRI of the\ndocument.  The location may refer to a local or remote resource.  If\nthe `listing` field is not set, the implementation must use the\nlocation IRI to retrieve directory listing.  If an implementation is\nunable to retrieve the directory listing stored at a remote resource (due to\nunsupported protocol, access denied, or other issue) it must signal an\nerror.\n\nIf the `location` field is not provided, the `listing` field must be\nprovided.  The implementation must assign a unique identifier for\nthe `location` field.\n\nIf the `path` field is provided but the `location` field is not, an\nimplementation may assign the value of the `path` field to `location`,\nthen follow the rules above.\n",
+                "jsonldPredicate": {
+                    "_id": "@id",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Directory/path",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The local path where the Directory is made available prior to executing a\nCommandLineTool.  This must be set by the implementation.  This field\nmust not be used in any other context.  The command line tool being\nexecuted must be able to to access the directory at `path` using the POSIX\n`opendir(2)` syscall.\n\nIf the `path` contains [POSIX shell metacharacters](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02)\n(`|`,`&`, `;`, `<`, `>`, `(`,`)`, `$`,`` ` ``, `\\`, `\"`, `'`,\n`<space>`, `<tab>`, and `<newline>`) or characters\n[not allowed](http://www.iana.org/assignments/idna-tables-6.3.0/idna-tables-6.3.0.xhtml)\nfor [Internationalized Domain Names for Applications](https://tools.ietf.org/html/rfc6452)\nthen implementations may terminate the process with a\n`permanentFailure`.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#path",
+                    "_type": "@id"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Directory/basename",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The base name of the directory, that is, the name of the file without any\nleading directory path.  The base name must not contain a slash `/`.\n\nIf not provided, the implementation must set this field based on the\n`location` field by taking the final path component after parsing\n`location` as an IRI.  If `basename` is provided, it is not required to\nmatch the value from `location`.\n\nWhen this file is made available to a CommandLineTool, it must be named\nwith `basename`, i.e. the final component of the `path` field must match\n`basename`.\n",
+                "jsonldPredicate": "cwl:basename"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Directory/listing",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#File",
+                            "https://w3id.org/cwl/cwl#Directory"
+                        ]
+                    }
+                ],
+                "doc": "List of files or subdirectories contained in this directory.  The name\nof each file or subdirectory is determined by the `basename` field of\neach `File` or `Directory` object.  It is an error if a `File` shares a\n`basename` with any other entry in `listing`.  If two or more\n`Directory` object share the same `basename`, this must be treated as\nequivalent to a single subdirectory with the listings recursively\nmerged.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#listing"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#SchemaBase",
+        "type": "record",
+        "abstract": true,
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#SchemaBase/label",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:label",
+                "doc": "A short, human-readable label of this object."
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#Parameter",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#SchemaBase",
+        "abstract": true,
+        "doc": "Define an input or output parameter to a process.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Parameter/secondaryFiles",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression",
+                    {
+                        "type": "array",
+                        "items": [
+                            "string",
+                            "https://w3id.org/cwl/cwl#Expression"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": "cwl:secondaryFiles",
+                "doc": "Only valid when `type: File` or is an array of `items: File`.\n\nDescribes files that must be included alongside the primary file(s).\n\nIf the value is an expression, the value of `self` in the expression\nmust be the primary input or output File to which this binding applies.\n\nIf the value is a string, it specifies that the following pattern\nshould be applied to the primary file:\n\n  1. If string begins with one or more caret `^` characters, for each\n    caret, remove the last file extension from the path (the last\n    period `.` and all following characters).  If there are no file\n    extensions, the path is unchanged.\n  2. Append the remainder of the string to the end of the file path.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Parameter/format",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    },
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#format",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "Only valid when `type: File` or is an array of `items: File`.\n\nFor input parameters, this must be one or more IRIs of concept nodes\nthat represents file formats which are allowed as input to this\nparameter, preferrably defined within an ontology.  If no ontology is\navailable, file formats may be tested by exact match.\n\nFor output parameters, this is the file format that will be assigned to\nthe output parameter.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Parameter/streamable",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "Only valid when `type: File` or is an array of `items: File`.\n\nA value of `true` indicates that the file is read or written\nsequentially without seeking.  An implementation may use this flag to\nindicate whether it is valid to stream file contents using a named\npipe.  Default: `false`.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Parameter/doc",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "A documentation string for this type, or an array of strings which should be concatenated.",
+                "jsonldPredicate": "rdfs:comment"
+            }
+        ]
+    },
+    {
+        "type": "enum",
+        "name": "https://w3id.org/cwl/cwl#Expression",
+        "doc": "'Expression' is not a real type.  It indicates that a field must allow\nruntime parameter references.  If [InlineJavascriptRequirement](#InlineJavascriptRequirement)\nis declared and supported by the platform, the field must also allow\nJavascript expressions.\n",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#ExpressionPlaceholder"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputBinding",
+        "type": "record",
+        "abstract": true,
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InputBinding/loadContents",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "jsonldPredicate": "cwl:loadContents",
+                "doc": "Only valid when `type: File` or is an array of `items: File`.\n\nRead up to the first 64 KiB of text from the file and place it in the\n\"contents\" field of the file object for use by expressions.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputBinding",
+        "type": "record",
+        "abstract": true
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputSchema",
+        "extends": "https://w3id.org/cwl/cwl#SchemaBase",
+        "type": "record",
+        "abstract": true
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputSchema",
+        "extends": "https://w3id.org/cwl/cwl#SchemaBase",
+        "type": "record",
+        "abstract": true
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputRecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#RecordField",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#EnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#ArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#PrimitiveType",
+                "specializeTo": "https://w3id.org/cwl/cwl#CWLType"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InputRecordField/inputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#InputBinding"
+                ],
+                "jsonldPredicate": "cwl:inputBinding"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InputRecordField/label",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:label",
+                "doc": "A short, human-readable label of this process object."
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputRecordSchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#RecordSchema",
+            "https://w3id.org/cwl/cwl#InputSchema"
+        ],
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordField",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputRecordField"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputEnumSchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#EnumSchema",
+            "https://w3id.org/cwl/cwl#InputSchema"
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InputEnumSchema/inputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#InputBinding"
+                ],
+                "jsonldPredicate": "cwl:inputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputArraySchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#ArraySchema",
+            "https://w3id.org/cwl/cwl#InputSchema"
+        ],
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#EnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#ArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#InputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#PrimitiveType",
+                "specializeTo": "https://w3id.org/cwl/cwl#CWLType"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InputArraySchema/inputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#InputBinding"
+                ],
+                "jsonldPredicate": "cwl:inputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputRecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/salad#RecordField",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#EnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#ArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#PrimitiveType",
+                "specializeTo": "https://w3id.org/cwl/cwl#CWLType"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#OutputRecordField/outputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#OutputBinding"
+                ],
+                "jsonldPredicate": "cwl:outputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputRecordSchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#RecordSchema",
+            "https://w3id.org/cwl/cwl#OutputSchema"
+        ],
+        "docParent": "https://w3id.org/cwl/cwl#OutputParameter",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordField",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputRecordField"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputEnumSchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#EnumSchema",
+            "https://w3id.org/cwl/cwl#OutputSchema"
+        ],
+        "docParent": "https://w3id.org/cwl/cwl#OutputParameter",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#OutputEnumSchema/outputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#OutputBinding"
+                ],
+                "jsonldPredicate": "cwl:outputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputArraySchema",
+        "type": "record",
+        "extends": [
+            "https://w3id.org/cwl/salad#ArraySchema",
+            "https://w3id.org/cwl/cwl#OutputSchema"
+        ],
+        "docParent": "https://w3id.org/cwl/cwl#OutputParameter",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#RecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#EnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#ArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#OutputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/salad#PrimitiveType",
+                "specializeTo": "https://w3id.org/cwl/cwl#CWLType"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#OutputArraySchema/outputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#OutputBinding"
+                ],
+                "jsonldPredicate": "cwl:outputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InputParameter",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#Parameter",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InputParameter/id",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The unique identifier for this parameter object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InputParameter/inputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#InputBinding"
+                ],
+                "jsonldPredicate": "cwl:inputBinding",
+                "doc": "Describes how to handle the inputs of a process and convert them\ninto a concrete form for execution, such as command line parameters.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InputParameter/default",
+                "type": [
+                    "null",
+                    "Any"
+                ],
+                "jsonldPredicate": "cwl:default",
+                "doc": "The default value for this parameter if not provided in the input\nobject.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InputParameter/type",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#CWLType",
+                    "https://w3id.org/cwl/cwl#InputRecordSchema",
+                    "https://w3id.org/cwl/cwl#InputEnumSchema",
+                    "https://w3id.org/cwl/cwl#InputArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#CWLType",
+                            "https://w3id.org/cwl/cwl#InputRecordSchema",
+                            "https://w3id.org/cwl/cwl#InputEnumSchema",
+                            "https://w3id.org/cwl/cwl#InputArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "refScope": 2,
+                    "typeDSL": true
+                },
+                "doc": "Specify valid types of data that may be assigned to this parameter.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#OutputParameter",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#Parameter",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#OutputParameter/id",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The unique identifier for this parameter object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#OutputParameter/outputBinding",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#OutputBinding"
+                ],
+                "jsonldPredicate": "cwl:outputBinding",
+                "doc": "Describes how to handle the outputs of a process.\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "abstract": true,
+        "doc": "A process requirement declares a prerequisite that may or must be fulfilled\nbefore executing a process.  See [`Process.hints`](#process) and\n[`Process.requirements`](#process).\n\nProcess requirements are the primary mechanism for specifying extensions to\nthe CWL core specification.\n"
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#Process",
+        "abstract": true,
+        "doc": "\nThe base executable type in CWL is the `Process` object defined by the\ndocument.  Note that the `Process` object is abstract and cannot be\ndirectly executed.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/id",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "@id",
+                "doc": "The unique identifier for this process object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/inputs",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#InputParameter"
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#inputs",
+                    "mapSubject": "id",
+                    "mapPredicate": "type"
+                },
+                "doc": "Defines the input parameters of the process.  The process is ready to\nrun when all required input parameters are associated with concrete\nvalues.  Input parameters include a schema for each parameter which is\nused to validate the input object.  It may also be used to build a user\ninterface for constructing the input object.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/outputs",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#OutputParameter"
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#outputs",
+                    "mapSubject": "id",
+                    "mapPredicate": "type"
+                },
+                "doc": "Defines the parameters representing the output of the process.  May be\nused to generate and/or validate the output object.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/requirements",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "https://w3id.org/cwl/cwl#ProcessRequirement"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#requirements",
+                    "mapSubject": "class"
+                },
+                "doc": "Declares requirements that apply to either the runtime environment or the\nworkflow engine that must be met in order to execute this process.  If\nan implementation cannot satisfy all requirements, or a requirement is\nlisted which is not recognized by the implementation, it is a fatal\nerror and the implementation must not attempt to run the process,\nunless overridden at user option.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/hints",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Any"
+                    }
+                ],
+                "doc": "Declares hints applying to either the runtime environment or the\nworkflow engine that may be helpful in executing this process.  It is\nnot an error if an implementation cannot satisfy all hints, however\nthe implementation may report a warning.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#hints",
+                    "noLinkCheck": true,
+                    "mapSubject": "class"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/label",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:label",
+                "doc": "A short, human-readable label of this process object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/doc",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:comment",
+                "doc": "A long, human-readable description of this process object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Process/cwlVersion",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#CWLVersion"
+                ],
+                "doc": "CWL document version. Always required at the document root. Not\nrequired for a Process embedded inside another Process.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#cwlVersion",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InlineJavascriptRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicates that the workflow platform must support inline Javascript expressions.\nIf this requirement is not present, the workflow platform must not perform expression\ninterpolatation.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InlineJavascriptRequirement/class",
+                "type": "string",
+                "doc": "Always 'InlineJavascriptRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InlineJavascriptRequirement/expressionLib",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "Additional code fragments that will also be inserted\nbefore executing the expression code.  Allows for function definitions that may\nbe called from CWL expressions.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#SchemaDefRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "This field consists of an array of type definitions which must be used when\ninterpreting the `inputs` and `outputs` fields.  When a `type` field\ncontain a IRI, the implementation must check if the type is defined in\n`schemaDefs` and use that definition.  If the type is not found in\n`schemaDefs`, it is an error.  The entries in `schemaDefs` must be\nprocessed in the order listed such that later schema definitions may refer\nto earlier schema definitions.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#SchemaDefRequirement/class",
+                "type": "string",
+                "doc": "Always 'SchemaDefRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#SchemaDefRequirement/types",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#InputSchema"
+                },
+                "doc": "The list of type definitions."
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandLineToolDoc",
+        "type": "documentation",
+        "doc": [
+            "# Common Workflow Language (CWL) Command Line Tool Description, v1.0\n\nThis version:\n  * https://w3id.org/cwl/v1.0/\n\nCurrent version:\n  * https://w3id.org/cwl/\n",
+            "\n\n",
+            "\n",
+            "\n\n",
+            "# Abstract\n\nA Command Line Tool is a non-interactive executable program that reads\nsome input, performs a computation, and terminates after producing some\noutput.  Command line programs are a flexible unit of code sharing and\nreuse, unfortunately the syntax and input/output semantics among command\nline programs is extremely heterogeneous. A common layer for describing\nthe syntax and semantics of programs can reduce this incidental\ncomplexity by providing a consistent way to connect programs together.\nThis specification defines the Common Workflow Language (CWL) Command\nLine Tool Description, a vendor-neutral standard for describing the\nsyntax and input/output semantics of command line programs.\n",
+            "\n",
+            "## Introduction to v1.0\n\nThis specification represents the first full release from the CWL group.\nSince draft-3, version 1.0 introduces the following changes and additions:\n\n  * The [Directory](#Directory) type.\n  * Syntax simplifcations: denoted by the `map<>` syntax. Example: inputs\n    contains a list of items, each with an id. Now one can specify\n    a mapping of that identifier to the corresponding\n    `CommandInputParamater`.\n    ```\n    inputs:\n     - id: one\n       type: string\n       doc: First input parameter\n     - id: two\n       type: int\n       doc: Second input parameter\n    ```\n    can be\n    ```\n    inputs:\n     one:\n      type: string\n      doc: First input parameter\n     two:\n      type: int\n      doc: Second input parameter\n    ```\n  * [InitialWorkDirRequirement](#InitialWorkDirRequirement): list of\n    files and subdirectories to be present in the output directory prior\n    to execution.\n  * Shortcuts for specifying the standard [output](#stdout) and/or\n    [error](#stderr) streams as a (streamable) File output.\n  * [SoftwareRequirement](#SoftwareRequirement) for describing software\n    dependencies of a tool.\n  * The common `description` field has been renamed to `doc`.\n\n## Errata\n\nPost v1.0 release changes to the spec.\n\n  * 13 July 2016: Mark `baseCommand` as optional and update descriptive text.\n\n## Purpose\n\nStandalone programs are a flexible and interoperable form of code reuse.\nUnlike monolithic applications, applications and analysis workflows which\nare composed of multiple separate programs can be written in multiple\nlanguages and execute concurrently on multiple hosts.  However, POSIX\ndoes not dictate computer-readable grammar or semantics for program input\nand output, resulting in extremely heterogeneous command line grammar and\ninput/output semantics among program.  This is a particular problem in\ndistributed computing (multi-node compute clusters) and virtualized\nenvironments (such as Docker containers) where it is often necessary to\nprovision resources such as input files before executing the program.\n\nOften this gap is filled by hard coding program invocation and\nimplicitly assuming requirements will be met, or abstracting program\ninvocation with wrapper scripts or descriptor documents.  Unfortunately,\nwhere these approaches are application or platform specific it creates a\nsignificant barrier to reproducibility and portability, as methods\ndeveloped for one platform must be manually ported to be used on new\nplatforms.  Similarly it creates redundant work, as wrappers for popular\ntools must be rewritten for each application or platform in use.\n\nThe Common Workflow Language Command Line Tool Description is designed to\nprovide a common standard description of grammar and semantics for\ninvoking programs used in data-intensive fields such as Bioinformatics,\nChemistry, Physics, Astronomy, and Statistics.  This specification\ndefines a precise data and execution model for Command Line Tools that\ncan be implemented on a variety of computing platforms, ranging from a\nsingle workstation to cluster, grid, cloud, and high performance\ncomputing platforms.\n",
+            "\n",
+            "\n"
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#EnvironmentDef",
+        "doc": "Define an environment variable that will be set in the runtime environment\nby the workflow platform when executing the command line tool.  May be the\nresult of executing an expression, such as getting a parameter from input.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#EnvironmentDef/envName",
+                "type": "string",
+                "doc": "The environment variable name"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#EnvironmentDef/envValue",
+                "type": [
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "The environment variable value"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#CommandLineBinding",
+        "extends": "https://w3id.org/cwl/cwl#InputBinding",
+        "doc": "\nWhen listed under `inputBinding` in the input schema, the term\n\"value\" refers to the the corresponding value in the input object.  For\nbinding objects listed in `CommandLineTool.arguments`, the term \"value\"\nrefers to the effective value after evaluating `valueFrom`.\n\nThe binding behavior when building the command line depends on the data\ntype of the value.  If there is a mismatch between the type described by\nthe input schema and the effective value, such as resulting from an\nexpression evaluation, an implementation must use the data type of the\neffective value.\n\n  - **string**: Add `prefix` and the string to the command line.\n\n  - **number**: Add `prefix` and decimal representation to command line.\n\n  - **boolean**: If true, add `prefix` to the command line.  If false, add\n      nothing.\n\n  - **File**: Add `prefix` and the value of\n    [`File.path`](#File) to the command line.\n\n  - **array**: If `itemSeparator` is specified, add `prefix` and the join\n      the array into a single string with `itemSeparator` separating the\n      items.  Otherwise first add `prefix`, then recursively process\n      individual elements.\n\n  - **object**: Add `prefix` only, and recursively add object fields for\n      which `inputBinding` is specified.\n\n  - **null**: Add nothing.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/position",
+                "type": [
+                    "null",
+                    "int"
+                ],
+                "doc": "The sorting key.  Default position is 0."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/prefix",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Command line prefix to add before the value."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/separate",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true (default), then the prefix and value must be added as separate\ncommand line arguments; if false, prefix and value must be concatenated\ninto a single command line argument.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/itemSeparator",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Join the array elements into a single string with the elements\nseparated by by `itemSeparator`.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/valueFrom",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": "cwl:valueFrom",
+                "doc": "If `valueFrom` is a constant string value, use this as the value and\napply the binding rules above.\n\nIf `valueFrom` is an expression, evaluate the expression to yield the\nactual value to use to build the command line and apply the binding\nrules above.  If the inputBinding is associated with an input\nparameter, the value of `self` in the expression will be the value of the\ninput parameter.\n\nWhen a binding is part of the `CommandLineTool.arguments` field,\nthe `valueFrom` field is required.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineBinding/shellQuote",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If `ShellCommandRequirement` is in the requirements for the current command,\nthis controls whether the value is quoted on the command line (default is true).\nUse `shellQuote: false` to inject metacharacters for operations such as pipes.\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#CommandOutputBinding",
+        "extends": "https://w3id.org/cwl/cwl#OutputBinding",
+        "doc": "Describes how to generate an output parameter based on the files produced\nby a CommandLineTool.\n\nThe output parameter is generated by applying these operations in\nthe following order:\n\n  - glob\n  - loadContents\n  - outputEval\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandOutputBinding/glob",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "Find files relative to the output directory, using POSIX glob(3)\npathname matching.  If an array is provided, find files that match any\npattern in the array.  If an expression is provided, the expression must\nreturn a string or an array of strings, which will then be evaluated as\none or more glob patterns.  Must only match and return files which\nactually exist.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandOutputBinding/loadContents",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "jsonldPredicate": "cwl:loadContents",
+                "doc": "For each file matched in `glob`, read up to\nthe first 64 KiB of text from the file and place it in the `contents`\nfield of the file object for manipulation by `outputEval`.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandOutputBinding/outputEval",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Evaluate an expression to generate the output value.  If `glob` was\nspecified, the value of `self` must be an array containing file objects\nthat were matched.  If no files were matched, `self` must be a zero\nlength array; if a single file was matched, the value of `self` is an\narray of a single element.  Additionally, if `loadContents` is `true`,\nthe File objects must include up to the first 64 KiB of file contents\nin the `contents` field.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandInputRecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#InputRecordField",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandLineBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandInputRecordSchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#InputRecordSchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputRecordField",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputRecordField"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandInputEnumSchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#InputEnumSchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandLineBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandInputArraySchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#InputArraySchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandLineBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandOutputRecordField",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputRecordField",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandOutputRecordSchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputRecordSchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputRecordField",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputRecordField"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandOutputEnumSchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputEnumSchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputBinding"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#CommandOutputArraySchema",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputArraySchema",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputBinding"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#CommandInputParameter",
+        "extends": "https://w3id.org/cwl/cwl#InputParameter",
+        "doc": "An input parameter for a CommandLineTool.",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputRecordSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputRecordSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputEnumSchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputEnumSchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputArraySchema",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputArraySchema"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandLineBinding"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#CommandOutputParameter",
+        "extends": "https://w3id.org/cwl/cwl#OutputParameter",
+        "doc": "An output parameter for a CommandLineTool.",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputBinding",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputBinding"
+            }
+        ],
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandOutputParameter/type",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#CWLType",
+                    "https://w3id.org/cwl/cwl#stdout",
+                    "https://w3id.org/cwl/cwl#stderr",
+                    "https://w3id.org/cwl/cwl#CommandOutputRecordSchema",
+                    "https://w3id.org/cwl/cwl#CommandOutputEnumSchema",
+                    "https://w3id.org/cwl/cwl#CommandOutputArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#CWLType",
+                            "https://w3id.org/cwl/cwl#CommandOutputRecordSchema",
+                            "https://w3id.org/cwl/cwl#CommandOutputEnumSchema",
+                            "https://w3id.org/cwl/cwl#CommandOutputArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "refScope": 2,
+                    "typeDSL": true
+                },
+                "doc": "Specify valid types of data that may be assigned to this parameter.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#stdout",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#stdout"
+        ],
+        "docParent": "https://w3id.org/cwl/cwl#CommandOutputParameter",
+        "doc": "Only valid as a `type` for a `CommandLineTool` output with no\n`outputBinding` set.\n\nThe following\n```\noutputs:\n   an_output_name:\n   type: stdout\n\nstdout: a_stdout_file\n```\nis equivalent to\n```\noutputs:\n  an_output_name:\n    type: File\n    streamable: true\n    outputBinding:\n      glob: a_stdout_file\n\nstdout: a_stdout_file\n```\n\nIf there is no `stdout` name provided, a random filename will be created.\nFor example, the following\n```\noutputs:\n  an_output_name:\n    type: stdout\n```\nis equivalent to\n```\noutputs:\n  an_output_name:\n    type: File\n    streamable: true\n    outputBinding:\n      glob: random_stdout_filenameABCDEFG\n\nstdout: random_stdout_filenameABCDEFG\n```\n"
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#stderr",
+        "type": "enum",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#stderr"
+        ],
+        "docParent": "https://w3id.org/cwl/cwl#CommandOutputParameter",
+        "doc": "Only valid as a `type` for a `CommandLineTool` output with no\n`outputBinding` set.\n\nThe following\n```\noutputs:\n  an_output_name:\n  type: stderr\n\nstderr: a_stderr_file\n```\nis equivalent to\n```\noutputs:\n  an_output_name:\n    type: File\n    streamable: true\n    outputBinding:\n      glob: a_stderr_file\n\nstderr: a_stderr_file\n```\n\nIf there is no `stderr` name provided, a random filename will be created.\nFor example, the following\n```\noutputs:\n  an_output_name:\n    type: stderr\n```\nis equivalent to\n```\noutputs:\n  an_output_name:\n    type: File\n    streamable: true\n    outputBinding:\n      glob: random_stderr_filenameABCDEFG\n\nstderr: random_stderr_filenameABCDEFG\n```\n"
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#CommandLineTool",
+        "extends": "https://w3id.org/cwl/cwl#Process",
+        "documentRoot": true,
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#InputParameter",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandInputParameter"
+            },
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputParameter",
+                "specializeTo": "https://w3id.org/cwl/cwl#CommandOutputParameter"
+            }
+        ],
+        "doc": "This defines the schema of the CWL Command Line Tool Description document.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/class",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                },
+                "type": "string"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/baseCommand",
+                "doc": "Specifies the program to execute.  If an array, the first element of\nthe array is the command to execute, and subsequent elements are\nmandatory command line arguments.  The elements in `baseCommand` must\nappear before any command line bindings from `inputBinding` or\n`arguments`.\n\nIf `baseCommand` is not provided or is an empty array, the first\nelement of the command line produced after processing `inputBinding` or\n`arguments` must be used as the program to execute.\n\nIf the program includes a path separator character it must\nbe an absolute path, otherwise it is an error.  If the program does not\ninclude a path separator, search the `$PATH` variable in the runtime\nenvironment of the workflow runner find the absolute path of the\nexecutable.\n",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#baseCommand",
+                    "_container": "@list"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/arguments",
+                "doc": "Command line bindings which are not directly associated with input parameters.\n",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": [
+                            "string",
+                            "https://w3id.org/cwl/cwl#Expression",
+                            "https://w3id.org/cwl/cwl#CommandLineBinding"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#arguments",
+                    "_container": "@list"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/stdin",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "A path to a file whose contents must be piped into the command's\nstandard input stream.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/stderr",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": "https://w3id.org/cwl/cwl#stderr",
+                "doc": "Capture the command's standard error stream to a file written to\nthe designated output directory.\n\nIf `stderr` is a string, it specifies the file name to use.\n\nIf `stderr` is an expression, the expression is evaluated and must\nreturn a string with the file name to use to capture stderr.  If the\nreturn value is not a string, or the resulting path contains illegal\ncharacters (such as the path separator `/`) it is an error.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/stdout",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": "https://w3id.org/cwl/cwl#stdout",
+                "doc": "Capture the command's standard output stream to a file written to\nthe designated output directory.\n\nIf `stdout` is a string, it specifies the file name to use.\n\nIf `stdout` is an expression, the expression is evaluated and must\nreturn a string with the file name to use to capture stdout.  If the\nreturn value is not a string, or the resulting path contains illegal\ncharacters (such as the path separator `/`) it is an error.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/successCodes",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "int"
+                    }
+                ],
+                "doc": "Exit codes that indicate the process completed successfully.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/temporaryFailCodes",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "int"
+                    }
+                ],
+                "doc": "Exit codes that indicate the process failed due to a possibly\ntemporary condition, where executing the process with the same\nruntime environment and inputs may produce different results.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#CommandLineTool/permanentFailCodes",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "int"
+                    }
+                ],
+                "doc": "Exit codes that indicate the process failed due to a permanent logic error, where executing the process with the same runtime environment and same inputs is expected to always fail."
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#DockerRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicates that a workflow component should be run in a\n[Docker](http://docker.com) container, and specifies how to fetch or build\nthe image.\n\nIf a CommandLineTool lists `DockerRequirement` under\n`hints` (or `requirements`), it may (or must) be run in the specified Docker\ncontainer.\n\nThe platform must first acquire or install the correct Docker image as\nspecified by `dockerPull`, `dockerImport`, `dockerLoad` or `dockerFile`.\n\nThe platform must execute the tool in the container using `docker run` with\nthe appropriate Docker image and tool command line.\n\nThe workflow platform may provide input files and the designated output\ndirectory through the use of volume bind mounts.  The platform may rewrite\nfile paths in the input object to correspond to the Docker bind mounted\nlocations.\n\nWhen running a tool contained in Docker, the workflow platform must not\nassume anything about the contents of the Docker container, such as the\npresence or absence of specific software, except to assume that the\ngenerated command line represents a valid command within the runtime\nenvironment of the container.\n\n## Interaction with other requirements\n\nIf [EnvVarRequirement](#EnvVarRequirement) is specified alongside a\nDockerRequirement, the environment variables must be provided to Docker\nusing `--env` or `--env-file` and interact with the container's preexisting\nenvironment as defined by Docker.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/class",
+                "type": "string",
+                "doc": "Always 'DockerRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerPull",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Specify a Docker image to retrieve using `docker pull`."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerLoad",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Specify a HTTP URL from which to download a Docker image using `docker load`."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerFile",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Supply the contents of a Dockerfile which will be built using `docker build`."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerImport",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Provide HTTP URL to download and gunzip a Docker images using `docker import."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerImageId",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "The image id that will be used for `docker run`.  May be a\nhuman-readable image name or the image identifier hash.  May be skipped\nif `dockerPull` is specified, in which case the `dockerPull` image id\nmust be used.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#DockerRequirement/dockerOutputDirectory",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "doc": "Set the designated output directory to a specific location inside the\nDocker container.\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#SoftwareRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "A list of software packages that should be configured in the environment of\nthe defined process.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#SoftwareRequirement/class",
+                "type": "string",
+                "doc": "Always 'SoftwareRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#SoftwareRequirement/packages",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#SoftwarePackage"
+                },
+                "doc": "The list of software to be configured.",
+                "jsonldPredicate": {
+                    "mapSubject": "package",
+                    "mapPredicate": "specs"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#SoftwarePackage",
+        "type": "record",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#SoftwarePackage/package",
+                "type": "string",
+                "doc": "The common name of the software to be configured."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#SoftwarePackage/version",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "The (optional) version of the software to configured."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#SoftwarePackage/specs",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "doc": "Must be one or more IRIs identifying resources for installing or\nenabling the software.  Implementations may provide resolvers which map\nwell-known software spec IRIs to some configuration action.\n\nFor example, an IRI `https://packages.debian.org/jessie/bowtie` could\nbe resolved with `apt-get install bowtie`.  An IRI\n`https://anaconda.org/bioconda/bowtie` could be resolved with `conda\ninstall -c bioconda bowtie`.\n\nTools may also provide IRIs to index entries such as\n[RRID](http://www.identifiers.org/rrid/), such as\n`http://identifiers.org/rrid/RRID:SCR_005476`\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#Dirent",
+        "type": "record",
+        "doc": "Define a file or subdirectory that must be placed in the designated output\ndirectory prior to executing the command line tool.  May be the result of\nexecuting an expression, such as building a configuration file from a\ntemplate.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Dirent/entryname",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#entryname"
+                },
+                "doc": "The name of the file or subdirectory to create in the output directory.\nIf `entry` is a File or Directory, this overrides `basename`.  Optional.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Dirent/entry",
+                "type": [
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#entry"
+                },
+                "doc": "If the value is a string literal or an expression which evaluates to a\nstring, a new file must be created with the string as the file contents.\n\nIf the value is an expression that evaluates to a `File` object, this\nindicates the referenced file should be added to the designated output\ndirectory prior to executing the tool.\n\nIf the value is an expression that evaluates to a `Dirent` object, this\nindicates that the File or Directory in `entry` should be added to the\ndesignated output directory with the name in `entryname`.\n\nIf `writable` is false, the file may be made available using a bind\nmount or file system link to avoid unnecessary copying of the input\nfile.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Dirent/writable",
+                "type": [
+                    "null",
+                    "boolean"
+                ],
+                "doc": "If true, the file or directory must be writable by the tool.  Changes\nto the file or directory must be isolated and not visible by any other\nCommandLineTool process.  This may be implemented by making a copy of\nthe original file or directory.  Default false (files and directories\nread-only by default).\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#InitialWorkDirRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Define a list of files and subdirectories that must be created by the workflow platform in the designated output directory prior to executing the command line tool.",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#InitialWorkDirRequirement/class",
+                "type": "string",
+                "doc": "InitialWorkDirRequirement",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#InitialWorkDirRequirement/listing",
+                "type": [
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#File",
+                            "https://w3id.org/cwl/cwl#Directory",
+                            "https://w3id.org/cwl/cwl#Dirent",
+                            "string",
+                            "https://w3id.org/cwl/cwl#Expression"
+                        ]
+                    },
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#listing"
+                },
+                "doc": "The list of files or subdirectories that must be placed in the\ndesignated output directory prior to executing the command line tool.\n\nMay be an expression.  If so, the expression return value must validate\nas `{type: array, items: [File, Directory]}`.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#EnvVarRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Define a list of environment variables which will be set in the\nexecution environment of the tool.  See `EnvironmentDef` for details.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#EnvVarRequirement/class",
+                "type": "string",
+                "doc": "Always 'EnvVarRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#EnvVarRequirement/envDef",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#EnvironmentDef"
+                },
+                "doc": "The list of environment variables.",
+                "jsonldPredicate": {
+                    "mapSubject": "envName",
+                    "mapPredicate": "envValue"
+                }
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#ShellCommandRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Modify the behavior of CommandLineTool to generate a single string\ncontaining a shell command line.  Each item in the argument list must be\njoined into a string separated by single spaces and quoted to prevent\nintepretation by the shell, unless `CommandLineBinding` for that argument\ncontains `shellQuote: false`.  If `shellQuote: false` is specified, the\nargument is joined into the command string without quoting, which allows\nthe use of shell metacharacters such as `|` for pipes.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#ShellCommandRequirement/class",
+                "type": "string",
+                "doc": "Always 'ShellCommandRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#ResourceRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Specify basic hardware resource requirements.\n\n\"min\" is the minimum amount of a resource that must be reserved to schedule\na job. If \"min\" cannot be satisfied, the job should not be run.\n\n\"max\" is the maximum amount of a resource that the job shall be permitted\nto use. If a node has sufficient resources, multiple jobs may be scheduled\non a single node provided each job's \"max\" resource requirements are\nmet. If a job attempts to exceed its \"max\" resource allocation, an\nimplementation may deny additional resources, which may result in job\nfailure.\n\nIf \"min\" is specified but \"max\" is not, then \"max\" == \"min\"\nIf \"max\" is specified by \"min\" is not, then \"min\" == \"max\".\n\nIt is an error if max < min.\n\nIt is an error if the value of any of these fields is negative.\n\nIf neither \"min\" nor \"max\" is specified for a resource, an implementation may provide a default.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/class",
+                "type": "string",
+                "doc": "Always 'ResourceRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/coresMin",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Minimum reserved number of CPU cores"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/coresMax",
+                "type": [
+                    "null",
+                    "int",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Maximum reserved number of CPU cores"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/ramMin",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Minimum reserved RAM in mebibytes (2**20)"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/ramMax",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Maximum reserved RAM in mebibytes (2**20)"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/tmpdirMin",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/tmpdirMax",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/outdirMin",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ResourceRequirement/outdirMax",
+                "type": [
+                    "null",
+                    "long",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#WorkflowDoc",
+        "type": "documentation",
+        "doc": [
+            "# Common Workflow Language (CWL) Workflow Description, v1.0\n\nThis version:\n  * https://w3id.org/cwl/v1.0/\n\nCurrent version:\n  * https://w3id.org/cwl/\n",
+            "\n\n",
+            "\n",
+            "\n\n",
+            "# Abstract\n\nOne way to define a workflow is: an analysis task represented by a\ndirected graph describing a sequence of operations that transform an\ninput data set to output. This specification defines the Common Workflow\nLanguage (CWL) Workflow description, a vendor-neutral standard for\nrepresenting workflows intended to be portable across a variety of\ncomputing platforms.\n",
+            "\n",
+            "\n## Introduction to v1.0\n\nThis specification represents the first full release from the CWL group.\nSince draft-3, this draft introduces the following changes and additions:\n\n  * The `inputs` and `outputs` fields have been renamed `in` and `out`.\n  * Syntax simplifcations: denoted by the `map<>` syntax. Example: `in`\n    contains a list of items, each with an id. Now one can specify\n    a mapping of that identifier to the corresponding\n    `InputParameter`.\n    ```\n    in:\n     - id: one\n       type: string\n       doc: First input parameter\n     - id: two\n       type: int\n       doc: Second input parameter\n    ```\n    can be\n    ```\n    in:\n     one:\n      type: string\n      doc: First input parameter\n     two:\n      type: int\n      doc: Second input parameter\n    ```\n  * The common field `description` has been renamed to `doc`.\n\n## Purpose\n\nThe Common Workflow Language Command Line Tool Description express\nworkflows for data-intensive science, such as Bioinformatics, Chemistry,\nPhysics, and Astronomy.  This specification is intended to define a data\nand execution model for Workflows that can be implemented on top of a\nvariety of computing platforms, ranging from an individual workstation to\ncluster, grid, cloud, and high performance computing systems.\n",
+            "\n"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#ExpressionToolOutputParameter",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputParameter",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#ExpressionToolOutputParameter/type",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#CWLType",
+                    "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                    "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                    "https://w3id.org/cwl/cwl#OutputArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#CWLType",
+                            "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                            "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                            "https://w3id.org/cwl/cwl#OutputArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "refScope": 2,
+                    "typeDSL": true
+                },
+                "doc": "Specify valid types of data that may be assigned to this parameter.\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#ExpressionTool",
+        "extends": "https://w3id.org/cwl/cwl#Process",
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputParameter",
+                "specializeTo": "https://w3id.org/cwl/cwl#ExpressionToolOutputParameter"
+            }
+        ],
+        "documentRoot": true,
+        "doc": "Execute an expression as a Workflow step.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#ExpressionTool/class",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                },
+                "type": "string"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#ExpressionTool/expression",
+                "type": [
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "doc": "The expression to execute.  The expression must return a JSON object which\nmatches the output parameters of the ExpressionTool.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#LinkMergeMethod",
+        "type": "enum",
+        "docParent": "https://w3id.org/cwl/cwl#WorkflowStepInput",
+        "doc": "The input link merge method, described in [WorkflowStepInput](#WorkflowStepInput).",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#LinkMergeMethod/merge_nested",
+            "https://w3id.org/cwl/cwl#LinkMergeMethod/merge_flattened"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#WorkflowOutputParameter",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#OutputParameter",
+        "docParent": "https://w3id.org/cwl/cwl#Workflow",
+        "doc": "Describe an output parameter of a workflow.  The parameter must be\nconnected to one or more parameters defined in the workflow that will\nprovide the value of the output parameter.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowOutputParameter/outputSource",
+                "doc": "Specifies one or more workflow parameters that supply the value of to\nthe output parameter.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#outputSource",
+                    "_type": "@id",
+                    "refScope": 0
+                },
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ]
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowOutputParameter/linkMerge",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#LinkMergeMethod"
+                ],
+                "jsonldPredicate": "cwl:linkMerge",
+                "doc": "The method to use to merge multiple sources into a single array.\nIf not specified, the default method is \"merge_nested\".\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowOutputParameter/type",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#CWLType",
+                    "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                    "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                    "https://w3id.org/cwl/cwl#OutputArraySchema",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": [
+                            "https://w3id.org/cwl/cwl#CWLType",
+                            "https://w3id.org/cwl/cwl#OutputRecordSchema",
+                            "https://w3id.org/cwl/cwl#OutputEnumSchema",
+                            "https://w3id.org/cwl/cwl#OutputArraySchema",
+                            "string"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/salad#type",
+                    "_type": "@vocab",
+                    "refScope": 2,
+                    "typeDSL": true
+                },
+                "doc": "Specify valid types of data that may be assigned to this parameter.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#Sink",
+        "type": "record",
+        "abstract": true,
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Sink/source",
+                "doc": "Specifies one or more workflow parameters that will provide input to\nthe underlying step parameter.\n",
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#source",
+                    "_type": "@id",
+                    "refScope": 2
+                },
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ]
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Sink/linkMerge",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#LinkMergeMethod"
+                ],
+                "jsonldPredicate": "cwl:linkMerge",
+                "doc": "The method to use to merge multiple inbound links into a single array.\nIf not specified, the default method is \"merge_nested\".\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#WorkflowStepInput",
+        "extends": "https://w3id.org/cwl/cwl#Sink",
+        "docParent": "https://w3id.org/cwl/cwl#WorkflowStep",
+        "doc": "The input of a workflow step connects an upstream parameter (from the\nworkflow inputs, or the outputs of other workflows steps) with the input\nparameters of the underlying step.\n\n## Input object\n\nA WorkflowStepInput object must contain an `id` field in the form\n`#fieldname` or `#stepname.fieldname`.  When the `id` field contains a\nperiod `.` the field name consists of the characters following the final\nperiod.  This defines a field of the workflow step input object with the\nvalue of the `source` parameter(s).\n\n## Merging\n\nTo merge multiple inbound data links,\n[MultipleInputFeatureRequirement](#MultipleInputFeatureRequirement) must be specified\nin the workflow or workflow step requirements.\n\nIf the sink parameter is an array, or named in a [workflow\nscatter](#WorkflowStep) operation, there may be multiple inbound data links\nlisted in the `source` field.  The values from the input links are merged\ndepending on the method specified in the `linkMerge` field.  If not\nspecified, the default method is \"merge_nested\".\n\n* **merge_nested**\n\n  The input must be an array consisting of exactly one entry for each\n  input link.  If \"merge_nested\" is specified with a single link, the value\n  from the link must be wrapped in a single-item list.\n\n* **merge_flattened**\n\n  1. The source and sink parameters must be compatible types, or the source\n     type must be compatible with single element from the \"items\" type of\n     the destination array parameter.\n  2. Source parameters which are arrays are concatenated.\n     Source parameters which are single element types are appended as\n     single elements.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStepInput/id",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "A unique identifier for this workflow input parameter."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStepInput/default",
+                "type": [
+                    "null",
+                    "Any"
+                ],
+                "doc": "The default value for this parameter if there is no `source`\nfield.\n",
+                "jsonldPredicate": "cwl:default"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStepInput/valueFrom",
+                "type": [
+                    "null",
+                    "string",
+                    "https://w3id.org/cwl/cwl#Expression"
+                ],
+                "jsonldPredicate": "cwl:valueFrom",
+                "doc": "To use valueFrom, [StepInputExpressionRequirement](#StepInputExpressionRequirement) must\nbe specified in the workflow or workflow step requirements.\n\nIf `valueFrom` is a constant string value, use this as the value for\nthis input parameter.\n\nIf `valueFrom` is a parameter reference or expression, it must be\nevaluated to yield the actual value to be assiged to the input field.\n\nThe `self` value of in the parameter reference or expression must be\nthe value of the parameter(s) specified in the `source` field, or\nnull if there is no `source` field.\n\nThe value of `inputs` in the parameter reference or expression must be\nthe input object to the workflow step after assigning the `source`\nvalues and then scattering.  The order of evaluating `valueFrom` among\nstep input parameters is undefined and the result of evaluating\n`valueFrom` on a parameter must not be visible to evaluation of\n`valueFrom` on other parameters.\n"
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#WorkflowStepOutput",
+        "docParent": "https://w3id.org/cwl/cwl#WorkflowStep",
+        "doc": "Associate an output parameter of the underlying process with a workflow\nparameter.  The workflow parameter (given in the `id` field) be may be used\nas a `source` to connect with input parameters of other workflow steps, or\nwith an output parameter of the process.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStepOutput/id",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "A unique identifier for this workflow output parameter.  This is the\nidentifier to use in the `source` field of `WorkflowStepInput` to\nconnect the output value to downstream parameters.\n"
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#ScatterMethod",
+        "type": "enum",
+        "docParent": "https://w3id.org/cwl/cwl#WorkflowStep",
+        "doc": "The scatter method, as described in [workflow step scatter](#WorkflowStep).",
+        "symbols": [
+            "https://w3id.org/cwl/cwl#ScatterMethod/dotproduct",
+            "https://w3id.org/cwl/cwl#ScatterMethod/nested_crossproduct",
+            "https://w3id.org/cwl/cwl#ScatterMethod/flat_crossproduct"
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#WorkflowStep",
+        "type": "record",
+        "docParent": "https://w3id.org/cwl/cwl#Workflow",
+        "doc": "A workflow step is an executable element of a workflow.  It specifies the\nunderlying process implementation (such as `CommandLineTool` or another\n`Workflow`) in the `run` field and connects the input and output parameters\nof the underlying process to workflow parameters.\n\n# Scatter/gather\n\nTo use scatter/gather,\n[ScatterFeatureRequirement](#ScatterFeatureRequirement) must be specified\nin the workflow or workflow step requirements.\n\nA \"scatter\" operation specifies that the associated workflow step or\nsubworkflow should execute separately over a list of input elements.  Each\njob making up a scatter operation is independent and may be executed\nconcurrently.\n\nThe `scatter` field specifies one or more input parameters which will be\nscattered.  An input parameter may be listed more than once.  The declared\ntype of each input parameter is implicitly wrapped in an array for each\ntime it appears in the `scatter` field.  As a result, upstream parameters\nwhich are connected to scattered parameters may be arrays.\n\nAll output parameter types are also implicitly wrapped in arrays.  Each job\nin the scatter results in an entry in the output array.\n\nIf `scatter` declares more than one input parameter, `scatterMethod`\ndescribes how to decompose the input into a discrete set of jobs.\n\n  * **dotproduct** specifies that each of the input arrays are aligned and one\n      element taken from each array to construct each job.  It is an error\n      if all input arrays are not the same length.\n\n  * **nested_crossproduct** specifies the Cartesian product of the inputs,\n      producing a job for every combination of the scattered inputs.  The\n      output must be nested arrays for each level of scattering, in the\n      order that the input arrays are listed in the `scatter` field.\n\n  * **flat_crossproduct** specifies the Cartesian product of the inputs,\n      producing a job for every combination of the scattered inputs.  The\n      output arrays must be flattened to a single level, but otherwise listed in the\n      order that the input arrays are listed in the `scatter` field.\n\n# Subworkflows\n\nTo specify a nested workflow as part of a workflow step,\n[SubworkflowFeatureRequirement](#SubworkflowFeatureRequirement) must be\nspecified in the workflow or workflow step requirements.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/id",
+                "type": "string",
+                "jsonldPredicate": "@id",
+                "doc": "The unique identifier for this workflow step."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/in",
+                "type": {
+                    "type": "array",
+                    "items": "https://w3id.org/cwl/cwl#WorkflowStepInput"
+                },
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#in",
+                    "mapSubject": "id",
+                    "mapPredicate": "source"
+                },
+                "doc": "Defines the input parameters of the workflow step.  The process is ready to\nrun when all required input parameters are associated with concrete\nvalues.  Input parameters include a schema for each parameter which is\nused to validate the input object.  It may also be used build a user\ninterface for constructing the input object.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/out",
+                "type": [
+                    {
+                        "type": "array",
+                        "items": [
+                            "string",
+                            "https://w3id.org/cwl/cwl#WorkflowStepOutput"
+                        ]
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#out",
+                    "_type": "@id",
+                    "identity": true
+                },
+                "doc": "Defines the parameters representing the output of the process.  May be\nused to generate and/or validate the output object.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/requirements",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "https://w3id.org/cwl/cwl#ProcessRequirement"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#requirements",
+                    "mapSubject": "class"
+                },
+                "doc": "Declares requirements that apply to either the runtime environment or the\nworkflow engine that must be met in order to execute this workflow step.  If\nan implementation cannot satisfy all requirements, or a requirement is\nlisted which is not recognized by the implementation, it is a fatal\nerror and the implementation must not attempt to run the process,\nunless overridden at user option.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/hints",
+                "type": [
+                    "null",
+                    {
+                        "type": "array",
+                        "items": "Any"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#hints",
+                    "noLinkCheck": true,
+                    "mapSubject": "class"
+                },
+                "doc": "Declares hints applying to either the runtime environment or the\nworkflow engine that may be helpful in executing this workflow step.  It is\nnot an error if an implementation cannot satisfy all hints, however\nthe implementation may report a warning.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/label",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:label",
+                "doc": "A short, human-readable label of this process object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/doc",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "jsonldPredicate": "rdfs:comment",
+                "doc": "A long, human-readable description of this process object."
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/run",
+                "type": [
+                    "string",
+                    "https://w3id.org/cwl/cwl#Process"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#run",
+                    "_type": "@id"
+                },
+                "doc": "Specifies the process to run.\n"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/scatter",
+                "type": [
+                    "null",
+                    "string",
+                    {
+                        "type": "array",
+                        "items": "string"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#scatter",
+                    "_type": "@id",
+                    "_container": "@list",
+                    "refScope": 0
+                }
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#WorkflowStep/scatterMethod",
+                "doc": "Required if `scatter` is an array of more than one element.\n",
+                "type": [
+                    "null",
+                    "https://w3id.org/cwl/cwl#ScatterMethod"
+                ],
+                "jsonldPredicate": {
+                    "_id": "https://w3id.org/cwl/cwl#scatterMethod",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#Workflow",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#Process",
+        "documentRoot": true,
+        "specialize": [
+            {
+                "specializeFrom": "https://w3id.org/cwl/cwl#OutputParameter",
+                "specializeTo": "https://w3id.org/cwl/cwl#WorkflowOutputParameter"
+            }
+        ],
+        "doc": "A workflow describes a set of **steps** and the **dependencies** between\nthose steps.  When a step produces output that will be consumed by a\nsecond step, the first step is a dependency of the second step.\n\nWhen there is a dependency, the workflow engine must execute the preceeding\nstep and wait for it to successfully produce output before executing the\ndependent step.  If two steps are defined in the workflow graph that\nare not directly or indirectly dependent, these steps are **independent**,\nand may execute in any order or execute concurrently.  A workflow is\ncomplete when all steps have been executed.\n\nDependencies between parameters are expressed using the `source` field on\n[workflow step input parameters](#WorkflowStepInput) and [workflow output\nparameters](#WorkflowOutputParameter).\n\nThe `source` field expresses the dependency of one parameter on another\nsuch that when a value is associated with the parameter specified by\n`source`, that value is propagated to the destination parameter.  When all\ndata links inbound to a given step are fufilled, the step is ready to\nexecute.\n\n## Workflow success and failure\n\nA completed step must result in one of `success`, `temporaryFailure` or\n`permanentFailure` states.  An implementation may choose to retry a step\nexecution which resulted in `temporaryFailure`.  An implementation may\nchoose to either continue running other steps of a workflow, or terminate\nimmediately upon `permanentFailure`.\n\n* If any step of a workflow execution results in `permanentFailure`, then\nthe workflow status is `permanentFailure`.\n\n* If one or more steps result in `temporaryFailure` and all other steps\ncomplete `success` or are not executed, then the workflow status is\n`temporaryFailure`.\n\n* If all workflow steps are executed and complete with `success`, then the\nworkflow status is `success`.\n\n# Extensions\n\n[ScatterFeatureRequirement](#ScatterFeatureRequirement) and\n[SubworkflowFeatureRequirement](#SubworkflowFeatureRequirement) are\navailable as standard [extensions](#Extensions_and_Metadata) to core\nworkflow semantics.\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#Workflow/class",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                },
+                "type": "string"
+            },
+            {
+                "name": "https://w3id.org/cwl/cwl#Workflow/steps",
+                "doc": "The individual steps that make up the workflow.  Each step is executed when all of its\ninput data links are fufilled.  An implementation may choose to execute\nthe steps in a different order than listed and/or execute steps\nconcurrently, provided that dependencies between steps are met.\n",
+                "type": [
+                    {
+                        "type": "array",
+                        "items": "https://w3id.org/cwl/cwl#WorkflowStep"
+                    }
+                ],
+                "jsonldPredicate": {
+                    "mapSubject": "id"
+                }
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#SubworkflowFeatureRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicates that the workflow platform must support nested workflows in\nthe `run` field of [WorkflowStep](#WorkflowStep).\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#SubworkflowFeatureRequirement/class",
+                "type": "string",
+                "doc": "Always 'SubworkflowFeatureRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#ScatterFeatureRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicates that the workflow platform must support the `scatter` and\n`scatterMethod` fields of [WorkflowStep](#WorkflowStep).\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#ScatterFeatureRequirement/class",
+                "type": "string",
+                "doc": "Always 'ScatterFeatureRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "name": "https://w3id.org/cwl/cwl#MultipleInputFeatureRequirement",
+        "type": "record",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicates that the workflow platform must support multiple inbound data links\nlisted in the `source` field of [WorkflowStepInput](#WorkflowStepInput).\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#MultipleInputFeatureRequirement/class",
+                "type": "string",
+                "doc": "Always 'MultipleInputFeatureRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    },
+    {
+        "type": "record",
+        "name": "https://w3id.org/cwl/cwl#StepInputExpressionRequirement",
+        "extends": "https://w3id.org/cwl/cwl#ProcessRequirement",
+        "doc": "Indicate that the workflow platform must support the `valueFrom` field\nof [WorkflowStepInput](#WorkflowStepInput).\n",
+        "fields": [
+            {
+                "name": "https://w3id.org/cwl/cwl#StepInputExpressionRequirement/class",
+                "type": "string",
+                "doc": "Always 'StepInputExpressionRequirement'",
+                "jsonldPredicate": {
+                    "_id": "@type",
+                    "_type": "@vocab"
+                }
+            }
+        ]
+    }
+]

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import sys
-import shutil
 
 import setuptools.command.egg_info as egg_info_cmd
-
 from setuptools import setup, find_packages
 
 SETUP_DIR = os.path.dirname(__file__)
@@ -28,25 +27,24 @@ else:
     requirements = []
 
 install_requires = [
-    'requests',
-    'ruamel.yaml == 0.12.4',
-    'rdflib >= 4.1.0',
-    'rdflib-jsonld >= 0.3.0',
-    'mistune',
-    'typing >= 3.5.2',
-    'CacheControl',
-    'lockfile']
+    'setuptools',
+    'requests >= 1.0',
+    'ruamel.yaml >= 0.12.4, < 0.15',
+    'rdflib >= 4.2.2, < 4.3.0',
+    'rdflib-jsonld >= 0.3.0, < 0.5.0',
+    'mistune >= 0.7.3, < 0.8',
+    'typing >= 3.5.3',
+    'CacheControl >= 0.11.7, < 0.12',
+    'lockfile >= 0.9',
+    'six >= 1.8.0']
 
-install_requires.append("avro")  # TODO: remove me once cwltool is
-# available in Debian Stable, Ubuntu 12.04 LTS
-
-# extras_require={                # TODO: uncomment me, same conditions as above
-#        ':python_version<"3"': ['avro'],
-#        ':python_version>="3"': ['avro-python3']}
-extras_require = {}               # TODO: to be removed when the above is added
+extras_require={
+    ':python_version<"3"': ['avro == 1.8.1'],
+    ':python_version>="3"': ['future', 'avro-cwl == 1.8.4']  # fork of avro for working with python3
+}
 
 setup(name='schema-salad',
-      version='1.17',
+      version='2.7',  # update the VERSION prefix in the Makefile as well 🙂
       description='Schema Annotations for Linked Avro Data (SALAD)',
       long_description=open(README).read(),
       author='Common workflow language working group',
@@ -63,19 +61,21 @@ setup(name='schema-salad',
       test_suite='tests',
       tests_require=['pytest'],
       entry_points={
-          'console_scripts': ["schema-salad-tool=schema_salad.main:main"]
+          'console_scripts': ["schema-salad-tool=schema_salad.main:main", "schema-salad-doc=schema_salad.makedoc:main"]
       },
       zip_safe=True,
       cmdclass={'egg_info': tagger},
       classifiers=[
           "Environment :: Console",
           "Intended Audience :: Science/Research",
-          "Operating System :: POSIX :: Linux",
+          "License :: OSI Approved :: Apache Software License",
+          "Operating System :: POSIX",
           "Operating System :: MacOS :: MacOS X",
-          "Development Status :: 4 - Beta",
+          "Operating System :: Microsoft :: Windows",
+          "Development Status :: 5 - Production/Stable",
           "Programming Language :: Python :: 2.7",
-          #"Programming Language :: Python :: 3.3",  # TODO: uncomment these
-          #"Programming Language :: Python :: 3.4",  # lines
-          #"Programming Language :: Python :: 3.5"
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6"
       ]
       )

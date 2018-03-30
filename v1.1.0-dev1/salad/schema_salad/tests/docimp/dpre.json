@@ -1,0 +1,13 @@
+[
+    {
+        "name": "file:///home/peter/work/salad/schema_salad/tests/docimp/d1.yml#Semantic_Annotations_for_Linked_Avro_Data", 
+        "type": "documentation", 
+        "doc": [
+            "*Hello*", 
+            "hello 2", 
+            "hello 3", 
+            "hello 4", 
+            "hello 5"
+        ]
+    }
+]

@@ -1686,3 +1686,35 @@
   tool: v1.1.0-dev1/record-out-format.cwl
   doc: Test format on output record fields
   tags: [ required ]
+
+- job: v1.1.0-dev1/wf-loadContents-job.yml
+  output: {
+    "my_int": 42
+  }
+  tool: v1.1.0-dev1/wf-loadContents.cwl
+  doc: Test WorkflowInputParameter.inputBinding.loadContents
+  tags: [ required ]
+
+- job: v1.1.0-dev1/wf-loadContents-job.yml
+  output: {
+    "my_int": 42
+  }
+  tool: v1.1.0-dev1/wf-loadContents2.cwl
+  doc: Test WorkflowInputParameter.loadContents
+  tags: [ required ]
+
+- job: v1.1.0-dev1/wf-loadContents-job.yml
+  output: {
+    "my_int": 42
+  }
+  tool: v1.1.0-dev1/wf-loadContents3.cwl
+  doc: Test loadContents on InputParameter.loadContents (expression)
+  tags: [ required ]
+
+- job: v1.1.0-dev1/wf-loadContents-job.yml
+  output: {
+    "my_int": 42
+  }
+  tool: v1.1.0-dev1/wf-loadContents4.cwl
+  doc: Test WorkflowStepInput.loadContents
+  tags: [ required ]

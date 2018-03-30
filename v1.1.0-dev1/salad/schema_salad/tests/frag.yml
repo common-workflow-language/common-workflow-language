@@ -1,0 +1,4 @@
+- id: foo1
+  bar: b1
+- id: foo2
+  bar: b2
