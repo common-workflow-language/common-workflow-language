@@ -48,6 +48,8 @@ $graph:
       underspecified behavior may have slightly different behavior in
       v1.1.0-dev1.
 
+      ## Changelog
+
         * Default values for some fields are now expressed in the schema.
         * When defining record types with `CommandInputRecordSchema`, fields of
           type `File` may now include `format`, `loadContents`,
@@ -57,7 +59,8 @@ $graph:
         * `inputBinding` has been added as an optional field for
           `CommandInputRecordSchema` (was previously in CWL `draft-3` but
           disappeared in `v1.0`)
-        * Any `doc` field may be an array of strings in addition to a single string.
+        * Any `doc` field may be an array of strings in addition to the
+          previously allowed single string.
         * Addition of `stdin` type shortcut for `CommandInputParameter`.
         * Clarify that the designated output directory should be empty
           except for files or directories specified using
@@ -65,6 +68,8 @@ $graph:
         * Clarify semantics of `shellQuote`
         * Expressions are now allowed to evaluate to `null` or `Dirent` in
           [InitialWorkDirRequirement.listing](#InitialWorkDirRequirement).
+
+      See also the [CWL Workflow Description, v1.1.0-dev1 changelog](Workflow.html#Changelog).
 
       ## Purpose
 

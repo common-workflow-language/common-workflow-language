@@ -46,13 +46,28 @@ $graph:
       underspecified behavior may have slightly different behavior in
       v1.1.0-dev1.
 
+      ## Changelog
+
         * Default values for some fields are now expressed in the schema
-        * When defining record types, fields of type `File` may now include `secondaryFiles` and `format`.
-        * InputSchema now permits a `doc` field
-        * The `doc` field may be an array of strings
+        * When defining record types, fields of type `File` may now include
+          `format`, `secondaryFiles`, and `streamable`.
+        * The Input schemas (Record, Array, Enum),  now permits a `doc` field
+        * Any `doc` field may be an array of strings in addition to the
+          previously allowed single string.
         * The `run` field now introduces a subscope so that embedded
           definitions do not have identifier conflicts with the
           outer workflow.
+        * `Workflow.inputs` and `ExpressionTool.inputs` now refer to the type
+          `WorkflowInputParameter` instead of `InputParameter`; the only syntax
+          difference from v1.0 is that `inputBinding` is now deprecated (as
+          there is no command line to bind input values to) and `inputBinding`
+          in a `Workflow` context will be removed in v2.0. Use the new
+          `WorkflowInputParameter.loadContents` instead.
+        * The presence of `OutputRecordField.outputBinding` in v1.0 was due to
+          a technical error and as it makes no semantic sense it was removed.
+
+
+      See also the [CWL Command Line Tool Description, v1.1.0-dev1 changelog](CommandLineTool.html#Changelog).
 
       ## Purpose
 
@@ -96,6 +111,7 @@ $graph:
 - name: WorkflowInputParameter
   type: record
   extends: InputParameter
+  docParent: "#Workflow"
   fields:
     - name: type
       type:
