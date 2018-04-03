@@ -237,9 +237,9 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Rob Finn, EMBL-EBI; https://orcid.org/0000-0001-8626-2148
 * Marc Fiume, DNAstack; https://orcid.org/0000-0002-9769-375X
 * Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
+* Kaushik Ghose, Seven Bridges Genomics, Inc; https://orcid.org/0000-0003-2933-1260
 * Carole Goble, The University of Manchester; https://orcid.org/0000-0003-1219-2137
 * Oliver Hofmann, University of Melbourne / bcbio-nextgen; https://orcid.org/0000-0002-7738-1513
-* Gaurav Kaushik, Seven Bridges Genomics, Inc; https://orcid.org/0000-0002-8461-1647
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Folker Meyer, Argonne / University of Chicago; https://orcid.org/0000-0003-1112-2284
 * Tom Morris, Curoverse; https://orcid.org/0000-0003-0435-7851
