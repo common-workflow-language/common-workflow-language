@@ -1540,7 +1540,7 @@
     "args": []
   }
   tool: v1.0/empty-array-input.cwl
-  doc: "Test that empty array input does not add anything to command line" 
+  doc: "Test that empty array input does not add anything to command line"
   tags: [ required ]
 
 - job: v1.0/empty.json
@@ -1562,3 +1562,47 @@
   tool: v1.0/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
   tags: [ inline_javascript ]
+
+- job: v1.0/new-dir-job.yml
+  output: {
+    "out": {
+        "checksum": "sha1$ada861e58d3ca64224d5b8ded8cd0e1e7f775057",
+        "class": "File",
+        "location": "output.txt",
+        "size": 26
+    },
+    "outdir": {
+        "location": "sample1",
+        "listing": [
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "location": "sample1.bam",
+                "class": "File",
+                "size": 0
+            },
+            {
+                "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "location": "sample1.other",
+                "class": "File",
+                "size": 0
+            }
+        ],
+        "class": "Directory"
+    }
+  }
+  tool: v1.0/new-dir.cwl
+  doc: Test returning directory literal in expression for InitialWorkDir listing
+  tags: [ required ]
+
+- job: v1.0/empty.json
+  output: {
+    "out": {
+        "checksum": "sha1$2aae6c35c94fcfb415dbe95f408b9ce91ee846ed",
+        "class": "File",
+        "location": "output.txt",
+        "size": 11
+    }
+  }
+  tool: v1.0/new-file.cwl
+  doc: Test returning file literal in expression for InitialWorkDir listing
+  tags: [ required ]
