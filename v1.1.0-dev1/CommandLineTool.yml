@@ -1007,7 +1007,7 @@ $graph:
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
-    - name: timeLimit
+    - name: timelimit
       type: [long, string, Expression]
       doc: |
         The time limit, in seconds.  A time limit of zero means no

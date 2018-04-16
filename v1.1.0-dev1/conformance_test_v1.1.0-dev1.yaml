@@ -1742,3 +1742,15 @@
   tool: v1.1.0-dev1/timelimit4.cwl
   doc: Test expression in time limit
   tags: [ timelimit ]
+
+- job: v1.1.0-dev1/empty.json
+  output: {}
+  tool: v1.1.0-dev1/networkaccess.cwl
+  doc: Test networkaccess enabled
+  tags: [ networkaccess ]
+
+- job: v1.1.0-dev1/empty.json
+  should_fail: true
+  tool: v1.1.0-dev1/networkaccess2.cwl
+  doc: Test networkaccess is disabled by default
+  tags: [ networkaccess ]
