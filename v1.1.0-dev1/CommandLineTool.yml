@@ -993,43 +993,13 @@ $graph:
 
 
 - type: record
-  name: Workspace
-  extends: ProcessRequirement
-  doc: |
-    Indicate where products of workflow execution (such as
-    intermediate and final outputs, logs, and so forth) should be
-    stored.  The exact semantics and valid values are implementation
-    and site specific.  Examples of possible workspace types include a
-    directory on the file system, an object storage bucket, or cloud
-    platform project.
-
-    Because this is generally site and analysis specific, users are
-    recommended to provide it as an override, separate from the workflow
-    and input object definitions.
-  mapSubject: workspace
-  fields:
-    - name: class
-      type: string
-      doc: "Always 'Workspace'"
-      jsonldPredicate:
-        "_id": "@type"
-        "_type": "@vocab"
-    - name: workspace
-      type: ["null", string, Expression]
-      jsonldPredicate:
-        "_type": "@id"
-      doc: |
-        URI for the.
-
-
-- type: record
   name: TimeLimit
   extends: ProcessRequirement
   doc: |
-    Set a limit on the execution time of a CommandLineTool or
+    Set an upper limit on the execution time of a CommandLineTool or
     ExpressionTool.  A tool execution which exceeds the time limit may
-    be terminated and failed.  Also used by some batch schedulers to
-    optimize cluster utilization.
+    be preemptively terminated and considered failed.  May also be
+    used by batch systems to make scheduling decisions.
   mapSubject: timeLimit
   fields:
     - name: class
@@ -1041,41 +1011,23 @@ $graph:
     - name: timeLimit
       type: [long, string, Expression]
       doc: |
-        The time limit, in seconds.
-
-
-- type: record
-  name: BatchQueue
-  extends: ProcessRequirement
-  doc: |
-    Specify one or more batch queues (also called "paritions" on some
-    schedulers) to which the execution of workflow steps should be
-    submitted.  If multiple queues are listed, the submission should
-    be executed on exactly one of the queues, generally the first
-    queue where the submission reaches the front.
-
-    Because this is generally site and analysis specific, users are
-    recommended to provide it as an override, separate from the workflow
-    and input object definitions.
-  mapSubject: batchQueue
-  fields:
-    - name: class
-      type: string
-      doc: "Always 'BatchQueue'"
-      jsonldPredicate:
-        "_id": "@type"
-        "_type": "@vocab"
-    - name: batchQueue
-      type: [string, string[], Expression]
+        The time limit, in seconds.  A time limit of zero means no
+        time limit.  Negative time limits are an error.
 
 
 - type: record
   name: WorkReuse
   extends: ProcessRequirement
   doc: |
-    For implementations that support reusing results of past similar
-    work, use this to enable or disable the reuse behavior for a
-    particular tool or step.
+    For implementations that support reusing output from past work (on
+    the assumption that same code and same input produce same
+    results), control whether to enable or disable the reuse behavior
+    for a particular tool or step (to accomodate situations where that
+    assumption is incorrect).  A reused step is not executed but
+    instead returns the same output as the original execution.
+
+    If `enableReuse` is not specified, correct tools should assume it
+    is enabled by default.
   mapSubject: enableReuse
   fields:
     - name: class
@@ -1086,6 +1038,7 @@ $graph:
         "_type": "@vocab"
     - name: enableReuse
       type: [boolean, string, Expression]
+      default: true
 
 
 - type: record
@@ -1093,7 +1046,8 @@ $graph:
   extends: ProcessRequirement
   doc: |
     Indicate whether a process requires outgoing IPv4/IPv6 network
-    access.
+    access.  Choice of IPv4 or IPv6 is implementation and site
+    specific, correct tools must support both.
 
     If `networkAccess` is false or not specified, tools must not
     assume network access, except for localhost (the loopback device).
@@ -1107,13 +1061,6 @@ $graph:
     Enabling network access does not imply a publically routable IP
     address or the ability to accept inbound connections.
 
-    If `acceptlist` is provided, the implementation should limit
-    the process to contacting only those hosts listed in
-    `acceptlist` and deny any other connection attempts.  The
-    `acceptlist` must be applied in addition to (not as a
-    substitute for) implementation and site specific security
-    policies.
-
   mapSubject: networkAccess
   fields:
     - name: class
@@ -1124,5 +1071,3 @@ $graph:
         "_type": "@vocab"
     - name: networkAccess
       type: [boolean, string, Expression]
-    - name: acceptlist
-      type: ["null", string, string[], Expression]
