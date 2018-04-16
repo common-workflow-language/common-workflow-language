@@ -1718,3 +1718,27 @@
   tool: v1.1.0-dev1/wf-loadContents4.cwl
   doc: Test WorkflowStepInput.loadContents
   tags: [ required ]
+
+- job: v1.1.0-dev1/empty.json
+  should_fail: true
+  tool: v1.1.0-dev1/timelimit.cwl
+  doc: Test that job fails when exceeding time limit
+  tags: [ timelimit ]
+
+- job: v1.1.0-dev1/empty.json
+  should_fail: true
+  tool: v1.1.0-dev1/timelimit2.cwl
+  doc: Test invalid time limit value
+  tags: [ timelimit ]
+
+- job: v1.1.0-dev1/empty.json
+  output: {}
+  tool: v1.1.0-dev1/timelimit3.cwl
+  doc: Test zero timelimit means no limit
+  tags: [ timelimit ]
+
+- job: v1.1.0-dev1/empty.json
+  should_fail: true
+  tool: v1.1.0-dev1/timelimit4.cwl
+  doc: Test expression in time limit
+  tags: [ timelimit ]

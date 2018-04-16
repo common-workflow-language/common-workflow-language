@@ -1000,7 +1000,6 @@ $graph:
     ExpressionTool.  A tool execution which exceeds the time limit may
     be preemptively terminated and considered failed.  May also be
     used by batch systems to make scheduling decisions.
-  mapSubject: timeLimit
   fields:
     - name: class
       type: string
@@ -1028,7 +1027,6 @@ $graph:
 
     If `enableReuse` is not specified, correct tools should assume it
     is enabled by default.
-  mapSubject: enableReuse
   fields:
     - name: class
       type: string
@@ -1061,7 +1059,6 @@ $graph:
     Enabling network access does not imply a publically routable IP
     address or the ability to accept inbound connections.
 
-  mapSubject: networkAccess
   fields:
     - name: class
       type: string
