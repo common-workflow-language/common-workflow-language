@@ -990,3 +990,81 @@ $graph:
     - name: outdirMax
       type: ["null", long, string, Expression]
       doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
+
+
+- type: record
+  name: TimeLimit
+  extends: ProcessRequirement
+  doc: |
+    Set an upper limit on the execution time of a CommandLineTool or
+    ExpressionTool.  A tool execution which exceeds the time limit may
+    be preemptively terminated and considered failed.  May also be
+    used by batch systems to make scheduling decisions.
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'TimeLimit'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: timelimit
+      type: [long, string, Expression]
+      doc: |
+        The time limit, in seconds.  A time limit of zero means no
+        time limit.  Negative time limits are an error.
+
+
+- type: record
+  name: WorkReuse
+  extends: ProcessRequirement
+  doc: |
+    For implementations that support reusing output from past work (on
+    the assumption that same code and same input produce same
+    results), control whether to enable or disable the reuse behavior
+    for a particular tool or step (to accomodate situations where that
+    assumption is incorrect).  A reused step is not executed but
+    instead returns the same output as the original execution.
+
+    If `enableReuse` is not specified, correct tools should assume it
+    is enabled by default.
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'WorkReuse'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: enableReuse
+      type: [boolean, string, Expression]
+      default: true
+
+
+- type: record
+  name: NetworkAccess
+  extends: ProcessRequirement
+  doc: |
+    Indicate whether a process requires outgoing IPv4/IPv6 network
+    access.  Choice of IPv4 or IPv6 is implementation and site
+    specific, correct tools must support both.
+
+    If `networkAccess` is false or not specified, tools must not
+    assume network access, except for localhost (the loopback device).
+
+    If `networkAccess` is true, the tool must be able to make outgoing
+    connections to network resources.  Resources may be on a private
+    subnet or the public Internet.  However, implementations and sites
+    may apply their own security policies to restrict what is
+    accessible by the tool.
+
+    Enabling network access does not imply a publically routable IP
+    address or the ability to accept inbound connections.
+
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'NetworkAccess'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: networkAccess
+      type: [boolean, string, Expression]
