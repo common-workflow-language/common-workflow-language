@@ -18,11 +18,9 @@ meet the needs of data-intensive science, such as Bioinformatics, Medical
 Imaging, Astronomy, Physics, and Chemistry.
 
 <a href="https://open-stand.org/about-us/principles"><img align="left" src="http://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
-CWL is developed by an informal, multi-vendor working group consisting of
+CWL is developed by a multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
-analysis workflows.  [The CWL project is on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/)
-
-
+analysis workflows.  [The CWL project is maintained on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/). Legally CWL is a member project of [Software Freedom Conservancy](https://sfconservancy.org/news/2018/apr/11/cwl-new-member-project/) and is formally managed by the elected [CWL leadership team](#Leadership_Team), however every-day project decisions are made by the [CWL community](#Support) which is open for participation by anyone.
 
 CWL builds on technologies such as [JSON-LD](http://json-ld.org)
 for data modeling and [Docker](http://docker.com) for portable runtime
@@ -256,6 +254,9 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Nebojša Tijanić, Seven Bridges
 * Ward Vandewege, Curoverse Inc. / Arvados; https://orcid.org/0000-0002-2527-6949
 * Alexander Wait Zaranek, Curoverse Inc. / Arvados; https://orcid.org/0000-0002-0415-9655
+
+
+<a name="Leadership_Team"></a>
 
 ## CWL Leadership Team
 
