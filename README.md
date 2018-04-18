@@ -17,20 +17,20 @@ cloud, and high performance computing (HPC) environments.  CWL is designed to
 meet the needs of data-intensive science, such as Bioinformatics, Medical
 Imaging, Astronomy, Physics, and Chemistry.
 
-<a href="https://open-stand.org/about-us/principles"><img align="left" src="http://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
+<a href="https://open-stand.org/about-us/principles"><img align="left" src="https://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
 CWL is developed by an informal, multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
 analysis workflows.  [The CWL project is on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/)
 
 
 
-CWL builds on technologies such as [JSON-LD](http://json-ld.org)
-for data modeling and [Docker](http://docker.com) for portable runtime
+CWL builds on technologies such as [JSON-LD](https://json-ld.org)
+for data modeling and [Docker](https://www.docker.com/) for portable runtime
 environments.
 
 ## User Guide
 
-The [CWL user guide](http://www.commonwl.org/user_guide) provides a
+The [CWL user guide](https://www.commonwl.org/user_guide/) provides a
 gentle introduction to learning how to write CWL command line tool and workflow
 descriptions.
 
@@ -39,7 +39,7 @@ descriptions.
 ## Specification
 
 For developers and advanced users, the current
-[CWL specification (v1.0.2)](http://www.commonwl.org/v1.0/) provides
+[CWL specification (v1.0.2)](https://www.commonwl.org/v1.0/) provides
 authoritative documentation of the execution of CWL documents.
 
 ### Citation
@@ -58,27 +58,27 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 
 |Software|Description|CWL support|Platform support|
 |--------|-----------|-----------|----------------|
-|[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](http://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, Windows, local execution only|
-|[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](http://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](http://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|
-|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](http://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, Azure, GCP, Grid Engine, LSF, Mesos, OpenStack, Slurm, PBS/Torque|
+|[cwltool](https://github.com/common-workflow-language/cwltool)|Reference implementation of CWL|[![Build Status](https://ci.commonwl.org/job/cwltool-conformance/badge/icon)](https://ci.commonwl.org/job/cwltool-conformance/lastBuild/testReport/)|Linux, OS X, Windows, local execution only|
+|[Arvados](https://arvados.org)|Distributed computing platform for data analysis on massive data sets. [Using CWL on Arvados](https://doc.arvados.org/user/cwl/cwl-runner.html)|[![Build Status](https://ci.commonwl.org/job/arvados-conformance/badge/icon)](https://ci.commonwl.org/job/arvados-conformance/lastBuild/testReport/)|AWS, GCP, Azure, Slurm|
+|[Toil](https://github.com/BD2KGenomics/toil)|Toil is a workflow engine entirely written in Python.|[![Build Status](https://ci.commonwl.org/job/toil-conformance/badge/icon)](https://ci.commonwl.org/job/toil-conformance/lastBuild/testReport/)|AWS, Azure, GCP, Grid Engine, LSF, Mesos, OpenStack, Slurm, PBS/Torque|
 |[Rabix Bunny](https://github.com/rabix/bunny)|An open-source, Java-based implementation of Common Workflow Language with support for multiple drafts/versions. See [Rabix.io](http://rabix.io) for details.|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=rabix-conformance)](https://ci.commonwl.org/job/rabix-conformance/)|Linux, OS X, [GA4GH TES](https://github.com/ga4gh/task-execution-server) (experimental)|
 |[Galaxy](https://galaxyproject.org/)|Web-based platform for data intensive biomedical research.|[alpha](https://github.com/common-workflow-language/galaxy)|-|
 |[cwl-tes](https://github.com/common-workflow-language/cwl-tes)|CWL engine backended by the [GA4GH Task Execution API](https://github.com/ga4gh/task-execution-schemas)|[![Build Status](https://travis-ci.org/common-workflow-language/cwl-tes.svg?branch=master)](https://travis-ci.org/common-workflow-language/cwl-tes)|Local, GCP, AWS, HTCondor, Grid Engine, PBS/Torque, Slurm|
 |[CWL-Airflow](https://github.com/Barski-lab/cwl-airflow)|Package to run CWL workflows in Apache-Airflow (supported by BioWardrobe Team, CCHMC)|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=airflow-conformance)](https://ci.commonwl.org/job/airflow-conformance)|Linux, OS X|
 |[Cromwell](https://github.com/broadinstitute/cromwell)|Cromwell workflow engine|[![Build Status](https://ci.commonwl.org/buildStatus/icon?job=cromwell)](https://ci.commonwl.org/job/cromwell) [alpha](https://github.com/broadinstitute/cromwell/issues?q=is%3Aopen+is%3Aissue+label%3ACWL)|local, HPC, Google, HtCondor|
-|[Xenon](http://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](http://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
+|[Xenon](https://nlesc.github.io/Xenon/)|Run CWL workflows using Xenon|[alpha](https://github.com/NLeSC/xenon-cwl-runner)|[any Xenon backend](https://nlesc.github.io/Xenon/): local, ssh, SLURM, Torque, Grid Engine|
 |[Consonance](https://github.com/Consonance/consonance)|orchestration tool for running SeqWare workflows and CWL tools|-|AWS, OpenStack, Azure|
-|[Apache Taverna](http://taverna.incubator.apache.org/)|Domain-independent Workflow Management System|[alpha](https://issues.apache.org/jira/browse/TAVERNA-900)|-|
+|[Apache Taverna](https://taverna.incubator.apache.org/)|Domain-independent Workflow Management System|[alpha](https://issues.apache.org/jira/browse/TAVERNA-900)|-|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|-|
 |[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine|-|-|
-|[REANA](https://reana.readthedocs.io/en/latest/index.html)|RE usable ANAlyses|[alpha](https://github.com/reanahub/reana-workflow-engine-cwl/issues/9#issuecomment-351472835)|Kubernetes, [CERN OpenStack](http://clouddocs.web.cern.ch/clouddocs/containers/index.html) ([OpenStack Magnum](https://wiki.openstack.org/wiki/Magnum))|
+|[REANA](https://reana.readthedocs.io/en/latest/index.html)|RE usable ANAlyses|[alpha](https://github.com/reanahub/reana-workflow-engine-cwl/issues/9#issuecomment-351472835)|Kubernetes, [CERN OpenStack](https://clouddocs.web.cern.ch/clouddocs/containers/) ([OpenStack Magnum](https://wiki.openstack.org/wiki/Magnum))|
 
 ## Repositories of CWL Tools and Workflows
 
 |Repository|Description|
 |----|-----------|
 |[Workflows repository](https://github.com/common-workflow-language/workflows)|Git repository of user contributed tools and workflows.|
-|[Dockstore tool registry](http://dockstore.org)|An open platform for sharing Docker-based tools described with the Common Workflow Language used by the GA4GH.|
+|[Dockstore tool registry](https://dockstore.org)|An open platform for sharing Docker-based tools described with the Common Workflow Language used by the GA4GH.|
 |[CWLviewer](https://view.commonwl.org/workflows)|A web application to view and share Common Workflow Language workflows|
 |[GitHub](https://github.com/search?q=extension%3Acwl+cwlVersion)|Search for CWL documents using `extension:cwl cwlVersion + <your search terms>`, for example `extension:cwl cwlVersion picard`.|
 |[Google](https://www.google.com/search?q=filetype%3Acwl+cwlVersion)|Search for CWL documents using `filetype:cwl cwlVersion + <your search terms>`, for example `filetype:cwl cwlVersion picard`.|
@@ -174,15 +174,15 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 
 ## Participating Organizations
 
-* [Curoverse](http://curoverse.com)
-* [Seven Bridges Genomics](http://sbgenomics.com)
-* [Galaxy Project](http://galaxyproject.org/)
-* [Apache Taverna](http://taverna.incubator.apache.org/)
-* [Institut Pasteur](http://www.pasteur.fr)
+* [Curoverse](https://curoverse.com)
+* [Seven Bridges Genomics](https://www.sevenbridges.com/)
+* [Galaxy Project](https://galaxyproject.org/)
+* [Apache Taverna](https://taverna.incubator.apache.org/)
+* [Institut Pasteur](https://www.pasteur.fr/en)
 * [Wellcome Trust Sanger Institute](https://www.sanger.ac.uk/)
 * [University of California Santa Cruz](https://cbse.soe.ucsc.edu/research/bioinfo)
-* [Harvard T.H. Chan School of Public Health](http://www.hsph.harvard.edu/)
-* [Cincinnati Children's Hospital Medical Center](http://www.cincinnatichildrens.org/)
+* [Harvard T.H. Chan School of Public Health](https://www.hsph.harvard.edu/)
+* [Cincinnati Children's Hospital Medical Center](https://www.cincinnatichildrens.org/)
 * [Broad Institute](https://www.broadinstitute.org)
 * [University of Melbourne Center for Cancer Research](https://umccr.github.io/)
 * [Netherlands eScience Center](https://www.esciencecenter.nl/)
@@ -190,7 +190,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * [CyVerse](http://www.cyverse.org/)
 * [Institute for Systems Biology](https://www.systemsbiology.org/)
 * [ELIXIR Europe](https://www.elixir-europe.org/)
-* [BioExcel CoE](http://bioexcel.eu/)
+* [BioExcel CoE](https://bioexcel.eu/)
 * [BD2K](https://commonfund.nih.gov/bd2k)
 * [EMBL Australia Bioinformatics Resource](https://www.embl-abr.org.au/)
 * [IBM Spectrum Computing](https://www.ibm.com/spectrum-computing)
@@ -212,7 +212,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
 * Sehrish Kanwal; https://orcid.org/0000-0002-5044-4692
 * Andrey Kartashov; https://orcid.org/0000-0001-9102-5681
-* John Kern; http://orcid.org/0000-0001-6977-458X
+* John Kern; https://orcid.org/0000-0001-6977-458X
 * Farah Zaib Khan; https://orcid.org/0000-0002-6337-3037
 * Dan Leehr; https://orcid.org/0000-0003-3221-9579
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
