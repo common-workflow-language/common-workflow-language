@@ -1540,7 +1540,7 @@
     "args": []
   }
   tool: v1.0/empty-array-input.cwl
-  doc: "Test that empty array input does not add anything to command line" 
+  doc: "Test that empty array input does not add anything to command line"
   tags: [ required ]
 
 - job: v1.0/empty.json
@@ -1562,3 +1562,29 @@
   tool: v1.0/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
   tags: [ inline_javascript ]
+
+- job: v1.0/empty.json
+  output: {
+    "outfile": {
+        "size": 1500,
+        "class": "File",
+        "checksum": "sha1$553f3a09003a9f69623f03bec13c0b078d706023",
+        "location": "result.txt"
+    }
+  }
+  tool: v1.0/wh/default-secondaryFile.cwl
+  doc: Test discover secondaryFile on default file input, packed wf
+  tags: [ required ]
+
+- job: v1.0/empty.json
+  output: {
+    "outfile": {
+        "size": 1500,
+        "class": "File",
+        "checksum": "sha1$553f3a09003a9f69623f03bec13c0b078d706023",
+        "location": "result.txt"
+    }
+  }
+  tool: v1.0/wh/default-secondaryFile2.cwl
+  doc: Test discover secondaryFile on default file input, split wf
+  tags: [ required ]
