@@ -9,7 +9,9 @@ Common Workflow Language
 <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" width="92" heigth="26" name="submit" alt="Donate to Common Workflow Language via PayPal">
 </form>
 
-<a href="https://www.youtube.com/watch?v=86eY8xs-Vo8"><img align="right" src="https://github.com/common-workflow-language/logo/raw/master/intro_video_screenshot_413x193.png" alt="[Video] Common Workflow Language explained in 64 seconds"></a>
+<a href="https://www.youtube.com/watch?v=86eY8xs-Vo8"><img align="right"
+src="https://github.com/common-workflow-language/logo/raw/master/intro_video_screenshot_413x193.png"
+alt="[Video] Common Workflow Language explained in 64 seconds"></a>
 The Common Workflow Language (CWL) is a specification for describing analysis
 workflows and tools in a way that makes them portable and scalable across a
 variety of software and hardware environments, from workstations to cluster,
@@ -17,12 +19,16 @@ cloud, and high performance computing (HPC) environments.  CWL is designed to
 meet the needs of data-intensive science, such as Bioinformatics, Medical
 Imaging, Astronomy, Physics, and Chemistry.
 
-<a href="https://open-stand.org/about-us/principles"><img align="left" src="https://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
-CWL is developed by an informal, multi-vendor working group consisting of
+<a href="https://open-stand.org/about-us/principles"><img align="left"
+src="https://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
+CWL is developed by a multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
-analysis workflows.  [The CWL project is on Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for collaborative open standards development](https://open-stand.org/about-us/principles/)
-
-
+analysis workflows.  [The CWL project is maintained on
+Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for 
+collaborative open standards development](https://open-stand.org/about-us/principles/). Legally CWL is a member project of 
+[Software Freedom Conservancy](https://sfconservancy.org/news/2018/apr/11/cwl-new-member-project/) and is formally managed by 
+the elected [CWL leadership team](#Leadership_Team), however every-day project decisions are made by the
+[CWL community](#Support) which is open for participation by anyone.
 
 CWL builds on technologies such as [JSON-LD](https://json-ld.org)
 for data modeling and [Docker](https://www.docker.com/) for portable runtime
@@ -34,7 +40,8 @@ The [CWL user guide](https://www.commonwl.org/user_guide/) provides a
 gentle introduction to learning how to write CWL command line tool and workflow
 descriptions.
 
-[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP) is a 15 minute introduction to the CWL project in Japanese.
+[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP) is a 15 minute introduction to the 
+CWL project in Japanese.
 
 ## Specification
 
@@ -46,7 +53,8 @@ authoritative documentation of the execution of CWL documents.
 
 To reference the CWL standards in a scholary work, please use the following citation inclusive of the DOI:
 
-Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016):
+Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John Chilton, Michael Heuer, Andrey Kartashov,
+Dan Leehr, Hervé Ménager, Maya Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016):
 **Common Workflow Language, v1.0**.
 Specification, _Common Workflow Language working group_.
 [https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
@@ -257,6 +265,8 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Ward Vandewege, Curoverse Inc. / Arvados; https://orcid.org/0000-0002-2527-6949
 * Alexander Wait Zaranek, Curoverse Inc. / Arvados; https://orcid.org/0000-0002-0415-9655
 
+
+<a name="Leadership_Team"></a>
 ## CWL Leadership Team
 
 (Alphabetical)
