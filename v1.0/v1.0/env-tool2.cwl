@@ -13,6 +13,6 @@ hints:
     envDef:
       TEST_ENV: $(inputs.in)
 
-baseCommand: ["/bin/bash", "-c", "echo $TEST_ENV"]
+baseCommand: ["/bin/sh", "-c", "echo $TEST_ENV"]
 
 stdout: out
