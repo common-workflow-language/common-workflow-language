@@ -141,6 +141,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[CWL for R](https://github.com/jefferys/cwl)|Parse and work with CWL from R|
 |[CWL for Julia](https://github.com/BioJulia/CWL.jl)|Utilities for working with CWL from Julia|
+|[buchanae/cwl](https://github.com/buchanae/cwl)|CWL document parsing and processing utilities in Go.|
 |[CWL for Go](https://github.com/otiai10/cwl.go)|-|
 |[CWL for Scala](https://github.com/broadinstitute/wdl4s)|CWL object model for Scala|
 |[cwl-proto](https://github.com/broadinstitute/cwl-proto)|Reading and writing Common Workflow Language to Protocol Buffers|
