@@ -8,6 +8,6 @@ outputs:
     outputBinding:
       glob: out
 
-baseCommand: ["/bin/bash", "-c", "echo $TEST_ENV"]
+baseCommand: ["/bin/sh", "-c", "echo $TEST_ENV"]
 
 stdout: out
