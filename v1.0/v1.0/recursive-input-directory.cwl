@@ -1,13 +1,12 @@
 cwlVersion: v1.0
 class: CommandLineTool
 requirements:
-  - class: InlineJavascriptRequirement
-  - class: InitialWorkDirRequirement
+  InitialWorkDirRequirement:
     listing:
       - entry: $(inputs.input_dir)
         entryname: work_dir
         writable: true
-  - class: ShellCommandRequirement
+  ShellCommandRequirement: {}
 stdout: output.txt
 arguments:
  - shellQuote: false

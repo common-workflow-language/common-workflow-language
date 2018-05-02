@@ -1,9 +1,6 @@
 class: CommandLineTool
 cwlVersion: v1.0
 
-requirements:
-  - class: InlineJavascriptRequirement
-
 hints:
   - class: DockerRequirement
     dockerPull: python:2-slim
