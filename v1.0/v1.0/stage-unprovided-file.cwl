@@ -1,8 +1,6 @@
 cwlVersion: v1.0
 class: CommandLineTool
 
-requirements: { InlineJavascriptRequirement: {} }
-
 inputs:
   - id: infile
     type: File?

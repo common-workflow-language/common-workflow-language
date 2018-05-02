@@ -1,13 +1,8 @@
 cwlVersion: v1.0
 class: CommandLineTool
-hints:
-  DockerRequirement:
-    dockerPull: java:7
-baseCommand: javac
 
 requirements:
-  - class: InlineJavascriptRequirement
-  - class: InitialWorkDirRequirement
+  InitialWorkDirRequirement:
     listing:
       - $(inputs.src)
 
@@ -16,7 +11,9 @@ inputs:
     type: File
     inputBinding:
       position: 1
-      valueFrom: $(self.basename)
+      valueFrom: $(self.nameroot).class
+
+baseCommand: touch
 
 outputs:
   classfile:

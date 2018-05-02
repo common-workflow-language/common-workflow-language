@@ -518,7 +518,8 @@
   tool: "v1.0/search.cwl#main"
   doc: |
     Test InitialWorkDirRequirement linking input files and capturing secondaryFiles
-    on input and output.
+    on input and output. Also tests the use of a variety of parameter references
+    and expressions in the secondaryFiles field.
   tags: [ initial_work_dir, inline_javascript ]
 
 - job: v1.0/rename-job.json
@@ -562,7 +563,7 @@
   tool: v1.0/schemadef-tool.cwl
   doc: |
     Test SchemaDefRequirement definition used in tool parameter
-  tags: [ schema_def, inline_javascript ]
+  tags: [ schema_def ]
 
 - job: v1.0/schemadef-job.json
   output:
@@ -1059,13 +1060,13 @@
 - job: v1.0/arguments-job.yml
   output:
     classfile:
-        checksum: sha1$e68df795c0686e9aa1a1195536bd900f5f417b18
+        checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
         location: Hello.class
         class: File
-        size: 184
+        size: 0
   tool: v1.0/linkfile.cwl
   doc: Test expression in InitialWorkDir listing
-  tags: [ inline_javascript, initial_work_dir ]
+  tags: [ initial_work_dir ]
 
 - job: v1.0/wc-job.json
   output:
@@ -1285,7 +1286,7 @@
       }
   tool: v1.0/recursive-input-directory.cwl
   doc: Test if a writable input directory is recursivly copied and writable
-  tags: [ inline_javascript, initial_work_dir, shell_command ]
+  tags: [ initial_work_dir, shell_command ]
 
 - output:
     out: "t\n"
@@ -1515,7 +1516,7 @@
   tool: v1.0/stage-unprovided-file.cwl
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
-  tags: [ inline_javascript ]
+  tags: [ required ]
 
 - tool: v1.0/exit-success.cwl
   doc: Test successCodes
@@ -1561,4 +1562,4 @@
   }
   tool: v1.0/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
-  tags: [ inline_javascript ]
+  tags: [ required ]
