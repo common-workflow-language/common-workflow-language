@@ -1059,13 +1059,13 @@
 - job: v1.0/arguments-job.yml
   output:
     classfile:
-        checksum: sha1$e68df795c0686e9aa1a1195536bd900f5f417b18
+        checksum: sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709
         location: Hello.class
         class: File
-        size: 184
+        size: 0
   tool: v1.0/linkfile.cwl
   doc: Test expression in InitialWorkDir listing
-  tags: [ inline_javascript, initial_work_dir ]
+  tags: [ initial_work_dir ]
 
 - job: v1.0/wc-job.json
   output:
