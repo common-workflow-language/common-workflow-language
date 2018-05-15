@@ -1431,7 +1431,7 @@
   doc: Test empty writable dir with InitialWorkDirRequirement inside Docker
   tags: [ inline_javascript, initial_work_dir ]
 
-- job: v1.0/dynresreq-job.json
+- job: v1.0/dynresreq-job.yaml
   tool: v1.0/dynresreq.cwl
   doc: Test dynamic resource reqs referencing inputs
   output:
@@ -1524,7 +1524,7 @@
   output: {}
   tags: [ required ]
 
-- job: v1.0/dynresreq-job.json
+- job: v1.0/dynresreq-job.yaml
   doc: Test simple workflow with a dynamic resource requirement
   tool: v1.0/dynresreq-workflow.cwl
   output:
@@ -1563,3 +1563,16 @@
   tool: v1.0/valueFrom-constant.cwl
   doc: Test valueFrom with constant value overriding provided array inputs
   tags: [ required ]
+
+- job: v1.0/dynresreq-dir-job.yaml
+  tool: v1.0/dynresreq-dir.cwl
+  doc: Test dynamic resource reqs referencing the size of Files inside a Directory
+  output:
+     output: {
+        "location": "cores.txt",
+        "size": 2,
+        "class": "File",
+        "checksum": "sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a"
+     }
+  tags: [ resource ]
+
