@@ -450,7 +450,7 @@
   label: nested_workflow
   id: 45
   doc: Test nested workflow
-  tags: [ subworkflow, workflow ]
+  tags: [ subworkflow, workflow, inline_javascript ]
 
 - job: v1.0/env-job.json
   output:
@@ -1885,6 +1885,7 @@
   doc: Test workflow scatter with single scatter parameter and two valueFrom using $inputs (first and current el)
   tags: [ scatter, step_input, workflow ]
 
+<<<<<<< HEAD
 - job: v1.0/import_schema-def_job.yml
   output:
     output_bam:
@@ -2323,3 +2324,64 @@
   label: clt_file_size_property_with_multi_file
   doc: Test use of size in expressions for a few files
   tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/empty.json
+  tool: v1.0/echo-tool.cwl
+  should_fail: true
+  doc: Test Any without defaults, unspecified, should fail.
+  tags: [ required ]
+
+- job: v1.0/null-expression1-job.json
+  tool: v1.0/echo-tool.cwl
+  should_fail: true
+  doc: Test Any without defaults, specified, should fail.
+  tags: [ required ]
+
+- job: v1.0/empty.json
+  output: 
+    wc_output: 
+        class: File
+        checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
+        size: 3
+  tool: v1.0/count-lines9-wf-noET.cwl
+  doc: Test default value on step input parameter, no ExpressionTool
+  tags: [ required ]
+
+- job: v1.0/cat-job.json
+  output:
+    wc_output: 
+        class: File
+        checksum: sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e
+        size: 2
+  tool: v1.0/count-lines11-wf-noET.cwl
+  doc: Test default value on step input parameter overridden by provided source
+  tags: [ required ]
+
+- job: v1.0/wc-job.json
+  output: 
+    wc_output: 
+        class: File
+        checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
+        size: 3
+  tool: v1.0/count-lines8-wf-noET.cwl
+  doc: Test nested workflow, without ExpressionTool
+  tags: [ subworkflow ]
+
+- job: v1.0/sum-job.json
+  output: 
+    result: 
+        class: File
+        checksum: sha1$ad552e6dc057d1d825bf49df79d6b98eba846ebe
+        size: 3
+  tool: v1.0/sum-wf-noET.cwl
+  doc: Test step input with multiple sources with multiple types, without ExpressionTool
+  tags: [ step_input, inline_javascript, multiple_input ]
+
+# TODO:
+# Test two step workflow with imported tools
+# Test two step workflow with inline tools
+# Test use default value on step input parameter with empty source
+#  Test use default value on step input parameter with null source
+# Test valueFrom on workflow step.
+# Testing the string 'null' does not trip up an Any with a default value.
+# Testing the string 'null' does not trip up an Any without a default value.
