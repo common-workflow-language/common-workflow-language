@@ -2376,12 +2376,3 @@
   tool: v1.0/sum-wf-noET.cwl
   doc: Test step input with multiple sources with multiple types, without ExpressionTool
   tags: [ step_input, inline_javascript, multiple_input ]
-
-# TODO:
-# Test two step workflow with imported tools
-# Test two step workflow with inline tools
-# Test use default value on step input parameter with empty source
-#  Test use default value on step input parameter with null source
-# Test valueFrom on workflow step.
-# Testing the string 'null' does not trip up an Any with a default value.
-# Testing the string 'null' does not trip up an Any without a default value.
