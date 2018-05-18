@@ -2467,3 +2467,27 @@
     Test default value on step input parameter overridden by provided source.
     With null producing first step and no ExpressionTool
   tags: [ required ]
+
+- short_name: directory_literal-input
+  tool: v1.0/cat-from-dir.cwl
+  job: v1.0/cat-from-dir-job.yaml
+  output:
+    checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
+    class: File
+    size: 13
+
+- short_name: directory_literal-input-with-literal_file
+  tool: v1.0/cat-from-dir.cwl
+  job: v1.0/cat-from-dir-with-literal-file.yaml
+  output:
+    checksum: sha1$ef88e689559565999700d6fea7cf7ba306d04360
+    class: File
+    size: 26
+
+- short_name: directory_literal-input_with-literal_file-no_stdin
+  tool: v1.0/cat3-from-dir.cwl
+  job: v1.0/cat-from-dir-with-literal-file.yaml
+  output:
+    checksum: sha1$ef88e689559565999700d6fea7cf7ba306d04360
+    class: File
+    size: 26
