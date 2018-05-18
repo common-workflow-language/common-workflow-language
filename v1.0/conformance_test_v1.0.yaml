@@ -1158,7 +1158,7 @@
   label: directory_input_docker
   id: 85
   doc: Test directory input in Docker
-  tags: [ required, command_line_tool ]
+  tags: [ required, command_line_tool, shell_command ]
 
 - job: v1.0/dir3-job.yml
   output:
