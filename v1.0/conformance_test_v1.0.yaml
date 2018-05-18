@@ -2376,3 +2376,94 @@
   tool: v1.0/sum-wf-noET.cwl
   doc: Test step input with multiple sources with multiple types, without ExpressionTool
   tags: [ step_input, inline_javascript, multiple_input ]
+
+- short_name: dynresreq-workflow-default-tool-input
+  tool: v1.0/dynresreq-workflow-tooldefault.cwl
+  job: v1.0/empty.json
+  output:
+    cores:
+        location: output
+        size: 2
+        class: File
+        checksum: sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a
+  doc: |
+    Within a workflow, test accessing the size attribute of an optional input
+    File as part of a CommandLineTool's ResourceRequirement calculation. The
+    CommandLineTool input has a default value (a local file) and the workflow
+    nor the workflow step does not provide any value for this input.
+  tags: [ resource ]
+
+- short_name: dynresreq-workflow-default-workflowstep-input
+  tool: v1.0/dynresreq-workflow-stepdefault.cwl
+  job: v1.0/empty.json
+  output:
+    cores:
+        location: output
+        size: 2
+        class: File
+        checksum: sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a
+  doc: |
+    Within a workflow, test accessing the size attribute of an optional input
+    File as part of a CommandLineTool's ResourceRequirement calculation. The
+    workflow step provides a default value (a local file) for this input and
+    the workflow itself does not provide any value for this input.
+  tags: [ resource ]
+
+- short_name: dynresreq-workflow-default-workflow-input
+  tool: v1.0/dynresreq-workflow-inputdefault.cwl
+  job: v1.0/empty.json
+  output:
+    cores:
+        location: output
+        size: 2
+        class: File
+        checksum: sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a
+  doc: |
+    Within a workflow, test accessing the size attribute of an optional input
+    File as part of a CommandLineTool's ResourceRequirement calculation. The
+    workflow itelf provides a default value (a local file) for this input.
+  tags: [ resource ]
+
+- short_name: workflow_step-default-overridden-2nd_step
+  job: v1.0/cat-job.json
+  output: {count_output: 1}
+  tool: v1.0/count-lines11-extra-step-wf.cwl
+  doc: |
+    Test default value on step input parameter overridden by provided source.
+    With passthrough first step
+  tags: [ inline_javascript ]
+
+- short_name: workflow_step-default-overridden-2nd_step-no_expression_tool
+  job: v1.0/cat-job.json
+  output:
+    wc_output:
+        class: File
+        checksum: sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e
+        size: 2
+  tool: v1.0/count-lines11-extra-step-wf-noET.cwl
+  doc: |
+    Test default value on step input parameter overridden by provided source.
+    With passthrough first step and no ExpressionTool
+  tags: [ required ]
+
+- short_name: workflow_step-default-overridden-2nd_step-1st_step_null
+  job: v1.0/empty.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines11-null-step-wf.cwl
+  doc: |
+    Test default value on step input parameter overridden by provided source.
+    With null producing first step
+  tags: [ inline_javascript ]
+
+- short_name: workflow_step-default-overridden-2nd_step-1st_step_null-no_expression_tool
+  job: v1.0/empty.json
+  output:
+    wc_output:
+        class: File
+        checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
+        size: 3
+  tool: v1.0/count-lines11-null-step-wf-noET.cwl
+  doc: |
+    Test default value on step input parameter overridden by provided source.
+    With null producing first step and no ExpressionTool
+  tags: [ required ]
