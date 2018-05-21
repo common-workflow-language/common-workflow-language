@@ -1509,6 +1509,15 @@
   doc: "Test that boolean flags do not appear on command line if inputBinding is empty and not null"
   tags: [ required ]
 
+- job: v1.0/empty.json
+  output: {
+    "args": []
+  }
+  tool: v1.0/stage-unprovided-file.cwl
+  doc: Test that expression engine does not fail to evaluate reference to self
+       with unprovided input
+  tags: [ required ]
+
 - tool: v1.0/exit-success.cwl
   doc: Test successCodes
   job: v1.0/empty.json
@@ -1532,7 +1541,7 @@
     "args": []
   }
   tool: v1.0/empty-array-input.cwl
-  doc: "Test that empty array input does not add anything to command line"
+  doc: "Test that empty array input does not add anything to command line" 
   tags: [ required ]
 
 - job: v1.0/empty.json
