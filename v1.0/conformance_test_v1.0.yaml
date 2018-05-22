@@ -1542,7 +1542,7 @@
     "args": []
   }
   tool: v1.0/empty-array-input.cwl
-  doc: "Test that empty array input does not add anything to command line" 
+  doc: "Test that empty array input does not add anything to command line"
   tags: [ required ]
 
 - job: v1.0/empty.json
@@ -1577,3 +1577,19 @@
      }
   tags: [ resource ]
 
+- job: v1.0/empty.json
+  tool: v1.0/pass-unconnected.cwl
+  doc: |
+    Test that it is not an error to connect a parameter to a workflow
+    step, even if the parameter doesn't appear in the `run` process
+    inputs.
+  output: { "out": "hello inp1\n" }
+  tags: [ required ]
+
+- job: v1.0/empty.json
+  tool: v1.0/fail-unconnected.cwl
+  doc: |
+    Test that parameters that doesn't appear in the `run` process
+    inputs are not present in the input object used to run the tool.
+  should_fail: true
+  tags: [ required ]
