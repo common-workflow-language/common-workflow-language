@@ -1518,7 +1518,6 @@
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
   tags: [ required ]
-  should_fail: true
 
 - tool: v1.0/exit-success.cwl
   doc: Test successCodes
