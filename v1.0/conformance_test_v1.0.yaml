@@ -799,6 +799,7 @@
   tool: v1.0/vf-concat.cwl
   doc: Test that second expression in concatenated valueFrom is not ignored
   tags: [ inline_javascript ]
+  should_fail: true
 
 - job: v1.0/step-valuefrom-wf.json
   output: {count_output: 16}
