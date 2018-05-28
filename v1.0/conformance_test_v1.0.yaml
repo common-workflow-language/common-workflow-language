@@ -1593,3 +1593,25 @@
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required ]
+
+- tool: v1.0/awk-awk.cwl
+  job: v1.0/awk-awk-job.yaml
+  doc: test that a $ in the baseCommand is not interpreted by the shell
+  output:
+    bRegionsNonZero:
+        basename: awk-awk-input_nonZero.txt
+        class: File
+        checksum: "sha1$810037850eb6f1791e9365e25f124808828070e2"
+        size: 24
+  tags: [ required ]
+
+- tool: v1.0/awk-awk2.cwl
+  job: v1.0/awk-awk-job.yaml
+  doc: test that a $ in an argument is not interpreted by the shell
+  output:
+    bRegionsNonZero:
+        basename: awk-awk-input_nonZero.txt
+        class: File
+        checksum: "sha1$810037850eb6f1791e9365e25f124808828070e2"
+        size: 24
+  tags: [ required ]
