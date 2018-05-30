@@ -1593,3 +1593,15 @@
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required ]
+- job: v1.0/empty.json
+  tool: v1.0/paramref_arguments_runtime.cwl
+  doc: confirm that $runtime is available to parameter references in arguments
+  tags: [ required ]
+  output:
+    "runtime_review": {
+        "basename": "runtime_review.txt",
+        "class": "File",
+        "checksum": "sha1$c01db123f62c07b8431d67e0e409a9f7de974f5c",
+        "size": 30,
+    }
+
