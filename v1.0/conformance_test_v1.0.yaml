@@ -1598,10 +1598,29 @@
   doc: confirm that $runtime is available to parameter references in arguments
   tags: [ required ]
   output:
-    "runtime_review": {
-        "basename": "runtime_review.txt",
-        "class": "File",
-        "checksum": "sha1$c01db123f62c07b8431d67e0e409a9f7de974f5c",
-        "size": 30,
-    }
+    runtime_review:
+        basename: runtime_review.txt
+        class: File
+        checksum: "sha1$c01db123f62c07b8431d67e0e409a9f7de974f5c"
+        size: 30
+- tool: v1.0/paramref_arguments_self.cwl
+  job: v1.0/empty.json
+  doc: confirm that $self is available and set to null in arguments
+  tags: [ required ]
+  output:
+    self_review:
+      location: self_review.txt
+      class: File
+      checksum: "sha1$724ba28f4a9a1b472057ff99511ed393a45552e1"
+      size: 5
+- job: v1.0/empty.json
+  tool: v1.0/paramref_arguments_inputs.cwl
+  doc: confirm that $inputs is available to parameter references in arguments
+  tags: [ required ]
+  output:
+    inputs_review:
+        location: inputs_review.txt
+        class: File
+        checksum: "sha1$724ba28f4a9a1b472057ff99511ed393a45552e1"
+        size: 5
 
