@@ -544,7 +544,7 @@
 
   tool: v1.0/iwdr-entry.cwl
   doc: Test if trailing newline is present in file entry in InitialWorkDir
-  tags: [ command_line_tool ]
+  tags: [ initial_work_dir, command_line_tool ]
 
 - job: v1.0/wc-job.json
   output:
