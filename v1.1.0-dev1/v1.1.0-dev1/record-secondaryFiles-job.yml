@@ -1,9 +1,0 @@
-record_input:
-  f1:
-    class: File
-    location: rec/A
-  f2:
-    - class: File
-      location: rec/B
-    - class: File
-      location: rec/C

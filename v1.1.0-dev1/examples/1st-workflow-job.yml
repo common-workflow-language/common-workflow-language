@@ -1,4 +1,0 @@
-inp:
-  class: File
-  path: hello.tar
-ex: Hello.java

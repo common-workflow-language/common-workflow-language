@@ -1,4 +1,0 @@
-class: EnvVarRequirement
-envDef:
-  - envName: "TEST_ENV"
-    envValue: "hello test env"

@@ -1,5 +1,0 @@
-dependent_parameters:
-  itemA: one
-  itemB: two
-exclusive_parameters:
-  itemD: four

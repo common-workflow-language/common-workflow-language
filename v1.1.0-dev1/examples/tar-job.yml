@@ -1,3 +1,0 @@
-tarfile:
-  class: File
-  path: hello.tar

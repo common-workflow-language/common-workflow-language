@@ -1,5 +1,0 @@
-{
-"name": "hello",
-"doc": {"$include": "hello.txt"},
-"type": "string"
-}
