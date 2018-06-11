@@ -800,6 +800,7 @@
   tool: v1.0/vf-concat.cwl
   doc: Test that second expression in concatenated valueFrom is not ignored
   tags: [ inline_javascript, command_line_tool ]
+  should_fail: true
 
 - job: v1.0/step-valuefrom-wf.json
   output: {count_output: 16}
@@ -1518,7 +1519,6 @@
   doc: Test that expression engine does not fail to evaluate reference to self
        with unprovided input
   tags: [ required, command_line_tool ]
-  should_fail: true
 
 - tool: v1.0/exit-success.cwl
   doc: Test successCodes
