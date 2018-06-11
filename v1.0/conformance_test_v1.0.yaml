@@ -794,13 +794,18 @@
 
 
 - job: v1.0/empty.json
-  output: {
-    "out": "a string\n"
-  }
+  output:
+    out: "\n"
+  tool: v1.0/vf-concat.cwl
+  doc: Test that valueFrom is ignored when the parameter is null
+  tags: [ inline_javascript, command_line_tool ]
+
+- job: v1.0/cat-job.json
+  output:
+    out: "a string\n"
   tool: v1.0/vf-concat.cwl
   doc: Test that second expression in concatenated valueFrom is not ignored
   tags: [ inline_javascript, command_line_tool ]
-  should_fail: true
 
 - job: v1.0/step-valuefrom-wf.json
   output: {count_output: 16}
