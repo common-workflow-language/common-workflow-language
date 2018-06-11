@@ -5,8 +5,8 @@ requirements:
 
 baseCommand: echo
 inputs:
-  - id: parameter
-    type: string?
+  file1:
+    type: File?
     inputBinding:
       valueFrom: $("a ")$("string")
 outputs:
