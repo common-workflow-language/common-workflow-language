@@ -1,8 +1,0 @@
-    {
-      "base": "one",
-      "form": {
-        "base": "two",
-        "http://example.com/three": "three",
-      },
-      "http://example.com/acid#four": "four"
-    }
