@@ -127,7 +127,6 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[pypi2cwl](https://github.com/common-workflow-language/pypi2cwl)|Automatically run argparse2cwl on any package in PyPi|
 |[acd2cwl](https://github.com/common-workflow-language/acd2cwl)|ACD (EMBOSS) to CWL generator|
 |[CTD converter](https://github.com/WorkflowConversion/CTDConverter)|Common Tool Definition (CTD) to CWL converter|
-|[WDL converter](https://github.com/common-workflow-language/wdl2cwl)|Workflow Definition Language (WDL) to CWL converter|
 |[scriptcwl](https://github.com/NLeSC/scriptcwl)|Create CWL workflows by writing a simple Python script|
 |[python-cwlgen](https://github.com/common-workflow-language/python-cwlgen)|Generate of CWL programmatically from Python.|
 |[cwl2nxf](https://github.com/nextflow-io/cwl2nxf)|Convert CWL to run on Nextflow|
@@ -138,11 +137,10 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 
 |Software|Description|
 |--------|-----------|
-|[cwltool](https://github.com/common-workflow-language/cwltool)|cwltool can be [imported as a Python module]((https://github.com/common-workflow-language/cwltool#import-as-a-module)) and [extended to create custom cwl runners](https://github.com/common-workflow-language/cwltool#extension-points)|
+|[cwltool](https://github.com/common-workflow-language/cwltool)|cwltool (can be [imported as a Python module]((https://github.com/common-workflow-language/cwltool#import-as-a-module)) and [extended to create custom cwl runners](https://github.com/common-workflow-language/cwltool#extension-points)|
 |[schema salad](https://github.com/common-workflow-language/schema_salad)|Python module and tools for working with the CWL schema.|
 |[cwlavro](https://github.com/common-workflow-language/cwlavro)|Java classes for loading CWL documents|
 |[CWL for R](https://github.com/jefferys/cwl)|Parse and work with CWL from R|
-|[CWL for Julia](https://github.com/BioJulia/CWL.jl)|Utilities for working with CWL from Julia|
 |[buchanae/cwl](https://github.com/buchanae/cwl)|CWL document parsing and processing utilities in Go.|
 |[CWL for Go](https://github.com/otiai10/cwl.go)|-|
 |[CWL for Scala](https://github.com/broadinstitute/wdl4s)|CWL object model for Scala|
