@@ -352,7 +352,10 @@ $graph:
   specialize:
     - specializeFrom: OutputRecordField
       specializeTo: CommandOutputRecordField
-
+  fields:
+    - name: name
+      type: string?
+      jsonldPredicate: "@id"
 
 - name: CommandOutputEnumSchema
   type: record

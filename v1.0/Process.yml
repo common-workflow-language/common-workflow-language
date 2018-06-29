@@ -562,12 +562,19 @@ $graph:
   specialize:
     - specializeFrom: "sld:RecordField"
       specializeTo: InputRecordField
+  fields:
+    - name: name
+      type: string?
+      jsonldPredicate: "@id"
 
 
 - name: InputEnumSchema
   type: record
   extends: ["sld:EnumSchema", InputSchema]
   fields:
+    - name: name
+      type: string?
+      jsonldPredicate: "@id"
     - name: inputBinding
       type: InputBinding?
       jsonldPredicate: "cwl:inputBinding"
