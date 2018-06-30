@@ -927,7 +927,7 @@
     }
   }
   tool: v1.0/test-cwl-out.cwl
-  label: TODO
+  label: docker_json_output_path
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
     and just 'path' is provided.
@@ -943,7 +943,7 @@
     }
   }
   tool: v1.0/test-cwl-out2.cwl
-  label: TODO
+  label: docker_json_output_location
   doc: |
     Test support for reading cwl.output.json when running in a Docker container
     and just 'location' is provided.
@@ -1714,7 +1714,7 @@
 
 - job: v1.0/empty.json
   tool: v1.0/pass-unconnected.cwl
-  label: wf_step_unconnected_param
+  label: wf_step_connect_undeclared_param
   doc: |
     Test that it is not an error to connect a parameter to a workflow
     step, even if the parameter doesn't appear in the `run` process
@@ -1724,9 +1724,9 @@
 
 - job: v1.0/empty.json
   tool: v1.0/fail-unconnected.cwl
-  label: wf_step_TODO
+  label: wf_step_access_undeclared_param
   doc: |
-    Test that parameters that doesn't appear in the `run` process
+    Test that parameters that don't appear in the `run` process
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required, workflow ]
