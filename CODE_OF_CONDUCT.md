@@ -112,3 +112,9 @@ To report an issue with anyone on the team you can escalate to Ward Vandewege
  (Veritas Genetics) wvandewege@veritasgenetics.com, Anton Nekrutenko (Galaxy)
 anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu,
 or to our legal sponsor, the Software Freedom Conservancy info@sfconservancy.org
+
+Additional Policies for the CWL Project @ Software Freedom Conservancy
+----------------------------------------------------------------------
+
+See https://sfconservancy.org/projects/policies/ for the "Conflict of interest policy"
+and "Travel and reimbursable expense policy".
