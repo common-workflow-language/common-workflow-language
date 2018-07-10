@@ -357,7 +357,7 @@ Implementations may apply other limits, such as process isolation, timeouts,
 and operating system containers/jails to minimize the security risks associated
 with running untrusted code embedded in a CWL document.
 
-Exceptions thrown from an exception must result in a `permanentFailure` of the
+Exceptions thrown from an expression must result in a `permanentFailure` of the
 process.
 
 ## Executing CWL documents as scripts
