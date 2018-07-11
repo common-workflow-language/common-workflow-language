@@ -1730,3 +1730,11 @@
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required, workflow ]
+
+- job: v1.0/file-input.json
+  tool: v1.0/assert-any-type-files-bound.cwl
+  label: any_type_files_bound
+  output: {}
+  doc: |
+    Test inputs marked as Any are bound into a tool, if they are files
+  tags: [ required, command_line_tool ]
