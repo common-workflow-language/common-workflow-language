@@ -80,7 +80,7 @@ A collection of existing references to CWL can be found at http://www.citeulike.
 |[Consonance](https://github.com/Consonance/consonance)|orchestration tool for running SeqWare workflows and CWL tools|-|AWS, OpenStack, Azure|
 |[Apache Taverna](https://taverna.incubator.apache.org/)|Domain-independent Workflow Management System|[alpha](https://issues.apache.org/jira/browse/TAVERNA-900)|-|
 |[AWE](https://github.com/MG-RAST/AWE)|Workflow and resource management system for bioinformatics data analysis.|[alpha](https://github.com/wgerlach/AWE)|-|
-|[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine|-|-|
+|[yacle](https://github.com/otiai10/yacle)|Yet Another CWL Engine| [![Build Status](https://travis-ci.org/otiai10/yacle.svg?branch=master)](https://travis-ci.org/otiai10/yacle) [![](https://img.shields.io/badge/dynamic/json.svg?label=CWL%20Conformance&url=https%3A%2F%2Fraw.githubusercontent.com%2Fotiai10%2Fyacle%2Fmaster%2F.conformance.json&query=pass&colorB=95c31e&suffix=%20cases)](https://github.com/common-workflow-language/common-workflow-language)  | local |
 
 
 ## Repositories of CWL Tools and Workflows
@@ -238,6 +238,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Tomoya Tanjo, NII; https://orcid.org/0000-0002-4421-9659
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
+* Hiromu Ochiai; [@otiai10](https://github.com/otiai10) https://orcid.org/0000-0001-6636-856X
 
 ## CWL Advisors
 
