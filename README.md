@@ -24,9 +24,9 @@ src="https://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open St
 CWL is developed by a multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
 analysis workflows.  [The CWL project is maintained on
-Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for 
-collaborative open standards development](https://open-stand.org/about-us/principles/). Legally CWL is a member project of 
-[Software Freedom Conservancy](https://sfconservancy.org/news/2018/apr/11/cwl-new-member-project/) and is formally managed by 
+Github](https://github.com/common-workflow-language/common-workflow-language) and we follow the [Open-Stand.org principles for
+collaborative open standards development](https://open-stand.org/about-us/principles/). Legally CWL is a member project of
+[Software Freedom Conservancy](https://sfconservancy.org/news/2018/apr/11/cwl-new-member-project/) and is formally managed by
 the elected [CWL leadership team](#Leadership_Team), however every-day project decisions are made by the
 [CWL community](#Support) which is open for participation by anyone.
 
@@ -40,7 +40,7 @@ The [CWL user guide](https://www.commonwl.org/user_guide/) provides a
 gentle introduction to learning how to write CWL command line tool and workflow
 descriptions.
 
-[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP) is a 15 minute introduction to the 
+[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP) is a 15 minute introduction to the
 CWL project in Japanese.
 
 ## Specification
@@ -219,6 +219,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Roman Valls Guimerà; https://orcid.org/0000-0002-0034-9697
 * Guillermo Carrasco Hernandez <guille.ch.88@gmail.com>
 * Kenzo-Hugo Hillion; https://orcid.org/0000-0002-6517-6934
+* Manabu Ishii, RIKEN; https://orcid.org/0000-0002-5843-4712
 * Sinisa Ivkovic <sinisa.ivkovic@sbgenomics.com>
 * Sehrish Kanwal; https://orcid.org/0000-0002-5044-4692
 * Andrey Kartashov; https://orcid.org/0000-0001-9102-5681
@@ -228,12 +229,14 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
 * Maxim Mikheev <mikhmv@biodatomics.com>
 * Michael Miller <mdmiller53@comcast.net>
+* Tazro Ohta, DBCLS; http://orcid.org/0000-0003-3777-5945
 * Tim Pierce <twp@unchi.org>
 * Josh Randall; https://orcid.org/0000-0003-1540-203X
 * Mark Robinson; https://orcid.org/0000-0002-8184-7507
 * Janko Simonović <janko.simonovic@sbgenomics.com>
 * Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
+* Tomoya Tanjo, NII; https://orcid.org/0000-0002-4421-9659
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
 
 ## CWL Advisors
