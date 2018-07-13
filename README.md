@@ -238,6 +238,7 @@ Conduct](https://github.com/common-workflow-language/common-workflow-language/bl
 * Luka Stojanovic <luka.stojanovic@sbgenomics.com>
 * Tomoya Tanjo, NII; https://orcid.org/0000-0002-4421-9659
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>
+* Hiromu Ochiai; [@otiai10](https://github.com/otiai10) https://orcid.org/0000-0001-6636-856X
 
 ## CWL Advisors
 
