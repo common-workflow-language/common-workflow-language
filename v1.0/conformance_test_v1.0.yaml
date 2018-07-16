@@ -299,7 +299,7 @@
   tool: v1.0/count-lines5-wf.cwl
   label: wf_input_default_provided
   doc: Test workflow with default value for input parameter (provided)
-  tags: [ inline_javacscript, workflow ]
+  tags: [ inline_javascript, workflow ]
 
 - job: v1.0/empty.json
   output: {default_output: workflow_default}
