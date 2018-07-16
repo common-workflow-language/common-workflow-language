@@ -88,7 +88,7 @@ if [[ -n "${SELF}" ]]; then
         cd ./schema_salad && pip install . --quiet && cd ..
     fi
     # This is how CWL should be written.
-    DEFINITION=./schema_salad/schema_salad/tests/test_schema/CommonWorkflowLanguage.yml
+    DEFINITION=./v1.0/CommonWorkflowLanguage.yml
     # Let's test each files
     for target in v1.0/v1.0/*.cwl; do
         schema-salad-tool ${DEFINITION} ${target} --quiet
