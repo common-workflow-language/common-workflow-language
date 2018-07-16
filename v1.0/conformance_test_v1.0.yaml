@@ -1877,3 +1877,18 @@
       - class: File
         location: hello.txt
   tags: [ command_line_tool ]
+
+- job: v1.0/secondaryfiles.json
+  tool: v1.0/secondaryfiles-no-append.cwl
+  label: secondary_files_no_append
+  id: 134
+  doc: |
+    Test that secondaryFiles that do not append to the primary filename are accepted.
+  output:
+    out:
+      class: File
+      location: hello.2.txt
+      secondaryFiles:
+      - class: File
+        location: hello
+  tags: [ command_line_tool ]
