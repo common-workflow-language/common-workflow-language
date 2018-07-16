@@ -78,8 +78,15 @@ do
 done
 
 if [[ -n "${SELF}" ]]; then
-    # Install schema_salad to validate cwl files.
-    cd ./schema_salad && pip install . --quiet && cd ..
+    # Ensure schema-salad-tool command
+    if [[ ! -x $(command -v schema-salad-tool) ]]; then
+        if [[ ! -d ./schema_salad ]]; then
+            echo >&2 "You need: git submodule update --init"
+            exit 1
+        fi
+        # Install schema_salad to validate cwl files.
+        cd ./schema_salad && pip install . --quiet && cd ..
+    fi
     # This is how CWL should be written.
     DEFINITION=./schema_salad/schema_salad/tests/test_schema/CommonWorkflowLanguage.yml
     # Let's test each files
