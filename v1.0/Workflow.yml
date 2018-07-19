@@ -303,7 +303,9 @@ $graph:
 
         The `self` value of in the parameter reference or expression must be
         the value of the parameter(s) specified in the `source` field, or
-        null if there is no `source` field.
+        null if there is no `source` field. When the step is specified in
+        `scatter`, it must be an element of the parameter specified in the
+        `source` field.
 
         The value of `inputs` in the parameter reference or expression must be
         the input object to the workflow step after assigning the `source`
