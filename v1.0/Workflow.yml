@@ -301,9 +301,12 @@ $graph:
         If `valueFrom` is a parameter reference or expression, it must be
         evaluated to yield the actual value to be assiged to the input field.
 
-        The `self` value of in the parameter reference or expression must be
-        the value of the parameter(s) specified in the `source` field, or
-        null if there is no `source` field.
+        The `self` value in the parameter reference or expression must be
+        1. `null` if there is no `source` field
+        2. the value of the parameter(s) specified in the `source` field when this
+        workflow input parameter **is not** specified in this workflow step's `scatter` field.
+        3. an element of the parameter specified in the `source` field when this workflow input 
+        parameter **is** specified in this workflow step's `scatter` field.
 
         The value of `inputs` in the parameter reference or expression must be
         the input object to the workflow step after assigning the `source`
