@@ -1,3 +1,0 @@
-[submodule "schema_salad"]
-	path = schema_salad
-	url = https://github.com/common-workflow-language/schema_salad.git
