@@ -237,7 +237,7 @@
   tool: v1.0/parseInt-tool.cwl
   label: expression_parseint
   id: 22
-  doc: Test ExpressionTool with Docker-based expression engine
+  doc: Test ExpressionTool with Javascript engine
   tags: [ inline_javascript, expression_tool ]
 
 - job: v1.0/wc-job.json
