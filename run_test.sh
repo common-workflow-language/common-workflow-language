@@ -17,6 +17,7 @@ Options:
                         FILENAME
   --classname=CLASSNAME In the JUnit XML, tag the results with the given
                         CLASSNAME
+  --timeout=TIMEOUT     cwltest timeout in seconds.
   --verbose             Print the cwltest invocation and pass --verbose to
                         cwltest
 
@@ -34,6 +35,7 @@ COVERAGE="python"
 EXTRA=""
 CLASS=""
 VERBOSE=""
+TIMEOUT=""
 
 while [[ -n "$1" ]]
 do
@@ -64,6 +66,9 @@ do
             ;;
         --verbose)
             VERBOSE=$arg
+            ;;
+        --timeout=*)
+            TIMEOUT=$arg
             ;;
         *=*)
             eval $(echo $arg | cut -d= -f1)=\"$(echo $arg | cut -d= -f2-)\"
@@ -98,7 +103,7 @@ runtest() {
     (cd $DRAFT_DIR
      COMMAND="cwltest --tool $1 \
 	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_N} \
-	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} \
+	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
 	     --basedir ${DRAFT_DIR} -- ${EXTRA}"
      if [[ $VERBOSE == "--verbose" ]]; then echo ${COMMAND}; fi
      ${COMMAND}
