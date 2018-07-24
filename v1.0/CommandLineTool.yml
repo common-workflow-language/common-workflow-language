@@ -180,6 +180,7 @@ $graph:
           the array into a single string with `itemSeparator` separating the
           items.  Otherwise first add `prefix`, then recursively process
           individual elements.
+          If the array is empty, it does not add anything to command line.
 
       - **object**: Add `prefix` only, and recursively add object fields for
           which `inputBinding` is specified.
