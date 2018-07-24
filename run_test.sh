@@ -17,6 +17,7 @@ Options:
                         FILENAME
   --classname=CLASSNAME In the JUnit XML, tag the results with the given
                         CLASSNAME
+  --timeout=TIMEOUT     cwltest timeout in seconds.
   --verbose             Print the cwltest invocation and pass --verbose to
                         cwltest
   --self                Test CWL and test .cwl files themselves. If this flag
@@ -37,6 +38,7 @@ EXTRA=""
 CLASS=""
 VERBOSE=""
 SELF=""
+TIMEOUT=""
 
 while [[ -n "$1" ]]
 do
@@ -71,6 +73,9 @@ do
         --self)
             SELF=1
             ;;
+        --timeout=*)
+            TIMEOUT=$arg
+            ;;
         *=*)
             eval $(echo $arg | cut -d= -f1)=\"$(echo $arg | cut -d= -f2-)\"
             ;;
@@ -80,12 +85,7 @@ done
 if [[ -n "${SELF}" ]]; then
     # Ensure schema-salad-tool command
     if [[ ! -x $(command -v schema-salad-tool) ]]; then
-        if [[ ! -d ./schema_salad ]]; then
-            echo >&2 "You need: git submodule update --init"
-            exit 1
-        fi
-        # Install schema_salad to validate cwl files.
-        cd ./schema_salad && pip install . --quiet && cd ..
+        pip install --quiet schema_salad
     fi
     # This is how CWL should be written.
     DEFINITION=./v1.0/CommonWorkflowLanguage.yml
@@ -124,7 +124,7 @@ runtest() {
     (cd $DRAFT_DIR
      COMMAND="cwltest --tool $1 \
 	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_N} \
-	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} \
+	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
 	     --basedir ${DRAFT_DIR} -- ${EXTRA}"
      if [[ $VERBOSE == "--verbose" ]]; then echo ${COMMAND}; fi
      ${COMMAND}
