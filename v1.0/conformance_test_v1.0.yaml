@@ -1164,6 +1164,7 @@
   output:
     "outdir": {
         "class": "Directory",
+        "location": Any,
         "listing": [
             {
               "class": "File",
