@@ -97,7 +97,7 @@
                     "type": "boolean", 
                     "inputBinding": {
                         "position": 1, 
-                        "prefix": "--reverse"
+                        "prefix": "-r"
                     }
                 }, 
                 {
