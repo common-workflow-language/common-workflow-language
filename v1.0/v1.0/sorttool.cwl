@@ -12,14 +12,14 @@ cwlVersion: v1.0
 #
 # This example also introduced the "position" field.  This indicates the
 # sorting order of items on the command line.  Lower numbers are placed
-# before higher numbers.  Here, the "--reverse" flag (if present) will be
-# added to the command line before the input file path.
+# before higher numbers.  Here, the "-r" (same as "--reverse") flag (if
+#  present) will be added to the command line before the input file path.
 inputs:
   - id: reverse
     type: boolean
     inputBinding:
       position: 1
-      prefix: "--reverse"
+      prefix: "-r"
   - id: input
     type: File
     inputBinding:
