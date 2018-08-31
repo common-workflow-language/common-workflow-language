@@ -20,6 +20,8 @@ Options:
   --timeout=TIMEOUT     cwltest timeout in seconds.
   --verbose             Print the cwltest invocation and pass --verbose to
                         cwltest
+  --self                Test CWL and test .cwl files themselves. If this flag
+                        is given, any other flags will be ignored.
 
 Note:
   EXTRA is useful for passing --enable-dev to the CWL reference runner:
@@ -35,6 +37,7 @@ COVERAGE="python"
 EXTRA=""
 CLASS=""
 VERBOSE=""
+SELF=""
 TIMEOUT=""
 
 while [[ -n "$1" ]]
@@ -67,6 +70,9 @@ do
         --verbose)
             VERBOSE=$arg
             ;;
+        --self)
+            SELF=1
+            ;;
         --timeout=*)
             TIMEOUT=$arg
             ;;
@@ -75,6 +81,21 @@ do
             ;;
     esac
 done
+
+if [[ -n "${SELF}" ]]; then
+    # Ensure schema-salad-tool command
+    if [[ ! -x $(command -v schema-salad-tool) ]]; then
+        pip install --quiet schema_salad
+    fi
+    # This is how CWL should be written.
+    DEFINITION=./v1.0/CommonWorkflowLanguage.yml
+    # Let's test each files
+    for target in v1.0/v1.0/*.cwl; do
+        schema-salad-tool ${DEFINITION} ${target} --quiet
+        if [[ $? -ne 0 ]]; then echo "[INVALID] ${target}" && exit 1; fi
+    done
+    exit 0
+fi
 
 DRAFT_DIR="$(cd $(dirname $0); pwd)/${DRAFT}"
 

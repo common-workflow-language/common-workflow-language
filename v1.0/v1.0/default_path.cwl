@@ -5,6 +5,6 @@ inputs:
     type: File
     default:
       class: File
-      path: default.txt
+      path: whale.txt
 outputs: []
 arguments: [cat,$(inputs.file1.path)]

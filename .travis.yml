@@ -2,6 +2,6 @@ language: python
 python:
   - 2.7
 before_script:
-  - git clone https://github.com/common-workflow-language/schema_salad.git salad && cd ./salad && pip install . && cd ..
+  - pip install schema_salad
 script:
-  - for target in v1.0/v1.0/*.cwl; do schema-salad-tool ./salad/schema_salad/tests/test_schema/CommonWorkflowLanguage.yml ${target} || exit 1; done
+  - ./run_test.sh --self
