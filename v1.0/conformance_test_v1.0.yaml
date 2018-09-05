@@ -1862,3 +1862,33 @@
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required, workflow ]
+
+- job: v1.0/secondaryfiles.json
+  tool: v1.0/secondaryfiles-extra-carets.cwl
+  label: secondary_files_extra_carets
+  id: 133
+  doc: |
+    Test that excess carets in a secondaryFile name are ignored.
+  output:
+    out:
+      class: File
+      location: hello.2.txt
+      secondaryFiles:
+      - class: File
+        location: hello.txt
+  tags: [ command_line_tool ]
+
+- job: v1.0/secondaryfiles.json
+  tool: v1.0/secondaryfiles-no-append.cwl
+  label: secondary_files_no_append
+  id: 134
+  doc: |
+    Test that secondaryFiles that do not append to the primary filename are accepted.
+  output:
+    out:
+      class: File
+      location: hello.2.txt
+      secondaryFiles:
+      - class: File
+        location: hello
+  tags: [ command_line_tool ]
