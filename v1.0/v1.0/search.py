@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # Toy program to search inverted index and print out each line the term
 # appears.
