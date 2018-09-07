@@ -3,6 +3,8 @@
 # Toy program to search inverted index and print out each line the term
 # appears.
 
+from __future__ import print_function
+
 import sys
 
 mainfile = sys.argv[1]
@@ -21,5 +23,5 @@ for a in index:
         for l in main:
             linenum += 1
             if linenum in n:
-                print linenum, l.rstrip()
+                print(linenum, l.rstrip())
         break
