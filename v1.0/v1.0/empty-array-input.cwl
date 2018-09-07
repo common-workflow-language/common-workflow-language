@@ -29,4 +29,4 @@ outputs:
       type: array
       items: string
 
-baseCommand: python2
+baseCommand: python

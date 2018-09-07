@@ -252,6 +252,6 @@
             ]
         }
     ]}],
-    "baseCommand": "python2",
+    "baseCommand": "python",
     "arguments": ["tmap", "mapall"]
 }
