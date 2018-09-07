@@ -36,6 +36,6 @@
       }
     ],
     "outputs": [{"id": "args", "type": "string[]"}],
-    "baseCommand": "python",
+    "baseCommand": "python2",
     "arguments": ["cat"]
 }

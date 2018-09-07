@@ -17,7 +17,7 @@ inputs:
     inputBinding:
       position: -1
 
-baseCommand: python
+baseCommand: python2
 
 outputs:
 - id: args

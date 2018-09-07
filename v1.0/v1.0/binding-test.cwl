@@ -28,5 +28,5 @@ inputs:
 outputs:
   args: string[]
 
-baseCommand: python
+baseCommand: python2
 arguments: ["bwa", "mem"]
