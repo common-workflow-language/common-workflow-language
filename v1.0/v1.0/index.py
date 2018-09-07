@@ -25,7 +25,7 @@ for l in main:
             words[w].add(linenum)
 
 for w in sorted(words.keys()):
-    index.write("%s: %s" % (w, ", ".join((str(i) for i in words[w]))) + "\n")
+    index.write("%s: %s" % (w, ", ".join((str(i) for i in sorted(words[w])))) + "\n")
 
 open(os.path.splitext(sys.argv[1])[0] + ".idx2", "w")
 open(sys.argv[1] + ".idx3", "w")
