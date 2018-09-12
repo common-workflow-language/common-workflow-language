@@ -1862,3 +1862,16 @@
     inputs are not present in the input object used to run the tool.
   should_fail: true
   tags: [ required, workflow ]
+
+- job: v1.0/empty.json
+  output:
+    results:
+       basename: results
+       class: File
+       checksum: "sha1$7d5ca8c0c03e883c56c4eb1ef6f6bb9bccad4d86"
+       size: 8
+  tool: v1.0/envvar3.cwl
+  label: env_home_tmpdir_docker
+  id: 133
+  doc: Test $HOME and $TMPDIR are set correctly in Docker without using return code
+  tags: [ shell_command, command_line_tool ]
