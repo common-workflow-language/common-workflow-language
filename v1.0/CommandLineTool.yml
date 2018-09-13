@@ -176,6 +176,9 @@ $graph:
       - **File**: Add `prefix` and the value of
         [`File.path`](#File) to the command line.
 
+      - **Directory**: Add `prefix` and the value of
+        [`Directory.path`](#Directory) to the command line.
+
       - **array**: If `itemSeparator` is specified, add `prefix` and the join
           the array into a single string with `itemSeparator` separating the
           items.  Otherwise first add `prefix`, then recursively process
