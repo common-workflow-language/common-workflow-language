@@ -651,7 +651,8 @@ $graph:
     The workflow platform may provide input files and the designated output
     directory through the use of volume bind mounts.  The platform may rewrite
     file paths in the input object to correspond to the Docker bind mounted
-    locations.
+    locations. That is, the platform may rewrite values in the parameter context
+    such as `runtime.outdir`, `runtime.tmpdir` and others.
 
     When running a tool contained in Docker, the workflow platform must not
     assume anything about the contents of the Docker container, such as the
