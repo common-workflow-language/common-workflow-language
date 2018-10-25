@@ -1875,3 +1875,13 @@
   id: 133
   doc: Test $HOME and $TMPDIR are set correctly in Docker without using return code
   tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/scatter-valuefrom-job1.json
+  output:
+    out: ["foo one one", "foo one two", "foo one three", "foo one four"]
+  tool: v1.0/scatter-valuefrom-inputs-wf1.cwl
+  label: wf_scatter_oneparam_valuefrom_inputs
+  id: 134
+  doc: Test workflow scatter with single scatter parameter and two valueFrom using $inputs (first and current el)
+  tags: [ scatter, step_input, workflow ]
+
