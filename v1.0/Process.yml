@@ -316,7 +316,7 @@ $graph:
     the same Directory.
 
     When executing a CommandLineTool, Directories must be recursively staged
-    first and have local values of `path` assigend.
+    first and have local values of `path` assigned.
 
     Directory objects in CommandLineTool output must provide either a
     `location` URI or a `path` property in the context of the tool execution
