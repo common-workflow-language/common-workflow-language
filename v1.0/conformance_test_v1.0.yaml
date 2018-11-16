@@ -1875,3 +1875,16 @@
   id: 133
   doc: Test $HOME and $TMPDIR are set correctly in Docker without using return code
   tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/import_schema-def_job.yml
+  output:
+    output_bam:
+      checksum: "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+      basename: a.bam
+      class: File
+      size: 0
+  tool: v1.0/import_schema-def_packed.cwl
+  label: packed_import_schema
+  id: 135
+  docs: SchemaDefRequirement with $import, and packed
+  tags: [ schema_def, workflow ]
