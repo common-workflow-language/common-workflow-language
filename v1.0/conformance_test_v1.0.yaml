@@ -564,7 +564,7 @@
             {
                 "location": "input.txt.idx1",
                 "class": "File",
-                "checksum": "sha1$553f3a09003a9f69623f03bec13c0b078d706023",
+                "checksum": "sha1$1f6fe811644355974cdd06d9eb695d6e859f3b44",
                 "size": 1500
             },
             {
@@ -1877,3 +1877,39 @@
       size: 24
       checksum: sha1$dd0a4c4c49ba43004d6611771972b6cf969c1c01
   tags: [ step_input, workflow ]
+
+- job: v1.0/empty.json
+  output:
+    results:
+       basename: results
+       class: File
+       checksum: "sha1$7d5ca8c0c03e883c56c4eb1ef6f6bb9bccad4d86"
+       size: 8
+  tool: v1.0/envvar3.cwl
+  label: env_home_tmpdir_docker
+  id: 133
+  doc: Test $HOME and $TMPDIR are set correctly in Docker without using return code
+  tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/scatter-valuefrom-job1.json
+  output:
+    out: ["foo one one", "foo one two", "foo one three", "foo one four"]
+  tool: v1.0/scatter-valuefrom-inputs-wf1.cwl
+  label: wf_scatter_oneparam_valuefrom_inputs
+  id: 134
+  doc: Test workflow scatter with single scatter parameter and two valueFrom using $inputs (first and current el)
+  tags: [ scatter, step_input, workflow ]
+
+- job: v1.0/import_schema-def_job.yml
+  output:
+    output_bam:
+      checksum: "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709"
+      basename: a.bam
+      class: File
+      size: 0
+  tool: v1.0/import_schema-def_packed.cwl
+  label: packed_import_schema
+  id: 135
+  docs: SchemaDefRequirement with $import, and packed
+  tags: [ schema_def, workflow ]
+

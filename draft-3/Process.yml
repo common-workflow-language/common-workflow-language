@@ -484,7 +484,6 @@ $graph:
         - "null"
         - type: array
           items: Any
-      jsonldPredicate: "cwl:hints"
       doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
