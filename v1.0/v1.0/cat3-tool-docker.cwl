@@ -13,6 +13,7 @@ inputs:
     inputBinding: {position: 1}
 outputs:
   output_file:
-    type: stdout
+    type: File
+    outputBinding: {glob: output.txt}
 baseCommand: cat
-stdout: cat-out
+stdout: output.txt

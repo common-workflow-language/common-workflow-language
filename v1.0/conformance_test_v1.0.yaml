@@ -72,11 +72,11 @@
       checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
       location: output.txt
       size: 13
-  tool: v1.0/cat3-tool.cwl
+  tool: v1.0/cat3-tool-docker.cwl
   label: stdout_redirect_docker
   id: 7
   doc: Test command execution in Docker with stdout redirection
-  tags: [ required, command_line_tool ]
+  tags: [ docker, command_line_tool ]
 
 - job: v1.0/cat-job.json
   tool: v1.0/cat3-tool-shortcut.cwl
@@ -89,7 +89,7 @@
   label: stdout_redirect_shortcut_docker
   id: 8
   doc: Test command execution in Docker with shortcut stdout redirection
-  tags: [ required, command_line_tool ]
+  tags: [ docker, command_line_tool ]
 
 - job: v1.0/cat-job.json
   output:
@@ -102,7 +102,7 @@
   label: stdout_redirect_mediumcut_docker
   id: 9
   doc: Test command execution in Docker with mediumcut stdout redirection
-  tags: [ required, command_line_tool ]
+  tags: [ docker, command_line_tool ]
 
 - job: v1.0/empty.json
   tool: v1.0/stderr.cwl
