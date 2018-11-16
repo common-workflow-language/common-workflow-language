@@ -30,5 +30,5 @@ steps:
           type: File
           outputBinding: { glob: output }
 
-      arguments: [cat,$(inputs.catfile1.path)]
+      arguments: [cat, $(inputs.catfile1.path)]
       stdout: output

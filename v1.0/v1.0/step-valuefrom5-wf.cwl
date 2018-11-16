@@ -2,9 +2,7 @@
 class: Workflow
 cwlVersion: v1.0
 requirements:
-  - class: StepInputExpressionRequirement
-  - class: InlineJavascriptRequirement
-  - class: MultipleInputFeatureRequirement
+  StepInputExpressionRequirement: {}
 
 inputs:
   file1: File
@@ -31,21 +29,21 @@ steps:
         echo_out:
           type: string
           outputBinding:
-            glob: "step1_out"
+            glob: step1_out
             loadContents: true
             outputEval: $(self[0].contents)
         echo_out_file:
           type: File
           outputBinding:
-            glob: "step1_out"
+            glob: step1_out
 
-      baseCommand: "echo"
+      baseCommand: echo
       stdout: step1_out
 
     in:
       name:
         source: file1
-        valueFrom: "$(self.basename)"
+        valueFrom: $(self.basename)
     out: [echo_out, echo_out_file]
 
 
@@ -62,15 +60,15 @@ steps:
         echo_out:
           type: string
           outputBinding:
-            glob: "step1_out"
+            glob: step1_out
             loadContents: true
             outputEval: $(self[0].contents)
 
-      baseCommand: "echo"
+      baseCommand: echo
       stdout: step1_out
 
     in:
       name:
         source: step1/echo_out_file
-        valueFrom: "$(self.basename)"
+        valueFrom: $(self.basename)
     out: [echo_out]

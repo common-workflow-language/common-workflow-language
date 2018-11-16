@@ -3,7 +3,7 @@ class: Workflow
 cwlVersion: v1.0
 
 requirements:
-  - class: InlineJavascriptRequirement
+  InlineJavascriptRequirement: {}
 
 inputs:
   i: int
