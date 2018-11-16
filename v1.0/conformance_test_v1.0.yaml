@@ -1863,6 +1863,21 @@
   should_fail: true
   tags: [ required, workflow ]
 
+- job: v1.0/dir3-job.yml
+  tool: v1.0/single_file_from_dir.cwl
+  label: step_input_directory_listing
+  id: 133
+  doc: >
+    WorkflowStepInput.valueFrom: if self is type `Directory`, then
+    `self.listing` should be present
+  output:
+    output:
+      class: File
+      basename: output
+      size: 24
+      checksum: sha1$dd0a4c4c49ba43004d6611771972b6cf969c1c01
+  tags: [ step_input, workflow ]
+
 - job: v1.0/empty.json
   output:
     results:
@@ -1897,3 +1912,4 @@
   id: 135
   docs: SchemaDefRequirement with $import, and packed
   tags: [ schema_def, workflow ]
+
