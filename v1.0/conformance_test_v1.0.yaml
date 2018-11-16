@@ -1897,3 +1897,429 @@
   id: 135
   docs: SchemaDefRequirement with $import, and packed
   tags: [ schema_def, workflow ]
+
+- job: v1.0/dir4-subdir-1-job.yml
+  output: {
+    "outlist": {
+      "checksum": "sha1$9d9bc8f5252d39274b5dfbac64216c6e888f5dfc",
+      "size": 14,
+      "location": "output.txt",
+      "class": "File"
+    }
+  }
+  tool: v1.0/dir4.cwl
+  id: 136
+  label: job_input_secondary_subdirs
+  doc: Test specifying secondaryFiles in subdirectories of the job input document.
+  tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/dir4-subdir-2-job.yml
+  output: {
+    "outlist": {
+      "checksum": "sha1$9d9bc8f5252d39274b5dfbac64216c6e888f5dfc",
+      "size": 14,
+      "location": "output.txt",
+      "class": "File"
+    }
+  }
+  tool: v1.0/dir4.cwl
+  id: 137
+  label: job_input_subdir_primary_and_secondary_subdirs
+  doc: Test specifying secondaryFiles in same subdirectory of the job input as the primary input file.
+  tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/count-lines3-job.json
+  output:
+    count_output: [16, 1]
+  tool: v1.0/count-lines13-wf.cwl
+  id: 138
+  label: scatter_embedded_subworkflow
+  doc: Test simple scatter over an embedded subworkflow
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/count-lines4-job.json
+  output:
+    count_output: [16, 1]
+  tool: v1.0/count-lines14-wf.cwl
+  id: 139
+  label: scatter_multi_input_embedded_subworkflow
+  doc: Test simple multiple input scatter over an embedded subworkflow
+  tags: [ workflow, scatter, subworkflow, multiple_input, inline_javascript ]
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines15-wf.cwl
+  id: 140
+  doc: Test twice nested subworkflow
+  label: workflow_embedded_subworkflow_embedded_subsubworkflow
+  tags: [ workflow, subworkflow, inline_javascript ]
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines16-wf.cwl
+  id: 141
+  label: workflow_embedded_subworkflow_with_tool_and_subsubworkflow
+  doc: Test subworkflow of mixed depth with tool first
+  tags: [ workflow, subworkflow, inline_javascript ]
+
+- job: v1.0/wc-job.json
+  output: {count_output: 16}
+  tool: v1.0/count-lines17-wf.cwl
+  id: 142
+  label: workflow_embedded_subworkflow_with_subsubworkflow_and_tool
+  doc: Test subworkflow of mixed depth with tool after
+  tags: [ workflow, subworkflow, inline_javascript ]
+
+- job: v1.0/record-output-job.json
+  output:
+    "orec": {
+        "ofoo": {
+            "location": "foo",
+            "size": 1111,
+            "class": "File",
+            "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
+        },
+        "obar": {
+            "location": "bar",
+            "size": 12010,
+            "class": "File",
+            "checksum": "sha1$aeb3d11bdf536511649129f4077d5cda6a324118"
+        }
+    }
+  tool: v1.0/record-output-wf.cwl
+  id: 143
+  label: workflow_records_inputs_and_outputs
+  doc: Test record type inputs to and outputs from workflows.
+  tags: [ workflow, shell_command ]
+
+- job: v1.0/io-int.json
+  output: {"o": 10}
+  tool: v1.0/io-int-wf.cwl
+  id: 144
+  label: workflow_integer_input
+  doc: Test integer workflow input and outputs
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/io-int.json
+  output: {"o": 10}
+  tool: v1.0/io-int-optional-wf.cwl
+  id: 145
+  label: workflow_integer_input_optional_specified
+  doc: Test optional integer workflow inputs (specified)
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/empty.json
+  output: {"o": 4}
+  tool: v1.0/io-int-optional-wf.cwl
+  id: 146
+  label: workflow_integer_input_optional_unspecified
+  doc: Test optional integer workflow inputs (unspecified)
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/io-int.json
+  output: {"o": 10}
+  tool: v1.0/io-int-default-wf.cwl
+  id: 147
+  label: workflow_integer_input_default_specified
+  doc: Test default integer workflow inputs (specified)
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/empty.json
+  output: {"o": 8}
+  tool: v1.0/io-int-default-wf.cwl
+  id: 148
+  label: workflow_integer_input_default_unspecified
+  doc: Test default integer workflow inputs (unspecified)
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/empty.json
+  output: {"o": 13}
+  tool: v1.0/io-int-default-tool-and-wf.cwl
+  id: 149
+  label: workflow_integer_input_default_and_tool_integer_input_default
+  doc: Test default integer tool and workflow inputs (unspecified)
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/empty.json
+  output: {"o": {
+            "class": "File",
+            "basename": "output",
+            "size": 1111,
+            "location": Any,
+            "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
+  }}
+  tool: v1.0/io-file-default-wf.cwl
+  id: 150
+  label: workflow_file_input_default_unspecified
+  doc: Test File input with default unspecified to workflow
+  tags: [ workflow ]
+
+- job: v1.0/default_path_job.yml
+  output: {"o": {
+                "class": "File",
+                "basename": "output",
+                "location": Any,
+                "checksum": "sha1$47a013e660d408619d894b20806b1d5086aab03b",
+                "size": 13
+  }}
+  tool: v1.0/io-file-default-wf.cwl
+  id: 151
+  label: workflow_file_input_default_specified
+  doc: Test File input with default specified to workflow
+  tags: [ workflow ]
+
+- job: v1.0/job-input-array-one-empty-file.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 0
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  id: 152
+  label: clt_optional_union_input_file_or_files_with_array_of_one_file_provided
+  doc: Test input union type or File or File array to a tool with one file in array specified.
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/job-input-array-few-files.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$6d1723861ad5a1260f1c3c07c93076c5a215f646",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 1114
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  id: 153
+  label: clt_optional_union_input_file_or_files_with_many_files_provided
+  doc: Test input union type or File or File array to a tool with a few files in array specified.
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/job-input-one-file.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 1111
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  id: 154
+  label: clt_optional_union_input_file_or_files_with_single_file_provided
+  doc: Test input union type or File or File array to a tool with one file specified.
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/job-input-null.json
+  output: {"output_file":
+    {
+        "checksum": "sha1$503458abf7614be3fb26d85ff5d8f3e17aa0a552",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 10
+  }}
+  tool: v1.0/io-file-or-files.cwl
+  id: 155
+  label: clt_optional_union_input_file_or_files_with_nothing_provided
+  doc: Test input union type or File or File array to a tool with null specified.
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-int.json
+  output: {"t1": 7}
+  tool: v1.0/io-any-1.cwl
+  id: 156
+  label: clt_any_input_with_integer_provided
+  doc: Test Any parameter with integer input to a tool
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-string.json
+  output: {"t1": "7"}
+  tool: v1.0/io-any-1.cwl
+  id: 157
+  label: clt_any_input_with_string_provided
+  doc: Test Any parameter with string input to a tool
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-file.json
+  output: {"t1": "File"}
+  tool: v1.0/io-any-1.cwl
+  id: 158
+  label: clt_any_input_with_file_provided
+  doc: Test Any parameter with file input to a tool
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-array.json
+  output: {"t1": [1, "moocow"]}
+  tool: v1.0/io-any-1.cwl
+  id: 159
+  label: clt_any_input_with_mixed_array_provided
+  doc: Test Any parameter with array input to a tool
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-record.json
+  output: {"t1": {"moo": 1, "cow": 5}}
+  tool: v1.0/io-any-1.cwl
+  id: 160
+  label: clt_any_input_with_record_provided
+  doc: Test Any parameter with record input to a tool
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: v1.0/io-any-int.json
+  output: {"t1": 7}
+  tool: v1.0/io-any-wf-1.cwl
+  id: 161
+  label: workflow_any_input_with_integer_provided
+  doc: Test Any parameter with integer input to a workflow
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/io-any-string.json
+  output: {"t1": "7"}
+  tool: v1.0/io-any-wf-1.cwl
+  id: 162
+  label: workflow_any_input_with_string_provided
+  doc: Test Any parameter with string input to a workflow
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/io-any-file.json
+  output: {"t1": "File"}
+  tool: v1.0/io-any-wf-1.cwl
+  id: 163
+  label: workflow_any_input_with_file_provided
+  doc: Test Any parameter with file input to a workflow
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/io-any-array.json
+  output: {"t1": [1, "moocow"]}
+  tool: v1.0/io-any-wf-1.cwl
+  id: 164
+  label: workflow_any_input_with_mixed_array_provided
+  doc: Test Any parameter with array input to a workflow
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/io-any-record.json
+  output: {"t1": {"moo": 1, "cow": 5}}
+  tool: v1.0/io-any-wf-1.cwl
+  id: 165
+  label: workflow_any_input_with_record_provided
+  doc: Test Any parameter with record input to a tool
+  tags: [ workflow, inline_javascript ]
+
+- job: v1.0/empty.json
+  output: {"o": "the default value"}
+  tool: v1.0/io-union-input-default-wf.cwl
+  id: 166
+  label: workflow_union_default_input_unspecified
+  doc: Test union type input to workflow with default unspecified
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/io-any-file.json
+  output: {"o": "File"}
+  tool: v1.0/io-union-input-default-wf.cwl
+  id: 167
+  label: workflow_union_default_input_with_file_provided
+  doc: Test union type input to workflow with default specified as file
+  tags: [ workflow, inline_javascript, expression_tool ]
+
+- job: v1.0/empty.json
+  output: {"val": "moocow\n"}
+  tool: v1.0/step-valuefrom4-wf.cwl
+  id: 168
+  label: workflowstep_valuefrom_string
+  doc: Test valueFrom on workflow step from literal (string).
+  tags: [ workflow, step_input ]
+
+- job: v1.0/wc-job.json
+  output: {"val1": "whale.txt\n", "val2": "step1_out\n"}
+  tool: v1.0/step-valuefrom5-wf.cwl
+  id: 169
+  label: workflowstep_valuefrom_file_basename
+  doc: Test valueFrom on workflow step using basename.
+  tags: [ workflow, step_input ]
+
+- job: v1.0/output-arrays-int-job.json
+  output: {"o": [0, 1, 2]}
+  tool: v1.0/output-arrays-int.cwl
+  id: 170
+  label: expression_tool_int_array_output
+  doc: Test output arrays in a tool (with ints).
+  tags: [ expression_tool, inline_javascript ]
+
+- job: v1.0/output-arrays-int-job.json
+  output: {"o": 12}
+  tool: v1.0/output-arrays-int-wf.cwl
+  id: 171
+  label: workflowstep_int_array_input_output
+  doc: Test output arrays in a workflow (with ints).
+  tags: [ workflow, expression_tool, inline_javascript ]
+
+- job: v1.0/output-arrays-file-job.json
+  output: {"o": [
+    {
+        "basename": "moo",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": Any,
+        "size": 0
+    },
+    {
+        "basename": "cow",
+        "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "class": "File",
+        "location": Any,
+        "size": 0
+    }
+  ]}
+  tool: v1.0/output-arrays-file-wf.cwl
+  id: 172
+  label: workflow_file_array_output
+  doc: Test output arrays in a workflow (with Files).
+  tags: [ workflow, expression_tool, inline_javascript ]
+
+- job: "v1.0/empty.json"
+  output: {"cow":
+    {
+        "checksum": "sha1$7a788f56fa49ae0ba5ebde780efe4d6a89b5db47",
+        "basename": "cow",
+        "class": "File",
+        "size": 4,
+        "location": Any
+  }}
+  tool: "v1.0/docker-run-cmd.cwl"
+  id: 173
+  label: docker_entrypoint
+  doc: Test Docker ENTRYPOINT usage
+  tags: [ command_line_tool, docker ]
+
+- job: "v1.0/job-input-array-one-empty-file.json"
+  output: {"output_file":
+    {
+        "checksum": "sha1$dad5a8472b87f6c5ef87d8fc6ef1458defc57250",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 11
+  }}
+  tool: "v1.0/size-expression-tool.cwl"
+  id: 174
+  label: clt_file_size_property_with_empty_file
+  doc: Test use of size in expressions for an empty file
+  tags: [ command_line_tool, inline_javascript ]
+
+- job: "v1.0/job-input-array-few-files.json"
+  output: {"output_file":
+    {
+        "checksum": "sha1$9def39730e8012bd09bf8387648982728501737d",
+        "basename": "output.txt",
+        "location": Any,
+        "class": "File",
+        "size": 31
+  }}
+  tool: "v1.0/size-expression-tool.cwl"
+  id: 175
+  label: clt_file_size_property_with_multi_file
+  doc: Test use of size in expressions for a few files
+  tags: [ command_line_tool, inline_javascript ]
