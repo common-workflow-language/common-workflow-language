@@ -292,7 +292,7 @@ $graph:
     The `location` property of a Directory is a URI that uniquely identifies
     the directory.  Implementations must support the file:// URI scheme and may
     support other schemes such as http://.  Alternately to `location`,
-    implementations must also accept the `path` property on Direcotry, which
+    implementations must also accept the `path` property on Directory, which
     must be a filesystem path available on the same host as the CWL runner (for
     inputs) or the runtime environment of a command line tool execution (for
     command line tool outputs).
