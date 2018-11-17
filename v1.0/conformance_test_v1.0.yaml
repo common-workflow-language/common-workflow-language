@@ -2330,7 +2330,7 @@
   id: 176
   label: any_without_defaults_unspecified_fails
   doc: Test Any without defaults, unspecified, should fail.
-  tags: [ required ]
+  tags: [ command_line_tool, required ]
 
 - job: v1.0/null-expression1-job.json
   tool: v1.0/echo-tool.cwl
@@ -2338,7 +2338,7 @@
   id: 177
   label: any_without_defaults_specified_fails
   doc: Test Any without defaults, specified, should fail.
-  tags: [ required ]
+  tags: [ command_line_tool, required ]
 
 - job: v1.0/empty.json
   output: 
@@ -2350,7 +2350,7 @@
   id: 178
   label: step_input_default_value_noexp
   doc: Test default value on step input parameter, no ExpressionTool
-  tags: [ required ]
+  tags: [ workflow, required ]
 
 - job: v1.0/cat-job.json
   output:
@@ -2359,10 +2359,10 @@
         checksum: sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e
         size: 2
   tool: v1.0/count-lines11-wf-noET.cwl
-  id: 178
+  id: 179
   label: step_input_default_value_overriden_noexp
   doc: Test default value on step input parameter overridden by provided source, no ExpressionTool
-  tags: [ required ]
+  tags: [ workflow, required ]
 
 - job: v1.0/wc-job.json
   output: 
@@ -2370,11 +2370,11 @@
         class: File
         checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
         size: 3
-  id: 179
+  id: 180
   label: nested_workflow_noexp
   tool: v1.0/count-lines8-wf-noET.cwl
   doc: Test nested workflow, without ExpressionTool
-  tags: [ subworkflow ]
+  tags: [ workflow, subworkflow ]
 
 - job: v1.0/sum-job.json
   output: 
@@ -2382,11 +2382,11 @@
         class: File
         checksum: sha1$ad552e6dc057d1d825bf49df79d6b98eba846ebe
         size: 3
-  id: 180
+  id: 181
   label: wf_multiplesources_multipletypes_noexp
   tool: v1.0/sum-wf-noET.cwl
   doc: Test step input with multiple sources with multiple types, without ExpressionTool
-  tags: [ step_input, inline_javascript, multiple_input ]
+  tags: [ workflow, step_input, inline_javascript, multiple_input ]
 
 - tool: v1.0/dynresreq-workflow-tooldefault.cwl
   job: v1.0/empty.json
@@ -2396,14 +2396,14 @@
         size: 2
         class: File
         checksum: sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a
-  id: 181
+  id: 182
   label: dynamic_resreq_wf_optional_file_default
   doc: |
     Within a workflow, test accessing the size attribute of an optional input
     File as part of a CommandLineTool's ResourceRequirement calculation. The
     CommandLineTool input has a default value (a local file) and the workflow
     nor the workflow step does not provide any value for this input.
-  tags: [ resource ]
+  tags: [ workflow, resource ]
 
 - tool: v1.0/dynresreq-workflow-stepdefault.cwl
   job: v1.0/empty.json
@@ -2413,18 +2413,18 @@
         size: 2
         class: File
         checksum: sha1$7448d8798a4380162d4b56f9b452e2f6f9e24e7a
-  id: 182
+  id: 183
   label: dynamic_resreq_wf_optional_file_step_default
   doc: |
     Within a workflow, test accessing the size attribute of an optional input
     File as part of a CommandLineTool's ResourceRequirement calculation. The
     workflow step provides a default value (a local file) for this input and
     the workflow itself does not provide any value for this input.
-  tags: [ resource ]
+  tags: [ workflow, resource ]
 
 - tool: v1.0/dynresreq-workflow-inputdefault.cwl
   job: v1.0/empty.json
-  id: 183
+  id: 184
   label: dynamic_resreq_wf_optional_file_wf_default
   output:
     cores:
@@ -2436,17 +2436,17 @@
     Within a workflow, test accessing the size attribute of an optional input
     File as part of a CommandLineTool's ResourceRequirement calculation. The
     workflow itelf provides a default value (a local file) for this input.
-  tags: [ resource ]
+  tags: [ workflow, resource ]
 
 - job: v1.0/cat-job.json
   output: {count_output: 1}
-  id: 184
+  id: 185
   label: step_input_default_value_overriden_2nd_step
   tool: v1.0/count-lines11-extra-step-wf.cwl
   doc: |
     Test default value on step input parameter overridden by provided source.
     With passthrough first step
-  tags: [ inline_javascript ]
+  tags: [ workflow, inline_javascript ]
 
 - job: v1.0/cat-job.json
   output:
@@ -2454,23 +2454,23 @@
         class: File
         checksum: sha1$e5fa44f2b31c1fb553b6021e7360d07d5d91ff5e
         size: 2
-  id: 185
+  id: 186
   label: step_input_default_value_overriden_2nd_step_noexp
   tool: v1.0/count-lines11-extra-step-wf-noET.cwl
   doc: |
     Test default value on step input parameter overridden by provided source.
     With passthrough first step and no ExpressionTool
-  tags: [ required ]
+  tags: [ workflow, required ]
 
 - job: v1.0/empty.json
   output: {count_output: 16}
-  id: 186
+  id: 187
   label: step_input_default_value_overriden_2nd_step_null
   tool: v1.0/count-lines11-null-step-wf.cwl
   doc: |
     Test default value on step input parameter overridden by provided source.
     With null producing first step
-  tags: [ inline_javascript ]
+  tags: [ workflow, inline_javascript ]
 
 - job: v1.0/empty.json
   output:
@@ -2478,13 +2478,13 @@
         class: File
         checksum: sha1$3596ea087bfdaf52380eae441077572ed289d657
         size: 3
-  id: 187
+  id: 188
   label: step_input_default_value_overriden_2nd_step_null_noexp
   tool: v1.0/count-lines11-null-step-wf-noET.cwl
   doc: |
     Test default value on step input parameter overridden by provided source.
     With null producing first step and no ExpressionTool
-  tags: [ required ]
+  tags: [ workflow, required ]
 
 - tool: v1.0/cat-from-dir.cwl
   job: v1.0/cat-from-dir-job.yaml
@@ -2492,8 +2492,9 @@
     checksum: sha1$47a013e660d408619d894b20806b1d5086aab03b
     class: File
     size: 13
-  id: 188
+  id: 189
   label: input_dir_basic
+  tags: [ command_line_tool, required ]
 
 - tool: v1.0/cat-from-dir.cwl
   job: v1.0/cat-from-dir-with-literal-file.yaml
@@ -2501,8 +2502,9 @@
     checksum: sha1$ef88e689559565999700d6fea7cf7ba306d04360
     class: File
     size: 26
-  id: 189
+  id: 190
   label: input_dir_file_literal
+  tags: [ command_line_tool, required ]
 
 - tool: v1.0/cat3-from-dir.cwl
   job: v1.0/cat-from-dir-with-literal-file.yaml
@@ -2510,5 +2512,6 @@
     checksum: sha1$ef88e689559565999700d6fea7cf7ba306d04360
     class: File
     size: 26
-  id: 190
+  id: 191
   label: input_dir_file_literal_nostdin
+  tags: [ command_line_tool, required ]
