@@ -1931,7 +1931,7 @@
 - job: v1.0/count-lines3-job.json
   output:
     count_output: [16, 1]
-  tool: v1.0/count-lines13-wf.cwl
+  tool: v1.0/count-lines18-wf.cwl
   id: 138
   label: scatter_embedded_subworkflow
   doc: Test simple scatter over an embedded subworkflow
