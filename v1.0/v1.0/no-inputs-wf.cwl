@@ -11,4 +11,17 @@ steps:
   step0:
     in: []
     out: [output]
-    run: no_inputs_tool.cwl
+    run: 
+      class: CommandLineTool
+      cwlVersion: v1.0
+      doc: "CommandLineTool without inputs."
+      hints:
+        DockerRequirement:
+          dockerPull: debian:stretch-slim
+      inputs: []
+      outputs:
+        output:
+          type: File
+          outputBinding: { glob: output }
+      baseCommand: [echo, cwl]
+      stdout: output
