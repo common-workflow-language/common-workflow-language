@@ -1,6 +1,7 @@
 #!/usr/bin/env cwl-runner
 class: Workflow
 cwlVersion: v1.0
+doc: "Workflow without inputs."
 inputs: []
 outputs: 
   output:
