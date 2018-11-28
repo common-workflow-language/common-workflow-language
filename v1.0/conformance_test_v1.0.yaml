@@ -2521,3 +2521,47 @@
   label: directory_literal_with_literal_file_nostdin
   doc: Test non-stdin reference to literal File via a Directory literal
   tags: [ command_line_tool, required ]
+
+
+- tool: v1.0/no-inputs-tool.cwl
+  output:
+    output:
+      checksum: sha1$1334e67fe9eb70db8ae14ccfa6cfb59e2cc24eae
+      location: output
+      class: File
+      size: 4
+  id: 192
+  label: no_inputs_commandlinetool
+  doc: Test CommandLineTool without inputs
+  tags: [ command_line_tool, required ]
+
+
+- tool: v1.0/no-outputs-tool.cwl
+  job: v1.0/cat-job.json
+  output: {}
+  id: 193
+  label: no_outputs_commandlinetool
+  doc: Test CommandLineTool without outputs
+  tags: [ command_line_tool, required ]
+
+
+- tool: v1.0/no-inputs-wf.cwl
+  output:
+    output:
+      checksum: sha1$1334e67fe9eb70db8ae14ccfa6cfb59e2cc24eae
+      location: output
+      class: File
+      size: 4
+  id: 194
+  label: no_inputs_workflow
+  doc: Test Workflow without inputs
+  tags: [ workflow, required ]
+
+
+- tool: v1.0/no-outputs-wf.cwl
+  job: v1.0/cat-job.json
+  output: {}
+  id: 195
+  label: no_outputs_workflow
+  doc: Test Workflow without outputs
+  tags: [ workflow, required ]
