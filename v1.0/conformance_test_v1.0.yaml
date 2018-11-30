@@ -2565,3 +2565,16 @@
   label: no_outputs_workflow
   doc: Test Workflow without outputs
   tags: [ workflow, required ]
+
+- tool: v1.0/anon_enum_inside_array.cwl
+  job: v1.0/anon_enum_inside_array.yml
+  output:
+    result:
+      class: File
+      checksum: "sha1$2132943d72c39423e0b9425cbc40dfd5bf3e9cb2"
+      size: 39
+  id: 196
+  label: anonymous_enum_in_array
+  doc: Test an anonymous enum inside an array inside a record
+  tags: [command_line, required]
+
