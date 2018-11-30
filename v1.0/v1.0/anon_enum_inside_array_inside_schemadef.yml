@@ -1,0 +1,4 @@
+first:  # "vcf2maf_params" record type.
+    species: homo_sapiens  # enum; valid values: "homo_sapiens", "mus_musculus" (optional)
+    ncbi_build: GRCh37  # enum; valid values: "GRCh37", "GRCh38", "GRCm38" (optional)
+
