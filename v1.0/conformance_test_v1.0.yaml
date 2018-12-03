@@ -2565,3 +2565,28 @@
   label: no_outputs_workflow
   doc: Test Workflow without outputs
   tags: [ workflow, required ]
+
+- tool: v1.0/anon_enum_inside_array.cwl
+  job: v1.0/anon_enum_inside_array.yml
+  output:
+    result:
+      class: File
+      checksum: "sha1$2132943d72c39423e0b9425cbc40dfd5bf3e9cb2"
+      size: 39
+  id: 196
+  label: anonymous_enum_in_array
+  doc: Test an anonymous enum inside an array inside a record
+  tags: [command_line, required]
+
+- tool: v1.0/anon_enum_inside_array_inside_schemadef.cwl
+  job: v1.0/anon_enum_inside_array_inside_schemadef.yml
+  output:
+    result:
+      class: File
+      checksum: "sha1$f17c7d81f66e1520fca25b96b90eeeae5bbf08b0"
+      size: 39
+  id: 196
+  label: schema-def_anonymous_enum_in_array
+  doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
+  tags: [command_line, schema_def]
+
