@@ -16,7 +16,6 @@ inputs:
 outputs:
   orec:
     type:
-      name: orec
       type: record
       fields:
       - name: ofoo
