@@ -2590,3 +2590,11 @@
   doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
   tags: [command_line, schema_def]
 
+- tool: v1.0/record-order.cwl
+  job: v1.0/record-order-job.json
+  output:
+    args: [-a, -b, '1', -c, '3', -d, -e, '2', -f, '4']
+  id: 198
+  label: record-order
+  doc: Test sorting arguments at each level (section 4.1)
+  tags: [command_line, required]
