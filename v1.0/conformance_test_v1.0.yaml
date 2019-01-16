@@ -2590,3 +2590,15 @@
   doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
   tags: [command_line_tool, schema_def]
 
+- job: v1.0/stage_array_in_dir-job.yml
+  output:
+    outfile:
+      checksum: "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
+      size: 1111
+      location: whale.txt
+      class: File
+  tool: v1.0/stage_array_in_dir.cwl
+  label: stage_array_in_dir
+  id: 198
+  doc: Test staging array of files in a subdirectory.
+  tags: [ initial_work_dir, command_line_tool ]
