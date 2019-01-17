@@ -1,8 +1,9 @@
 class: CommandLineTool
 cwlVersion: v1.0
 baseCommand:
-  - ls
-  - staged
+  - cp
+  - staged/whale.txt
+  - whale_copy.txt
 inputs:
   - id: infiles
     type: File[]
@@ -10,7 +11,7 @@ outputs:
   - id: outfile
     type: File
     outputBinding:
-      glob: staged/whale.txt
+      glob: whale_copy.txt
 requirements:
   - class: InitialWorkDirRequirement
     listing:

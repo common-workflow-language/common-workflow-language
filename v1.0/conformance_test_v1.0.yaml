@@ -2595,7 +2595,7 @@
     outfile:
       checksum: "sha1$327fc7aedf4f6b69a42a7c8b808dc5a7aff61376"
       size: 1111
-      location: whale.txt
+      location: whale_copy.txt
       class: File
   tool: v1.0/stage_array_in_dir.cwl
   label: stage_array_in_dir
