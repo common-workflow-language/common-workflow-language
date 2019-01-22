@@ -18,6 +18,7 @@ requirements:
       - entry: >-
           ${ return { 'class': 'Directory', 'listing': inputs.infiles,
           'basename': 'staged'} }
+        writable: true
   - class: InlineJavascriptRequirement
 hints:
   - class: DockerRequirement
