@@ -2643,3 +2643,23 @@
   label: file_literal_size_fails_over_64kb_control
   doc: Test file literals of size over 64kb fail (control for previous test)
   tags: [ expression_tool ]
+
+- tool: v1.0/cat-default-file-literal-64kb-plus-1.cwl
+  job: v1.0/empty.json
+  should_fail: true
+  id: 204
+  label: file_literal_as_default_size_fails_over_64kb
+  doc: Test file literals as tool defaults of size over 64kb fail (control for previous test)
+  tags: [ command_line_tool ]
+
+- tool: v1.0/cat-default-file-literal-64kb.cwl
+  job: v1.0/empty.json
+  output:
+    output:
+      class: File
+      checksum: "sha1$79db5888b5d38e10afbdbd14a19cd1caa9044c65"
+      size: 65536
+  id: 205
+  label: file_literal_as_default_size_fails_over_64kb_control
+  doc: Test file literals as tool defaults of size over 64kb fail (control for previous test)
+  tags: [ command_line_tool ]
