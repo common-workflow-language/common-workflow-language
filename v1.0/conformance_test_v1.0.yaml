@@ -2623,3 +2623,23 @@
   label: step_input_loadContents_fails_over_64kb_control
   doc: Test loadContents on step input fails over 64kb (control for previous test)
   tags: [workflow, inline_javascript]
+
+- tool: v1.0/file-literal-output-size.cwl
+  job: v1.0/size_64kb_plus_1.json
+  should_fail: true
+  id: 202
+  label: file_literal_size_fails_over_64kb
+  doc: Test file literals of size over 64kb fail.
+  tags: [ expression_tool ]
+
+- tool: v1.0/file-literal-output-size.cwl
+  job: v1.0/size_64kb.json
+  output:
+    lit:
+      class: File
+      checksum: "sha1$79db5888b5d38e10afbdbd14a19cd1caa9044c65"
+      size: 65536
+  id: 203
+  label: file_literal_size_fails_over_64kb_control
+  doc: Test file literals of size over 64kb fail (control for previous test)
+  tags: [ expression_tool ]
