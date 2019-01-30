@@ -4,7 +4,6 @@ cwlVersion: v1.0
 
 inputs:
     file1: File[]
-    file2: File[]
 
 outputs:
     count_output:
