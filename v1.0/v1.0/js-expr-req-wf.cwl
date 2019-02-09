@@ -2,6 +2,9 @@ cwlVersion: v1.0
 $graph:
   - id: tool
     class: CommandLineTool
+    hints:
+      ResourceRequirement:
+        ramMin: 128
     requirements:
       InlineJavascriptRequirement:
         expressionLib:

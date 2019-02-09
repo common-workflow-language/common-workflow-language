@@ -2,6 +2,9 @@
 
 class: CommandLineTool
 cwlVersion: v1.0
+hints:
+  ResourceRequirement:
+    ramMin: 128
 
 inputs:
   file1: File

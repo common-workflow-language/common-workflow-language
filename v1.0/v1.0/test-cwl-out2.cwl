@@ -3,6 +3,8 @@ cwlVersion: v1.0
 requirements:
   - class: ShellCommandRequirement
 hints:
+  ResourceRequirement:
+    ramMin: 128
   DockerRequirement:
     dockerPull: "debian:stretch-slim"
 

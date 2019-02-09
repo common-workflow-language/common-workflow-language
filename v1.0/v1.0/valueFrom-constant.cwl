@@ -4,6 +4,8 @@ cwlVersion: v1.0
 hints:
   - class: DockerRequirement
     dockerPull: python:2-slim
+  - class: ResourceRequirement
+    ramMin: 128
 
 inputs:
   - id: array_input

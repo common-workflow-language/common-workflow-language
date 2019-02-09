@@ -9,6 +9,8 @@ outputs:
       glob: out
 
 hints:
+  ResourceRequirement:
+    ramMin: 128
   EnvVarRequirement:
     envDef:
       TEST_ENV: $(inputs.in)

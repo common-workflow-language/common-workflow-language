@@ -4,6 +4,9 @@ cwlVersion: v1.0
 
 requirements:
   - class: InlineJavascriptRequirement
+hints:
+  ResourceRequirement:
+    ramMin: 128
 
 inputs:
     file1:

@@ -5,6 +5,9 @@ $graph:
 
 - id: echo
   class: CommandLineTool
+  hints:
+    ResourceRequirement:
+      ramMin: 128
   inputs:
     first:
       type: string

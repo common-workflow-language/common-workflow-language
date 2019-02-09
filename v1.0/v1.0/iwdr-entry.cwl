@@ -3,6 +3,9 @@
 class: CommandLineTool
 cwlVersion: v1.0
 baseCommand: ["cat", "example.conf"]
+hints:
+  ResourceRequirement:
+    ramMin: 128
 
 requirements:
   InitialWorkDirRequirement:

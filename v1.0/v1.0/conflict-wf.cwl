@@ -2,6 +2,9 @@ cwlVersion: v1.0
 $graph:
 - id: echo
   class: CommandLineTool
+  hints:
+    ResourceRequirement:
+      ramMin: 128
   inputs:
     text:
       type: string
@@ -18,6 +21,10 @@ $graph:
 
 - id: cat
   class: CommandLineTool
+  hints:
+    ResourceRequirement:
+      ramMin: 128
+
   inputs:
     file1:
       type: File

@@ -2,6 +2,9 @@
 class: CommandLineTool
 cwlVersion: v1.0
 doc: "Test of capturing stderr output."
+hints:
+  ResourceRequirement:
+    ramMin: 128
 requirements:
   ShellCommandRequirement: {}
 inputs: []

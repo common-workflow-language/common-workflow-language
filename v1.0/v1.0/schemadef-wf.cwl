@@ -2,6 +2,9 @@
 
 cwlVersion: v1.0
 class: Workflow
+hints:
+  ResourceRequirement:
+    ramMin: 128
 
 requirements:
   - $import: schemadef-type.yml

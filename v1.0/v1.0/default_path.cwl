@@ -1,5 +1,8 @@
 cwlVersion: v1.0
 class: CommandLineTool
+hints:
+  ResourceRequirement:
+    ramMin: 128
 inputs:
   - id: "file1"
     type: File

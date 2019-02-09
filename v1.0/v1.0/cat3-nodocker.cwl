@@ -2,6 +2,9 @@
 class: CommandLineTool
 cwlVersion: v1.0
 doc: "Print the contents of a file to stdout using 'cat'."
+hints:
+  ResourceRequirement:
+    ramMin: 128
 inputs:
   file1:
     type: File

@@ -7,6 +7,7 @@ class: CommandLineTool
 hints:
   - class: ResourceRequirement
     coresMin: 2
+    ramMin: 128
   - class: DockerRequirement
     dockerPull: python:2-slim
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env cwl-runner
 class: CommandLineTool
 cwlVersion: v1.0
+hints:
+  ResourceRequirement:
+    ramMin: 128
 requirements:
  - class: InlineJavascriptRequirement
 

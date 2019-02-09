@@ -4,6 +4,8 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
+  - class: ResourceRequirement
+    ramMin: 128
   - class: DockerRequirement
     dockerPull: python:2-slim
 

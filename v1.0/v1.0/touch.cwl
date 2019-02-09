@@ -5,6 +5,8 @@ class: CommandLineTool
 hints:
   DockerRequirement:
     dockerPull: debian:stretch-slim
+  ResourceRequirement:
+    ramMin: 128
 
 inputs:
   name:

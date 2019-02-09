@@ -46,6 +46,9 @@ steps:
     run:
       class: CommandLineTool
       id: step1command
+      hints:
+        ResourceRequirement:
+          ramMin: 128
       inputs:
         first:
           type: string

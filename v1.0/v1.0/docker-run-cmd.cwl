@@ -1,5 +1,8 @@
 class: CommandLineTool
 cwlVersion: v1.0
+hints:
+  ResourceRequirement:
+    ramMin: 128
 requirements:
   DockerRequirement:
     dockerPull: bash:4.4.12

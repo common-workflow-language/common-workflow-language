@@ -13,6 +13,8 @@ requirements:
 hints:
   DockerRequirement:
     dockerPull: "debian:stretch-slim"
+  ResourceRequirement:
+    ramMin: 128
 inputs:
   - id: file1
     type: File

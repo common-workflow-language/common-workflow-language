@@ -2,6 +2,9 @@ class: CommandLineTool
 cwlVersion: v1.0
 inputs: []
 outputs: []
+hints:
+  ResourceRequirement:
+    ramMin: 128
 requirements:
   ShellCommandRequirement: {}
 arguments: [

@@ -9,7 +9,6 @@ outputs:
     out:
       type: File
       outputSource: step1/out
-
 requirements:
   EnvVarRequirement:
     envDef:

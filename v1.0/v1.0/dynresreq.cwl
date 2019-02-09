@@ -4,6 +4,7 @@ cwlVersion: v1.0
 
 requirements:
   ResourceRequirement:
+      ramMin: 128
       coresMin: $(inputs.special_file.size)
       coresMax: $(inputs.special_file.size)
 

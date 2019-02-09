@@ -37,6 +37,9 @@ steps:
     out: [o]
     run:
       class: CommandLineTool
+      hints:
+        ResourceRequirement:
+          ramMin: 128
 
       inputs:
         i:

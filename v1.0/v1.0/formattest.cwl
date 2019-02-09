@@ -3,6 +3,9 @@ $namespaces:
 cwlVersion: v1.0
 class: CommandLineTool
 doc: "Reverse each line using the `rev` command"
+hints:
+  ResourceRequirement:
+    ramMin: 128
 inputs:
   input:
     type: File

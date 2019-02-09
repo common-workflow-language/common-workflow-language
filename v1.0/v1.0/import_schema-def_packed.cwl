@@ -82,6 +82,10 @@
                 {
                     "dockerPull": "debian:stretch-slim", 
                     "class": "DockerRequirement"
+                },
+                {
+                    "class": "ResourceRequirement",
+                    "ramMin": 128
                 }
             ]
         }
