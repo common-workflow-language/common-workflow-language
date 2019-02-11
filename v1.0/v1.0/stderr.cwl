@@ -4,7 +4,7 @@ cwlVersion: v1.0
 doc: "Test of capturing stderr output."
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 requirements:
   ShellCommandRequirement: {}
 inputs: []

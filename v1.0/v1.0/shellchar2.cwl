@@ -6,7 +6,7 @@ doc: |
   ShellCommandRequirement is in effect.
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 requirements:
   ShellCommandRequirement: {}
 inputs: []

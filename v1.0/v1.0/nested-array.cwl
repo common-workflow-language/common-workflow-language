@@ -3,7 +3,7 @@ class: CommandLineTool
 baseCommand: echo
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs:
   letters:
     type:

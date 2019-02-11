@@ -4,7 +4,7 @@ $graph:
   class: CommandLineTool
   hints:
     ResourceRequirement:
-      ramMin: 128
+      ramMin: 8
   inputs:
     text:
       type: string
@@ -23,7 +23,7 @@ $graph:
   class: CommandLineTool
   hints:
     ResourceRequirement:
-      ramMin: 128
+      ramMin: 8
 
   inputs:
     file1:

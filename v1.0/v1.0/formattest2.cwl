@@ -7,7 +7,7 @@ cwlVersion: v1.0
 doc: "Reverse each line using the `rev` command"
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
   DockerRequirement:
     dockerPull: "debian:stretch-slim"
 

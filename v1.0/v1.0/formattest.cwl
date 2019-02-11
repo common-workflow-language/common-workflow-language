@@ -5,7 +5,7 @@ class: CommandLineTool
 doc: "Reverse each line using the `rev` command"
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs:
   input:
     type: File

@@ -5,7 +5,7 @@ cwlVersion: v1.0
 requirements:
   InlineJavascriptRequirement: {}
   ResourceRequirement:
-      ramMin: 128
+      ramMin: 8
       coresMin: $(inputs.dir.listing[0].size)
       coresMax: $(inputs.dir.listing[0].size)
 

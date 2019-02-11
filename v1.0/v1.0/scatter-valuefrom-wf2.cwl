@@ -48,7 +48,7 @@ steps:
       id: step1command
       hints:
         ResourceRequirement:
-          ramMin: 128
+          ramMin: 8
       inputs:
         first:
           type: string

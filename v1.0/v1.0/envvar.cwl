@@ -4,7 +4,7 @@ inputs: []
 outputs: []
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 requirements:
   ShellCommandRequirement: {}
 arguments: [

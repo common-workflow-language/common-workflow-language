@@ -4,7 +4,7 @@ $graph:
     class: CommandLineTool
     hints:
       ResourceRequirement:
-        ramMin: 128
+        ramMin: 8
     requirements:
       InlineJavascriptRequirement:
         expressionLib:

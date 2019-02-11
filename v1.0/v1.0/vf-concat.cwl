@@ -3,7 +3,7 @@ class: CommandLineTool
 requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement
-    ramMin: 128
+    ramMin: 8
 
 baseCommand: echo
 inputs:

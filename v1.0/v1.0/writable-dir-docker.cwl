@@ -14,7 +14,7 @@ hints:
   - class: DockerRequirement
     dockerPull: alpine
   - class: ResourceRequirement
-    ramMin: 128
+    ramMin: 8
 
 inputs: []
 outputs:

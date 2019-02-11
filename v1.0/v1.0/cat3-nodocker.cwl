@@ -4,7 +4,7 @@ cwlVersion: v1.0
 doc: "Print the contents of a file to stdout using 'cat'."
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs:
   file1:
     type: File

@@ -3,7 +3,7 @@ cwlVersion: v1.0
 baseCommand: "true"
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 requirements:
   InitialWorkDirRequirement:
     listing:

@@ -6,7 +6,7 @@ requirements:
 
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 
 inputs:
   tool: File

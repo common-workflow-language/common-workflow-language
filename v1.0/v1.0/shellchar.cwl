@@ -7,7 +7,7 @@ doc: |
   effect.
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs: []
 outputs:
   stdout_file: stdout

@@ -39,7 +39,7 @@ steps:
       class: CommandLineTool
       hints:
         ResourceRequirement:
-          ramMin: 128
+          ramMin: 8
 
       inputs:
         i:

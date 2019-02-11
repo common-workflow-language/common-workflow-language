@@ -5,7 +5,7 @@ $graph:
   class: CommandLineTool
   hints:
     ResourceRequirement:
-      ramMin: 128
+      ramMin: 8
   inputs:
     echo_in1:
       type: string

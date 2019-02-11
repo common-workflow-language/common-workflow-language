@@ -5,7 +5,7 @@ cwlVersion: v1.0
 baseCommand: ["cat", "example.conf"]
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 
 requirements:
   InitialWorkDirRequirement:

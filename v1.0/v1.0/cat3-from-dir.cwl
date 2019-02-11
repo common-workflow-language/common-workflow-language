@@ -3,7 +3,7 @@ class: CommandLineTool
 cwlVersion: v1.0
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs:
   dir1:
     type: Directory

@@ -8,7 +8,7 @@ hints:
   DockerRequirement:
     dockerPull: "debian:stretch-slim"
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
   ex:BlibberBlubberFakeRequirement:
     fakeField: fraggleFroogle
 inputs:

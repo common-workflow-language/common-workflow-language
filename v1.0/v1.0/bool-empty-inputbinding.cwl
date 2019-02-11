@@ -5,7 +5,7 @@ hints:
   - class: DockerRequirement
     dockerPull: python:2-slim
   - class: ResourceRequirement
-    ramMin: 128
+    ramMin: 8
 inputs:
 - id: flag
   type: boolean

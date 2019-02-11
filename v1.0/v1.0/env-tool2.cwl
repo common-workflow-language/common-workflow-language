@@ -10,7 +10,7 @@ outputs:
 
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
   EnvVarRequirement:
     envDef:
       TEST_ENV: $(inputs.in)

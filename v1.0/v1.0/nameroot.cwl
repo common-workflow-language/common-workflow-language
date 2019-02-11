@@ -2,7 +2,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 hints:
   ResourceRequirement:
-    ramMin: 128
+    ramMin: 8
 inputs:
   file1: File
 outputs:
