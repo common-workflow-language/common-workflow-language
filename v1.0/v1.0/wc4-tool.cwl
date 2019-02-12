@@ -3,6 +3,9 @@ class: CommandLineTool
 cwlVersion: v1.0
 requirements:
   - class: InlineJavascriptRequirement
+hints:
+  ResourceRequirement:
+    ramMin: 8
 
 inputs:
     file1:

@@ -3,6 +3,9 @@ cwlVersion: v1.0
 $graph:
 - id: echo
   class: CommandLineTool
+  hints:
+    ResourceRequirement:
+      ramMin: 8
   inputs:
     echo_in1:
       type: string

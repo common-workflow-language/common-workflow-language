@@ -2,6 +2,8 @@ cwlVersion: v1.0
 class: CommandLineTool
 requirements:
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 8
 
 baseCommand: echo
 inputs:

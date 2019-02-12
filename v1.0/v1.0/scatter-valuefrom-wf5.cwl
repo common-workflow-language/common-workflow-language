@@ -35,6 +35,9 @@ steps:
     scatter: echo_in
     run:
       class: CommandLineTool
+      hints:
+        ResourceRequirement:
+          ramMin: 8
       inputs:
         first:
           type: string

@@ -4,6 +4,10 @@ class: Workflow
 requirements:
   - class: StepInputExpressionRequirement
 
+hints:
+  ResourceRequirement:
+    ramMin: 8
+
 inputs:
   tool: File
 

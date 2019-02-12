@@ -9,6 +9,8 @@ outputs:
 requirements:
   ShellCommandRequirement: {}
 hints:
+  ResourceRequirement:
+    ramMin: 8
   DockerRequirement:
     dockerPull: debian:stretch-slim
 arguments:

@@ -4,6 +4,9 @@ cwlVersion: v1.0
 doc: |
   Ensure that `shellQuote: true` is the default behavior when
   ShellCommandRequirement is in effect.
+hints:
+  ResourceRequirement:
+    ramMin: 8
 requirements:
   ShellCommandRequirement: {}
 inputs: []

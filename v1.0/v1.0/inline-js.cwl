@@ -6,6 +6,8 @@ requirements:
 hints:
   - class: DockerRequirement
     dockerPull: python:2-slim
+  - class: ResourceRequirement
+    ramMin: 8
 
 inputs:
   - id: args.py

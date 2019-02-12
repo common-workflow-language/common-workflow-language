@@ -5,6 +5,9 @@ doc: |
   Ensure that arguments containing shell directives are not interpreted and
   that `shellQuote: false` has no effect when ShellCommandRequirement is not in
   effect.
+hints:
+  ResourceRequirement:
+    ramMin: 8
 inputs: []
 outputs:
   stdout_file: stdout

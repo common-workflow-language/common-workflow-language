@@ -5,6 +5,10 @@ class: CommandLineTool
 cwlVersion: v1.0
 doc: "Reverse each line using the `rev` command"
 
+hints:
+  ResourceRequirement:
+    ramMin: 8
+
 # The "inputs" array defines the structure of the input object that describes
 # the inputs to the underlying program.  Here, there is one input field
 # defined that will be called "input" and will contain a "File" object.

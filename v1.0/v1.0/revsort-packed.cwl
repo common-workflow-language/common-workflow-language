@@ -85,7 +85,13 @@
                 }
             ], 
             "baseCommand": "rev", 
-            "stdout": "output.txt", 
+            "stdout": "output.txt",
+            "hints": [
+                {
+                    "class": "ResourceRequirement",
+                    "ramMin": 128
+                }
+            ],
             "id": "#revtool.cwl"
         }, 
         {
@@ -119,6 +125,12 @@
             ], 
             "baseCommand": "sort", 
             "stdout": "output.txt", 
+            "hints": [
+                {
+                    "class": "ResourceRequirement",
+                    "ramMin": 128
+                }
+            ],
             "id": "#sorttool.cwl"
         }
     ]

@@ -5,6 +5,8 @@ requirements:
 hints:
   DockerRequirement:
     dockerPull: debian:stretch-slim
+  ResourceRequirement:
+    ramMin: 8
 inputs:
   indir: Directory
 outputs:

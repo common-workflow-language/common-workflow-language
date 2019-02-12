@@ -1,6 +1,9 @@
 class: CommandLineTool
 cwlVersion: v1.0
 baseCommand: "true"
+hints:
+  ResourceRequirement:
+    ramMin: 8
 requirements:
   InitialWorkDirRequirement:
     listing:

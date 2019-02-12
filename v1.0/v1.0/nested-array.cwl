@@ -1,6 +1,9 @@
 cwlVersion: v1.0
 class: CommandLineTool
 baseCommand: echo
+hints:
+  ResourceRequirement:
+    ramMin: 8
 inputs:
   letters:
     type:

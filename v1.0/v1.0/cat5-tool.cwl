@@ -7,6 +7,8 @@ doc: "Print the contents of a file to stdout using 'cat' running in a docker con
 hints:
   DockerRequirement:
     dockerPull: "debian:stretch-slim"
+  ResourceRequirement:
+    ramMin: 8
   ex:BlibberBlubberFakeRequirement:
     fakeField: fraggleFroogle
 inputs:

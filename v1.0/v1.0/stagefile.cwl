@@ -3,6 +3,8 @@ cwlVersion: v1.0
 hints:
   - class: DockerRequirement
     dockerPull: python:2-slim
+  - class: ResourceRequirement
+    ramMin: 8
 requirements:
   InitialWorkDirRequirement:
     listing:

@@ -5,6 +5,8 @@ doc: "CommandLineTool without outputs."
 hints:
   DockerRequirement:
     dockerPull: debian:stretch-slim
+  ResourceRequirement:
+    ramMin: 8
 inputs:
   file1:
     type: File

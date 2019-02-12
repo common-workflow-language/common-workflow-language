@@ -2,6 +2,9 @@
 
 class: CommandLineTool
 cwlVersion: v1.0
+hints:
+  ResourceRequirement:
+    ramMin: 8
 
 inputs:
   dir1: Directory

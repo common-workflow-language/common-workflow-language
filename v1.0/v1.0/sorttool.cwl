@@ -3,6 +3,9 @@
 class: CommandLineTool
 doc: "Sort lines using the `sort` command"
 cwlVersion: v1.0
+hints:
+  ResourceRequirement:
+    ramMin: 8
 
 # This example is similar to the previous one, with an additional input
 # parameter called "reverse".  It is a boolean parameter, which is

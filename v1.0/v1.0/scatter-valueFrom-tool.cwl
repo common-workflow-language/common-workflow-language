@@ -1,5 +1,8 @@
 cwlVersion: v1.0
 class: CommandLineTool
+hints:
+  ResourceRequirement:
+    ramMin: 8
 inputs:
   scattered_message:
     type: string
