@@ -26,7 +26,7 @@ steps:
       class: CommandLineTool
       baseCommand: [ touch, deeply/nested/dir/structure/ya ]
       requirements:
-        InitialWorkDirRequirement:
+        InitialWorkDirRequirement: # does not include writable:True
           listing:
             - entry: $(inputs.dir)
       inputs:
