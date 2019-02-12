@@ -2590,3 +2590,11 @@
   doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
   tags: [command_line_tool, schema_def]
 
+- doc: Test InitialWorkDirRequirement without writable fails on write
+  id: 198
+  job: v1.0/empty.json
+  should_fail: true
+  tool: v1.0/iwdr_nested_missing_writable.cwl
+  label: initialworkdir_nesteddir_missing_writable
+  tags: [ initial_work_dir, workflow ]
+
