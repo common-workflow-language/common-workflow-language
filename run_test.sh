@@ -22,6 +22,7 @@ Options:
                         cwltest
   --self                Test CWL and test .cwl files themselves. If this flag
                         is given, any other flags will be ignored.
+  --badgedir=DIRNAME    Specifies the directory to store JSON files for badges.
 
 Note:
   EXTRA is useful for passing --enable-dev to the CWL reference runner:
@@ -38,6 +39,7 @@ EXTRA=""
 CLASS=""
 VERBOSE=""
 SELF=""
+BADGE=""
 TIMEOUT=""
 
 while [[ -n "$1" ]]
@@ -72,6 +74,9 @@ do
             ;;
         --self)
             SELF=1
+            ;;
+        --badgedir=*)
+            BADGE=$arg
             ;;
         --timeout=*)
             TIMEOUT=$arg
@@ -125,7 +130,7 @@ runtest() {
      COMMAND="cwltest --tool $1 \
 	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_N} \
 	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
-	     --basedir ${DRAFT_DIR} -- ${EXTRA}"
+	     --basedir ${DRAFT_DIR} ${BADGE} -- ${EXTRA}"
      if [[ $VERBOSE == "--verbose" ]]; then echo ${COMMAND}; fi
      ${COMMAND}
     )
