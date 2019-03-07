@@ -2591,7 +2591,7 @@
   tags: [command_line_tool, schema_def]
 
 
-- job: v1.0/itemseparator-job1.cwl
+- job: v1.0/itemseparator-job1.yml
   output:
     o:
       class: File
@@ -2604,7 +2604,7 @@
   tags: [ required, command_line_tool ]
 
 
-- job: v1.0/itemseparator-job2.cwl
+- job: v1.0/itemseparator-job2.yml
   output:
     o:
       class: File
