@@ -2590,3 +2590,40 @@
   doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
   tags: [command_line_tool, schema_def]
 
+- tool: v1.0/anon_enum_inside_array_inside_schemadef.cwl
+  job: v1.0/anon_enum_inside_array_inside_schemadef.yml
+  output:
+    result:
+      class: File
+      checksum: "sha1$f17c7d81f66e1520fca25b96b90eeeae5bbf08b0"
+      size: 39
+  id: 197
+  label: schema-def_anonymous_enum_in_array
+  doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
+  tags: [command_line_tool, schema_def]
+
+
+- job: v1.0/itemseparator-job1.cwl
+  output:
+    o:
+      class: File
+      checksum: sha1$1f44fbdb98150d4ba212e7b2cdec6c9bda27f6ef
+      size: 8
+  tool: v1.0/itemseparator1.cwl
+  label: itemseparator_multiple_items
+  id: 198
+  doc: Test itemSeparator with multiple inputs in array input.
+  tags: [ required, command_line_tool ]
+
+
+- job: v1.0/itemseparator-job2.cwl
+  output:
+    o:
+      class: File
+      checksum: sha1$90ce62edf2fe4940e041a68b13e7b5f9d02bbf51
+      size: 4
+  tool: v1.0/itemseparator1.cwl
+  label: itemseparator_multiple_items
+  id: 199
+  doc: Test itemSeparator with single input in array input.
+  tags: [ required, command_line_tool ]
