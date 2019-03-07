@@ -15,4 +15,4 @@ outputs:
     type: int[]
 
 expression: >
-  ${return {'o': Array.apply(null, {length: inputs.i}).map(Number.call, Number)};}
+  ${return {'o': Array.apply(undefined, {length: inputs.i}).map(Number.call, Number)};}
