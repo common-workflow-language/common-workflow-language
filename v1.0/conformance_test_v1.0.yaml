@@ -2611,7 +2611,7 @@
       checksum: sha1$90ce62edf2fe4940e041a68b13e7b5f9d02bbf51
       size: 4
   tool: v1.0/itemseparator1.cwl
-  label: itemseparator_multiple_items
+  label: itemseparator_single_item
   id: 199
   doc: Test itemSeparator with single input in array input.
   tags: [ required, command_line_tool ]
