@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 read -rd "\000" helpmessage <<EOF
 $(basename $0): Run common workflow tool description language conformance tests.
