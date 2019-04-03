@@ -352,7 +352,7 @@
   label: envvar_req
   id: 34
   doc: Test EnvVarRequirement
-  tags: [ env_var, command_line_tool ]
+  tags: [ env_var, shell_command, command_line_tool ]
 
 - job: v1.0/scatter-job1.json
   output:
@@ -463,7 +463,7 @@
   label: requirement_priority
   id: 46
   doc: Test requirement priority
-  tags: [ env_var, workflow ]
+  tags: [ env_var, shell_command, workflow ]
 
 - job: v1.0/env-job.json
   output:
@@ -476,7 +476,7 @@
   label: requirement_override_hints
   id: 47
   doc: Test requirements override hints
-  tags: [ env_var, workflow ]
+  tags: [ env_var, shell_command, workflow ]
 
 - job: v1.0/env-job.json
   output:
@@ -489,7 +489,7 @@
   label: requirement_workflow_steps
   id: 48
   doc: Test requirements on workflow steps
-  tags: [ env_var, workflow ]
+  tags: [ env_var, shell_command, workflow ]
 
 - job: v1.0/empty.json
   output: {count_output: 16}
@@ -1433,7 +1433,7 @@
   label: hints_import
   id: 104
   doc: Test hints with $import
-  tags: [ required, command_line_tool ]
+  tags: [ required, env_var, shell_command, command_line_tool ]
 
 - output: {}
   job: v1.0/default_path_job.yml
