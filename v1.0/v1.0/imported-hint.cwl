@@ -11,6 +11,6 @@ outputs:
 hints:
 - $import: envvar.yml
 
-baseCommand: ["/bin/sh", "-c", "echo $TEST_ENV"]
+baseCommand: ["echo", "$TEST_ENV"]
 
 stdout: out

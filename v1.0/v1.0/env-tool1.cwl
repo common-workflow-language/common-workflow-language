@@ -16,6 +16,6 @@ requirements:
     envDef:
       TEST_ENV: $(inputs.in)
 
-baseCommand: ["/bin/sh", "-c", "echo $TEST_ENV"]
+baseCommand: ["echo", "$TEST_ENV"]
 
 stdout: out
