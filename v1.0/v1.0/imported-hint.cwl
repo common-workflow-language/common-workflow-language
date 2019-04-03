@@ -4,6 +4,7 @@ class: CommandLineTool
 hints:
   ResourceRequirement:
     ramMin: 8
+  ShellCommandRequirement: {}
 inputs: []
 outputs:
   out: stdout
@@ -11,6 +12,15 @@ outputs:
 hints:
 - $import: envvar.yml
 
-baseCommand: ["echo", "$TEST_ENV"]
+arguments:
+  - valueFrom: "/bin/sh"
+    position: 1
+    shellQuote: false
+  - valueFrom: "-c"
+    position: 2
+    shellQuote: false
+  - valueFrom: "echo $TEST_ENV"
+    position: 3
+    shellQuote: true
 
 stdout: out

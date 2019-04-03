@@ -6,14 +6,15 @@ hints:
 requirements:
   DockerRequirement:
     dockerPull: bash:4.4.12
-  InlineJavascriptRequirement: {}
 inputs: []
 outputs:
   cow:
     type: File
     outputBinding:
       glob: cow
-baseCommand: ["-c"]
 
 arguments:
-  - valueFrom: "${ return \"echo 'moo' > cow\" }"
+  - valueFrom: "-c"
+    position: 0
+  - valueFrom: "echo 'moo' > cow"
+    position: 1
