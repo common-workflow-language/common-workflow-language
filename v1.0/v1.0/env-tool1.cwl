@@ -18,15 +18,7 @@ requirements:
   ShellCommandRequirement: {}
 
 arguments:
-  - valueFrom: "/bin/sh"
-    position: 1
-    shellQuote: false
-  - valueFrom: "-c"
-    position: 2
-    shellQuote: false
-  - valueFrom: "echo $TEST_ENV"
+  - valueFrom: "echo $TEST_ENV > out"
     position: 3
-    shellQuote: true
+    shellQuote: false
 
-
-stdout: out

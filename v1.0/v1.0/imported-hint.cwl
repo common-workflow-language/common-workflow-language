@@ -1,26 +1,22 @@
 #!/usr/bin/env cwl-runner
 cwlVersion: v1.0
 class: CommandLineTool
-hints:
+
+requirements:
+  ShellCommandRequirement: {}
   ResourceRequirement:
     ramMin: 8
-  ShellCommandRequirement: {}
 inputs: []
 outputs:
-  out: stdout
+  out:
+    type: File
+    outputBinding:
+      glob: out
 
 hints:
 - $import: envvar.yml
 
 arguments:
-  - valueFrom: "/bin/sh"
-    position: 1
-    shellQuote: false
-  - valueFrom: "-c"
-    position: 2
-    shellQuote: false
-  - valueFrom: "echo $TEST_ENV"
+  - valueFrom: "echo $TEST_ENV > out"
     position: 3
-    shellQuote: true
-
-stdout: out
+    shellQuote: false
