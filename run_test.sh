@@ -26,6 +26,7 @@ Options:
   --self                Test CWL and test .cwl files themselves. If this flag
                         is given, any other flags will be ignored.
   --badgedir=DIRNAME    Specifies the directory to store JSON files for badges.
+  --tags TAGS           Tags to be tested
 
 Note:
   EXTRA is useful for passing --enable-dev to the CWL reference runner:
@@ -43,6 +44,7 @@ VERBOSE=""
 SELF=""
 BADGE=""
 TIMEOUT=""
+TAGS=""
 
 while [ -n "$1" ]
 do
@@ -82,6 +84,9 @@ do
             ;;
         --timeout=*)
             TIMEOUT=$arg
+            ;;
+        --tags=*)
+            TAGS=$arg
             ;;
         *=*)
             eval "$(echo "$arg" | cut -d= -f1)"=\""$(echo "$arg" | cut -d= -f2-)"\"
@@ -132,7 +137,7 @@ runtest() {
      COMMAND="cwltest --tool $1 \
 	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_N} \
 	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
-	     --basedir ${DRAFT_DIR} ${BADGE} -- ${EXTRA}"
+	     --basedir ${DRAFT_DIR} ${BADGE} ${TAGS} -- ${EXTRA}"
      if [ "$VERBOSE" = "--verbose" ]; then echo "${COMMAND}"; fi
      ${COMMAND}
     )
