@@ -1892,7 +1892,7 @@
       basename: a.bam
       class: File
       size: 0
-  tool: v1.0/import_schema-def_packed.cwl
+  tool: "v1.0/import_schema-def_packed.cwl#main"
   label: packed_import_schema
   id: 135
   doc: SchemaDefRequirement with $import, and packed
