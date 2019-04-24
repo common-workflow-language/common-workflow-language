@@ -12,4 +12,9 @@ outputs:
     type: File
     outputBinding:
       glob: cow
-baseCommand: ["-c", "echo 'moo' > cow"]
+
+arguments:
+  - valueFrom: "-c"
+    position: 0
+  - valueFrom: "echo 'moo' > cow"
+    position: 1

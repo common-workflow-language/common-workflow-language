@@ -15,7 +15,10 @@ requirements:
   EnvVarRequirement:
     envDef:
       TEST_ENV: $(inputs.in)
+  ShellCommandRequirement: {}
 
-baseCommand: ["/bin/sh", "-c", "echo $TEST_ENV"]
+arguments:
+  - valueFrom: "echo $TEST_ENV > out"
+    position: 3
+    shellQuote: false
 
-stdout: out
