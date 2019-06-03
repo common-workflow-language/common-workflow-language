@@ -6,6 +6,9 @@ outputs:
   results:
     type: File
     outputBinding: { glob: results }
+  # log:
+  #   type: File
+  #   outputBinding: { glob: log }
 requirements:
   ShellCommandRequirement: {}
 hints:
@@ -16,7 +19,7 @@ hints:
 arguments:
   - shellQuote: false
     valueFrom: |
-      echo HOME=$HOME TMPDIR=$TMPDIR > log
+      echo HOME=$HOME TMPDIR=$TMPDIR # > log
       if [ "$HOME" = "$(runtime.outdir)" ] && [ "$TMPDIR" = "$(runtime.tmpdir)" ]
       then
           echo success > results
