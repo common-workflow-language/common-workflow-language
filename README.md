@@ -51,8 +51,10 @@ is a 15 minute introduction to the CWL project in Japanese.
 
 ## Specification
 
-For developers and advanced users, the current [CWL specification (v1.0.2)](https://www.commonwl.org/v1.0/)
-provides authoritative documentation of the execution of CWL documents.
+For developers and advanced users, the current
+[CWL specification (v1.1)](https://www.commonwl.org/v1.1/) (https://github.com/common-workflow-language/cwl-v1.1) provides
+authoritative documentation of the execution of CWL documents.  The previous version
+[CWL specification (v1.0.2)](https://www.commonwl.org/v1.0/) (https://github.com/common-workflow-language/common-workflow-language/tree/master/v1.0) is also available.
 
 ### Citation
 
@@ -110,4 +112,4 @@ For the following content:
  - CWL Advisors
  - CWL Leadership team
 
-Please see https://www.github.com/common-workflow-language/cwl-website/ 
+Please see https://www.github.com/common-workflow-language/cwl-website/
