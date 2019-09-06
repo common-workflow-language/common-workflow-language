@@ -2205,7 +2205,7 @@
   tool: v1.0/io-any-wf-1.cwl
   id: 165
   label: workflow_any_input_with_record_provided
-  doc: Test Any parameter with record input to a tool
+  doc: Test Any parameter with record input to a tool in a workflow
   tags: [ workflow, inline_javascript ]
 
 - job: v1.0/empty.json
