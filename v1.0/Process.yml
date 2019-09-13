@@ -44,6 +44,8 @@ $graph:
   symbols:
     - cwl:File
     - cwl:Directory
+    - cwl:stdout
+    - cwl:stderr
   doc:
     - "Extends primitive types with the concept of a file and directory as a builtin type."
     - "File: A File object"
