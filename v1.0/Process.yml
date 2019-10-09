@@ -262,8 +262,8 @@ $graph:
         `<B> owl:equivalentClass <C>` and `<B> owl:subclassOf <A>` then infer
         `<C> owl:subclassOf <A>`.
 
-        File format ontologies may be provided in the "$schema" metadata at the
-        root of the document.  If no ontologies are specified in `$schema`, the
+        File format ontologies may be provided in the "$schemas" metadata at the
+        root of the document.  If no ontologies are specified in `$schemas`, the
         runtime may perform exact file format matches.
     - name: contents
       type: string?
