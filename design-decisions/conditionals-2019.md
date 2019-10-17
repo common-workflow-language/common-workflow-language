@@ -75,7 +75,7 @@ steps:
       in1: val
       a_new_var: val
     run: ../tools/foo.cwl
-    runIf: $(inputs.a_new_var > 1)
+    when: $(inputs.a_new_var > 1)
     out: [out1]  # out1 is of type string
 
 outputs:
@@ -90,7 +90,7 @@ requirements:
   InlineJavascriptRequirement: {}
 ```
 
-The new syntax adds a single field to `WorkflowStep` (`runIf`) and a new 
+The new syntax adds a single field to `WorkflowStep` (`when`) and a new 
 operator called `branchSelect` to the `WorkflowStepInput` and 
 `WorkflowOutputParameter`. This is a fairly non-intrusive 
 modification, fully backwards compatible (it's an addition, not a modification) and allows
@@ -99,9 +99,9 @@ developers to easily modify existing workflows with an intuitive syntax.
 The most common pattern - a by-pass, e.g. as used when deciding whether to run a BAM indexer
 or just pass on a BAM file - is very easy to implement.
 
-### runIf
+### when
 
-The `runIf` field allows the workflow developer to isolate the trigger condition
+The `when` field allows the workflow developer to isolate the trigger condition
 for whether a conditional step should run or not into a single explicit field.
 This makes it easy for a reader to determine if a step can be conditional and
 makes it easy for Visual Programming editors and other tools to mark the step
