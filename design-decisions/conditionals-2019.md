@@ -59,47 +59,67 @@ While the difficulty for workflow executor developers should be considered,
 it is more important to make life easier for workflow developers.
 
 
+## Walkthrough of proposed syntax with commentary on design decisions 
+
+
 ### Example code
 
 ```
 class: Workflow
-cwlVersion: v1.conditionals-dev
+cwlVersion: v1.2.0-dev1
 inputs:
-  in1: string
   val: int
 
 steps:
 
-  step1:
+  step0:
     in:
       in1: val
       a_new_var: val
     run: ../tools/foo.cwl
     when: $(inputs.a_new_var > 1)
-    out: [out1]  # out1 is of type string
+    out: [out1]
+
+
+  step1:
+    in:
+      in1: val
+      a_new_var: val
+    run: ../tools/bar.cwl
+    when: $(inputs.a_new_var < 1)
+    out: [out1]
 
 outputs:
   out1: 
     type: string
     outputSource:
-      - step1/out1
-      - in1
-    branchSelect: first_that_ran 
+        - step0/out1
+        - step1/out1
+    pickValue: first_non_null
 
 requirements: 
   InlineJavascriptRequirement: {}
 ```
 
 The new syntax adds a single field to `WorkflowStep` (`when`) and a new 
-operator called `branchSelect` to the `WorkflowStepInput` and 
+operator called `pickValue` to the `WorkflowStepInput` and 
 `WorkflowOutputParameter`. This is a fairly non-intrusive 
 modification, fully backwards compatible (it's an addition, not a modification) and allows
 developers to easily modify existing workflows with an intuitive syntax.
-
-The most common pattern - a by-pass, e.g. as used when deciding whether to run a BAM indexer
-or just pass on a BAM file - is very easy to implement.
+Additionally, the `pickValue` field describes an operator that
+can exist independent of conditional steps.
 
 ### when
+
+```
+  step0:
+    in:
+      in1: val
+      a_new_var: val
+    run: ../tools/foo.cwl
+    when: $(inputs.a_new_var > 1)
+    out: [out1]
+```
 
 The `when` field allows the workflow developer to isolate the trigger condition
 for whether a conditional step should run or not into a single explicit field.
@@ -108,7 +128,103 @@ makes it easy for Visual Programming editors and other tools to mark the step
 as conditional and show at least the conditional expression so an auditor can
 inspect what triggers the step.
 
-### branchSelect
+### Skipped steps produce `null` on every output
+
+In an initial design, skipped steps produced a special internal object called
+a `skipNull`. The `skipNull` was introduced in order to inform downstream 
+sinks that this value comes from a skipped step.
+
+When outputs from conditional steps converged on a sink, 
+a proposed operator called `branchSelect` was introduced, which
+handled these `skipNull` objects according to the desired pattern. After
+passing through `branchSelect` all the `skipNull` objects were removed
+leaving behind inputs that behaved as if the skipped steps never ran.
+If `branchSelect` was not used the `skipNull`s were converted to nulls
+with a warning.
+
+After a discussion initiated by @jmchilton it was decided to further
+simplify the concepts have skipped steps just produce `null`. Now we
+can now no longer distinguish between a `null` produced by a step that
+ran and a `null` produced by a skipped step. It was decided that if
+an important use case arose where it was absoluetly vital to be able
+to distinguish the sources of `null`, we would make additions to the
+specification to handle it.
+
+
+### pickValue
+
+The first disruptive concept introduced by conditionals is that a step
+can now NOT run. The scope of this disruption has been confined by
+mandating that a skipped step produce `null` values on its outputs,
+bringing the produced type into the universe of allowed CWL types.
+
+Perhaps even more disruptive than this first concept is the consideration
+that now a scalar sink can now recieve multiple inputs. 
+
+```
+outputs:
+  out1: 
+    type: string
+    outputSource:
+        - step0/out1
+        - step1/out1
+    pickValue: first_non_null
+```
+
+Our intention here is that only one of these two inputs (the one
+that ran) should be fed into `out1`. In order to confine and make this
+disruption tractable we have introduced the `pickValue` operator.
+This sits at the same level as the existing `linkMerge` operator and
+also operates on lists of inputs. Just like the `linkMerge` 
+operator can convert a list of lists into a single list, the `pickValue`
+operator can convert a list into a scalar by filtering out any `null`
+values in the list. Combining `when` and `pickValue` allows us to 
+describe the common conditional processing patterns, as listed in
+the [proposal](https://github.com/common-workflow-language/common-workflow-language/issues/854)
+
+
+### pickValue does not recurse into a list
+It was decided during a discussion ( [2019.10.05](https://docs.google.com/document/d/1Fd3KR2Nhl22yh_09V2PoFrTGsZGEkhs2qj_19Q4I9VQ/edit)) that
+the `pickValue` operator would only filter out nulls at the top level of the list.
+This serves the purpose of allowing `pickValue` to handle cases (as described above)
+where multiple inputs feed into a scalar port, while not creating any surprising
+changes within a list of lists, when, for example, two lists are combined in
+parallel. An example is given [here](https://github.com/kaushik-work/cwl-conditionals/blob/master/workflows/scatter-3.cwl)
+This principle of least surprise was first proposed by @pvanheus.
+
+In case a valid use case is later presented, an addition to the specification may
+be made, that can be used to require `pickValue` or some similar operator to
+recurse into nested lists.
+
+### pickValue is at the same level as linkMerge
+
+@jmchilton proposed at the Boston, October 2019, CWL mini-conference that the `pickValue` operator be placed beneath 
+the source operator. Looking like
+
+```
+outputs:
+  out1: 
+    type: string
+    outputSource:
+      first_non_null:
+        - step0/out1
+        - step1/out1
+```
+This syntax has a great virtue of being very obvious to read. It makes it very clear what is happening
+with the two inputs and how they are being fed into `out1`. @kaushik-work proposed, however, that
+it creates an in-congruence with the existing `linkMerge` operator. Also, during the meeting of
+2019.10.05, it was formally decided that
+a) the `linkMerge` operator would operate first and
+b) `pickValue` would not recurse into the lists
+
+This makes this proposed syntax mis-leading, since it suggests that `first_non_null` operates before
+`linkMerge`.
+
+For these reason it was decided to have the `pickValue` operator sit at the same level as `linkMerge`
+to emphasize the kinship between these two operators.
+
+
+### Commentary on `null`
 
 The major complexity introduced by conditionals (in any language
 framework) is that now a variable that was going to be consumed by a downstream
@@ -125,18 +241,16 @@ is a code path where that happens, leading to bad things.
 
 In a CWL workflow where type safety is a high priority the first guard against
 the equivalent of an undefined variable is that all outputs of a skipped step
-that are otherwise not handled are converted to the CWL `null` type. 
-
-Therefore, static checkers should raise a type error if the sole source for a
-required input is the output from a conditional step.
+produce a CWL `null` type. Static checkers should, therefore, raise a type 
+error if the sole source for a required input is the output from a conditional step.
 
 A workflow developer will, in most cases, want to treat a skipped step not
 as a step that produced a `null` but rather as a step that never existed in
-the first place. `branchSelect` serves this purpose, helping the workflow
+the first place. `pickValue` serves this purpose, helping the workflow
 developer filter skipped inputs to a downstream sink while maintaining type
 consistency.
 
-For detailed use cases for each kind of `branchSelect` see the specification.
+For detailed use cases for each kind of `pickValue` see the specification.
 
 
 ### Why not introduce a new process object?
@@ -196,23 +310,6 @@ such safer constructs with the cost of more code.
 
 
 ## Future expansion
-
-### Smart inference of `branchSelect`
-In most cases the `branchSelect` value can be infered based on the 
-type of the sink port and the nature of the source steps. Because of this
-we can write some explicit rules for `branchSelect` inference
-
-Use `the_first_that_ran` when
-1. sink is of type `T` and all sources are of type `T` AND
-1. There is exactly one source which does not come from a conditional step
-
-Use `the_one_that_ran` when
-1. sink is of type `T` and all sources are of type `T` AND
-1. Every source comes from a conditonal step
-
-Use `all_that_ran` when
-1. sink is of type `[T]` and all sources are of type `T`
-
 
 ### More detailed validation warnings
 We can warn the user they may have an unintended pattern if
