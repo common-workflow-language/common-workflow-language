@@ -146,7 +146,7 @@ After a discussion initiated by @jmchilton it was decided to further
 simplify the concepts have skipped steps just produce `null`. Now we
 can now no longer distinguish between a `null` produced by a step that
 ran and a `null` produced by a skipped step. It was decided that if
-an important use case arose where it was absoluetly vital to be able
+an important use case arose where it was absolutely vital to be able
 to distinguish the sources of `null`, we would make additions to the
 specification to handle it.
 
@@ -159,7 +159,7 @@ mandating that a skipped step produce `null` values on its outputs,
 bringing the produced type into the universe of allowed CWL types.
 
 Perhaps even more disruptive than this first concept is the consideration
-that now a scalar sink can now recieve multiple inputs. 
+that now a scalar sink can now receive multiple inputs. 
 
 ```
 outputs:
