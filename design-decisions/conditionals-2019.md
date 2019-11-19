@@ -2,9 +2,19 @@
 
 ## Abstract
 
-This is a documentation of the decisions made in the design of conditionals outlined in 
+This is a documentation of the design and design decisions for conditionals as outlined in 
 [issue 854](https://github.com/common-workflow-language/common-workflow-language/issues/854)
-For the specification of the feature please see that issue and the CWL specifications document.
+
+![basic patterns](conditionals/conditional-patterns-1.png)
+
+The design adds a new field `when` to a `WorkflowStep`. This field is an expression that
+evaluates to `True` or `False`. Depending on this valeue the encolosed step is run or not.
+
+The design also adds a new field `pickValue` which operates after `linkMerge` and serves to
+filter out null values. While this can be used independently of the conditionals feature the
+`first_non_null` and `only_non_null` are intended for the specific case where a list of inputs
+- some coming from conditional steps - converge on a scalar input.
+
 
 ## Conditionals in the context of CWL
 
