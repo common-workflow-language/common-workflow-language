@@ -106,9 +106,6 @@ outputs:
         - step0/out1
         - step1/out1
     pickValue: first_non_null
-
-requirements: 
-  InlineJavascriptRequirement: {}
 ```
 
 The new syntax adds a single field to `WorkflowStep` (`when`) and a new 
@@ -260,8 +257,6 @@ the first place. `pickValue` serves this purpose, helping the workflow
 developer filter skipped inputs to a downstream sink while maintaining type
 consistency.
 
-For detailed use cases for each kind of `pickValue` see the specification.
-
 
 ### Why not introduce a new process object?
 
@@ -276,8 +271,8 @@ point of view
 1. Isolation of conditional variables to a separate process object
 2. Ability to implement `if-else` and `switch-default` patterns
 
-The first point is addressed by `branchSelect` and the fallback of filling
-undefined values with `null` if no `branchSelect` is supplied.
+The first point is addressed by converting outputs of a skipped step
+into the conventional CWL `null` type.
 
 The second point is an important factor in favor of a new process object and
 is further discussed below
@@ -286,12 +281,12 @@ is further discussed below
 
 In the current design the developer has to write an explicit expression that
 serves as an `else` or  `default` condition. While 
-`branchSelect: the_one_that_ran` allows a user to verify they get the correct 
+`pickValue: only_non_null` allows a user to verify they get the correct 
 behavior during execution, a developer has to be careful about the expressions 
 in these fall back conditions. 
 
-The `if-else` or `switch-case` construct can be implemented by using `runIf`
-in combination with `branchSelect: the_first_that_ran`. The drawback is that
+The `if-else` or `switch-case` construct can be implemented by using `when`
+in combination with `pickValue: first_non_null`. The drawback is that
 the `else` or `default` step will always run even if it's output is not used.
 
 On the one hand, this demands extra vigilance and work on the part of the 
@@ -319,21 +314,13 @@ cases are important we should add a Switch like construct which will allow
 such safer constructs with the cost of more code.
 
 
-## Future expansion
+## Future directions based on user feedback
 
-### More detailed validation warnings
-We can warn the user they may have an unintended pattern if
-1. User has `branchSelect: the_first_that_ran` and has sources
-   from un-conditional steps in the middle of the list
-1. User has `branchSelect: the_one_that_ran` and has one or
-   more sources from un-conditional steps
-
-
+### Handle `null` and `skipNull`
+In case a convincing use case is found where it is important to
+distinguish between `null` produced by a step that ran and one
+that was skipped, we will revisit this decision
 
 ### Provision for `if-else` and `switch-default` constructs
-As discussed before this adds cognitive burden for the user 
-and additional state tracking for the runner developer. 
-This feature may be added if there is substantial user feedback
-that the additional complexity on all fronts is important. The
-most user friendly path will probbaly be to resurrect the `Switch` statement proposal.
-
+If users find the lack of an `else` or `default` clause a big burden
+we will consider adding constructs that allow this.
