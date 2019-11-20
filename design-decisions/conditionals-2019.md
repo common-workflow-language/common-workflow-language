@@ -6,11 +6,13 @@ This is a documentation of the design and design decisions for conditionals as o
 [issue 854](https://github.com/common-workflow-language/common-workflow-language/issues/854)
 
 ![basic patterns](conditionals/conditional-patterns-1.png)
-
+![basic scatter](conditionals/conditional-patterns-2.png)
+![dual scatter nested](conditionals/conditional-patterns-3.png)
+![dual scatter flattened](conditionals/conditional-patterns-4.png)
 
 The design adds a new field `when` to a `WorkflowStep`. This field is an expression that
 evaluates to `True` or `False`. The executor runs the step if the value is `True`,
-skips it if `False`. A skipped step produces `null` values on all it's outputs.
+skips it if `False`. A skipped step produces `null` values on all its outputs.
 
 The design also adds a new `Sink` field `pickValue` which operates after `linkMerge` and serves to
 filter out null values. While this can be used independently of the conditionals feature the
@@ -139,6 +141,13 @@ makes it easy for Visual Programming editors and other tools to mark the step
 as conditional and show at least the conditional expression so an auditor can
 inspect what triggers the step.
 
+Variables available to the expression in `when` are a _superset_ of the variables
+available to the process enclosed in the step. In the example above, an input
+`a_new_var` is defined in the step `in` field. `a_new_var` does not exist in
+the interface for the enclosed tool `foo.cwl` but is allowed since it is
+consumed by the expression in the `when` field.
+
+
 ### Skipped steps produce `null` on every output
 
 In an initial design, skipped steps produced a special internal object called
@@ -192,6 +201,16 @@ operator can convert a list into a scalar by filtering out any `null`
 values in the list. Combining `when` and `pickValue` allows us to 
 describe the common conditional processing patterns, as listed in
 the [proposal](https://github.com/common-workflow-language/common-workflow-language/issues/854)
+
+### pickValue helps eliminate some issues with having no `else` or `default`
+The `pickValue` operator `only_non_null` declares to the executor that, of
+all the incident inputs to a scalar port, only one can have a non-`null` value.
+If more than one non-`null` is found the executor will raise an error. This
+alerts the user to cases where exclusive conditional expressions were intended
+but not achieved.
+
+This operator is, therefore, more strict than `first_non_null` which allows
+for there to be multiple non-`null` values in the list.
 
 
 ### pickValue does not recurse into a list
