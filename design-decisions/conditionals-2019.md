@@ -8,12 +8,13 @@ This is a documentation of the design and design decisions for conditionals as o
 ![basic patterns](conditionals/conditional-patterns-1.png)
 
 The design adds a new field `when` to a `WorkflowStep`. This field is an expression that
-evaluates to `True` or `False`. Depending on this valeue the encolosed step is run or not.
+evaluates to `True` or `False`. The executor runs the step if the value is `True`,
+skips it if `False`. A skipped step produces `null` values on all it's outputs.
 
-The design also adds a new field `pickValue` which operates after `linkMerge` and serves to
+The design also adds a new `Sink` field `pickValue` which operates after `linkMerge` and serves to
 filter out null values. While this can be used independently of the conditionals feature the
-`first_non_null` and `only_non_null` are intended for the specific case where a list of inputs
-- some coming from conditional steps - converge on a scalar input.
+`first_non_null` and `only_non_null` operators are intended for the specific case 
+where a list of inputs - some coming from conditional steps - converge on a scalar input.
 
 
 ## Conditionals in the context of CWL
