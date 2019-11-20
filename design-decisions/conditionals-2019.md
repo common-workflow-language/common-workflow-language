@@ -7,6 +7,7 @@ This is a documentation of the design and design decisions for conditionals as o
 
 ![basic patterns](conditionals/conditional-patterns-1.png)
 
+
 The design adds a new field `when` to a `WorkflowStep`. This field is an expression that
 evaluates to `True` or `False`. The executor runs the step if the value is `True`,
 skips it if `False`. A skipped step produces `null` values on all it's outputs.
@@ -16,6 +17,8 @@ filter out null values. While this can be used independently of the conditionals
 `first_non_null` and `only_non_null` operators are intended for the specific case 
 where a list of inputs - some coming from conditional steps - converge on a scalar input.
 
+### Order of operator application
+`linkMerge -> pickValue -> default -> valueFrom`
 
 ## Conditionals in the context of CWL
 
@@ -192,7 +195,7 @@ the [proposal](https://github.com/common-workflow-language/common-workflow-langu
 
 
 ### pickValue does not recurse into a list
-It was decided during a discussion ( [2019.10.05](https://docs.google.com/document/d/1Fd3KR2Nhl22yh_09V2PoFrTGsZGEkhs2qj_19Q4I9VQ/edit)) that
+It was decided during a discussion ( [2019.11.05](https://docs.google.com/document/d/1Fd3KR2Nhl22yh_09V2PoFrTGsZGEkhs2qj_19Q4I9VQ/edit)) that
 the `pickValue` operator would only filter out nulls at the top level of the list.
 This serves the purpose of allowing `pickValue` to handle cases (as described above)
 where multiple inputs feed into a scalar port, while not creating any surprising
@@ -221,7 +224,7 @@ outputs:
 This syntax has a great virtue of being very obvious to read. It makes it very clear what is happening
 with the two inputs and how they are being fed into `out1`. @kaushik-work proposed, however, that
 it creates an in-congruence with the existing `linkMerge` operator. Also, during the meeting of
-2019.10.05, it was formally decided that
+( [2019.11.05](https://docs.google.com/document/d/1Fd3KR2Nhl22yh_09V2PoFrTGsZGEkhs2qj_19Q4I9VQ/edit)), it was formally decided that
 a) the `linkMerge` operator would operate first and
 b) `pickValue` would not recurse into the lists
 
