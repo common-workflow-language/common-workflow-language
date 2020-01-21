@@ -1557,7 +1557,7 @@
   label: nameroot_nameext_generated
   id: 111
   doc: Test that nameroot and nameext are generated from basename at execution time by the runner
-  tags: [ step_input_expression, workflow ]
+  tags: [ step_input, workflow ]
 
 - job: v1.0/wc-job.json
   output: {}
