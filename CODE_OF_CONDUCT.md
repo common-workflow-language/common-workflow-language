@@ -56,7 +56,7 @@ Reporting
 
 If you are being harassed by a member of the CWL Project, notice that someone
 else is being harassed, or have any other concerns, please contact the CWL
-Leadership Team at leadership@commonwl.org. If person who is harassing
+Leadership Team at cwl-leadership@googlegroups.com. If person who is harassing
 you is on the team, they will recuse themselves from handling your incident. We
 will respond as promptly as we can.
 
@@ -65,7 +65,7 @@ harassed by a member of CWL Project outside our spaces, we still want to
 know about it. We will take all good-faith reports of harassment by CWL Project
 members, especially the CWL Leadership Team, seriously. This includes harassment
 outside our spaces and harassment that took place at any point in time. The
-abuse team reserves the right to exclude people from the CWL Project based on
+CWL leadership team reserves the right to exclude people from the CWL Project based on
 their past behavior, including behavior outside CWL Project spaces and
 behavior towards people who are not in the CWL Project.
 
@@ -98,11 +98,23 @@ created by the Geek Feminism community.
 CWL Leadership Team
 -------------------
 
-As a stop gap measure until a more formal governance structure is adopted, the
-following individuals make up the leadership of the CWL Project: Peter Amstutz,
-John Chilton, Michael R. Crusoe, and Nebojša Tijanić.
+The following individuals make up the leadership of the CWL Project (Alphabetical)
+
+- Peter Amstutz, Veritas Genetics / Arvados; https://orcid.org/0000-0003-3566-7705
+- John Chilton, Pennsylvania State University / Galaxy Project; https://orcid.org/0000-0002-6794-0756
+- Michael R. Crusoe, CWL Project Lead; https://orcid.org/0000-0002-2961-9670
+- Brandi Davis Dusenbery, Seven Bridges Genomics, Inc.; https://orcid.org/0000-0001-7811-8613
+- Jeff Gentry, Broad Institute; https://orcid.org/0000-0001-5351-8442
+- Hervé Ménager, Institut Pasteur; https://orcid.org/0000-0002-7552-1009
+- Stian Soiland-Reyes, University of Manchester; https://orcid.org/0000-0001-9842-9718
 
 To report an issue with anyone on the team you can escalate to Ward Vandewege
- (Curoverse) ward@curoverse.com, Anton Nekrutenko (Galaxy)
-anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu, or
-Brandi Davis-Dusenbery (Seven Bridges Genomics) brandi@sbgenomics.com.
+ (Veritas Genetics) wvandewege@veritasgenetics.com, Anton Nekrutenko (Galaxy)
+anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu,
+or to our legal sponsor, the Software Freedom Conservancy info@sfconservancy.org
+
+Additional Policies for the CWL Project @ Software Freedom Conservancy
+----------------------------------------------------------------------
+
+See https://sfconservancy.org/projects/policies/ for the "Conflict of interest policy"
+and "Travel and reimbursable expense policy".
