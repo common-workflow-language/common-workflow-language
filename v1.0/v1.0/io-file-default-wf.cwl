@@ -6,7 +6,7 @@ inputs:
     type: File
     default:
       class: File
-      path: whale.txt
+      location: whale.txt
 
 outputs:
   o:
