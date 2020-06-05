@@ -103,6 +103,6 @@ following individuals make up the leadership of the CWL Project: Peter Amstutz,
 John Chilton, Michael R. Crusoe, and Nebojša Tijanić.
 
 To report an issue with anyone on the team you can escalate to Ward Vandewege
- (Curoverse) ward@curoverse.com, Anton Nekrutenko (Galaxy)
+ (Curii) ward@curii.com, Anton Nekrutenko (Galaxy)
 anton AT bx DOT psu DOT edu, C. Titus Brown (UC Davis) ctbrown@ucdavis.edu, or
 Brandi Davis-Dusenbery (Seven Bridges Genomics) brandi@sbgenomics.com.
