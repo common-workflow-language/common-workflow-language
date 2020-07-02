@@ -1,8 +1,7 @@
 # Common workflow language conformance test suite
 
 The conformance tests are intended to test feature coverage of a CWL
-implementation.  It uses the module "cwltool.cwltest" from the cwltool
-reference implementation.
+implementation.  It uses the module "cwltest" from https://github.com/common-workflow-language/cwltest/
 
 ## Usage
 
@@ -22,19 +21,19 @@ RUNNER=other-cwl-runner
 
 The CWL implementation to be tested.
 
-DRAFT=draft-N
+EXTRA=--parallel
 
-The CWL draft to be tested.
+Extra options to pass to the CWL runner
 
 -nN
 
 Run a single specific test number N.
 
-For example, to run conformance test 15 of draft-2 against the "cwltool"
-reference implementation:
+For example, to run conformance test 15 against the "cwltool"
+reference implementation with `--parallel`:
 
 ```
-$ ./run_test.sh RUNNER=cwltool DRAFT=draft-2 -n15
+$ ./run_test.sh RUNNER=cwltool EXTRA=--parallel -n15
 Test [15/49]
 All tests passed
 ```
