@@ -1,7 +1,9 @@
-# Common workflow language conformance test suite
+# Common Workflow Language standards v1.0 conformance test suite
 
 The conformance tests are intended to test feature coverage of a CWL
-implementation.  It uses the module "cwltest" from https://github.com/common-workflow-language/cwltest/
+implementation.  It uses the Python module "cwltest" from https://github.com/common-workflow-language/cwltest/
+
+For CWL v1.1 conformance tests see: https://github.com/common-workflow-language/cwl-v1.1/blob/main/CONFORMANCE_TESTS.md and for CWL v1.2 conformance tests see: https://github.com/common-workflow-language/cwl-v1.2/blob/main/CONFORMANCE_TESTS.md
 
 ## Usage
 
