@@ -14,11 +14,6 @@ CWL v1.2.x: https://github.com/common-workflow-language/cwl-v1.2/
 
 [**Support**](#Support) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="Z55VS5LBBSZTJ">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" width="92" heigth="26" name="submit" alt="Donate to Common Workflow Language via PayPal">
-</form>
 
 <a href="https://www.youtube.com/watch?v=86eY8xs-Vo8"><img align="right"
 src="https://github.com/common-workflow-language/logo/raw/main/intro_video_screenshot_413x193.png"
@@ -31,7 +26,7 @@ meet the needs of data-intensive science, such as Bioinformatics, Medical
 Imaging, Astronomy, Physics, and Chemistry.
 
 <a href="https://open-stand.org/about-us/principles"><img align="left"
-src="https://standards.ieee.org/images/openstand/128x128-blue2.png" alt="Open Stand badge"></a>
+src="https://github.com/common-workflow-language/cwl-website/raw/main/openstand-128x128-blue.png" alt="Open Stand badge"></a>
 CWL is developed by a multi-vendor working group consisting of
 organizations and individuals aiming to enable scientists to share data
 analysis workflows.  [The CWL project is maintained on
