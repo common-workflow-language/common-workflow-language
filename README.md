@@ -6,6 +6,10 @@ Main website: https://www.commonwl.org
 GitHub repository for www.commonwl.org:
 https://www.github.com/common-workflow-language/cwl-website
 
+CWL v1.0.x: https://github.com/common-workflow-language/common-workflow-language (this repository)
+CWL v1.1.x: https://github.com/common-workflow-language/cwl-v1.1/
+CWL v1.2.x: https://github.com/common-workflow-language/cwl-v1.2/
+
 [**Support**](#Support) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/common-workflow-language/common-workflow-language.svg)](https://github.com/common-workflow-language/common-workflow-language/stargazers)
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -15,10 +19,10 @@ https://www.github.com/common-workflow-language/cwl-website
 </form>
 
 <a href="https://www.youtube.com/watch?v=86eY8xs-Vo8"><img align="right"
-src="https://github.com/common-workflow-language/logo/raw/master/intro_video_screenshot_413x193.png"
+src="https://github.com/common-workflow-language/logo/raw/main/intro_video_screenshot_413x193.png"
 alt="[Video] Common Workflow Language explained in 64 seconds"></a>
 The Common Workflow Language (CWL) is a specification for describing analysis
-workflows and tools in a way that makes them portable and scalable across a
+workflows and tools in a way that makes them portable and scalable across a\
 variety of software and hardware environments, from workstations to cluster,
 cloud, and high performance computing (HPC) environments.  CWL is designed to
 meet the needs of data-intensive science, such as Bioinformatics, Medical
@@ -49,12 +53,12 @@ descriptions.
 [CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP)
 is a 15 minute introduction to the CWL project in Japanese.
 
-## Specification
+[**CWL Recommended Practices**](http://www.commonwl.org/user_guide/rec-practices/)
 
-For developers and advanced users, the current
-[CWL specification (v1.1)](https://www.commonwl.org/v1.1/) (https://github.com/common-workflow-language/cwl-v1.1) provides
-authoritative documentation of the execution of CWL documents.  The previous version
-[CWL specification (v1.0.2)](https://www.commonwl.org/v1.0/) (https://github.com/common-workflow-language/common-workflow-language/tree/master/v1.0) is also available.
+[CWLの日本語での解説ドキュメント](https://github.com/pitagora-galaxy/cwl/wiki/CWL-Start-Guide-JP) is a 15 minute introduction to the
+CWL project in Japanese.
+
+A series of [video lessons about CWL](https://stepik.org/lesson/35918/step/1?unit=15070) is available in Russian as part of the [Управление вычислениями](https://stepik.org/course/1612/syllabus)(Computation Management) free online course.
 
 ### Citation
 
@@ -68,14 +72,13 @@ Nedeljkovich, Matt Scales, Stian Soiland-Reyes, Luka Stojanovic (2016):
 working group_. [https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
 doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156.v2)
 
-A collection of existing references to CWL can be found at http://www.citeulike.org/group/20713
+A collection of existing references to CWL can be found at [https://zotero.org/groups/cwl](https://www.zotero.org/groups/2294829/cwl/items)
 
 <a name="Support"></a>
 ## Support, Community and Contributing
 
-The recommended place to ask a question about all things CWL is on Biostars. After you have [read previous questions and answers](https://www.biostars.org/t/cwl/) you can [post your question using the 'cwl' tag](https://www.biostars.org/p/new/post/?tag_val=cwl)
-
-[![Biostars CWL](https://www.biostars.org/static/biostar2.logo.png)](https://www.biostars.org/t/cwl/)
+The recommended place to ask a question about all things CWL is on [the CWL Discourse Group](https://cwl.discourse.group/).
+Previously we used [biostars.org](https://www.biostars.org/t/cwl/) where you can still read older responses.
 
 If you are interested in learning more or contributing ideas or code,
 [come chat with us on Gitter](https://gitter.im/common-workflow-language/common-workflow-language),
@@ -83,6 +86,9 @@ check out [#CommonWL on Twitter](https://twitter.com/search?q=%23CommonWL),
 join the [mailing list common-workflow-language on Google Groups](https://groups.google.com/forum/#!forum/common-workflow-language) or
 [fork the repository](https://github.com/common-workflow-language/common-workflow-language)
 and send a pull request!
+
+Besides the web interface for the mailing list, one can also join by sending a blank email to
+common-workflow-language+subscribe@googlegroups.com and replying to the automated message.
 
 ### Code of Conduct
 
@@ -96,7 +102,7 @@ Anyone who violates this code of conduct may be sanctioned or expelled from
 these spaces at the discretion of the leadership team.
 
 For more details, see our [Code of
-Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/master/CODE_OF_CONDUCT.md).
+Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/main/CODE_OF_CONDUCT.md).
 
 For the following content:
  - CWL Implementations
@@ -112,4 +118,4 @@ For the following content:
  - CWL Advisors
  - CWL Leadership team
 
-Please see https://www.github.com/common-workflow-language/cwl-website/
+Please see https://github.com/common-workflow-language/cwl-website#readme
