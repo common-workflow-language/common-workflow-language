@@ -7,7 +7,9 @@ GitHub repository for www.commonwl.org:
 https://www.github.com/common-workflow-language/cwl-website
 
 CWL v1.0.x: https://github.com/common-workflow-language/common-workflow-language (this repository)
+
 CWL v1.1.x: https://github.com/common-workflow-language/cwl-v1.1/
+
 CWL v1.2.x: https://github.com/common-workflow-language/cwl-v1.2/
 
 [**Support**](#Support) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/common-workflow-language/common-workflow-language?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
