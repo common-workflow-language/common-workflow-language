@@ -435,6 +435,12 @@
   doc: Test workflow scatter with two empty scatter parameters and dotproduct join method
   tags: [ scatter, workflow ]
 
+- job: v1.0/scatter-job1.json
+  output:
+    out: ["foo one", "foo two", "foo three", "foo four"]
+  tool: v1.0/scatter-wf5.cwl
+  doc: Test workflow scatter with step out as array of objects
+
 - tool: v1.0/echo-tool.cwl
   job: v1.0/env-job.json
   output:
@@ -1023,6 +1029,12 @@
     Test support for reading cwl.output.json when running in a Docker container
     and just 'location' is provided.
   tags: [ shell_command, command_line_tool ]
+
+- job: v1.0/empty.json
+  output: {}
+  tool: v1.0/test-cwl-out-wf.cwl
+  doc: |
+    Test support for reading cwl.output.json in a workflow.
 
 - job: v1.0/abc.json
   output:
