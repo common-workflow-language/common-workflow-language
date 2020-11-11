@@ -1,9 +1,7 @@
 {
     "reference": {
         "class": "File",
-        "location": "chr20.fa",
-        "size": 123,
-        "checksum": "sha1$hash"
+        "location": "chr20.fa"
     },
     "reads": [
         {
