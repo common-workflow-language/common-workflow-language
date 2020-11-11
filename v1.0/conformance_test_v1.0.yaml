@@ -2590,3 +2590,76 @@
   doc: Test an anonymous enum inside an array inside a record, SchemaDefRequirement
   tags: [command_line_tool, schema_def]
 
+- tool: v1.0/loadContents-output-contains-b.cwl
+  job: v1.0/64kbplus1-job.json
+  should_fail: true
+  id: 198
+  label: ouptut_loadContents_fails_over_64kb
+  doc: Test loadContents on output binding fails over 64kb.
+  tags: [command_line_tool, inline_javascript]
+
+- tool: v1.0/loadContents-output-contains-b.cwl
+  job: v1.0/64kbminus1-job.json
+  output:
+    contains_b: true
+  id: 199
+  label: ouptut_loadContents_fails_over_64kb_control
+  doc: Test loadContents on output binding fails over 64kb (control for previous test)
+  tags: [command_line_tool, inline_javascript]
+
+- tool: v1.0/loadContents-input-contains-b-wf.cwl
+  job: v1.0/64kbplus1-job.json
+  should_fail: true
+  id: 200
+  label: step_input_loadContents_fails_over_64kb
+  doc: Test loadContents on step input fails over 64kb.
+  tags: [workflow, inline_javascript]
+
+- tool: v1.0/loadContents-input-contains-b-wf.cwl
+  job: v1.0/64kbminus1-job.json
+  output:
+    contains_b: true
+  id: 201
+  label: step_input_loadContents_fails_over_64kb_control
+  doc: Test loadContents on step input fails over 64kb (control for previous test)
+  tags: [workflow, inline_javascript]
+
+- tool: v1.0/file-literal-output-size.cwl
+  job: v1.0/size_64kb_plus_1.json
+  should_fail: true
+  id: 202
+  label: file_literal_size_fails_over_64kb
+  doc: Test file literals of size over 64kb fail.
+  tags: [ expression_tool ]
+
+- tool: v1.0/file-literal-output-size.cwl
+  job: v1.0/size_64kb.json
+  output:
+    lit:
+      class: File
+      checksum: "sha1$79db5888b5d38e10afbdbd14a19cd1caa9044c65"
+      size: 65536
+  id: 203
+  label: file_literal_size_fails_over_64kb_control
+  doc: Test file literals of size over 64kb fail (control for previous test)
+  tags: [ expression_tool ]
+
+- tool: v1.0/cat-default-file-literal-64kb-plus-1.cwl
+  job: v1.0/empty.json
+  should_fail: true
+  id: 204
+  label: file_literal_as_default_size_fails_over_64kb
+  doc: Test file literals as tool defaults of size over 64kb fail (control for previous test)
+  tags: [ command_line_tool ]
+
+- tool: v1.0/cat-default-file-literal-64kb.cwl
+  job: v1.0/empty.json
+  output:
+    output:
+      class: File
+      checksum: "sha1$79db5888b5d38e10afbdbd14a19cd1caa9044c65"
+      size: 65536
+  id: 205
+  label: file_literal_as_default_size_fails_over_64kb_control
+  doc: Test file literals as tool defaults of size over 64kb fail (control for previous test)
+  tags: [ command_line_tool ]
