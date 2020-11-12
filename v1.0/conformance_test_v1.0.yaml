@@ -863,7 +863,7 @@
   label: metadata
   id: 63
   doc: Test metadata
-  tags: [ required ]
+  tags: [ required, command_line_tool ]
 
 - job: v1.0/formattest-job.json
   output:
@@ -1871,7 +1871,7 @@
        checksum: "sha1$7d5ca8c0c03e883c56c4eb1ef6f6bb9bccad4d86"
        size: 8
   tool: v1.0/envvar3.cwl
-  label: env_home_tmpdir_docker
+  label: env_home_tmpdir_docker_complex
   id: 133
   doc: Test $HOME and $TMPDIR are set correctly in Docker without using return code
   tags: [ shell_command, command_line_tool ]
