@@ -7,6 +7,6 @@ cwlVersion: v1.0
 inputs: []
 
 outputs:
-  output: Any
+  output: Any?
 
 expression: "$({'output': null })"
