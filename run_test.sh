@@ -11,8 +11,10 @@ Syntax:
                        [EXTRA=--optional-arguments-to-cwl-runner]
 
 Options:
-  -ntest_range          Run a specific test(s) (format 1,2-4,7)
-  -Ntest_range          Exclude a specific test(s) (format 1,2-4,7)
+  -ntest_range          Run specific test(s) by number (format "1,2-4,7")
+  -Ntest_range          Exclude specific test(s) by number (format "1,2-4,7")
+  -stest_names          Run specific test(s) by name (format "test_a,test_b")
+  -Stest_names          Exclude specific test(s) by name (format "test_a,test_b")
   -l                    List tests
   -jJ                   Specifies the number of tests to run simultaneously
                         (defaults to one).
@@ -37,6 +39,8 @@ EOF
 DRAFT=v1.0
 TEST_n=""
 TEST_N=""
+TEST_s=""
+TEST_S=""
 JUNIT_XML=""
 RUNNER=cwl-runner
 PLATFORM=$(uname -s)
@@ -62,6 +66,12 @@ do
             ;;
 	-N*)
 	    TEST_N=$arg
+	    ;;
+        -s*)
+            TEST_s=$arg
+            ;;
+	-S*)
+	    TEST_S=$arg
 	    ;;
         -j*)
             TEST_J=$arg
@@ -140,7 +150,8 @@ runtest() {
     runs=$((runs+1))
     (cd "$DRAFT_DIR" || exit 1
      COMMAND="cwltest --tool $1 \
-	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_n} ${TEST_N} \
+	     --test=conformance_test_${DRAFT}.yaml ${CLASS} \
+	     ${TEST_n} ${TEST_N} ${TEST_s} ${TEST_S} \
 	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
 	     --basedir ${DRAFT_DIR} ${BADGE} ${TAGS} -- ${EXTRA}"
      if [ "$VERBOSE" = "--verbose" ]; then echo "${COMMAND}"; fi
