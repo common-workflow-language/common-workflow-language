@@ -59,8 +59,17 @@ A series of [video lessons about CWL](https://stepik.org/lesson/35918/step/1?uni
 
 ### Citation
 
-To reference the CWL standards in a scholary work, please use the following
-citation inclusive of the DOI:
+To reference the CWL project in a scholary work, please use the following
+citation:
+
+Michael R. Crusoe, Sanne Abeln, Alexandru Iosup, Peter Amstutz, John Chilton,
+Nebojša Tijanić, Hervé Ménager, Stian Soiland-Reyes, Carole Goble,
+The CWL Community (2021): **Methods Included: Standardizing Computational Reuse
+and Portability with the Common Workflow Language**. arXiv 2105.07028 [cs.DC]
+https://arxiv.org/abs/2105.07028
+
+To cite version 1.0 of the CWL standards specifically, please use the following
+citation inclusive of the DOI.
 
 Peter Amstutz, Michael R. Crusoe, Nebojša Tijanić (editors), Brad Chapman, John
 Chilton, Michael Heuer, Andrey Kartashov, Dan Leehr, Hervé Ménager, Maya

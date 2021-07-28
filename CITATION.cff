@@ -1,53 +1,107 @@
+# Are you editing this file?
+# Synchronize any changes made with
+# README.md
+# and
+# https://github.com/common-workflow-language/user_guide/blob/gh-pages/CITATION
+
 cff-version: "1.1.0"
-message: "To reference the Common Workflow Language standards and the CWL project in scholarly work, please cite the following work"
+message: |
+  To reference the CWL project in scholarly work, please cite the following work.
+  To reference a particular version of the CWL standards, please see the entries
+  under "references"
 title: "Methods Included: Standardizing Computational Reuse and Portability with the Common Workflow Language"
-abstract: "A widely used standard for portable multilingual data analysis pipelines would enable considerable benefits to scholarly publication reuse, research/industry collaboration, regulatory cost control, and to the environment. Published research that used multiple computer languages for their analysis pipelines would include a complete and reusable description of that analysis that is runnable on a diverse set of computing environments. Researchers would be able to easier collaborate and reuse these pipelines, adding or exchanging components regardless of programming language used; collaborations with and within the industry would be easier; approval of new medical interventions that rely on such pipelines would be faster. Time will be saved and environmental impact would also be reduced, as these descriptions contain enough information for advanced optimization without user intervention. Workflows are widely used in data analysis pipelines, enabling innovation and decision-making for the modern society. In many domains the analysis components are numerous and written in multiple different computer languages by third parties. However, lacking a standard for reusable and portable multilingual workflows, then reusing published multilingual workflows, collaborating on open problems, and optimizing their execution would be severely hampered. Moreover, only a standard for multilingual data analysis pipelines that was widely used would enable considerable benefits to research-industry collaboration, regulatory cost control, and to preserving the environment. Prior to the start of the CWL project, there was no standard for describing multilingual analysis pipelines in a portable and reusable manner. Even today / currently, although there exist hundreds of single-vendor and other single-source systems that run workflows, none is a general, community-driven, and consensus-built standard."
 identifiers: 
   - type: url
-      value: "https://arxiv.org/abs/2105.07028"
+    value: "https://arxiv.org/abs/2105.07028"
+abstract: "A widely used standard for portable multilingual data analysis pipelines would enable considerable benefits to scholarly publication reuse, research/industry collaboration, regulatory cost control, and to the environment. Published research that used multiple computer languages for their analysis pipelines would include a complete and reusable description of that analysis that is runnable on a diverse set of computing environments. Researchers would be able to easier collaborate and reuse these pipelines, adding or exchanging components regardless of programming language used; collaborations with and within the industry would be easier; approval of new medical interventions that rely on such pipelines would be faster. Time will be saved and environmental impact would also be reduced, as these descriptions contain enough information for advanced optimization without user intervention. Workflows are widely used in data analysis pipelines, enabling innovation and decision-making for the modern society. In many domains the analysis components are numerous and written in multiple different computer languages by third parties. However, lacking a standard for reusable and portable multilingual workflows, then reusing published multilingual workflows, collaborating on open problems, and optimizing their execution would be severely hampered. Moreover, only a standard for multilingual data analysis pipelines that was widely used would enable considerable benefits to research-industry collaboration, regulatory cost control, and to preserving the environment. Prior to the start of the CWL project, there was no standard for describing multilingual analysis pipelines in a portable and reusable manner. Even today / currently, although there exist hundreds of single-vendor and other single-source systems that run workflows, none is a general, community-driven, and consensus-built standard."
 authors: 
-  -
-    affiliation: "VU Amsterdam, Department of Computer Science; Software Freedom Conservancy, Common Workflow Language project"
+  - given-names: "Michael R."
     family-names: Crusoe
-    given-names: "Michael R."
+    affiliation: "VU Amsterdam, Department of Computer Science; Software Freedom Conservancy, Common Workflow Language project"
     orcid: "https://orcid.org/0000-0002-2961-9670"
-  -
-    affiliation: "VU Amsterdam, Department of Computer Science"
+  - given-names: Sanne
     family-names: Abeln
-    given-names: Sanne
-    orcid: "https://orcid.org/0000-0002-2779-7174"
-  -
     affiliation: "VU Amsterdam, Department of Computer Science"
+    orcid: "https://orcid.org/0000-0002-2779-7174"
+  - given-names: Alexandru
     family-names: Iosup
-    given-names: Alexandru
+    affiliation: "VU Amsterdam, Department of Computer Science"
     orcid: "https://orcid.org/0000-0001-8030-9398"
-  -
-    affiliation: "Curii Corporation"
+  - given-names: Peter
     family-names: Amstutz
-    given-names: Peter
+    affiliation: "Curii Corporation"
     orcid: "https://orcid.org/0000-0003-3566-7705"
-  -
-    affiliation: "Pennsylvania State University, Department of Biochemistry and Molecular Biology; Galaxy Project"
+  - given-names: John
     family-names: Chilton
-    given-names: John
+    affiliation: "Pennsylvania State University, Department of Biochemistry and Molecular Biology; Galaxy Project"
     orcid: "https://orcid.org/0000-0002-6794-0756"
-  -
-    affiliation: Totient
+  - given-names: "Nebojša"
     family-names: "Tijanić"
-    given-names: "Nebojša"
+    affiliation: Totient
     orcid: "https://orcid.org/0000-0001-8316-4067"
-  -
-    affiliation: "Institut Pasteur"
+  - given-names: "Hervé"
     family-names: "Ménager"
-    given-names: "Hervé"
+    affiliation: "Institut Pasteur"
     orcid: "https://orcid.org/0000-0002-7552-1009"
-  -
-    affiliation: "The University of Manchester, Department of Computer Science; Informatics Institute, University of Amsterdam"
+  - given-names: Stian
     family-names: "Soiland-Reyes"
-    given-names: Stian
+    affiliation: "The University of Manchester, Department of Computer Science; Informatics Institute, University of Amsterdam"
     orcid: "https://orcid.org/0000-0001-9842-9718"
-  -
-    affiliation: "The University of Manchester, Department of Computer Science"
+  - given-names: Carole
     family-names: Goble
-    given-names: Carole
+    affiliation: "The University of Manchester, Department of Computer Science"
     orcid: "https://orcid.org/0000-0003-1219-2137"
+  - name: "The CWL Community"
+    website: "https://www.commonwl.org"
+references:
+  - type: standard
+    title: "Common Workflow Language, v1.0"
+    doi: 10.6084/m9.figshare.3115156.v2
+    date-published: 2016-07-08
+    license: Apache-2.0
+    url: "https://w3id.org/cwl/v1.0/"
+    repository-code: "https://github.com/common-workflow-language/common-workflow-language/"
+    authors:
+     - given-names: Peter
+       family-names: Amstutz
+       orcid: "https://orcid.org/0000-0003-3566-7705"
+       affiliation: "Arvados Project, Veritas Genetics"
+     - given-names: "Michael R."
+       family-names: Crusoe
+       orcid: "https://orcid.org/0000-0002-2961-9670"
+     - given-names: Nebojša
+       family-namess: Tijanić
+       orcid: "https://orcid.org/0000-0001-8316-4067"
+       affiliation: "Seven Bridges Genomics, Inc."
+  - type: standard
+    title: "Common Workflow Language, v1.1"
+    date-published: 2019-06-06
+    license: Apache-2.0
+    url: "https://w3id.org/cwl/v1.1/"
+    repository-code: "https://github.com/common-workflow-language/cwl-v1.1/"
+    authors:
+     - given-names: Peter
+       family-names: Amstutz
+       affiliation: "Curii Corporation / Arvados"
+       orcid: "https://orcid.org/0000-0003-3566-7705"
+     - given-names: "Michael R."
+       family-names: Crusoe
+       orcid: "https://orcid.org/0000-0002-2961-9670"
+  - type: standard
+    title: "Common Workflow Language, v1.2"
+    date-published: 2020-08-07
+    license: Apache-2.0
+    url: "https://w3id.org/cwl/v1.2/"
+    repository-code: "https://github.com/common-workflow-language/cwl-v1.2/"
+    authors:
+     - given-names: Peter
+       family-names: Amstutz
+       affiliation: "Curii Corporation / Arvados"
+       orcid: "https://orcid.org/0000-0003-3566-7705"
+     - given-names: "Michael R."
+       family-names: Crusoe
+       orcid: "https://orcid.org/0000-0002-2961-9670"
+     - given-names: Kaushik
+       family-names: Ghose
+       orcid: "https://orcid.org/0000-0003-2933-1260"
+       affiliation: "Seven Bridges Genomics, Inc."
