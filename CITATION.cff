@@ -70,7 +70,7 @@ references:
        family-names: Crusoe
        orcid: "https://orcid.org/0000-0002-2961-9670"
      - given-names: Nebojša
-       family-namess: Tijanić
+       family-names: Tijanić
        orcid: "https://orcid.org/0000-0001-8316-4067"
        affiliation: "Seven Bridges Genomics, Inc."
   - type: standard
