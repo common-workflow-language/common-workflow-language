@@ -307,16 +307,20 @@ requirement `InlineJavascriptRequirement`.  Expressions may be used in any
 field permitting the pseudo-type `Expression`, as specified by this
 document.
 
-Expressions are denoted by the syntax `$(...)` or `${...}`.  A code
-fragment wrapped in the `$(...)` syntax must be evaluated as a
-[ECMAScript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).  A
-code fragment wrapped in the `${...}` syntax must be evaluated as a
-[EMACScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
-for an anonymous, zero-argument function.  Expressions must return a valid JSON
-data type: one of null, string, number, boolean, array, object.
-Implementations must permit any syntactically valid Javascript and account
-for nesting of parenthesis or braces and that strings that may contain
-parenthesis or braces when scanning for expressions.
+Expressions are denoted by the syntax `$(...)` or `${...}`.
+
+A code fragment wrapped in the `$(...)` syntax must be evaluated as a
+[ECMAScript expression](http://www.ecma-international.org/ecma-262/5.1/#sec-11).
+
+A code fragment wrapped in the `${...}` syntax must be evaluated as a
+[ECMAScript function body](http://www.ecma-international.org/ecma-262/5.1/#sec-13)
+for an anonymous, zero-argument function.  This means the code will be
+evaluated as `(function() { ... })()`.
+
+Expressions must return a valid JSON data type: one of null, string, number,
+boolean, array, object.  Implementations must permit any syntactically valid
+Javascript and account for nesting of parenthesis or braces and that strings
+that may contain parenthesis or braces when scanning for expressions.
 
 The runtime must include any code defined in the ["expressionLib" field of
 InlineJavascriptRequirement](#InlineJavascriptRequirement) prior to
