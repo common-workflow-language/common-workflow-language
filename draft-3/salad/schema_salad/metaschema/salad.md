@@ -2,7 +2,7 @@
 
 Author:
 
-* Peter Amstutz <peter.amstutz@curoverse.com>, Curoverse
+* Peter Amstutz, Curoverse (now <peter.amstutz@curii.com>)
 
 Contributors:
 
