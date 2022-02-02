@@ -2,7 +2,7 @@
 
 name: Common Workflow Language
 icon: https://raw.githubusercontent.com/common-workflow-language/media/main/CWL-Logo-nofonts.svg
-headline: 
+headline: Interoperable workflow execution of containerized command line tools
 description: |
   The Common Workflow Language (CWL) is an open standard for describing analysis workflows and tools 
   in a way that makes them portable and scalable across a variety of software and hardware environments, 
