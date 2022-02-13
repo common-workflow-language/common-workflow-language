@@ -9,7 +9,7 @@
 ## Summary
 
 ### Tool description
-CTD reflects the perspective of a tool author targetting the KNIME processing unit approach ("nodes"), whereas 
+CTD reflects the perspective of a tool author targeting the KNIME processing unit approach ("nodes"), whereas 
 Galaxy reflects the perspective of a platform centered around non-developer users interacting with a graphical interface.
 
 ### Parameters description
@@ -42,7 +42,7 @@ All of the specifications include a flexible set of possibilities for the genera
 
 ### Parameter level 
 
-**Important remark** The structure of the CTD file is slightly different, because it explicitely allows the definition of "sub-tools" through a nested structure of NODE/ITEM elements. A node is a subgroup of parameters, and ITEM is a parameter.
+**Important remark** The structure of the CTD file is slightly different, because it explicitly allows the definition of "sub-tools" through a nested structure of NODE/ITEM elements. A node is a subgroup of parameters, and ITEM is a parameter.
 Therefore, to focus on Parameter-level information, we consider only the ITEM element here for parameter description in CTD.
 
 |Galaxy information   |Optional   |CTD information   |Optional  |CWL information   |Optional   |
