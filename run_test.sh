@@ -126,7 +126,9 @@ fi
 
 DRAFT_DIR="$(cd "$(dirname "$0")"; pwd)/${DRAFT}"
 
-if ! runner="$(command -v $RUNNER)" ; then
+if [ -n "${TEST_L}" ]; then
+    runner=$RUNNER    
+elif ! runner="$(command -v $RUNNER)" ; then
     echo >&2 "$helpmessage"
     echo >&2
     echo >&2 "runner '$RUNNER' not found"
@@ -143,9 +145,12 @@ checkexit() {
 }
 
 runtest() {
-    echo "--- Running conformance test $DRAFT on $1 ---"
 
-    "$1" --version
+    if [ -z "${TEST_L}" ]; then
+        echo "--- Running CWL Conformance Tests $DRAFT on $1 ---"
+
+        "$1" --version
+    fi
 
     runs=$((runs+1))
     (cd "$DRAFT_DIR" || exit 1
