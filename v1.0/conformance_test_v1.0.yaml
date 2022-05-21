@@ -630,7 +630,7 @@
     Test InitialWorkDirRequirement linking input files and capturing secondaryFiles
     on input and output. Also tests the use of a variety of parameter references
     and expressions in the secondaryFiles field.
-  tags: [ initial_work_dir, inline_javascript, command_line_tool ]
+  tags: [ initial_work_dir, inline_javascript, workflow ]
 
 - job: v1.0/rename-job.json
   output:
