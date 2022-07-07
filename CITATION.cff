@@ -2,7 +2,7 @@
 # Synchronize any changes made with
 # README.md
 # and
-# https://github.com/common-workflow-language/user_guide/blob/gh-pages/CITATION
+# https://github.com/common-workflow-language/user_guide/blob/main/CITATION
 
 cff-version: "1.1.0"
 message: |
@@ -11,8 +11,8 @@ message: |
   under "references"
 title: "Methods Included: Standardizing Computational Reuse and Portability with the Common Workflow Language"
 identifiers: 
-  - type: url
-    value: "https://arxiv.org/abs/2105.07028"
+  - type: doi
+    value: 10.1145/3486897
 abstract: "A widely used standard for portable multilingual data analysis pipelines would enable considerable benefits to scholarly publication reuse, research/industry collaboration, regulatory cost control, and to the environment. Published research that used multiple computer languages for their analysis pipelines would include a complete and reusable description of that analysis that is runnable on a diverse set of computing environments. Researchers would be able to easier collaborate and reuse these pipelines, adding or exchanging components regardless of programming language used; collaborations with and within the industry would be easier; approval of new medical interventions that rely on such pipelines would be faster. Time will be saved and environmental impact would also be reduced, as these descriptions contain enough information for advanced optimization without user intervention. Workflows are widely used in data analysis pipelines, enabling innovation and decision-making for the modern society. In many domains the analysis components are numerous and written in multiple different computer languages by third parties. However, lacking a standard for reusable and portable multilingual workflows, then reusing published multilingual workflows, collaborating on open problems, and optimizing their execution would be severely hampered. Moreover, only a standard for multilingual data analysis pipelines that was widely used would enable considerable benefits to research-industry collaboration, regulatory cost control, and to preserving the environment. Prior to the start of the CWL project, there was no standard for describing multilingual analysis pipelines in a portable and reusable manner. Even today / currently, although there exist hundreds of single-vendor and other single-source systems that run workflows, none is a general, community-driven, and consensus-built standard."
 authors: 
   - given-names: "Michael R."
