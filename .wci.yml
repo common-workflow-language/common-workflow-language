@@ -1,0 +1,50 @@
+# Metadata for https://workflows.community/systems/common-workflow-language/
+
+name: Common Workflow Language
+icon: https://raw.githubusercontent.com/common-workflow-language/media/main/CWL-Logo-nofonts.svg
+headline: Interoperable workflow execution of containerized command line tools
+description: |
+  The Common Workflow Language (CWL) is an open standard for describing analysis workflows and tools 
+  in a way that makes them portable and scalable across a variety of software and hardware environments, 
+  from workstations to cluster, cloud, and high performance computing (HPC) environments. 
+  CWL is designed to meet the needs of data-intensive science, such as Bioinformatics, Medical Imaging, 
+  Astronomy, High Energy Physics, and Machine Learning.
+  
+  Multiple engines implements the CWL standard, making the workflows executable and interoperable with minimal or no changes.
+
+language: YAML
+
+release: 
+  version: 1.2.0
+  date: 2020-08-07
+  url: https://www.commonwl.org/v1.2/
+
+documentation:
+  general: https://www.commonwl.org/
+  installation: https://www.commonwl.org/#implementations
+  tutorial: https://www.commonwl.org/user_guide/
+
+social:
+  twitter: commonwl
+
+execution_environment:
+  interfaces:
+    - Command Line
+    - Web
+    - REST APIs    
+  resource_managers:
+    - Local
+    - AWS
+    - GCP
+    - Azure
+    - Slurm
+    - Google Cloud
+    - Grid Engine
+    - HTCondor
+    - LSF
+    - Mesos
+    - OpenStack
+    - PBS/Torque
+    - Kubernetes
+    - Singularity
+    - Occam

@@ -11,7 +11,10 @@ Syntax:
                        [EXTRA=--optional-arguments-to-cwl-runner]
 
 Options:
-  -nT                   Run a specific test.
+  -ntest_range          Run specific test(s) by number (format "1,2-4,7")
+  -Ntest_range          Exclude specific test(s) by number (format "1,2-4,7")
+  -stest_names          Run specific test(s) by name (format "test_a,test_b")
+  -Stest_names          Exclude specific test(s) by name (format "test_a,test_b")
   -l                    List tests
   -jJ                   Specifies the number of tests to run simultaneously
                         (defaults to one).
@@ -34,7 +37,10 @@ Note:
 EOF
 
 DRAFT=v1.0
+TEST_n=""
 TEST_N=""
+TEST_s=""
+TEST_S=""
 JUNIT_XML=""
 RUNNER=cwl-runner
 PLATFORM=$(uname -s)
@@ -56,8 +62,17 @@ do
             exit 1
             ;;
         -n*)
-            TEST_N=$arg
+            TEST_n=$arg
             ;;
+	-N*)
+	    TEST_N=$arg
+	    ;;
+        -s*)
+            TEST_s=$arg
+            ;;
+	-S*)
+	    TEST_S=$arg
+	    ;;
         -j*)
             TEST_J=$arg
             ;;
@@ -111,7 +126,9 @@ fi
 
 DRAFT_DIR="$(cd "$(dirname "$0")"; pwd)/${DRAFT}"
 
-if ! runner="$(command -v $RUNNER)" ; then
+if [ -n "${TEST_L}" ]; then
+    runner=$RUNNER    
+elif ! runner="$(command -v $RUNNER)" ; then
     echo >&2 "$helpmessage"
     echo >&2
     echo >&2 "runner '$RUNNER' not found"
@@ -128,14 +145,18 @@ checkexit() {
 }
 
 runtest() {
-    echo "--- Running conformance test $DRAFT on $1 ---"
 
-    "$1" --version
+    if [ -z "${TEST_L}" ]; then
+        echo "--- Running CWL Conformance Tests $DRAFT on $1 ---"
+
+        "$1" --version
+    fi
 
     runs=$((runs+1))
     (cd "$DRAFT_DIR" || exit 1
      COMMAND="cwltest --tool $1 \
-	     --test=conformance_test_${DRAFT}.yaml ${CLASS} ${TEST_N} \
+	     --test=conformance_test_${DRAFT}.yaml ${CLASS} \
+	     ${TEST_n} ${TEST_N} ${TEST_s} ${TEST_S} \
 	     ${VERBOSE} ${TEST_L} ${TEST_J} ${ONLY_TOOLS} ${JUNIT_XML} ${TIMEOUT} \
 	     --basedir ${DRAFT_DIR} ${BADGE} ${TAGS} -- ${EXTRA}"
      if [ "$VERBOSE" = "--verbose" ]; then echo "${COMMAND}"; fi
