@@ -690,7 +690,11 @@ $graph:
         into a concrete form for execution, such as command line parameters.
 
     - name: default
-      type: Any?
+      type:
+        - "null"
+        - File
+        - Directory
+        - Any
       jsonldPredicate:
         _id: cwl:default
         noLinkCheck: true
@@ -824,7 +828,10 @@ $graph:
         error and the implementation must not attempt to run the process,
         unless overridden at user option.
     - name: hints
-      type: Any[]?
+      type:
+        - "null"
+        - type: array
+          items: [ProcessRequirement, Any]
       doc: |
         Declares hints applying to either the runtime environment or the
         workflow engine that may be helpful in executing this process.  It is
