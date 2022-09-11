@@ -277,7 +277,7 @@ $graph:
       jsonldPredicate: "@id"
       doc: "A unique identifier for this workflow input parameter."
     - name: default
-      type: ["null", Any]
+      type: ["null", File, Directory, Any]
       doc: |
         The default value for this parameter to use if either there is no
         `source` field, or the value produced by the `source` is `null`.  The
@@ -305,7 +305,7 @@ $graph:
         1. `null` if there is no `source` field
         2. the value of the parameter(s) specified in the `source` field when this
         workflow input parameter **is not** specified in this workflow step's `scatter` field.
-        3. an element of the parameter specified in the `source` field when this workflow input 
+        3. an element of the parameter specified in the `source` field when this workflow input
         parameter **is** specified in this workflow step's `scatter` field.
 
         The value of `inputs` in the parameter reference or expression must be
