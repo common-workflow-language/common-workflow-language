@@ -2,7 +2,7 @@
 # Synchronize any changes made with
 # README.md
 # and
-# https://github.com/common-workflow-language/user_guide/blob/main/CITATION
+# https://github.com/common-workflow-language/user_guide/blob/main/CITATION.md
 
 cff-version: "1.1.0"
 message: |
