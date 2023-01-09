@@ -63,10 +63,10 @@ To reference the CWL project in a scholary work, please use the following
 citation:
 
 Michael R. Crusoe, Sanne Abeln, Alexandru Iosup, Peter Amstutz, John Chilton,
-Nebojša Tijanić, Hervé Ménager, Stian Soiland-Reyes, Carole Goble,
-The CWL Community (2021): **Methods Included: Standardizing Computational Reuse
-and Portability with the Common Workflow Language**. arXiv 2105.07028 [cs.DC]
-https://arxiv.org/abs/2105.07028
+Nebojša Tijanić, Hervé Ménager, Stian Soiland-Reyes, Bogdan Gavrilović,
+Carole Goble, and The CWL Community. (2022): **[Methods Included: Standardizing Computational Reuse
+and Portability with the Common Workflow Language](https://cacm.acm.org/magazines/2022/6/261172-methods-included/fulltext)**.
+Commun. ACM 65, 6 (June 2022), 54–63. https://doi.org/10.1145/3486897
 
 To cite version 1.0 of the CWL standards specifically, please use the following
 citation inclusive of the DOI.
@@ -79,22 +79,6 @@ working group_. [https://w3id.org/cwl/v1.0/](https://w3id.org/cwl/v1.0/)
 doi:[10.6084/m9.figshare.3115156.v2](https://doi.org/10.6084/m9.figshare.3115156.v2)
 
 A collection of existing references to CWL can be found at [https://zotero.org/groups/cwl](https://www.zotero.org/groups/2294829/cwl/items)
-
-<a name="Support"></a>
-## Support, Community and Contributing
-
-The recommended place to ask a question about all things CWL is on [the CWL Discourse Group](https://cwl.discourse.group/).
-Previously we used [biostars.org](https://www.biostars.org/t/cwl/) where you can still read older responses.
-
-If you are interested in learning more or contributing ideas or code,
-[come chat with us on Gitter](https://gitter.im/common-workflow-language/common-workflow-language),
-check out [#CommonWL on Twitter](https://twitter.com/search?q=%23CommonWL),
-join the [mailing list common-workflow-language on Google Groups](https://groups.google.com/forum/#!forum/common-workflow-language) or
-[fork the repository](https://github.com/common-workflow-language/common-workflow-language)
-and send a pull request!
-
-Besides the web interface for the mailing list, one can also join by sending a blank email to
-common-workflow-language+subscribe@googlegroups.com and replying to the automated message.
 
 ### Code of Conduct
 
@@ -110,7 +94,9 @@ these spaces at the discretion of the leadership team.
 For more details, see our [Code of
 Conduct](https://github.com/common-workflow-language/common-workflow-language/blob/main/CODE_OF_CONDUCT.md).
 
+<a name="Support"></a>
 For the following content:
+ - Support, Community and Contributing
  - CWL Implementations
  - Repositories of CWL Tools and Workflows
  - Software for working with CWL
@@ -124,4 +110,4 @@ For the following content:
  - CWL Advisors
  - CWL Leadership team
 
-Please see https://github.com/common-workflow-language/cwl-website#readme
+Please see <https://www.commonwl.org>
