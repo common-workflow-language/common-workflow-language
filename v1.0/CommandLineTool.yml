@@ -193,12 +193,14 @@ $graph:
   fields:
     - name: position
       type: int?
+      default: 0
       doc: "The sorting key.  Default position is 0."
     - name: prefix
       type: string?
       doc: "Command line prefix to add before the value."
     - name: separate
       type: boolean?
+      default: true
       doc: |
         If true (default), then the prefix and value must be added as separate
         command line arguments; if false, prefix and value must be concatenated
@@ -231,6 +233,7 @@ $graph:
 
     - name: shellQuote
       type: boolean?
+      default: true
       doc: |
         If `ShellCommandRequirement` is in the requirements for the current command,
         this controls whether the value is quoted on the command line (default is true).
@@ -753,6 +756,7 @@ $graph:
         compatible.
     - name: specs
       type: string[]?
+      jsonldPredicate: {_type: "@id", noLinkCheck: true}
       doc: |
         One or more [IRI](https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier)s
         identifying resources for installing or enabling the software named in
@@ -833,6 +837,7 @@ $graph:
         file.
     - name: writable
       type: boolean?
+      default: false
       doc: |
         If true, the file or directory must be writable by the tool.  Changes
         to the file or directory must be isolated and not visible by any other

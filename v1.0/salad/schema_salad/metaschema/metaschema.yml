@@ -164,6 +164,7 @@ $graph:
       doc: "The identifier for this type"
     - name: inVocab
       type: boolean?
+      default: true
       doc: |
         By default or if "true", include the short name of this type in the
         vocabulary (the keys of the JSON-LD context).  If false, do not include
