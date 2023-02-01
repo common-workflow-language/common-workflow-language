@@ -137,7 +137,11 @@ $graph:
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
-      type: string
+      type:
+        type: enum
+        name: ExpressionTool_class
+        symbols:
+          - cwl:ExpressionTool
     - name: expression
       type: [string, Expression]
       doc: |
@@ -547,7 +551,11 @@ $graph:
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
-      type: string
+      type:
+        type: enum
+        name: Workflow_class
+        symbols:
+          - cwl:Workflow
     - name: steps
       doc: |
         The individual steps that make up the workflow.  Each step is executed when all of its
@@ -569,7 +577,11 @@ $graph:
     the `run` field of [WorkflowStep](#WorkflowStep).
   fields:
     - name: "class"
-      type: "string"
+      type:
+        type: enum
+        name: SubworkflowFeatureRequirement_class
+        symbols:
+          - cwl:SubworkflowFeatureRequirement
       doc: "Always 'SubworkflowFeatureRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -583,7 +595,11 @@ $graph:
     `scatterMethod` fields of [WorkflowStep](#WorkflowStep).
   fields:
     - name: "class"
-      type: "string"
+      type:
+        type: enum
+        name: ScatterFeatureRequirement_class
+        symbols:
+          - cwl:ScatterFeatureRequirement
       doc: "Always 'ScatterFeatureRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -597,7 +613,11 @@ $graph:
     listed in the `source` field of [WorkflowStepInput](#WorkflowStepInput).
   fields:
     - name: "class"
-      type: "string"
+      type:
+        type: enum
+        name: MultipleInputFeatureRequirement_class
+        symbols:
+          - cwl:MultipleInputFeatureRequirement
       doc: "Always 'MultipleInputFeatureRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -611,7 +631,11 @@ $graph:
     of [WorkflowStepInput](#WorkflowStepInput).
   fields:
     - name: "class"
-      type: "string"
+      type:
+        type: enum
+        name: StepInputExpressionRequirement_class
+        symbols:
+          - cwl:StepInputExpressionRequirement
       doc: "Always 'StepInputExpressionRequirement'"
       jsonldPredicate:
         "_id": "@type"

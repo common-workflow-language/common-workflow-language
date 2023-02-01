@@ -867,7 +867,11 @@ $graph:
     interpolatation.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: InlineJavascriptRequirement_class
+        symbols:
+          - cwl:InlineJavascriptRequirement
       doc: "Always 'InlineJavascriptRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -893,7 +897,11 @@ $graph:
     to earlier schema definitions.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: SchemaDefRequirement_class
+        symbols:
+          - cwl:SchemaDefRequirement
       doc: "Always 'SchemaDefRequirement'"
       jsonldPredicate:
         "_id": "@type"

@@ -549,7 +549,11 @@ $graph:
       jsonldPredicate:
         "_id": "@type"
         "_type": "@vocab"
-      type: string
+      type:
+        type: enum
+        name: CommandLineTool_class
+        symbols:
+          - cwl:CommandLineTool
     - name: baseCommand
       doc: |
         Specifies the program to execute.  If an array, the first element of
@@ -674,7 +678,11 @@ $graph:
 
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: DockerRequirement_class
+        symbols:
+          - cwl:DockerRequirement
       doc: "Always 'DockerRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -713,7 +721,11 @@ $graph:
     the defined process.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: SoftwareRequirement_class
+        symbols:
+          - cwl:SoftwareRequirement
       doc: "Always 'SoftwareRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -841,7 +853,11 @@ $graph:
     command line tool.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: InitialWorkDirRequirement_class
+        symbols:
+          - cwl:InitialWorkDirRequirement
       doc: InitialWorkDirRequirement
       jsonldPredicate:
         "_id": "@type"
@@ -877,7 +893,11 @@ $graph:
     execution environment of the tool.  See `EnvironmentDef` for details.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: EnvVarRequirement_class
+        symbols:
+          - cwl:EnvVarRequirement
       doc: "Always 'EnvVarRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -903,7 +923,11 @@ $graph:
     the use of shell metacharacters such as `|` for pipes.
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: ShellCommandRequirement_class
+        symbols:
+          - cwl:ShellCommandRequirement
       doc: "Always 'ShellCommandRequirement'"
       jsonldPredicate:
         "_id": "@type"
@@ -937,7 +961,11 @@ $graph:
 
   fields:
     - name: class
-      type: string
+      type:
+        type: enum
+        name: ResourceRequirement_class
+        symbols:
+          - cwl:ResourceRequirement
       doc: "Always 'ResourceRequirement'"
       jsonldPredicate:
         "_id": "@type"
