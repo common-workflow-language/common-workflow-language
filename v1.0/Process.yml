@@ -229,7 +229,10 @@ $graph:
         Optional hash code for validating file integrity.  Currently must be in the form
         "sha1$ + hexadecimal string" using the SHA-1 algorithm.
     - name: size
-      type: long?
+      type:
+        - "null"
+        - int
+        - long
       doc: Optional file size
     - name: "secondaryFiles"
       type:

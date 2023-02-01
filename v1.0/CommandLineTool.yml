@@ -971,7 +971,7 @@ $graph:
         "_id": "@type"
         "_type": "@vocab"
     - name: coresMin
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Minimum reserved number of CPU cores
 
     - name: coresMax
@@ -979,11 +979,11 @@ $graph:
       doc: Maximum reserved number of CPU cores
 
     - name: ramMin
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Minimum reserved RAM in mebibytes (2**20)
 
     - name: ramMax
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Maximum reserved RAM in mebibytes (2**20)
 
     - name: tmpdirMin
@@ -991,13 +991,13 @@ $graph:
       doc: Minimum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
 
     - name: tmpdirMax
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Maximum reserved filesystem based storage for the designated temporary directory, in mebibytes (2**20)
 
     - name: outdirMin
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Minimum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
 
     - name: outdirMax
-      type: ["null", long, string, Expression]
+      type: ["null", int, long, string, Expression]
       doc: Maximum reserved filesystem based storage for the designated output directory, in mebibytes (2**20)
