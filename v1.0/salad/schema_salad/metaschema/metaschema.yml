@@ -20,6 +20,7 @@ $graph:
     - $include: import_include.md
     - $import: map_res.yml
     - $import: typedsl_res.yml
+    - $import: sfdsl_res.yml
 
 - name: "Link_Validation"
   type: documentation
@@ -35,10 +36,40 @@ $graph:
     `noLinkCheck` in the `jsonldPredicate` section of the field schema.
 
 
-- name: "Schema_validation"
+- name: "Schema_Validation"
   type: documentation
-  doc: ""
+  doc: |
+    # Validating a document against a schema
 
+    To validate a document against the schema, first [apply
+    preprocessing](#Document_preprocessing), then, use the following
+    algorithm.
+
+    1. The document root must be an object or a list.  If the document root is an
+       object containing the field `$graph` (which must be a list of
+       objects), then validation applies to each object in the list.
+    2. For each object, attempt to validate as one of the record types
+       flagged with `documentRoot: true`.
+    3. To validate a record, go through `fields` and recursively
+       validate each field of the object.
+    4. For fields with a list of types (type union), go through each
+       type in the list and recursively validate the type.  For the
+       field to be valid, at least one type in the union must be valid.
+    5. Missing fields are considered `null`.  To validate, the allowed types
+       for the field must include `null`
+    6. Primitive types are null, boolean, int, long, float, double,
+       string.  To validate, the value in the document must have one
+       of these type.  For numerics, the value appearing in the
+       document must fit into the specified type.
+    7. To validate an array, the value in the document must be a list,
+       and each item in the list must recursively validate as a type
+       in `items`.
+    8. To validate an enum, the value in the document be a string, and
+       the value must be equal to the short name of one of the values
+       listed in `symbols`.
+    9. As a special case, a field with the `Expression` type validates string values
+      which contain a CWL parameter reference or expression in the form
+      `$(...)` or `${...}`
 
 # - name: "JSON_LD_Context"
 #   type: documentation
@@ -123,7 +154,7 @@ $graph:
         then finally `#foo`.  The first valid URI in the search order shall be
         used as the fully resolved value of the identifier.  The value of the
         refScope field is the specified number of levels from the containing
-        identifer scope before starting the search, so if `refScope: 2` then
+        identifier scope before starting the search, so if `refScope: 2` then
         "baz" and "bar" must be stripped to get the base `#foo` and search
         `#foo/foo` and the `#foo`.  The last scope searched must be the top
         level scope before determining if the identifier cannot be resolved.
@@ -131,7 +162,15 @@ $graph:
       type: boolean?
       doc: |
         Field must be expanded based on the the Schema Salad type DSL.
-
+    - name: secondaryFilesDSL
+      type: boolean?
+      doc: |
+        Field must be expanded based on the the Schema Salad secondary file DSL.
+    - name: subscope
+      type: string?
+      doc: |
+        Append the subscope to the current scope when performing
+        identifier resolution to objects under this field.
 
 - name: SpecializeDef
   type: record
@@ -166,23 +205,24 @@ $graph:
       type: boolean?
       default: true
       doc: |
-        By default or if "true", include the short name of this type in the
-        vocabulary (the keys of the JSON-LD context).  If false, do not include
-        the short name in the vocabulary.
+        If "true" (the default), include the short name of this type
+        in the vocabulary.  The vocabulary are all the symbols (field
+        names and other identifiers, such as classes and enum values)
+        which can be used in the document without a namespace prefix.
+        These are the keys of the JSON-LD context.  If false, do not
+        include the short name in the vocabulary.
+
+        This is useful for specifying schema extensions that will be
+        included in validation without introducing ambiguity by
+        introducing non-standard terms into the vocabulary.
 
 
 - name: DocType
   type: record
+  extends: Documented
   abstract: true
   docParent: "#Schema"
   fields:
-    - name: doc
-      type:
-        - string?
-        - string[]?
-      doc: "A documentation string for this type, or an array of strings which should be concatenated."
-      jsonldPredicate: "rdfs:comment"
-
     - name: docParent
       type: string?
       doc: |
@@ -248,6 +288,13 @@ $graph:
       doc: |
         Annotate this type with linked data context.
       jsonldPredicate: "sld:jsonldPredicate"
+    - name: default
+      type: Any?
+      jsonldPredicate:
+        _id: sld:default
+        noLinkCheck: true
+      doc: |
+        The default value to use for this field if the field is missing or "null".
 
 
 - name: SaladRecordSchema
@@ -262,7 +309,8 @@ $graph:
       type: boolean?
       doc: |
         If true, this record is abstract and may be used as a base for other
-        records, but is not valid on its own.
+        records, but is not valid on its own. Inherited fields may be
+        re-specified to narrow their type.
 
     - name: extends
       type:
@@ -274,7 +322,7 @@ $graph:
         refScope: 1
       doc: |
         Indicates that this record inherits fields from one or more base records.
-
+        Inherited fields may be re-specified to narrow their type.
     - name: specialize
       type:
         - SpecializeDef[]?
@@ -291,7 +339,7 @@ $graph:
 - name: SaladEnumSchema
   docParent: "#Schema"
   type: record
-  extends: [EnumSchema, SchemaDefinedType]
+  extends: [NamedType, EnumSchema, SchemaDefinedType]
   documentRoot: true
   doc: |
     Define an enumerated type.
@@ -308,6 +356,24 @@ $graph:
         Indicates that this enum inherits symbols from a base enum.
 
 
+- name: SaladMapSchema
+  docParent: "#Schema"
+  type: record
+  extends: [NamedType, MapSchema, SchemaDefinedType]
+  documentRoot: true
+  doc: |
+    Define a map type.
+
+
+- name: SaladUnionSchema
+  docParent: "#Schema"
+  type: record
+  extends: [NamedType, UnionSchema, SchemaDefinedType]
+  documentRoot: true
+  doc: |
+    Define a union type.
+
+
 - name: Documentation
   type: record
   docParent: "#Schema"
@@ -320,8 +386,8 @@ $graph:
     - name: type
       doc: "Must be `documentation`"
       type:
-        name: Documentation_symbol
         type: enum
+        name: Documentation_name
         symbols:
           - "sld:documentation"
       jsonldPredicate:
