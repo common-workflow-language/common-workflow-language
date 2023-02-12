@@ -14,6 +14,19 @@ $graph:
   doc: |
     # Schema
 
+- name: Documented
+  type: record
+  abstract: true
+  docParent: "#Schema"
+  fields:
+    - name: doc
+      type:
+        - string?
+        - string[]?
+      doc: "A documentation string for this object, or an array of strings which should be concatenated."
+      jsonldPredicate: "rdfs:comment"
+
+
 - name: PrimitiveType
   type: enum
   symbols:
@@ -26,8 +39,9 @@ $graph:
     - "xsd:string"
   doc:
     - |
-      Salad data types are based on Avro schema declarations.  Refer to the
-      [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
+      Names of salad data types (based on Avro schema declarations).
+
+      Refer to the [Avro schema declaration documentation](https://avro.apache.org/docs/current/spec.html#schemas) for
       detailed information.
     - "null: no value"
     - "boolean: a binary value"
@@ -48,6 +62,7 @@ $graph:
 
 - name: RecordField
   type: record
+  extends: Documented
   doc: A field of a record.
   fields:
     - name: name
@@ -56,18 +71,14 @@ $graph:
       doc: |
         The name of the field
 
-    - name: doc
-      type: string?
-      doc: |
-        A documentation string for this field
-      jsonldPredicate: "rdfs:comment"
-
     - name: type
       type:
         - PrimitiveType
         - RecordSchema
         - EnumSchema
         - ArraySchema
+        - MapSchema
+        - UnionSchema
         - string
         - type: array
           items:
@@ -75,6 +86,8 @@ $graph:
             - RecordSchema
             - EnumSchema
             - ArraySchema
+            - MapSchema
+            - UnionSchema
             - string
       jsonldPredicate:
         _id: sld:type
@@ -91,8 +104,8 @@ $graph:
     type:
       doc: "Must be `record`"
       type:
-        name: Record_symbol
         type: enum
+        name: Record_name
         symbols:
           - "sld:record"
       jsonldPredicate:
@@ -117,8 +130,8 @@ $graph:
     type:
       doc: "Must be `enum`"
       type:
-        name: Enum_symbol
         type: enum
+        name: Enum_name
         symbols:
           - "sld:enum"
       jsonldPredicate:
@@ -126,6 +139,9 @@ $graph:
         _type: "@vocab"
         typeDSL: true
         refScope: 2
+    name:
+      type: string?
+      jsonldPredicate: "@id"
     symbols:
       type: string[]
       jsonldPredicate:
@@ -141,8 +157,8 @@ $graph:
     type:
       doc: "Must be `array`"
       type:
-        name: Array_symbol
         type: enum
+        name: Array_name
         symbols:
           - "sld:array"
       jsonldPredicate:
@@ -156,6 +172,8 @@ $graph:
         - RecordSchema
         - EnumSchema
         - ArraySchema
+        - MapSchema
+        - UnionSchema
         - string
         - type: array
           items:
@@ -163,10 +181,98 @@ $graph:
             - RecordSchema
             - EnumSchema
             - ArraySchema
+            - MapSchema
+            - UnionSchema
             - string
       jsonldPredicate:
         _id: "sld:items"
         _type: "@vocab"
         refScope: 2
-        typeDSL: True
       doc: "Defines the type of the array elements."
+    flatten:
+      type: boolean?
+      jsonldPredicate:
+        _id: "sld:flatten"
+        _type: "@vocab"
+        refScope: 2
+      doc: "Flatten inner array objects into a single sequence (default: true)."
+
+
+- name: MapSchema
+  type: record
+  fields:
+    type:
+      doc: "Must be `map`"
+      type:
+        type: enum
+        name: Map_name
+        symbols:
+          - "sld:map"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+        typeDSL: true
+        refScope: 2
+    values:
+      type:
+        - PrimitiveType
+        - RecordSchema
+        - EnumSchema
+        - ArraySchema
+        - MapSchema
+        - UnionSchema
+        - string
+        - type: array
+          items:
+            - PrimitiveType
+            - RecordSchema
+            - EnumSchema
+            - ArraySchema
+            - MapSchema
+            - UnionSchema
+            - string
+      jsonldPredicate:
+        _id: "sld:values"
+        _type: "@vocab"
+        refScope: 2
+      doc: "Defines the type of the map elements."
+
+
+- name: UnionSchema
+  type: record
+  fields:
+    type:
+      doc: "Must be `union`"
+      type:
+        type: enum
+        name: Union_name
+        symbols:
+          - "sld:union"
+      jsonldPredicate:
+        _id: "sld:type"
+        _type: "@vocab"
+        typeDSL: true
+        refScope: 2
+    names:
+      type:
+        - PrimitiveType
+        - RecordSchema
+        - EnumSchema
+        - ArraySchema
+        - MapSchema
+        - UnionSchema
+        - string
+        - type: array
+          items:
+            - PrimitiveType
+            - RecordSchema
+            - EnumSchema
+            - ArraySchema
+            - MapSchema
+            - UnionSchema
+            - string
+      jsonldPredicate:
+        _id: "sld:names"
+        _type: "@vocab"
+        refScope: 2
+      doc: "Defines the type of the union elements."
