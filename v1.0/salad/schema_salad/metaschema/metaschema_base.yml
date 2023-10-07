@@ -95,7 +95,9 @@ $graph:
         typeDSL: true
         refScope: 2
       doc: |
-        The field type
+        The field type. If it is an array, it indicates
+        that the field type is a union type of its elements.
+        Its elements may be duplicated.
 
 
 - name: RecordSchema

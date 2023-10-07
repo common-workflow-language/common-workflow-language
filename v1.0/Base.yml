@@ -19,19 +19,8 @@ $graph:
 
 - name: CWLArraySchema
   type: record
+  extends: "sld:ArraySchema"
   fields:
-    type:
-      doc: "Must be `array`"
-      type:
-        type: enum
-        name: cwl_array_name
-        symbols:
-          - "sld:array"
-      jsonldPredicate:
-        _id: "sld:type"
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
     items:
       type:
         - PrimitiveType
@@ -54,15 +43,8 @@ $graph:
 
 - name: CWLRecordField
   type: record
-  extends: "sld:Documented"
-  doc: A field of a record.
+  extends: "sld:RecordField"
   fields:
-    - name: name
-      type: string
-      jsonldPredicate: "@id"
-      doc: |
-        The name of the field
-
     - name: type
       type:
         - PrimitiveType
@@ -87,19 +69,8 @@ $graph:
 
 - name: CWLRecordSchema
   type: record
+  extends: "sld:RecordSchema"
   fields:
-    type:
-      doc: "Must be `record`"
-      type:
-        type: enum
-        name: cwl_record_name
-        symbols:
-          - "sld:record"
-      jsonldPredicate:
-        _id: "sld:type"
-        _type: "@vocab"
-        typeDSL: true
-        refScope: 2
     fields:
       type: CWLRecordField[]?
       jsonldPredicate:
