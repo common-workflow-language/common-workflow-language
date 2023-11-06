@@ -191,13 +191,6 @@ $graph:
         _type: "@vocab"
         refScope: 2
       doc: "Defines the type of the array elements."
-    flatten:
-      type: boolean?
-      jsonldPredicate:
-        _id: "sld:flatten"
-        _type: "@vocab"
-        refScope: 2
-      doc: "Flatten inner array objects into a single sequence (default: true)."
 
 
 - name: MapSchema

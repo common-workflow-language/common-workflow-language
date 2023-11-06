@@ -274,6 +274,7 @@ $graph:
       doc: |
         If true, indicates that the type is a valid at the document root.  At
         least one type in a schema must be tagged with `documentRoot: true`.
+      jsonldPredicate: sld:documentRoot
 
 
 - name: SaladRecordField
@@ -368,10 +369,17 @@ $graph:
 - name: SaladUnionSchema
   docParent: "#Schema"
   type: record
-  extends: [NamedType, UnionSchema, SchemaDefinedType]
+  extends: [NamedType, UnionSchema, DocType]
   documentRoot: true
   doc: |
     Define a union type.
+  fields:
+    - name: documentRoot
+      type: boolean?
+      doc: |
+        If true, indicates that the type is a valid at the document root.  At
+        least one type in a schema must be tagged with `documentRoot: true`.
+      jsonldPredicate: sld:documentRoot
 
 
 - name: Documentation
