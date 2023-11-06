@@ -2,13 +2,15 @@
 
 Author:
 
-* Peter Amstutz, Curoverse (now <peter.amstutz@curii.com>)
+* Peter Amstutz <peter.amstutz@curii.com>, Curii Corporation
 
 Contributors:
 
 * The developers of Apache Avro
 * The developers of JSON-LD
 * Nebojša Tijanić <nebojsa.tijanic@sbgenomics.com>, Seven Bridges Genomics
+* Michael R. Crusoe, ELIXIR-DE
+* Iacopo Colonnelli, University of Torino
 
 # Abstract
 
@@ -70,17 +72,38 @@ and RDF schema, and production of RDF triples by applying the JSON-LD
 context.  The schema language also provides for robust support of inline
 documentation.
 
-## Introduction to v1.0
+## Introduction to v1.1
 
-This is the second version of of the Schema Salad specification.  It is
-developed concurrently with v1.0 of the Common Workflow Language for use in
+This is the third version of the Schema Salad specification.  It is
+developed concurrently with v1.1 of the Common Workflow Language for use in
 specifying the Common Workflow Language, however Schema Salad is intended to be
-useful to a broader audience.  Compared to the draft-1 schema salad
+useful to a broader audience.  Compared to the v1.0 schema salad
 specification, the following changes have been made:
 
-* Use of [mapSubject and mapPredicate](#Identifier_maps) to transform maps to lists of records.
-* Resolution of the [domain Specific Language for types](#Domain_Specific_Language_for_types)
-* Consolidation of the formal [schema into section 5](#Schema).
+* Support for `default` values on record fields to specify default values
+* Add subscoped fields (fields which introduce a new inner scope for identifiers)
+* Add the *inVocab* flag (default true) to indicate if a type is added to the vocabulary of well known terms or must be prefixed
+* Add *secondaryFilesDSL* micro DSL (domain specific language) to convert text strings to a secondaryFiles record type used in CWL
+* The `$mixin` feature has been removed from the specification, as it
+  is poorly documented, not included in conformance testing,
+  and not widely supported.
+
+## Introduction to v1.2
+
+This is the fourth version of the Schema Salad specification. It was created to
+ease the development of extensions to CWL v1.2. The only change is that
+inherited records can narrow the types of fields if those fields are re-specified
+with a matching jsonldPredicate.
+
+## Introduction to v1.3
+
+This is the fifth version of the Schema Salad specification. It was created to
+enhance code generation by representing CWL data types as specific Python objects
+(instead of  relying on the generic `Any` type). The following changes have been made:
+
+* Support for the Avro `map` schema
+* Add named versions of the `map` and `union` Avro types
+* Support for nested named `union` type definitions
 
 ## References to Other Specifications
 
@@ -88,7 +111,7 @@ specification, the following changes have been made:
 
 **JSON Linked Data (JSON-LD)**: http://json-ld.org
 
-**YAML**: http://yaml.org
+**YAML**: https://yaml.org/spec/1.2/spec.html
 
 **Avro**: https://avro.apache.org/docs/current/spec.html
 
@@ -109,7 +132,7 @@ the behavior of conforming implementations.
 
 The terminology used to describe Salad documents is defined in the Concepts
 section of the specification. The terms defined in the following list are
-used in building those definitions and in describing the actions of an
+used in building those definitions and in describing the actions of a
 Salad implementation:
 
 **may**: Conforming Salad documents and Salad implementations are permitted but
@@ -157,11 +180,19 @@ by a document schema, where each term maps to absolute URI.
 
 ## Syntax
 
-Conforming Salad documents are serialized and loaded using YAML syntax and
-UTF-8 text encoding.  Salad documents are written using the JSON-compatible
-subset of YAML.  Features of YAML such as headers and type tags that are
-not found in the standard JSON data model must not be used in conforming
-Salad documents.  It is a fatal error if the document is not valid YAML.
+Conforming Salad v1.1 documents are serialized and loaded using a
+subset of YAML 1.2 syntax and UTF-8 text encoding.  Salad documents
+are written using the [JSON-compatible subset of YAML described in
+section 10.2](https://yaml.org/spec/1.2/spec.html#id2803231).  The
+following features of YAML must not be used in conforming Salad
+documents:
+
+* Use of explicit node tags with leading `!` or `!!`
+* Use of anchors with leading `&` and aliases with leading `*`
+* %YAML directives
+* %TAG directives
+
+It is a fatal error if the document is not valid YAML.
 
 A Salad document must consist only of either a single root object or an
 array of objects.
@@ -223,9 +254,9 @@ document schema.  A schema may consist of:
   * Any number of documentation objects which allow in-line documentation of the schema.
 
 The schema for defining a salad schema (the metaschema) is described in
-detail in "Schema validation".
+detail in the [Schema](#Schema) section.
 
-### Record field annotations
+## Record field annotations
 
 In a document schema, record field definitions may include the field
 `jsonldPredicate`, which may be either a string or object.  Implementations
@@ -235,20 +266,56 @@ rules:
   * If the value of `jsonldPredicate` is `@id`, the field is an identifier
   field.
 
-  * If the value of `jsonldPredicate` is an object, and contains that
-  object contains the field `_type` with the value `@id`, the field is a
-  link field.
+  * If the value of `jsonldPredicate` is an object, and that
+  object contains the field `_type` with the value `@id`, the
+  field is a link field.  If the field `jsonldPredicate` also
+  has the field `identity` with the value `true`, the field is
+  resolved with [identifier resolution](#Identifier_resolution).
+  Otherwise it is resolved with [link resolution](#Link_resolution).
 
-  * If the value of `jsonldPredicate` is an object, and contains that
-  object contains the field `_type` with the value `@vocab`, the field is a
-  vocabulary field, which is a subtype of link field.
+  * If the value of `jsonldPredicate` is an object which contains the
+  field `_type` with the value `@vocab`, the field value is subject to
+  [vocabulary resolution](#Vocabulary_resolution).
 
 ## Document traversal
 
-To perform document document preprocessing, link validation and schema
+To perform document preprocessing, link validation and schema
 validation, the document must be traversed starting from the fields or
 array items of the root object or array and recursively visiting each child
 item which contains an object or arrays.
+
+## Short names
+
+The "short name" of a fully qualified identifier is the portion of
+the identifier following the final slash `/` of either the fragment
+identifier following `#` or the path portion, if there is no fragment.
+Some examples:
+
+* the short name of `http://example.com/foo` is `foo`
+* the short name of `http://example.com/#bar` is `bar`
+* the short name of `http://example.com/foo/bar` is `bar`
+* the short name of `http://example.com/foo#bar` is `bar`
+* the short name of `http://example.com/#foo/bar` is `bar`
+* the short name of `http://example.com/foo#bar/baz` is `baz`
+
+## Inheritance and specialization
+
+A record definition may inherit from one or more record definitions
+with the `extends` field.  This copies the fields defined in the
+parent record(s) as the base for the new record.  A record definition
+may `specialize` type declarations of the fields inherited from the
+base record.  For each field inherited from the base record, any
+instance of the type in `specializeFrom` is replaced with the type in
+`specializeTo`.  The type in `specializeTo` should extend from the
+type in `specializeFrom`.
+
+A record definition may be `abstract`.  This means the record
+definition is not used for validation on its own, but may be extended
+by other definitions.  If an abstract type appears in a field
+definition, it is logically replaced with a union of all concrete
+subtypes of the abstract type.  In other words, the field value does
+not validate as the abstract type, but must validate as some concrete
+type that inherits from the abstract type.
 
 # Document preprocessing
 

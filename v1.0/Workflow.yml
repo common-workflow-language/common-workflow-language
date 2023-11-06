@@ -288,6 +288,7 @@ $graph:
         default must be applied prior to scattering or evaluating `valueFrom`.
       jsonldPredicate:
         _id: "cwl:default"
+        _container: "@list"
         noLinkCheck: true
     - name: valueFrom
       type:
