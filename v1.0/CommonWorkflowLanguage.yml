@@ -1,3 +1,4 @@
+saladVersion: v1.3
 $base: "https://w3id.org/cwl/cwl#"
 
 $namespaces:
