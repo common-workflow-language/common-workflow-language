@@ -1,0 +1,250 @@
+$base: http://commonwl.org/cwltool#
+$namespaces:
+  cwl: "https://w3id.org/cwl/cwl#"
+  cwltool: "http://commonwl.org/cwltool#"
+$graph:
+- $import: https://github.com/common-workflow-language/common-workflow-language/raw/codegen/v1.0/CommonWorkflowLanguage.yml
+
+- name: LoadListingRequirement
+  type: record
+  extends: cwl:ProcessRequirement
+  inVocab: false
+  fields:
+    class:
+      type: string
+      doc: "Always 'LoadListingRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    loadListing:
+      type:
+        - type: enum
+          name: LoadListingEnum
+          symbols: [no_listing, shallow_listing, deep_listing]
+
+- name: InplaceUpdateRequirement
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  fields:
+    class:
+      type: string
+      doc: "Always 'InplaceUpdateRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    inplaceUpdate:
+      type: boolean
+
+- name: Secrets
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  fields:
+    class:
+      type: string
+      doc: "Always 'Secrets'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    secrets:
+      type: string[]
+      doc: |
+        List one or more input parameters that are sensitive (such as passwords)
+        which will be deliberately obscured from logging.
+      jsonldPredicate:
+        "_type": "@id"
+        refScope: 0
+
+
+- name: TimeLimit
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  doc: |
+    Set an upper limit on the execution time of a CommandLineTool or
+    ExpressionTool.  A tool execution which exceeds the time limit may
+    be preemptively terminated and considered failed.  May also be
+    used by batch systems to make scheduling decisions.
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'TimeLimit'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: timelimit
+      type: [long, string]
+      doc: |
+        The time limit, in seconds.  A time limit of zero means no
+        time limit.  Negative time limits are an error.
+
+
+- name: WorkReuse
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  doc: |
+    For implementations that support reusing output from past work (on
+    the assumption that same code and same input produce same
+    results), control whether to enable or disable the reuse behavior
+    for a particular tool or step (to accommodate situations where that
+    assumption is incorrect).  A reused step is not executed but
+    instead returns the same output as the original execution.
+
+    If `enableReuse` is not specified, correct tools should assume it
+    is enabled by default.
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'WorkReuse'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: enableReuse
+      type: [boolean, string]
+      #default: true
+
+
+- name: NetworkAccess
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  doc: |
+    Indicate whether a process requires outgoing IPv4/IPv6 network
+    access.  Choice of IPv4 or IPv6 is implementation and site
+    specific, correct tools must support both.
+
+    If `networkAccess` is false or not specified, tools must not
+    assume network access, except for localhost (the loopback device).
+
+    If `networkAccess` is true, the tool must be able to make outgoing
+    connections to network resources.  Resources may be on a private
+    subnet or the public Internet.  However, implementations and sites
+    may apply their own security policies to restrict what is
+    accessible by the tool.
+
+    Enabling network access does not imply a publicly routable IP
+    address or the ability to accept inbound connections.
+
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'NetworkAccess'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: networkAccess
+      type: [boolean, string]
+
+- name: ProcessGenerator
+  type: record
+  inVocab: true
+  extends: cwl:Process
+  documentRoot: true
+  fields:
+    - name: class
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+      type: string
+    - name: run
+      type: [string, cwl:Process]
+      jsonldPredicate:
+        _id: "cwl:run"
+        _type: "@id"
+      doc: |
+        Specifies the process to run.
+
+- name: MPIRequirement
+  type: record
+  inVocab: false
+  extends: cwl:ProcessRequirement
+  doc: |
+    Indicates that a process requires an MPI runtime.
+  fields:
+    - name: class
+      type: string
+      doc: "Always 'MPIRequirement'"
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    - name: processes
+      type: [int, cwl:Expression]
+      doc: |
+        The number of MPI processes to start. If you give a string,
+        this will be evaluated as a CWL Expression and it must
+        evaluate to an integer.
+
+- name: CUDARequirement
+  type: record
+  extends: cwl:ProcessRequirement
+  inVocab: false
+  doc: |
+    Require support for NVIDA CUDA (GPU hardware acceleration).
+  fields:
+    class:
+      type: string
+      doc: 'cwltool:CUDARequirement'
+      jsonldPredicate:
+        _id: "@type"
+        _type: "@vocab"
+    cudaVersionMin:
+      type: string
+      doc: |
+        Minimum CUDA version to run the software, in X.Y format.  This
+        corresponds to a CUDA SDK release.  When running directly on
+        the host (not in a container) the host must have a compatible
+        CUDA SDK (matching the exact version, or, starting with CUDA
+        11.3, matching major version).  When run in a container, the
+        container image should provide the CUDA runtime, and the host
+        driver is injected into the container.  In this case, because
+        CUDA drivers are backwards compatible, it is possible to
+        use an older SDK with a newer driver across major versions.
+
+        See https://docs.nvidia.com/deploy/cuda-compatibility/ for
+        details.
+    cudaComputeCapability:
+      type:
+        - 'string'
+        - 'string[]'
+      doc: |
+        CUDA hardware capability required to run the software, in X.Y
+        format.
+
+        * If this is a single value, it defines only the minimum
+          compute capability.  GPUs with higher capability are also
+          accepted.
+
+        * If it is an array value, then only select GPUs with compute
+          capabilities that explicitly appear in the array.
+    cudaDeviceCountMin:
+      type: ['null', int, cwl:Expression]
+      default: 1
+      doc: |
+        Minimum number of GPU devices to request.  If not specified,
+        same as `cudaDeviceCountMax`.  If neither are specified,
+        default 1.
+    cudaDeviceCountMax:
+      type: ['null', int, cwl:Expression]
+      doc: |
+        Maximum number of GPU devices to request.  If not specified,
+        same as `cudaDeviceCountMin`.
+- name: ShmSize
+  type: record
+  extends: cwl:ProcessRequirement
+  inVocab: false
+  fields:
+    class:
+      type: string
+      doc: 'cwltool:ShmSize'
+      jsonldPredicate:
+        "_id": "@type"
+        "_type": "@vocab"
+    shmSize:
+      type: string
+      doc: |
+        Size of /dev/shm. The format is `<number><unit>`. <number> must be greater
+        than 0. Unit is optional and can be `b` (bytes), `k` (kilobytes), `m`
+        (megabytes), or `g` (gigabytes). If you omit the unit, the default is
+        bytes. If you omit the size entirely, the value is `64m`."
