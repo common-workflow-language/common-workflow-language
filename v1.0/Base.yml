@@ -237,7 +237,7 @@ $graph:
       doc: |
         The basename root such that `nameroot + nameext == basename`, and
         `nameext` is empty or begins with a period and contains at most one
-        period.  For the purposess of path splitting leading periods on the
+        period.  For the purposes of path splitting leading periods on the
         basename are ignored; a basename of `.cshrc` will have a nameroot of
         `.cshrc`.
 
@@ -286,10 +286,10 @@ $graph:
         noLinkCheck: true
       doc: |
         The format of the file: this must be an IRI of a concept node that
-        represents the file format, preferrably defined within an ontology.
+        represents the file format, preferably defined within an ontology.
         If no ontology is available, file formats may be tested by exact match.
 
-        Reasoning about format compatability must be done by checking that an
+        Reasoning about format compatibility must be done by checking that an
         input file format is the same, `owl:equivalentClass` or
         `rdfs:subClassOf` the format required by the input parameter.
         `owl:equivalentClass` is transitive with `rdfs:subClassOf`, e.g. if
@@ -350,7 +350,7 @@ $graph:
     the same Directory.
 
     When executing a CommandLineTool, Directories must be recursively staged
-    first and have local values of `path` assigend.
+    first and have local values of `path` assigned.
 
     Directory objects in CommandLineTool output must provide either a
     `location` URI or a `path` property in the context of the tool execution
