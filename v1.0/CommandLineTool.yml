@@ -391,46 +391,36 @@ $graph:
     - specializeFrom: OutputBinding
       specializeTo: CommandOutputBinding
 
+- name: CommandInputParameterType
+  type: union
+  names:
+    - CWLType
+    - CommandInputRecordSchema
+    - CommandInputEnumSchema
+    - CommandInputArraySchema
+    - string
+    - type: array
+      items:
+        - CWLType
+        - CommandInputRecordSchema
+        - CommandInputEnumSchema
+        - CommandInputArraySchema
+        - string
+  doc: |
+    Type schema for the CWL `CommandInputParameter` class.
 
 - type: record
   name: CommandInputParameter
   extends: InputParameter
   doc: An input parameter for a CommandLineTool.
   specialize:
-    - specializeFrom: InputRecordSchema
-      specializeTo: CommandInputRecordSchema
-    - specializeFrom: InputEnumSchema
-      specializeTo: CommandInputEnumSchema
-    - specializeFrom: InputArraySchema
-      specializeTo: CommandInputArraySchema
     - specializeFrom: InputBinding
       specializeTo: CommandLineBinding
-
-- type: record
-  name: CommandOutputParameter
-  extends: OutputParameter
-  doc: An output parameter for a CommandLineTool.
-  specialize:
-    - specializeFrom: OutputBinding
-      specializeTo: CommandOutputBinding
   fields:
     - name: type
       type:
         - "null"
-        - CWLType
-        - stdout
-        - stderr
-        - CommandOutputRecordSchema
-        - CommandOutputEnumSchema
-        - CommandOutputArraySchema
-        - string
-        - type: array
-          items:
-            - CWLType
-            - CommandOutputRecordSchema
-            - CommandOutputEnumSchema
-            - CommandOutputArraySchema
-            - string
+        - CommandInputParameterType
       jsonldPredicate:
         "_id": "sld:type"
         "_type": "@vocab"
@@ -534,6 +524,45 @@ $graph:
     stderr: random_stderr_filenameABCDEFG
     ```
 
+- name: CommandOutputParameterType
+  type: union
+  names:
+    - CWLType
+    - stdout
+    - stderr
+    - CommandOutputRecordSchema
+    - CommandOutputEnumSchema
+    - CommandOutputArraySchema
+    - string
+    - type: array
+      items:
+        - CWLType
+        - CommandOutputRecordSchema
+        - CommandOutputEnumSchema
+        - CommandOutputArraySchema
+        - string
+  doc: |
+    Type schema for the CWL `CommandInputParameter` class.
+
+- type: record
+  name: CommandOutputParameter
+  extends: OutputParameter
+  doc: An output parameter for a CommandLineTool.
+  specialize:
+    - specializeFrom: OutputBinding
+      specializeTo: CommandOutputBinding
+  fields:
+    - name: type
+      type:
+        - "null"
+        - CommandOutputParameterType
+      jsonldPredicate:
+        "_id": "sld:type"
+        "_type": "@vocab"
+        refScope: 2
+        typeDSL: True
+      doc: |
+        Specify valid types of data that may be assigned to this parameter.
 
 - type: record
   name: CommandLineTool

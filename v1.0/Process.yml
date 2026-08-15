@@ -217,6 +217,23 @@ $graph:
       type: InputBinding?
       jsonldPredicate: "cwl:inputBinding"
 
+- name: InputParameterType
+  type: union
+  names:
+    - CWLType
+    - InputRecordSchema
+    - InputEnumSchema
+    - InputArraySchema
+    - string
+    - type: array
+      items:
+        - CWLType
+        - InputRecordSchema
+        - InputEnumSchema
+        - InputArraySchema
+        - string
+  doc: |
+    Type schema for the CWL `WorkflowInputParameter` class.
 
 - name: OutputRecordField
   type: record
@@ -272,6 +289,23 @@ $graph:
       type: OutputBinding?
       jsonldPredicate: "cwl:outputBinding"
 
+- name: OutputParameterType
+  type: union
+  names:
+    - CWLType
+    - OutputRecordSchema
+    - OutputEnumSchema
+    - OutputArraySchema
+    - string
+    - type: array
+      items:
+        - CWLType
+        - OutputRecordSchema
+        - OutputEnumSchema
+        - OutputArraySchema
+        - string
+  doc: |
+    Type schema for the CWL `WorkflowOutputParameter` class.
 
 - name: InputParameter
   type: record
@@ -325,18 +359,7 @@ $graph:
     - name: type
       type:
         - "null"
-        - CWLType
-        - InputRecordSchema
-        - InputEnumSchema
-        - InputArraySchema
-        - string
-        - type: array
-          items:
-            - CWLType
-            - InputRecordSchema
-            - InputEnumSchema
-            - InputArraySchema
-            - string
+        - InputParameterType
       jsonldPredicate:
         "_id": "sld:type"
         "_type": "@vocab"

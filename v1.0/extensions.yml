@@ -3,7 +3,7 @@ $namespaces:
   cwl: "https://w3id.org/cwl/cwl#"
   cwltool: "http://commonwl.org/cwltool#"
 $graph:
-- $import: https://github.com/common-workflow-language/common-workflow-language/raw/codegen/v1.0/CommonWorkflowLanguage.yml
+- $import: CommonWorkflowLanguage.yml
 
 - name: LoadListingRequirement
   type: record
